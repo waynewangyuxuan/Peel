@@ -1,0 +1,20 @@
+{
+  "acceptance_ids": [
+    "adapter-verification"
+  ],
+  "evidence_id": "evidence-adapter-verification",
+  "kind": "ticket_evidence",
+  "origin": "agent",
+  "recorded_at": "2026-08-25T21:42:00Z",
+  "refs": [
+    "packages/codex-app-server/VERIFICATION.md",
+    "packages/codex-app-server/test/live-smoke.ts",
+    "packages/codex-app-server/test/transport.test.ts",
+    "packages/codex-app-server/test/client.test.ts",
+    "packages/codex-app-server/test/reducer.test.ts",
+    "command:cd packages/codex-app-server && npm run test:live"
+  ],
+  "schema_version": 1,
+  "summary": "The strict TypeScript build and 17 fixture tests passed, including handshake-bound startup detection and reconnect thread/resume coverage. The opt-in real smoke passed after the fixes against Codex 0.149.0, observing four status events and an aggregate diff while proving list/search/read/name/Turn plus Fork at exact completed lastTurnId; it created and deleted only its two captured test Thread IDs and temporary Git repository, with no Project API or approval request.",
+  "ticket_id": "ticket-build-appserver-adapter"
+}

@@ -1,0 +1,23 @@
+{
+  "accepted_acceptance_ids": [
+    "transport-handshake",
+    "thread-client-mainline",
+    "reconstructable-reducer",
+    "capability-matrix",
+    "adapter-verification"
+  ],
+  "closed_at": "2026-08-25T21:06:41Z",
+  "evidence_ids": [
+    "evidence-appserver-transport",
+    "evidence-thread-client-mainline",
+    "evidence-reconstructable-reducer",
+    "evidence-capability-matrix",
+    "evidence-adapter-verification"
+  ],
+  "kind": "ticket_outcome",
+  "schema_version": 1,
+  "status": "successful",
+  "summary": "Independent re-adjudication accepted all five criteria. The transport performs the required initialize/initialized handshake with correlated JSON-RPC, stderr separation, reconnect, and no implicit request replay. The typed client covers the required Thread and Turn mainline, exact completed-turn fork, approvals, and reconnect resubscription through thread/resume before authoritative rebuild. The reducer reconstructs UI state deterministically from authoritative snapshots plus supported notifications without shadow transcript ownership. Capability state is now bound to the transport's exact initialize.experimentalApi value, detects stable and experimental methods from the same resolved Codex executable at startup with explicit fallback and runtime downgrade, and leaves unimplemented optional product concepts unavailable. Independent verification passed 17/17 fixture tests, the installed-schema check for 10 methods and 8 notifications, project and Ticket validation, and a real opt-in App Server smoke covering initialize, startup schema detection, list/search/read, create/turn/interrupt/read, exact-turn fork, rename, reconnect-resume, status events, aggregate diff, and cleanup.",
+  "ticket_id": "ticket-build-appserver-adapter",
+  "unresolved_acceptance_ids": []
+}

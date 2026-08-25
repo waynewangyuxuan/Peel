@@ -1,0 +1,18 @@
+{
+  "acceptance_ids": [
+    "transport-handshake"
+  ],
+  "evidence_id": "evidence-appserver-transport",
+  "kind": "ticket_evidence",
+  "origin": "agent",
+  "recorded_at": "2026-08-25T21:42:00Z",
+  "refs": [
+    "packages/codex-app-server/src/transport.ts",
+    "packages/codex-app-server/test/transport.test.ts",
+    "packages/codex-app-server/VERIFICATION.md",
+    "command:cd packages/codex-app-server && npm test"
+  ],
+  "schema_version": 1,
+  "summary": "AppServerTransport owns the allowlisted local stdio child process, initialize/initialized handshake, request correlation and timeouts, local AbortSignal cancellation, stderr/protocol/RPC errors, server requests and responses, graceful SIGTERM/SIGKILL shutdown, and bounded reconnect. Seventeen fixture tests prove pending requests reject on disconnect and writes are never replayed.",
+  "ticket_id": "ticket-build-appserver-adapter"
+}

@@ -1,0 +1,18 @@
+{
+  "acceptance_ids": [
+    "thread-client-mainline"
+  ],
+  "evidence_id": "evidence-thread-client-mainline",
+  "kind": "ticket_evidence",
+  "origin": "agent",
+  "recorded_at": "2026-08-25T21:42:00Z",
+  "refs": [
+    "packages/codex-app-server/src/client.ts",
+    "packages/codex-app-server/src/protocol.ts",
+    "packages/codex-app-server/test/client.test.ts",
+    "packages/codex-app-server/VERIFICATION.md"
+  ],
+  "schema_version": 1,
+  "summary": "The typed client exposes list/search/read/resume, Thread start, exact completed-lastTurnId Fork, Turn start/interrupt, name, delete, status/event subscriptions, method-specific approval responses, aggregate diff access, and reconnect resubscription via thread/resume before reducer rebuild. The live smoke exercised list/search/read/name/status/diff/turn and exact-turn Fork against Codex 0.149.0.",
+  "ticket_id": "ticket-build-appserver-adapter"
+}
