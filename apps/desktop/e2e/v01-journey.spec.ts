@@ -370,6 +370,35 @@ test("real Thread-first Fork loop, recovery surfaces, scale, and restart", async
   await page.waitForTimeout(420);
   await expect(page.locator(".thread-name")).toHaveText("Overview branch name");
   expect(await page.locator(".transcript").evaluate((element) => element.scrollTop)).toBeGreaterThanOrEqual(Math.max(0, childScroll - 3));
+
+  await page.locator(".transcript").evaluate((element) => {
+    element.scrollTop = 0;
+    element.dispatchEvent(new Event("scroll"));
+  });
+  await page.waitForTimeout(700);
+  await page.locator('.turn[data-turn-id="turn-3"] .turn-actions button').click();
+  await page.locator(".fork-surface textarea").fill("Grandchild verifies exact long-turn return");
+  await page.getByRole("button", { name: "Create & send" }).click();
+  await expect(page.locator(".lineage-tree button")).toHaveCount(3);
+  await page.locator(".branched-from").click();
+  const exactLongParentTurn = page.locator('.turn.highlighted[data-turn-id="turn-3"]');
+  await expect(exactLongParentTurn).toBeVisible();
+  await page.waitForTimeout(500);
+  const longParentTurn = page.locator('.turn[data-turn-id="turn-3"]');
+  const exactReturn = await longParentTurn.evaluate((element) => {
+    const bounds = element.getBoundingClientRect();
+    const viewport = element.closest(".transcript")!.getBoundingClientRect();
+    return {
+      highlighted: element.classList.contains("highlighted"),
+      visible: bounds.bottom > viewport.top && bounds.top < viewport.bottom,
+      turnTop: bounds.top,
+      turnBottom: bounds.bottom,
+      viewportTop: viewport.top,
+      viewportBottom: viewport.bottom,
+    };
+  });
+  expect(exactReturn).toMatchObject({ highlighted: true, visible: true });
+
   await page.getByLabel("Message").fill("Close-fast draft survives without waiting for debounce");
   await app!.close();
   app = null;
@@ -382,7 +411,7 @@ test("real Thread-first Fork loop, recovery surfaces, scale, and restart", async
   scaleState.viewMode = "overview";
   const scaleSpace = scaleState.spaces[firstSpaceId]!;
   const root = scaleSpace.nodes[scaleSpace.rootThreadId]!;
-  for (let index = 0; index < 47; index += 1) {
+  for (let index = 0; index < 46; index += 1) {
     const id = `synthetic-${index}`;
     scaleSpace.nodes[id] = { ...root, threadId: id, parentThreadId: scaleSpace.rootThreadId, forkedAtTurnId: "turn-2", createdAt: Date.now() + index, position: suggestedChildPosition(scaleSpace, scaleSpace.rootThreadId), title: `Scale direction ${index}`, titleOrigin: "automatic", lastViewedTurnId: null };
   }
@@ -395,7 +424,7 @@ test("real Thread-first Fork loop, recovery surfaces, scale, and restart", async
   app = null;
   await launch();
   await expect(page.locator(".overview-card")).toHaveCount(50);
-  await expect(page.getByText("Scale direction 46")).toBeAttached();
+  await expect(page.getByText("Scale direction 45")).toBeAttached();
   await expect(page.locator(".status-dot.failed")).toBeAttached();
   await expect(page.locator(".overview-edges path")).toHaveCount(49);
   await page.getByRole("button", { name: "Fit", exact: true }).click();
@@ -416,11 +445,11 @@ test("real Thread-first Fork loop, recovery surfaces, scale, and restart", async
   });
   expect(fitResult).toEqual({ cardsFit: true, pathsFit: true });
   await page.screenshot({ path: join(desktopRoot, "test-results/overview-50.png") });
-  const lateCard = page.locator(".overview-card").filter({ hasText: "Scale direction 46" });
+  const lateCard = page.locator(".overview-card").filter({ hasText: "Scale direction 45" });
   await lateCard.getByRole("button", { name: "Open" }).click();
-  await expect(page.locator(".thread-name")).toHaveText("Scale direction 46");
+  await expect(page.locator(".thread-name")).toHaveText("Scale direction 45");
   await page.locator(".segmented button").nth(1).click();
-  await page.locator(".overview-card").filter({ hasText: "Overview branch name" }).getByRole("button", { name: "Open" }).click();
+  await page.locator(".overview-card").filter({ has: page.getByRole("heading", { name: "Overview branch name", exact: true }) }).getByRole("button", { name: "Open" }).click();
   await expect(page.getByLabel("Message")).toHaveValue("Close-fast draft survives without waiting for debounce");
   await page.screenshot({ path: join(desktopRoot, "test-results/focus-restored.png") });
   await writeFile(join(repository, "DIFF_TEST.md"), "diff drawer exact file and patch\n");

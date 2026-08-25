@@ -15,6 +15,8 @@ interface TranscriptProps {
   draft: string;
   approvals: AppServerServerRequest[];
   highlightTurnId: string | null;
+  restoreScrollTop: number;
+  onHighlightScrolled(turnId: string): void;
   onDraft(value: string): void;
   onScroll(value: number): void;
   onSend(input: UserInput[]): Promise<void>;
@@ -32,6 +34,8 @@ export function Transcript({
   draft,
   approvals,
   highlightTurnId,
+  restoreScrollTop,
+  onHighlightScrolled,
   onDraft,
   onScroll,
   onSend,
@@ -49,6 +53,8 @@ export function Transcript({
   const mounted = useRef(true);
   const draftRef = useRef(draft);
   const followBottom = useRef(true);
+  const restoredScroll = useRef(false);
+  const acknowledgedHighlight = useRef<string | null>(null);
   draftRef.current = draft;
 
   useEffect(() => () => {
@@ -65,10 +71,29 @@ export function Transcript({
     element.scrollTop = element.scrollHeight;
   }, [thread, reduced]);
 
-  useEffect(() => {
-    if (!highlightTurnId) return;
-    document.querySelector(`[data-turn-id="${CSS.escape(highlightTurnId)}"]`)?.scrollIntoView({ block: "center" });
-  }, [highlightTurnId]);
+  useLayoutEffect(() => {
+    const element = scroller.current;
+    if (!element) return;
+    if (!highlightTurnId) {
+      acknowledgedHighlight.current = null;
+      if (restoredScroll.current) return;
+      element.scrollTop = restoreScrollTop;
+      followBottom.current = element.scrollHeight - element.scrollTop - element.clientHeight < 56;
+      restoredScroll.current = true;
+      return;
+    }
+    if (acknowledgedHighlight.current === highlightTurnId) return;
+    const target = element.querySelector<HTMLElement>(`[data-turn-id="${CSS.escape(highlightTurnId)}"]`);
+    if (!target) return;
+    target.scrollIntoView({ block: "center" });
+    followBottom.current = element.scrollHeight - element.scrollTop - element.clientHeight < 56;
+    restoredScroll.current = true;
+    const viewport = element.getBoundingClientRect();
+    const targetBounds = target.getBoundingClientRect();
+    if (targetBounds.bottom <= viewport.top || targetBounds.top >= viewport.bottom) return;
+    acknowledgedHighlight.current = highlightTurnId;
+    onHighlightScrolled(highlightTurnId);
+  }, [highlightTurnId, onHighlightScrolled, restoreScrollTop, thread.id]);
 
   const submit = async (): Promise<void> => {
     const text = draft.trim();

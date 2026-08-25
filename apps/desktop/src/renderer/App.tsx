@@ -22,12 +22,13 @@ export function App(): ReactNode {
   const [forkDraft, setForkDraft] = useState<ForkDraft | null>(null);
   const [forkError, setForkError] = useState<string | null>(null);
   const [forkBusy, setForkBusy] = useState(false);
-  const [highlightTurnId, setHighlightTurnId] = useState<string | null>(null);
+  const [highlightTarget, setHighlightTarget] = useState<{ threadId: string; turnId: string } | null>(null);
   const [showThreadPicker, setShowThreadPicker] = useState(false);
   const [showDiff, setShowDiff] = useState(false);
   const [toast, setToast] = useState<string | null>(null);
   const refreshTimers = useRef(new Map<string, number>());
   const refreshPending = useRef(new Set<string>());
+  const highlightTimer = useRef<number | null>(null);
 
   const installState = useCallback((next: PeelState): void => {
     stateRef.current = next;
@@ -109,7 +110,13 @@ export function App(): ReactNode {
       saveTimer.current = null;
       await window.peel.saveState(stateRef.current);
     });
-    return () => { offConnection(); offNotification(); offRequest(); offFlush(); };
+    return () => {
+      offConnection();
+      offNotification();
+      offRequest();
+      offFlush();
+      if (highlightTimer.current !== null) window.clearTimeout(highlightTimer.current);
+    };
   }, [installState, mutate, readThread]);
 
   const activeSpace = state?.activeSpaceId ? state.spaces[state.activeSpaceId] ?? null : null;
@@ -120,7 +127,6 @@ export function App(): ReactNode {
     if (!connected || !activeNode) return;
     const threadId = activeNode.threadId;
     let cancelled = false;
-    let scrollTimer: number | null = null;
     void readThread(threadId).then((snapshot) => {
       if (cancelled || stateRef.current.activeThreadId !== threadId || stateRef.current.viewMode !== "focus") return;
       const latest = latestCompletedTurn(snapshot.thread);
@@ -130,17 +136,8 @@ export function App(): ReactNode {
       if (latest && node && node.lastViewedTurnId !== latest.id) {
         mutate((draft) => { draft.spaces[spaceId!]!.nodes[threadId]!.lastViewedTurnId = latest.id; }, 500);
       }
-      const scroll = stateRef.current.threadViews[threadId]?.scrollTop ?? 0;
-      scrollTimer = window.setTimeout(() => {
-        if (cancelled || stateRef.current.activeThreadId !== threadId || stateRef.current.viewMode !== "focus") return;
-        const element = document.querySelector<HTMLElement>(".transcript");
-        if (element) element.scrollTop = scroll;
-      }, 0);
     }).catch((error) => setToast(messageOf(error)));
-    return () => {
-      cancelled = true;
-      if (scrollTimer !== null) window.clearTimeout(scrollTimer);
-    };
+    return () => { cancelled = true; };
   }, [activeNode?.threadId, connected, mutate, readThread]);
 
   useEffect(() => {
@@ -174,12 +171,23 @@ export function App(): ReactNode {
   if (!state) return <div className="launch-screen"><div className="peel-mark">P</div><span>Opening Peel…</span></div>;
 
   const selectThread = (threadId: string, focusTurnId?: string): void => {
+    if (highlightTimer.current !== null) {
+      window.clearTimeout(highlightTimer.current);
+      highlightTimer.current = null;
+    }
     mutate((draft) => {
       draft.activeThreadId = threadId;
       draft.viewMode = "focus";
     }, 0);
-    setHighlightTurnId(focusTurnId ?? null);
-    window.setTimeout(() => setHighlightTurnId(null), 1800);
+    setHighlightTarget(focusTurnId ? { threadId, turnId: focusTurnId } : null);
+  };
+
+  const acknowledgeHighlightScroll = (threadId: string, turnId: string): void => {
+    if (highlightTimer.current !== null) window.clearTimeout(highlightTimer.current);
+    highlightTimer.current = window.setTimeout(() => {
+      highlightTimer.current = null;
+      setHighlightTarget((current) => current?.threadId === threadId && current.turnId === turnId ? null : current);
+    }, 1800);
   };
 
   const beginFork = (turnId: string): void => {
@@ -303,7 +311,9 @@ export function App(): ReactNode {
             diff={diffs[activeNode.threadId] ?? null}
             draft={currentDraft}
             approvals={approvals.filter((request) => (request.params as Record<string, unknown>).threadId === activeNode.threadId)}
-            highlightTurnId={highlightTurnId}
+            highlightTurnId={highlightTarget?.threadId === activeNode.threadId ? highlightTarget.turnId : null}
+            restoreScrollTop={state.threadViews[activeNode.threadId]?.scrollTop ?? 0}
+            onHighlightScrolled={(turnId) => acknowledgeHighlightScroll(activeNode.threadId, turnId)}
             onDraft={(value) => mutate((draft) => {
               const current = draft.threadViews[activeNode.threadId] ?? { draft: "", scrollTop: 0 };
               draft.threadViews[activeNode.threadId] = { ...current, draft: value };
