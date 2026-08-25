@@ -1,0 +1,159 @@
+#!/usr/bin/env node
+import { appendFileSync, existsSync, unlinkSync } from "node:fs";
+import { join } from "node:path";
+import readline from "node:readline";
+
+const now = Math.floor(Date.now() / 1000);
+const cwd = process.env.TMPDIR || process.cwd();
+const logPath = process.env.TMPDIR ? join(process.env.TMPDIR, "peel-mock-rpc.jsonl") : null;
+const log = (event) => { if (logPath) appendFileSync(logPath, `${JSON.stringify(event)}\n`); };
+const item = (type, id, text, extra = {}) => ({ type, id, text, ...extra });
+const turn = (id, prompt, answer) => ({
+  id,
+  items: [item("userMessage", `${id}-u`, prompt), item("agentMessage", `${id}-a`, answer)],
+  status: "completed",
+  error: null,
+  startedAt: now - 30,
+  completedAt: now - 29,
+  durationMs: 1000,
+});
+const root = {
+  id: "thread-root",
+  sessionId: "session-root",
+  forkedFromId: null,
+  parentThreadId: null,
+  preview: "Design a spatial workspace for branching Codex conversations",
+  ephemeral: false,
+  projectId: "ignored-project",
+  modelProvider: "openai",
+  createdAt: now - 100,
+  updatedAt: now - 20,
+  recencyAt: now - 20,
+  status: { type: "idle" },
+  path: null,
+  cwd,
+  cliVersion: "test",
+  source: "mock",
+  threadSource: null,
+  agentNickname: null,
+  agentRole: null,
+  gitInfo: null,
+  name: "Spatial product direction",
+  turns: [
+    turn("turn-1", "Map the core navigation", "## Direction\nUse a **full-fidelity** Focus view and a spatial Overview.\n- Keep `chat` in screen space."),
+    { ...turn("turn-2", "Make Forks trustworthy", "Create a local draft first, then fork on the first send."), items: [
+      item("userMessage", "turn-2-u", "Make Forks trustworthy"),
+      item("agentMessage", "turn-2-a", "Create a local draft first, then fork on the first send."),
+      item("commandExecution", "turn-2-command", "npm test\nAll checks passed", { status: "completed", command: "npm test" }),
+      item("fileChange", "turn-2-files", "", { changes: [{ path: "src/focus.tsx", diff: "+ renderFocus()" }] }),
+      item("subAgentActivity", "turn-2-subagent", "Inspect deterministic card fields", { status: "running" }),
+      item("error", "turn-2-error", "A recoverable fixture error"),
+      item("futureCapability", "turn-2-x", "A future Codex item remains visible through a safe fallback."),
+    ] },
+  ],
+};
+const threads = new Map([[root.id, root]]);
+let childIndex = 0;
+let requestIndex = 90;
+
+const send = (message) => process.stdout.write(`${JSON.stringify(message)}\n`);
+const notify = (method, params) => send({ method, params });
+
+const reader = readline.createInterface({ input: process.stdin });
+reader.on("line", (line) => {
+  const message = JSON.parse(line);
+  if (!message.id) return;
+  const { id, method, params = {} } = message;
+  log({ method, params });
+  if (method === "initialize") return send({ id, result: { userAgent: "peel-e2e", platform: "darwin" } });
+  if (method === "thread/list") {
+    const search = String(params.searchTerm || "").toLowerCase();
+    const data = [...threads.values()].filter((thread) => !search || `${thread.name} ${thread.preview}`.toLowerCase().includes(search));
+    return send({ id, result: { data, nextCursor: null, backwardsCursor: null } });
+  }
+  if (method === "thread/read" || method === "thread/resume") {
+    const thread = threads.get(params.threadId) || restoreTestChild(params.threadId);
+    return thread ? send({ id, result: method === "thread/read" ? { thread } : startResponse(thread) }) : send({ id, error: { code: -32004, message: "Unknown test Thread" } });
+  }
+  if (method === "thread/fork") {
+    const failForkMarker = process.env.TMPDIR ? join(process.env.TMPDIR, "fail-fork") : null;
+    if (failForkMarker && existsSync(failForkMarker)) {
+      unlinkSync(failForkMarker);
+      return send({ id, error: { code: -32060, message: "Forced Fork failure for recovery testing" } });
+    }
+    const parent = threads.get(params.threadId);
+    if (!parent) return send({ id, error: { code: -32004, message: "Unknown parent" } });
+    const lastIndex = parent.turns.findIndex((candidate) => candidate.id === params.lastTurnId);
+    if (lastIndex < 0 || parent.turns[lastIndex].status !== "completed") return send({ id, error: { code: -32005, message: "Fork Turn must be completed" } });
+    const childId = `thread-child-${++childIndex}`;
+    const child = { ...structuredClone(parent), id: childId, sessionId: `session-${childId}`, name: null, preview: "", cwd: params.cwd || parent.cwd, forkedFromId: parent.id, parentThreadId: parent.id, createdAt: now, updatedAt: now, turns: structuredClone(parent.turns.slice(0, lastIndex + 1)) };
+    threads.set(childId, child);
+    return send({ id, result: startResponse(child) });
+  }
+  if (method === "thread/name/set") {
+    const thread = threads.get(params.threadId);
+    if (thread) thread.name = params.name;
+    send({ id, result: {} });
+    return notify("thread/name/updated", { threadId: params.threadId, name: params.name });
+  }
+  if (method === "turn/start") {
+    const failTurnMarker = process.env.TMPDIR ? join(process.env.TMPDIR, "fail-turn") : null;
+    if (failTurnMarker && existsSync(failTurnMarker)) {
+      unlinkSync(failTurnMarker);
+      return send({ id, error: { code: -32061, message: "Forced First Turn failure for recovery testing" } });
+    }
+    const thread = threads.get(params.threadId);
+    if (!thread) return send({ id, error: { code: -32004, message: "Unknown Thread" } });
+    const textInput = params.input.find((candidate) => candidate.type === "text");
+    const turnId = `turn-${thread.turns.length + 1}`;
+    const started = { id: turnId, items: [], status: "inProgress", error: null, startedAt: now, completedAt: null, durationMs: null };
+    thread.turns.push(started);
+    thread.status = { type: "active", activeFlags: [] };
+    send({ id, result: { turn: started } });
+    notify("turn/started", { threadId: thread.id, turn: started });
+    const user = item("userMessage", `${turnId}-u`, textInput?.text || "Attachment");
+    started.items.push(user);
+    notify("item/started", { threadId: thread.id, turnId, item: user });
+    notify("item/completed", { threadId: thread.id, turnId, item: user });
+    const agent = item("agentMessage", `${turnId}-a`, "");
+    started.items.push(agent);
+    notify("item/started", { threadId: thread.id, turnId, item: agent });
+    setTimeout(() => notify("item/agentMessage/delta", { threadId: thread.id, turnId, itemId: agent.id, delta: "A streamed result for this direction." }), 35);
+    setTimeout(() => {
+      agent.text = "A streamed result for this direction.";
+      notify("item/completed", { threadId: thread.id, turnId, item: agent });
+      started.status = "completed";
+      started.completedAt = now + 1;
+      started.durationMs = 1000;
+      thread.status = { type: "active", activeFlags: ["waitingOnApproval"] };
+      notify("turn/completed", { threadId: thread.id, turn: started });
+      notify("thread/status/changed", { threadId: thread.id, status: thread.status });
+      send({ id: ++requestIndex, method: "item/commandExecution/requestApproval", params: { threadId: thread.id, turnId, command: "npm test" } });
+    }, 300);
+    return;
+  }
+  if (method === "turn/interrupt" || method === "thread/delete") return send({ id, result: {} });
+  return send({ id, error: { code: -32601, message: `Unsupported mock method: ${method}` } });
+});
+
+function startResponse(thread) {
+  return { thread, model: "gpt-test", modelProvider: "openai", serviceTier: null, cwd: thread.cwd, instructionSources: [], approvalPolicy: "on-request", approvalsReviewer: null, sandbox: "workspace-write", reasoningEffort: "medium" };
+}
+
+function restoreTestChild(threadId) {
+  if (!String(threadId).startsWith("thread-child-")) return null;
+  const child = {
+    ...structuredClone(root),
+    id: threadId,
+    sessionId: `session-${threadId}`,
+    name: "Try a compact navigation di…",
+    preview: "Try a compact navigation direction",
+    forkedFromId: root.id,
+    parentThreadId: root.id,
+    createdAt: now,
+    updatedAt: now,
+    turns: [...structuredClone(root.turns), turn("turn-3", "Try a compact navigation direction", "A streamed result for this direction.")],
+  };
+  threads.set(threadId, child);
+  return child;
+}

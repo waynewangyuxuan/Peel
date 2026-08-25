@@ -1,5 +1,7 @@
 node_modules/
 out/
 dist/
+**/native/bin/
+test-results/
+playwright-report/
 .DS_Store
-

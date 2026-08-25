@@ -1,0 +1,16 @@
+import { describe, expect, it } from "vitest";
+
+import { encodeWav } from "../src/renderer/audio";
+
+describe("voice dictation recording", () => {
+  it("encodes captured microphone PCM as a real mono WAV boundary", () => {
+    const wav = encodeWav([new Float32Array([0, .5, -1, 1])], 16_000);
+    const bytes = new Uint8Array(wav);
+    const view = new DataView(wav);
+    expect(new TextDecoder().decode(bytes.slice(0, 4))).toBe("RIFF");
+    expect(new TextDecoder().decode(bytes.slice(8, 12))).toBe("WAVE");
+    expect(view.getUint16(22, true)).toBe(1);
+    expect(view.getUint32(24, true)).toBe(16_000);
+    expect(view.getUint32(40, true)).toBe(8);
+  });
+});

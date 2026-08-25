@@ -1,0 +1,17 @@
+{
+  "name": "peel",
+  "version": "0.1.0",
+  "private": true,
+  "workspaces": [
+    "apps/*",
+    "packages/*"
+  ],
+  "scripts": {
+    "build": "npm run build --workspace @peel/codex-app-server && npm run build --workspace @peel/git-workspace && npm run build --workspace @peel/desktop",
+    "test": "npm run test --workspace @peel/codex-app-server && npm run test --workspace @peel/git-workspace && npm run test --workspace @peel/desktop",
+    "package:desktop": "npm run build && npm run package --workspace @peel/desktop"
+  },
+  "engines": {
+    "node": ">=22"
+  }
+}

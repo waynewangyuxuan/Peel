@@ -1,0 +1,41 @@
+{
+  "name": "@peel/desktop",
+  "version": "0.1.0",
+  "private": true,
+  "type": "module",
+  "main": "dist/main/main.js",
+  "scripts": {
+    "build:native": "mkdir -p native/bin && clang -fobjc-arc -fblocks native/SpeechTranscriber.m -o native/bin/peel-speech -framework Foundation -framework Speech -Wl,-sectcreate,__TEXT,__info_plist,native/VoiceHelper-Info.plist",
+    "build:renderer": "vite build --config vite.renderer.config.ts",
+    "build:main": "vite build --config vite.main.config.ts && vite build --config vite.preload.config.ts",
+    "typecheck": "tsc -p tsconfig.json --noEmit",
+    "build": "npm run typecheck && npm run build:native && npm run build:renderer && npm run build:main",
+    "dev": "npm run build:native && vite --config vite.renderer.config.ts",
+    "test": "vitest run test",
+    "test:e2e": "playwright test",
+    "package": "electron-packager . Peel --out out --overwrite --platform darwin --arch arm64 --app-bundle-id com.peel.desktop --extend-info build/Info.plist --asar.unpackDir=native/bin --ignore='(^|/)(src|test|e2e|node_modules/.cache)(/|$)'",
+    "verify:package": "node scripts/verify-package.mjs",
+    "verify:live-codex": "node scripts/verify-live-codex.mjs"
+  },
+  "dependencies": {
+    "@peel/codex-app-server": "0.1.0",
+    "@peel/git-workspace": "0.1.0",
+    "react": "19.2.8",
+    "react-dom": "19.2.8"
+  },
+  "devDependencies": {
+    "@electron/packager": "20.3.0",
+    "@playwright/test": "1.62.1",
+    "@types/node": "26.3.0",
+    "@types/react": "19.2.14",
+    "@types/react-dom": "19.2.3",
+    "@vitejs/plugin-react": "6.0.1",
+    "electron": "44.0.0",
+    "typescript": "7.0.2",
+    "vite": "8.2.2",
+    "vitest": "4.1.11"
+  },
+  "engines": {
+    "node": ">=22"
+  }
+}
