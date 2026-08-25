@@ -1,0 +1,33 @@
+{
+  "accepted_acceptance_ids": [
+    "thread-first-entry",
+    "focus-fidelity",
+    "fork-first-send",
+    "lineage-return",
+    "overview-and-layout",
+    "real-voice-dictation",
+    "naming-and-attention",
+    "worktree-diff",
+    "packaged-desktop-lifecycle",
+    "automated-v01-journeys"
+  ],
+  "closed_at": "2026-08-25T23:12:50Z",
+  "evidence_ids": [
+    "evidence-v01-thread-first-entry",
+    "evidence-v01-focus-fidelity",
+    "evidence-v01-fork-first-send",
+    "evidence-v01-lineage-return",
+    "evidence-v01-overview-layout",
+    "evidence-v01-real-voice-dictation",
+    "evidence-v01-naming-attention",
+    "evidence-v01-worktree-diff",
+    "evidence-v01-packaged-lifecycle",
+    "evidence-v01-automated-journeys"
+  ],
+  "kind": "ticket_outcome",
+  "schema_version": 1,
+  "status": "successful",
+  "summary": "Independent closeout accepted all ten v0.1 criteria after reading the exact Ticket, all 13 Context references including the preserved PRD and runnable Demo, both prerequisite successful Outcomes and their Evidence, baseline commit 39194ada8bed962fa65f99efd1bb2cc7bd4ecf2b, repair commits f93731145d0780dc3fe59a9b21e2ce101c931d5f and 84bd8326d9195acaf2e47f651e80a6ae826219b2, the complete implementation diff, tests, documentation, and all ten acceptance-linked Evidence records. Thread-first entry has one real Codex Thread Root and no Project coupling. Focus preserves selectable transcript fidelity, horizontal code, throttled streaming, approvals, attachments, per-Thread Draft/Scroll, unknown-item escape, and exact long Parent-Turn return. Both Fork gestures create a local sub-150ms Draft with no pre-Send RPC; First Send preserves exact lastTurnId and recovers Worktree, Fork, persistence, First Turn, and finalization failures without duplicate Worktrees, Forks, or Turns. Overview uses deterministic traceable cards, real Fork edges, stable collision-free placement, persisted camera/node state, and a verified 50-node Fit with late-node Focus entry. Production Voice is real microphone PCM/WAV through an unpacked native Apple Speech.framework helper; denial, interruption, delayed permission, recognition failure, and concurrent typing preserve the editable Draft without auto-send. Manual names win delayed automatic writes across Header, Tree, and Card; attention/Subagent facts remain deterministic. Worktree metadata and lightweight Diff stay within the prohibited-Git-workflow boundary. Independent final verification on clean commit 84bd832 passed project/Ticket validation, 39/39 tests, the 23.1-second Electron journey, a Node 24 clean-clone install/test/build/package with no tracked changes, clean-package double-launch restoration with native Voice helper, and a read-only packaged live-Codex smoke listing 50 Threads.",
+  "ticket_id": "ticket-deliver-v01-spatial-loop",
+  "unresolved_acceptance_ids": []
+}
