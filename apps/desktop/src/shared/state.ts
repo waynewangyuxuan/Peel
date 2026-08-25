@@ -72,14 +72,21 @@ export function threadView(state: PeelState, threadId: string): ThreadViewState 
 export function suggestedChildPosition(space: SpaceRecord, parentThreadId: string): Point {
   const parent = space.nodes[parentThreadId];
   if (!parent) return { x: 0, y: 0 };
-  const siblings = Object.values(space.nodes)
-    .filter((node) => node.parentThreadId === parentThreadId)
-    .sort((a, b) => a.createdAt - b.createdAt);
-  const index = siblings.length;
-  return {
-    x: parent.position.x + CARD_WIDTH + CARD_GAP_X,
-    y: parent.position.y + (index - Math.max(0, siblings.length - 1) / 2) * (186 + CARD_GAP_Y),
-  };
+  const nodes = Object.values(space.nodes);
+  const rowOffsets = [0, 1, -1, 2, -2, 3, -3, 4];
+  for (let column = 1; column <= nodes.length + 1; column += 1) {
+    for (const row of rowOffsets) {
+      const candidate = {
+        x: parent.position.x + column * (CARD_WIDTH + CARD_GAP_X),
+        y: parent.position.y + row * (186 + CARD_GAP_Y),
+      };
+      const overlaps = nodes.some((node) =>
+        Math.abs(node.position.x - candidate.x) < CARD_WIDTH + CARD_GAP_X / 2
+        && Math.abs(node.position.y - candidate.y) < 186 + CARD_GAP_Y / 2);
+      if (!overlaps) return candidate;
+    }
+  }
+  return { x: parent.position.x + (nodes.length + 2) * (CARD_WIDTH + CARD_GAP_X), y: parent.position.y };
 }
 
 export function normalizeState(candidate: unknown): PeelState {
@@ -112,7 +119,7 @@ function validSpace(value: unknown): value is SpaceRecord {
   const nodes = space.nodes as Record<string, SpaceNode>;
   const root = nodes[space.rootThreadId];
   if (!root || root.threadId !== space.rootThreadId || root.parentThreadId !== null || root.forkedAtTurnId !== null) return false;
-  if (![space.camera.x, space.camera.y, space.camera.scale].every(Number.isFinite) || space.camera.scale < .2 || space.camera.scale > 2) return false;
+  if (![space.camera.x, space.camera.y, space.camera.scale].every(Number.isFinite) || space.camera.scale < .08 || space.camera.scale > 2) return false;
   for (const [threadId, node] of Object.entries(nodes)) {
     if (!node || node.threadId !== threadId || typeof node.title !== "string" || typeof node.cwd !== "string") return false;
     if (![node.position?.x, node.position?.y].every(Number.isFinite)) return false;

@@ -4,7 +4,7 @@ import { join } from "node:path";
 import { afterEach, describe, expect, it } from "vitest";
 
 import { StateStore } from "../src/main/state-store";
-import { emptyState } from "../src/shared/state";
+import { createSpace, emptyState } from "../src/shared/state";
 
 const directories: string[] = [];
 
@@ -34,5 +34,40 @@ describe("StateStore", () => {
     second.threadViews.last = { draft: "last", scrollTop: 0 };
     await Promise.all([store.save(first), store.save(second)]);
     expect((await store.load()).threadViews.last?.draft).toBe("last");
+  });
+
+  it("serializes complete mutations and preserves service-owned nodes when a stale renderer save arrives", async () => {
+    const directory = await mkdtemp(join(tmpdir(), "peel-state-test-"));
+    directories.push(directory);
+    const store = new StateStore(directory);
+    const initial = emptyState();
+    const space = createSpace({ id: "root", name: "Root", preview: "", cwd: "/repo", createdAt: 1 });
+    initial.spaces[space.id] = space;
+    initial.activeSpaceId = space.id;
+    initial.activeThreadId = "root";
+    await store.save(initial);
+    const staleRenderer = structuredClone(initial);
+    staleRenderer.threadViews.root = { draft: "new local draft", scrollTop: 40 };
+
+    const addChild = store.mutate((state) => {
+      state.spaces[space.id]!.nodes.child = {
+        ...state.spaces[space.id]!.nodes.root!,
+        threadId: "child",
+        parentThreadId: "root",
+        forkedAtTurnId: "turn-1",
+        title: "Child",
+      };
+    });
+    const renameRoot = store.mutate((state) => {
+      state.spaces[space.id]!.nodes.root!.title = "Manual root";
+      state.spaces[space.id]!.nodes.root!.titleOrigin = "manual";
+    });
+    const staleSave = store.save(staleRenderer);
+    await Promise.all([addChild, renameRoot, staleSave]);
+
+    const restored = await store.load();
+    expect(restored.spaces[space.id]!.nodes.child?.parentThreadId).toBe("root");
+    expect(restored.spaces[space.id]!.nodes.root).toMatchObject({ title: "Manual root", titleOrigin: "manual" });
+    expect(restored.threadViews.root).toEqual({ draft: "new local draft", scrollTop: 40 });
   });
 });

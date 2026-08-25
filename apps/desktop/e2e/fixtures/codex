@@ -1,6 +1,6 @@
 #!/usr/bin/env node
-import { appendFileSync, existsSync, unlinkSync } from "node:fs";
-import { join } from "node:path";
+import { appendFileSync, existsSync, unlinkSync, writeFileSync } from "node:fs";
+import { dirname, join } from "node:path";
 import readline from "node:readline";
 
 const now = Math.floor(Date.now() / 1000);
@@ -40,7 +40,7 @@ const root = {
   gitInfo: null,
   name: "Spatial product direction",
   turns: [
-    turn("turn-1", "Map the core navigation", "## Direction\nUse a **full-fidelity** Focus view and a spatial Overview.\n- Keep `chat` in screen space."),
+    turn("turn-1", "Map the core navigation", "## Direction\nUse a **full-fidelity** Focus view and a spatial Overview.\n- Keep `chat` in screen space.\n```ts\nconst spatialSurface = 'a-very-long-code-line-that-must-remain-unwrapped-and-scroll-horizontally-across-the-full-focus-transcript-without-changing-the-reading-layout';\n```"),
     { ...turn("turn-2", "Make Forks trustworthy", "Create a local draft first, then fork on the first send."), items: [
       item("userMessage", "turn-2-u", "Make Forks trustworthy"),
       item("agentMessage", "turn-2-a", "Create a local draft first, then fork on the first send."),
@@ -62,7 +62,7 @@ const notify = (method, params) => send({ method, params });
 const reader = readline.createInterface({ input: process.stdin });
 reader.on("line", (line) => {
   const message = JSON.parse(line);
-  if (!message.id) return;
+  if (!message.id || !message.method) return;
   const { id, method, params = {} } = message;
   log({ method, params });
   if (method === "initialize") return send({ id, result: { userAgent: "peel-e2e", platform: "darwin" } });
@@ -72,8 +72,20 @@ reader.on("line", (line) => {
     return send({ id, result: { data, nextCursor: null, backwardsCursor: null } });
   }
   if (method === "thread/read" || method === "thread/resume") {
-    const thread = threads.get(params.threadId) || restoreTestChild(params.threadId);
-    return thread ? send({ id, result: method === "thread/read" ? { thread } : startResponse(thread) }) : send({ id, error: { code: -32004, message: "Unknown test Thread" } });
+    let thread = threads.get(params.threadId) || restoreTestChild(params.threadId) || restoreSynthetic(params.threadId);
+    const nonGitMarker = process.env.TMPDIR ? join(process.env.TMPDIR, "root-non-git-once") : null;
+    if (thread?.id === "thread-root" && nonGitMarker && existsSync(nonGitMarker)) {
+      unlinkSync(nonGitMarker);
+      thread = { ...structuredClone(thread), cwd: dirname(cwd) };
+    }
+    const response = thread ? { id, result: method === "thread/read" ? { thread } : startResponse(thread) } : { id, error: { code: -32004, message: "Unknown test Thread" } };
+    const delayMarker = process.env.TMPDIR ? join(process.env.TMPDIR, `delay-read-${params.threadId}`) : null;
+    if (delayMarker && existsSync(delayMarker)) {
+      unlinkSync(delayMarker);
+      setTimeout(() => send(response), 320);
+      return;
+    }
+    return send(response);
   }
   if (method === "thread/fork") {
     const failForkMarker = process.env.TMPDIR ? join(process.env.TMPDIR, "fail-fork") : null;
@@ -88,10 +100,24 @@ reader.on("line", (line) => {
     const childId = `thread-child-${++childIndex}`;
     const child = { ...structuredClone(parent), id: childId, sessionId: `session-${childId}`, name: null, preview: "", cwd: params.cwd || parent.cwd, forkedFromId: parent.id, parentThreadId: parent.id, createdAt: now, updatedAt: now, turns: structuredClone(parent.turns.slice(0, lastIndex + 1)) };
     threads.set(childId, child);
+    const delayForkMarker = process.env.TMPDIR ? join(process.env.TMPDIR, "delay-fork") : null;
+    if (delayForkMarker && existsSync(delayForkMarker)) {
+      unlinkSync(delayForkMarker);
+      setTimeout(() => send({ id, result: startResponse(child) }), 320);
+      return;
+    }
     return send({ id, result: startResponse(child) });
   }
   if (method === "thread/name/set") {
     const thread = threads.get(params.threadId);
+    if (params.name === "Try a compact navigation di…") {
+      setTimeout(() => {
+        if (thread) thread.name = params.name;
+        send({ id, result: {} });
+        setTimeout(() => notify("thread/name/updated", { threadId: params.threadId, name: params.name }), 350);
+      }, 220);
+      return;
+    }
     if (thread) thread.name = params.name;
     send({ id, result: {} });
     return notify("thread/name/updated", { threadId: params.threadId, name: params.name });
@@ -105,6 +131,11 @@ reader.on("line", (line) => {
     const thread = threads.get(params.threadId);
     if (!thread) return send({ id, error: { code: -32004, message: "Unknown Thread" } });
     const textInput = params.input.find((candidate) => candidate.type === "text");
+    const armFinalizeMarker = process.env.TMPDIR ? join(process.env.TMPDIR, "arm-finalize-persist") : null;
+    if (armFinalizeMarker && existsSync(armFinalizeMarker)) {
+      unlinkSync(armFinalizeMarker);
+      writeFileSync(join(process.env.TMPDIR, "fail-persist"), "1");
+    }
     const turnId = `turn-${thread.turns.length + 1}`;
     const started = { id: turnId, items: [], status: "inProgress", error: null, startedAt: now, completedAt: null, durationMs: null };
     thread.turns.push(started);
@@ -118,9 +149,10 @@ reader.on("line", (line) => {
     const agent = item("agentMessage", `${turnId}-a`, "");
     started.items.push(agent);
     notify("item/started", { threadId: thread.id, turnId, item: agent });
-    setTimeout(() => notify("item/agentMessage/delta", { threadId: thread.id, turnId, itemId: agent.id, delta: "A streamed result for this direction." }), 35);
+    const fragments = Array.from({ length: 12 }, (_, index) => index === 0 ? "A streamed result for this direction. " : `Streaming segment ${index}. `);
+    fragments.forEach((delta, index) => setTimeout(() => notify("item/agentMessage/delta", { threadId: thread.id, turnId, itemId: agent.id, delta }), 25 + index * 20));
     setTimeout(() => {
-      agent.text = "A streamed result for this direction.";
+      agent.text = `${fragments.join("")}\n${Array.from({ length: 34 }, (_, index) => `Completed output line ${index + 1} keeps the transcript tall enough to verify bottom-follow behavior.`).join("\n")}`;
       notify("item/completed", { threadId: thread.id, turnId, item: agent });
       started.status = "completed";
       started.completedAt = now + 1;
@@ -156,4 +188,25 @@ function restoreTestChild(threadId) {
   };
   threads.set(threadId, child);
   return child;
+}
+
+function restoreSynthetic(threadId) {
+  if (!String(threadId).startsWith("synthetic-")) return null;
+  const synthetic = {
+    ...structuredClone(root),
+    id: threadId,
+    sessionId: `session-${threadId}`,
+    name: `Scale direction ${String(threadId).replace("synthetic-", "")}`,
+    preview: `Synthetic scale Thread ${threadId}`,
+    forkedFromId: root.id,
+    parentThreadId: root.id,
+    createdAt: now,
+    updatedAt: now,
+  };
+  if (threadId === "synthetic-failed") {
+    synthetic.status = { type: "systemError", message: "Synthetic failure" };
+    synthetic.turns[synthetic.turns.length - 1].status = "failed";
+  }
+  threads.set(threadId, synthetic);
+  return synthetic;
 }

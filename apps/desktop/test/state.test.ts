@@ -37,6 +37,15 @@ describe("Peel state model", () => {
     }
     expect(space.nodes.root!.position).toEqual(rootBefore);
     expect(new Set(Object.values(space.nodes).map((node) => `${node.position.x}:${node.position.y}`)).size).toBe(51);
+    const nodes = Object.values(space.nodes);
+    for (const node of nodes) {
+      for (const other of nodes) {
+        if (node.threadId === other.threadId) continue;
+        expect(Math.abs(node.position.x - other.position.x) >= 296 || Math.abs(node.position.y - other.position.y) >= 188).toBe(true);
+      }
+    }
+    expect(Math.max(...nodes.map((node) => node.position.x)) - Math.min(...nodes.map((node) => node.position.x))).toBeLessThan(3_000);
+    expect(Math.max(...nodes.map((node) => node.position.y)) - Math.min(...nodes.map((node) => node.position.y))).toBeLessThan(2_000);
   });
 
   it("uses deterministic temporary and automatic titles", () => {

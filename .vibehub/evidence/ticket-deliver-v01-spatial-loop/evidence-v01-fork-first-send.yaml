@@ -1,0 +1,19 @@
+{
+  "acceptance_ids": [
+    "fork-first-send"
+  ],
+  "evidence_id": "evidence-v01-fork-first-send",
+  "kind": "ticket_evidence",
+  "origin": "agent",
+  "recorded_at": "2026-08-25T22:10:19Z",
+  "refs": [
+    "apps/desktop/src/renderer/Transcript.tsx",
+    "apps/desktop/src/renderer/App.tsx",
+    "apps/desktop/src/main/peel-service.ts",
+    "apps/desktop/e2e/v01-journey.spec.ts",
+    "apps/desktop/e2e/fixtures/codex"
+  ],
+  "schema_version": 1,
+  "summary": "Branch from here and the 1:1 Pointer-Capture Peel handle share one synchronous local Fork Draft path. The journey measures visibility below 150ms, proves Escape sends no thread/fork RPC, locks dismissal while First Send is in flight, and confirms exact turn-2 lastTurnId. Worktree, Fork, state-persist, First Turn, and post-Turn draft-clear failures retain or safely finalize the Prompt. Prepared Worktree and prepared remote Fork identities are validated/reused, with log assertions proving no duplicate Worktree, remote Fork, or remote Turn.",
+  "ticket_id": "ticket-deliver-v01-spatial-loop"
+}

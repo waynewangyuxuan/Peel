@@ -36,12 +36,13 @@ export class PeelService extends EventEmitter {
   readonly #store: StateStore;
   readonly #worktreesRoot: string;
   readonly #automaticTitles = new Map<string, PendingAutomaticTitle>();
+  readonly #titleQueues = new Map<string, Promise<void>>();
   #connected = false;
   #connectionError: string | null = null;
 
-  constructor(userDataPath: string, options: { codexBinary?: string } = {}) {
+  constructor(userDataPath: string, options: { codexBinary?: string; stateFailureMarker?: string } = {}) {
     super();
-    this.#store = new StateStore(userDataPath);
+    this.#store = new StateStore(userDataPath, options.stateFailureMarker);
     this.#worktreesRoot = join(userDataPath, "Worktrees");
     this.transport = new AppServerTransport({ reconnect: true, ...(options.codexBinary ? { codexBinary: options.codexBinary } : {}) });
     this.client = new AppServerClient(this.transport);
@@ -130,8 +131,8 @@ export class PeelService extends EventEmitter {
       return failure("persist", "The parent is no longer part of this Space", input, false);
     }
 
-    let cwd = parent.cwd;
-    let worktreeName: string | null = null;
+    let cwd = input.draft.preparedFork?.cwd ?? parent.cwd;
+    let worktreeName: string | null = input.draft.preparedFork?.worktreeName ?? null;
     if (input.draft.preparedWorktree) {
       const prepared = await this.git.inspect(input.draft.preparedWorktree.cwd);
       const worktreesRoot = await realpath(this.#worktreesRoot).catch(() => this.#worktreesRoot);
@@ -141,7 +142,27 @@ export class PeelService extends EventEmitter {
       }
       cwd = prepared.worktreeRoot;
       worktreeName = input.draft.preparedWorktree.name;
-    } else if (input.draft.createWorktree) {
+    }
+    if (input.draft.preparedFork) {
+      const preparedForkCwd = await realpath(input.draft.preparedFork.cwd).catch(() => input.draft.preparedFork!.cwd);
+      const selectedCwd = await realpath(cwd).catch(() => cwd);
+      if (preparedForkCwd !== selectedCwd || input.draft.preparedFork.worktreeName !== worktreeName) {
+        return {
+          ...failure("fork", "The prepared Fork no longer matches its execution location", input, true),
+          preparedFork: input.draft.preparedFork,
+          ...(input.draft.preparedWorktree ? { preparedWorktree: input.draft.preparedWorktree } : {}),
+        };
+      }
+      try {
+        await this.client.readThread(input.draft.preparedFork.threadId, false);
+      } catch (error) {
+        return {
+          ...failure("fork", `The prepared Codex Fork is unavailable: ${messageOf(error)}`, input, true),
+          preparedFork: input.draft.preparedFork,
+          ...(input.draft.preparedWorktree ? { preparedWorktree: input.draft.preparedWorktree } : {}),
+        };
+      }
+    } else if (!input.draft.preparedWorktree && input.draft.createWorktree) {
       try {
         await mkdir(this.#worktreesRoot, { recursive: true });
         const created = await this.git.createWorktree({
@@ -161,22 +182,24 @@ export class PeelService extends EventEmitter {
       }
     }
 
-    let childThreadId: string;
-    try {
-      const forked = await this.client.forkThread({
-        threadId: parent.threadId,
-        lastTurnId: input.draft.forkedAtTurnId,
-        cwd,
-      });
-      childThreadId = forked.thread.id;
-    } catch (error) {
-      return {
-        ...failure("fork", messageOf(error), input, true),
-        ...(worktreeName ? {
-          preparedWorktree: { cwd, name: worktreeName },
-          recoverableArtifacts: [{ kind: "worktree", name: worktreeName, path: cwd }],
-        } : {}),
-      };
+    let childThreadId = input.draft.preparedFork?.threadId;
+    if (!childThreadId) {
+      try {
+        const forked = await this.client.forkThread({
+          threadId: parent.threadId,
+          lastTurnId: input.draft.forkedAtTurnId,
+          cwd,
+        });
+        childThreadId = forked.thread.id;
+      } catch (error) {
+        return {
+          ...failure("fork", messageOf(error), input, true),
+          ...(worktreeName ? {
+            preparedWorktree: { cwd, name: worktreeName },
+            recoverableArtifacts: [{ kind: "worktree", name: worktreeName, path: cwd }],
+          } : {}),
+        };
+      }
     }
 
     try {
@@ -203,34 +226,53 @@ export class PeelService extends EventEmitter {
         return latest;
       });
     } catch (error) {
-      return { ...failure("persist", messageOf(error), input, true), childThreadId };
+      const preparedFork = { threadId: childThreadId, cwd, worktreeName };
+      return {
+        ...failure("persist", messageOf(error), input, true),
+        childThreadId,
+        preparedFork,
+        ...(worktreeName ? {
+          preparedWorktree: { cwd, name: worktreeName },
+          recoverableArtifacts: [
+            { kind: "thread", name: childThreadId },
+            { kind: "worktree", name: worktreeName, path: cwd },
+          ],
+        } : { recoverableArtifacts: [{ kind: "thread", name: childThreadId }] }),
+      };
     }
 
+    let turnId: string;
     try {
-      const turnId = await this.client.startTurn({ threadId: childThreadId, input: input.input, cwd });
-      this.#automaticTitles.set(childThreadId, { prompt: input.draft.prompt, firstTurnId: turnId });
+      turnId = await this.client.startTurn({ threadId: childThreadId, input: input.input, cwd });
+    } catch (error) {
+      return { ...failure("turn", messageOf(error), input, true), childThreadId };
+    }
+    this.#automaticTitles.set(childThreadId, { prompt: input.draft.prompt, firstTurnId: turnId });
+    try {
       await this.#store.mutate((latest) => {
         latest.threadViews[childThreadId] = { draft: "", scrollTop: 0 };
         return latest;
       });
       return { ok: true, threadId: childThreadId, turnId, cwd, worktreeName };
     } catch (error) {
-      return { ...failure("turn", messageOf(error), input, true), childThreadId };
+      return { ok: true, threadId: childThreadId, turnId, cwd, worktreeName, persistenceWarning: messageOf(error) };
     }
   }
 
   async setThreadName(threadId: string, name: string, spaceId: string): Promise<PeelState> {
     const normalized = name.replace(/\s+/g, " ").trim();
     if (!normalized) throw new Error("A Thread name cannot be empty");
-    await this.client.setThreadName(threadId, normalized);
-    this.#automaticTitles.delete(threadId);
-    return await this.#store.mutate((state) => {
-      const node = state.spaces[spaceId]?.nodes[threadId];
-      if (!node) throw new Error("Thread is not in the selected Space");
-      node.title = normalized;
-      node.titleOrigin = "manual";
-      state.spaces[spaceId]!.updatedAt = Date.now();
-      return state;
+    return await this.#withTitleLock(threadId, async () => {
+      this.#automaticTitles.delete(threadId);
+      await this.client.setThreadName(threadId, normalized);
+      return await this.#store.mutate((state) => {
+        const node = state.spaces[spaceId]?.nodes[threadId];
+        if (!node) throw new Error("Thread is not in the selected Space");
+        node.title = normalized;
+        node.titleOrigin = "manual";
+        state.spaces[spaceId]!.updatedAt = Date.now();
+        return state;
+      });
     });
   }
 
@@ -245,29 +287,43 @@ export class PeelService extends EventEmitter {
     const threadId = typeof params.threadId === "string" ? params.threadId : null;
     const turn = params.turn as { id?: unknown } | undefined;
     if (!threadId || typeof turn?.id !== "string") return;
-    const pending = this.#automaticTitles.get(threadId);
-    if (!pending || pending.firstTurnId !== turn.id) return;
-    const state = await this.#store.load();
-    const space = Object.values(state.spaces).find((candidate) => candidate.nodes[threadId]);
-    const node = space?.nodes[threadId];
-    if (!space || !node || node.titleOrigin !== "temporary") {
-      this.#automaticTitles.delete(threadId);
-      return;
-    }
-    const title = automaticTitle(pending.prompt);
+    await this.#withTitleLock(threadId, async () => {
+      const pending = this.#automaticTitles.get(threadId);
+      if (!pending || pending.firstTurnId !== turn.id) return;
+      const state = await this.#store.load();
+      const space = Object.values(state.spaces).find((candidate) => candidate.nodes[threadId]);
+      const node = space?.nodes[threadId];
+      if (!space || !node || node.titleOrigin !== "temporary") {
+        this.#automaticTitles.delete(threadId);
+        return;
+      }
+      const title = automaticTitle(pending.prompt);
+      try {
+        await this.client.setThreadName(threadId, title);
+        await this.#store.mutate((latest) => {
+          const current = latest.spaces[space.id]?.nodes[threadId];
+          if (current?.titleOrigin === "temporary") {
+            current.title = title;
+            current.titleOrigin = "automatic";
+          }
+          return latest;
+        });
+        this.#automaticTitles.delete(threadId);
+      } catch (error) {
+        this.emit("titleError", { threadId, error: messageOf(error) });
+      }
+    });
+  }
+
+  async #withTitleLock<T>(threadId: string, action: () => Promise<T>): Promise<T> {
+    const previous = this.#titleQueues.get(threadId) ?? Promise.resolve();
+    const run = previous.catch(() => undefined).then(action);
+    const tail = run.then(() => undefined, () => undefined);
+    this.#titleQueues.set(threadId, tail);
     try {
-      await this.client.setThreadName(threadId, title);
-      await this.#store.mutate((latest) => {
-        const current = latest.spaces[space.id]?.nodes[threadId];
-        if (current?.titleOrigin === "temporary") {
-          current.title = title;
-          current.titleOrigin = "automatic";
-        }
-        return latest;
-      });
-      this.#automaticTitles.delete(threadId);
-    } catch (error) {
-      this.emit("titleError", { threadId, error: messageOf(error) });
+      return await run;
+    } finally {
+      if (this.#titleQueues.get(threadId) === tail) this.#titleQueues.delete(threadId);
     }
   }
 

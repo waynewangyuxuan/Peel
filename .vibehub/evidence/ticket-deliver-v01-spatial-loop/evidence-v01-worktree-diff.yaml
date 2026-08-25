@@ -1,0 +1,20 @@
+{
+  "acceptance_ids": [
+    "worktree-diff"
+  ],
+  "evidence_id": "evidence-v01-worktree-diff",
+  "kind": "ticket_evidence",
+  "origin": "agent",
+  "recorded_at": "2026-08-25T22:10:19Z",
+  "refs": [
+    "apps/desktop/src/main/peel-service.ts",
+    "apps/desktop/src/renderer/App.tsx",
+    "apps/desktop/src/renderer/Overview.tsx",
+    "apps/desktop/e2e/v01-journey.spec.ts",
+    "packages/git-workspace/src/adapter.ts",
+    ".vibehub/outcomes/ticket-build-git-workspace-adapter.yaml"
+  ],
+  "schema_version": 1,
+  "summary": "Fork Draft offers Current Workspace or Create a New Worktree before First Send and explicitly says Continue in this worktree when the Parent is already isolated. The journey completes both modes, shows real peel/<slug> plus changed-file metadata in Focus/Overview, exercises non-Git failure/current fallback, and proves prepared-Worktree reuse. The on-demand Diff drawer verifies exact file list and patch plus Open Worktree, Editor, and explicit Copy-ID/open-Codex targets, then returns to the prior mode without exposing commit, push, PR, cleanup, branch dashboard, or Git management UI.",
+  "ticket_id": "ticket-deliver-v01-spatial-loop"
+}

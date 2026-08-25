@@ -19,6 +19,8 @@ const currentDirectory = dirname(fileURLToPath(import.meta.url));
 let window: BrowserWindow | null = null;
 let service: PeelService | null = null;
 let quitting = false;
+let allowWindowClose = false;
+let flushResolver: (() => void) | null = null;
 
 function appRoot(): string {
   return app.isPackaged ? app.getAppPath() : join(currentDirectory, "../..");
@@ -55,10 +57,38 @@ async function createWindow(): Promise<void> {
     if (url !== window?.webContents.getURL()) event.preventDefault();
   });
   window.once("ready-to-show", () => window?.show());
+  window.on("close", (event) => {
+    if (allowWindowClose || !window) return;
+    event.preventDefault();
+    void flushRenderer().finally(() => {
+      if (!window) return;
+      allowWindowClose = true;
+      window.destroy();
+      window = null;
+      allowWindowClose = false;
+    });
+  });
   await window.loadURL(rendererUrl());
 }
 
+async function flushRenderer(): Promise<void> {
+  if (!window || window.isDestroyed()) return;
+  await new Promise<void>((resolve) => {
+    const timer = setTimeout(() => {
+      flushResolver = null;
+      resolve();
+    }, 2_000);
+    flushResolver = () => {
+      clearTimeout(timer);
+      flushResolver = null;
+      resolve();
+    };
+    window?.webContents.send(IPC.flushRequest);
+  });
+}
+
 function registerIpc(peel: PeelService, voice: VoiceService): void {
+  ipcMain.on(IPC.flushComplete, () => flushResolver?.());
   ipcMain.handle(IPC.bootstrap, async () => await peel.bootstrap());
   ipcMain.handle(IPC.searchThreads, async (_event, term: string) => await peel.searchThreads(term));
   ipcMain.handle(IPC.readThread, async (_event, threadId: string) => await peel.readThread(threadId));
@@ -99,6 +129,7 @@ app.whenReady().then(async () => {
   });
   service = new PeelService(process.env.PEEL_USER_DATA_PATH || app.getPath("userData"), {
     ...(process.env.PEEL_CODEX_BINARY ? { codexBinary: process.env.PEEL_CODEX_BINARY } : {}),
+    ...(process.env.PEEL_TEST_STATE_FAILURE_MARKER ? { stateFailureMarker: process.env.PEEL_TEST_STATE_FAILURE_MARKER } : {}),
   });
   const voiceHelperPath = process.env.PEEL_VOICE_HELPER || (app.isPackaged
     ? join(process.resourcesPath, "app.asar.unpacked/native/bin/peel-speech")
@@ -116,7 +147,14 @@ app.on("before-quit", (event) => {
   if (quitting || !service) return;
   event.preventDefault();
   quitting = true;
-  void service.shutdown().finally(() => app.quit());
+  void flushRenderer()
+    .finally(() => service?.shutdown())
+    .finally(() => {
+      allowWindowClose = true;
+      window?.destroy();
+      window = null;
+      app.quit();
+    });
 });
 
 app.on("window-all-closed", () => {

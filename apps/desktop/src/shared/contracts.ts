@@ -68,6 +68,7 @@ export interface ForkDraft {
   prompt: string;
   createWorktree: boolean;
   preparedWorktree?: { cwd: string; name: string };
+  preparedFork?: { threadId: string; cwd: string; worktreeName: string | null };
 }
 
 export interface ThreadSnapshot {
@@ -99,6 +100,7 @@ export interface CommitForkSuccess {
   turnId: string;
   cwd: string;
   worktreeName: string | null;
+  persistenceWarning?: string;
 }
 
 export interface CommitForkFailure {
@@ -111,6 +113,7 @@ export interface CommitForkFailure {
   recoverableArtifacts: Array<{ kind: string; name?: string; path?: string }>;
   childThreadId?: string;
   preparedWorktree?: { cwd: string; name: string };
+  preparedFork?: { threadId: string; cwd: string; worktreeName: string | null };
 }
 
 export type CommitForkResult = CommitForkSuccess | CommitForkFailure;
@@ -156,6 +159,7 @@ export interface PeelApi {
   onCodexNotification(listener: (notification: AppServerNotification) => void): () => void;
   onServerRequest(listener: (request: AppServerServerRequest) => void): () => void;
   onConnection(listener: (payload: { connected: boolean; error: string | null }) => void): () => void;
+  onFlushRequest(listener: () => Promise<void>): () => void;
 }
 
 export const IPC = {
@@ -175,4 +179,6 @@ export const IPC = {
   codexNotification: "peel:event:codex",
   serverRequest: "peel:event:server-request",
   connection: "peel:event:connection",
+  flushRequest: "peel:event:flush-request",
+  flushComplete: "peel:event:flush-complete",
 } as const;

@@ -1,2 +1,19 @@
 #!/usr/bin/env node
-process.stdout.write(`${JSON.stringify({ ok: true, text: "dictated editable words" })}\n`);
+import { existsSync, unlinkSync } from "node:fs";
+import { join } from "node:path";
+
+const marker = (name) => process.env.TMPDIR ? join(process.env.TMPDIR, name) : null;
+const fail = marker("fail-speech");
+const delay = marker("delay-speech");
+if (fail && existsSync(fail)) {
+  unlinkSync(fail);
+  process.stdout.write(`${JSON.stringify({ ok: false, error: "Forced transcription failure" })}\n`);
+  process.exit(1);
+}
+const respond = () => process.stdout.write(`${JSON.stringify({ ok: true, text: "dictated editable words" })}\n`);
+if (delay && existsSync(delay)) {
+  unlinkSync(delay);
+  setTimeout(respond, 350);
+} else {
+  respond();
+}

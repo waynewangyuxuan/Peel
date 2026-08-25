@@ -8,6 +8,7 @@ Peel is a macOS desktop client for navigating real Codex Threads as a single-roo
 - Focus is the full conversation surface: streamed Items, commands, file changes, approvals, Activity, attachments, editable per-Thread drafts, Voice Dictation, and a safe fallback for unknown Items.
 - A completed Turn can create a local, cancellable Fork Draft. No Thread or Worktree exists until First Send.
 - Overview contains deterministic Fork cards and real Fork edges only. Card positions and camera state are stable and persisted.
+- Incremental placement never moves existing cards, avoids occupied card slots, and keeps a 50-node synthetic Space navigable through Fit, pan, zoom, and Focus entry.
 - New Worktree and Diff are lightweight execution-location tools. Peel does not implement commit, push, PR, branch management, arbitrary graph editing, or Project management.
 
 ## Local development
@@ -30,8 +31,8 @@ npm run package:desktop
 npm run verify:package --workspace @peel/desktop
 ```
 
-The package is written to `apps/desktop/out/Peel-darwin-arm64/Peel.app`. The verification launches that exact bundle twice outside Vite, checks the unpacked native Speech helper and privacy usage strings, and proves a draft survives a full restart. This is a local dogfood package; distribution signing and notarization are release operations outside the v0.1 Ticket.
+The package is written to `apps/desktop/out/Peel-darwin-arm64/Peel.app`. The verification launches that exact bundle twice outside Vite, checks the unpacked native Speech helper and privacy usage strings, and proves an edit made immediately before close survives a full restart. This is a local dogfood package; distribution signing and notarization are release operations outside the v0.1 Ticket.
 
 Voice Dictation requests macOS microphone and Speech Recognition permission on first use. Recognition errors and capture interruption leave the existing draft untouched. The transcript is appended to the draft and is never sent automatically.
 
-“Open in Codex” copies the exact Thread ID to the clipboard and opens Codex as an escape hatch. Peel does not fabricate an undocumented Thread deep link.
+“Copy ID & open Codex” copies the exact Thread ID to the clipboard and opens Codex as an explicit escape hatch. Peel does not fabricate an undocumented Thread deep link.

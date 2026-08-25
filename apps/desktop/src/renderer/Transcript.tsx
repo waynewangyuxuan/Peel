@@ -1,5 +1,6 @@
 import type { AppServerServerRequest, CodexThread, CodexTurn, ReducedThread, ThreadItem, UserInput } from "@peel/codex-app-server";
-import { useEffect, useRef, useState, type ChangeEvent, type KeyboardEvent, type PointerEvent as ReactPointerEvent, type ReactNode } from "react";
+import type { WorkspaceDiffSummary } from "@peel/git-workspace";
+import { useEffect, useLayoutEffect, useRef, useState, type ChangeEvent, type KeyboardEvent, type PointerEvent as ReactPointerEvent, type ReactNode } from "react";
 
 import type { ApprovalDecisionInput, ForkDraft, SpaceNode } from "../shared/contracts";
 import { Icon } from "./icons";
@@ -10,6 +11,7 @@ interface TranscriptProps {
   thread: CodexThread;
   reduced: ReducedThread | null;
   node: SpaceNode;
+  diff: WorkspaceDiffSummary | null;
   draft: string;
   approvals: AppServerServerRequest[];
   highlightTurnId: string | null;
@@ -18,6 +20,7 @@ interface TranscriptProps {
   onSend(input: UserInput[]): Promise<void>;
   onBranch(turn: CodexTurn): void;
   onApproval(input: ApprovalDecisionInput): Promise<void>;
+  onDiff(): void;
   onOpenCodex(): void;
 }
 
@@ -25,6 +28,7 @@ export function Transcript({
   thread,
   reduced,
   node,
+  diff,
   draft,
   approvals,
   highlightTurnId,
@@ -33,6 +37,7 @@ export function Transcript({
   onSend,
   onBranch,
   onApproval,
+  onDiff,
   onOpenCodex,
 }: TranscriptProps): ReactNode {
   const scroller = useRef<HTMLDivElement>(null);
@@ -41,6 +46,24 @@ export function Transcript({
   const [voice, setVoice] = useState<"idle" | "recording" | "transcribing">("idle");
   const [voiceError, setVoiceError] = useState<string | null>(null);
   const recorder = useRef<RecorderSession | null>(null);
+  const mounted = useRef(true);
+  const draftRef = useRef(draft);
+  const followBottom = useRef(true);
+  draftRef.current = draft;
+
+  useEffect(() => () => {
+    mounted.current = false;
+    recorder.current?.cancel();
+    recorder.current = null;
+  }, []);
+
+  useLayoutEffect(() => {
+    const element = scroller.current;
+    if (!element || !followBottom.current) return;
+    const selection = window.getSelection();
+    if (selection && !selection.isCollapsed && selection.anchorNode && element.contains(selection.anchorNode)) return;
+    element.scrollTop = element.scrollHeight;
+  }, [thread, reduced]);
 
   useEffect(() => {
     if (!highlightTurnId) return;
@@ -87,33 +110,51 @@ export function Transcript({
         const wav = await recorder.current.stop();
         recorder.current = null;
         const result = await window.peel.transcribeWav(wav);
-        onDraft([draft.trimEnd(), result.text].filter(Boolean).join(draft.trim() ? " " : ""));
+        if (!mounted.current) return;
+        const latestDraft = draftRef.current;
+        onDraft([latestDraft.trimEnd(), result.text].filter(Boolean).join(latestDraft.trim() ? " " : ""));
       } catch (error) {
+        if (!mounted.current) return;
         setVoiceError(error instanceof Error ? error.message : String(error));
       } finally {
-        setVoice("idle");
+        if (mounted.current) setVoice("idle");
       }
       return;
     }
     try {
-      recorder.current = await startPcmRecorder((message) => {
+      const session = await startPcmRecorder((message) => {
+        if (!mounted.current) return;
         recorder.current = null;
         setVoice("idle");
         setVoiceError(message);
       });
+      if (!mounted.current) {
+        session.cancel();
+        return;
+      }
+      recorder.current = session;
       setVoice("recording");
     } catch (error) {
+      if (!mounted.current) return;
       setVoiceError(error instanceof Error ? error.message : String(error));
     }
   };
 
   const active = reduced?.status.type === "active";
   return <div className="transcript-column">
-    <div className="transcript" ref={scroller} onScroll={(event) => onScroll(event.currentTarget.scrollTop)}>
+    <div className="transcript" ref={scroller} onScroll={(event) => {
+      const element = event.currentTarget;
+      followBottom.current = element.scrollHeight - element.scrollTop - element.clientHeight < 56;
+      onScroll(element.scrollTop);
+    }}>
       <div className="thread-intro">
         <div className="eyebrow">Thread</div>
         <h1>{node.title}</h1>
         <p>{thread.cwd}</p>
+        <div className="thread-runtime">
+          {node.worktreeName && <span><Icon name="folder" size={12}/>{node.worktreeName}</span>}
+          {diff && <button onClick={onDiff}>{diff.changedFileCount} changed file{diff.changedFileCount === 1 ? "" : "s"}</button>}
+        </div>
       </div>
       {thread.turns.length === 0 && <div className="empty-thread">This Thread has no turns yet.</div>}
       {thread.turns.map((turn) => <TurnView
@@ -222,7 +263,7 @@ function ItemView({ item, streamedText, onOpenCodex }: { item: ThreadItem; strea
   if (item.type === "fileChange") return <details className="activity-item file-change"><summary>File changes · {Array.isArray(item.changes) ? item.changes.length : 1}</summary><pre>{text || JSON.stringify(item.changes ?? {}, null, 2)}</pre></details>;
   if (item.type === "collabAgentToolCall" || item.type === "subAgentActivity") return <details className="activity-item subagent"><summary>Subagent activity</summary><pre>{text || safeJson(item)}</pre></details>;
   if (item.type === "error") return <div className="item-error">{text || String(item.message ?? "Codex reported an error")}</div>;
-  return <div className="unknown-item"><span>Codex item: {item.type}</span><button onClick={onOpenCodex}>Open in Codex <Icon name="external" size={12}/></button></div>;
+  return <div className="unknown-item"><span>Codex item: {item.type}</span><button onClick={onOpenCodex}>Copy ID & open Codex <Icon name="external" size={12}/></button></div>;
 }
 
 function RichText({ text }: { text: string }): ReactNode {
@@ -286,9 +327,10 @@ function ApprovalCard({ request, onDecide }: {
   </div>;
 }
 
-export function ForkComposer({ fork, parentTitle, error, busy, onChange, onCancel, onCommit }: {
+export function ForkComposer({ fork, parentTitle, parentWorktreeName, error, busy, onChange, onCancel, onCommit }: {
   fork: ForkDraft;
   parentTitle: string;
+  parentWorktreeName: string | null;
   error: string | null;
   busy: boolean;
   onChange(next: ForkDraft): void;
@@ -297,7 +339,7 @@ export function ForkComposer({ fork, parentTitle, error, busy, onChange, onCance
 }): ReactNode {
   return <aside className="fork-surface" aria-label="Fork draft">
     <div className="fork-provenance"><Icon name="branch"/> Branched from <strong>{parentTitle}</strong></div>
-    <button className="icon-button close-fork" onClick={onCancel} aria-label="Cancel fork"><Icon name="close"/></button>
+    <button className="icon-button close-fork" onClick={onCancel} disabled={busy} aria-label="Cancel fork"><Icon name="close"/></button>
     <div className="fork-body">
       <div className="eyebrow">New direction</div>
       <h2>What should change from here?</h2>
@@ -306,10 +348,10 @@ export function ForkComposer({ fork, parentTitle, error, busy, onChange, onCance
         <input type="checkbox" checked={fork.createWorktree} disabled={Boolean(fork.preparedWorktree)} onChange={(event) => onChange({ ...fork, createWorktree: event.target.checked })}/>
         <span><strong>{fork.preparedWorktree ? `Prepared ${fork.preparedWorktree.name}` : "Create a new worktree"}</strong><small>{fork.preparedWorktree ? "This prepared Worktree will be reused when you retry." : "Isolate code changes for this direction. The Fork tree stays the same."}</small></span>
       </label>
-      {!fork.createWorktree && <div className="current-workspace-note"><Icon name="folder"/> Continue in the current workspace</div>}
+      {!fork.createWorktree && <div className="current-workspace-note"><Icon name="folder"/> {parentWorktreeName ? `Continue in this worktree · ${parentWorktreeName}` : "Continue in the current workspace"}</div>}
       {error && <div className="fork-error"><Icon name="retry"/> {error}</div>}
     </div>
-    <div className="fork-footer"><span>Esc to cancel · no Thread exists yet</span><button className="primary-button" disabled={!fork.prompt.trim() || busy} onClick={() => void onCommit()}>{busy ? "Creating…" : "Create & send"}</button></div>
+    <div className="fork-footer"><span>{busy ? "First Send in progress · this draft is locked" : "Esc to cancel · no Thread exists yet"}</span><button className="primary-button" disabled={!fork.prompt.trim() || busy} onClick={() => void onCommit()}>{busy ? "Creating…" : "Create & send"}</button></div>
   </aside>;
 }
 

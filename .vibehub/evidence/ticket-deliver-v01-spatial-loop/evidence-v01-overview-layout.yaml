@@ -1,0 +1,20 @@
+{
+  "acceptance_ids": [
+    "overview-and-layout"
+  ],
+  "evidence_id": "evidence-v01-overview-layout",
+  "kind": "ticket_evidence",
+  "origin": "agent",
+  "recorded_at": "2026-08-25T22:10:19Z",
+  "refs": [
+    "apps/desktop/src/renderer/Overview.tsx",
+    "apps/desktop/src/renderer/styles.css",
+    "apps/desktop/src/shared/state.ts",
+    "apps/desktop/test/state.test.ts",
+    "apps/desktop/e2e/v01-journey.spec.ts",
+    "command:npm run test:e2e --workspace @peel/desktop regenerates overview-50.png for visual inspection"
+  ],
+  "schema_version": 1,
+  "summary": "Overview is a distinct transformed world with no Transcript or Composer. Cards use only deterministic Thread/Turn/Git/Activity facts; Fork, latest User, and latest completed Result snippets return to exact source Turns. Collision-aware incremental placement scans fixed downstream slots without moving existing nodes, and dynamic SVG bounds prevent Edge clipping after drag/scale. Unit and Electron checks build 50 nodes with the real allocator, assert no overlap, all Cards/49 Edges inside Fit bounds, Failed visibility, persisted camera, and real Focus entry into a late node.",
+  "ticket_id": "ticket-deliver-v01-spatial-loop"
+}

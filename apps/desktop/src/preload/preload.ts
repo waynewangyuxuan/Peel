@@ -42,6 +42,13 @@ const api: PeelApi = {
   onServerRequest: (listener: (payload: AppServerServerRequest) => void) =>
     subscription(IPC.serverRequest, listener),
   onConnection: (listener) => subscription(IPC.connection, listener),
+  onFlushRequest: (listener) => {
+    const wrapped = (): void => {
+      void listener().finally(() => ipcRenderer.send(IPC.flushComplete));
+    };
+    ipcRenderer.on(IPC.flushRequest, wrapped);
+    return () => ipcRenderer.removeListener(IPC.flushRequest, wrapped);
+  },
 };
 
 contextBridge.exposeInMainWorld("peel", api);

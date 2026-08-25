@@ -1,0 +1,20 @@
+{
+  "acceptance_ids": [
+    "lineage-return"
+  ],
+  "evidence_id": "evidence-v01-lineage-return",
+  "kind": "ticket_evidence",
+  "origin": "agent",
+  "recorded_at": "2026-08-25T22:10:19Z",
+  "refs": [
+    "apps/desktop/src/shared/contracts.ts",
+    "apps/desktop/src/shared/state.ts",
+    "apps/desktop/src/main/peel-service.ts",
+    "apps/desktop/src/renderer/App.tsx",
+    "apps/desktop/e2e/v01-journey.spec.ts",
+    "apps/desktop/test/state.test.ts"
+  ],
+  "schema_version": 1,
+  "summary": "First Send persists parentThreadId, Child Thread ID, exact forkedAtTurnId, createdAt, cwd, and collision-free stable position as one rooted tree; validation rejects extra roots and cycles. Branched from selects and highlights the exact Parent Turn. The adversarial return journey re-enters the Child while a delayed Parent read is outstanding and proves the Child's distinct Draft and Scroll survive without cross-Thread overwrite.",
+  "ticket_id": "ticket-deliver-v01-spatial-loop"
+}

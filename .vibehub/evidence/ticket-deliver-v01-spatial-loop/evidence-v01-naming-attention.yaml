@@ -1,0 +1,20 @@
+{
+  "acceptance_ids": [
+    "naming-and-attention"
+  ],
+  "evidence_id": "evidence-v01-naming-attention",
+  "kind": "ticket_evidence",
+  "origin": "agent",
+  "recorded_at": "2026-08-25T22:10:19Z",
+  "refs": [
+    "apps/desktop/src/shared/state.ts",
+    "apps/desktop/src/main/peel-service.ts",
+    "apps/desktop/src/renderer/App.tsx",
+    "apps/desktop/src/renderer/Overview.tsx",
+    "apps/desktop/e2e/v01-journey.spec.ts",
+    "apps/desktop/test/state.test.ts"
+  ],
+  "schema_version": 1,
+  "summary": "Temporary and automatic titles are deterministic and sync through thread/name/set. Per-Thread title queues serialize automatic/manual writes, manual origin wins stale renderer saves, and delayed automatic RPC responses plus later notifications cannot overwrite a manual name. The journey performs Codex-synced inline Rename in Thread Header, Focus Tree, and Overview Card, including navigation during an open editor. Focus/Overview derive Running, Needs Approval, New Result, and Failed from Codex facts; Subagent Items remain folded Parent Activity and only deterministic count/status reaches Overview.",
+  "ticket_id": "ticket-deliver-v01-spatial-loop"
+}

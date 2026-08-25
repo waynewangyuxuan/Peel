@@ -27,6 +27,7 @@ export function App(): ReactNode {
   const [showDiff, setShowDiff] = useState(false);
   const [toast, setToast] = useState<string | null>(null);
   const refreshTimers = useRef(new Map<string, number>());
+  const refreshPending = useRef(new Set<string>());
 
   const installState = useCallback((next: PeelState): void => {
     stateRef.current = next;
@@ -37,7 +38,8 @@ export function App(): ReactNode {
     installState(next);
     if (saveTimer.current !== null) window.clearTimeout(saveTimer.current);
     saveTimer.current = window.setTimeout(() => {
-      void window.peel.saveState(stateRef.current).then(installState).catch((error) => setToast(messageOf(error)));
+      saveTimer.current = null;
+      void window.peel.saveState(next).catch((error) => setToast(messageOf(error)));
     }, delay);
   }, [installState]);
 
@@ -74,28 +76,40 @@ export function App(): ReactNode {
         mutate((draft) => {
           for (const space of Object.values(draft.spaces)) {
             const node = space.nodes[threadId];
-            if (!node) continue;
+            if (!node || node.titleOrigin === "manual") continue;
             node.title = params.name as string;
-            if (node.titleOrigin !== "manual") node.titleOrigin = "automatic";
+            node.titleOrigin = "automatic";
           }
         }, 0);
       }
-      const existingTimer = refreshTimers.current.get(threadId);
-      if (existingTimer !== undefined) window.clearTimeout(existingTimer);
-      const timer = window.setTimeout(() => void readThread(threadId).then((snapshot) => {
-        refreshTimers.current.delete(threadId);
-        const current = stateRef.current;
-        if (current.viewMode !== "focus" || current.activeThreadId !== threadId || notification.method !== "turn/completed") return;
-        const latest = latestCompletedTurn(snapshot.thread);
-        if (!latest || !current.activeSpaceId) return;
-        mutate((draft) => { const node = draft.spaces[current.activeSpaceId!]?.nodes[threadId]; if (node) node.lastViewedTurnId = latest.id; }, 400);
-      }).catch(() => refreshTimers.current.delete(threadId)), 70);
-      refreshTimers.current.set(threadId, timer);
+      refreshPending.current.add(threadId);
+      const scheduleRefresh = (): void => {
+        if (refreshTimers.current.has(threadId)) return;
+        refreshPending.current.delete(threadId);
+        void readThread(threadId).then((snapshot) => {
+          const current = stateRef.current;
+          if (current.viewMode !== "focus" || current.activeThreadId !== threadId) return;
+          const latest = latestCompletedTurn(snapshot.thread);
+          if (!latest || !current.activeSpaceId) return;
+          mutate((draft) => { const node = draft.spaces[current.activeSpaceId!]?.nodes[threadId]; if (node) node.lastViewedTurnId = latest.id; }, 400);
+        }).catch(() => undefined);
+        const timer = window.setTimeout(() => {
+          refreshTimers.current.delete(threadId);
+          if (refreshPending.current.has(threadId)) scheduleRefresh();
+        }, 70);
+        refreshTimers.current.set(threadId, timer);
+      };
+      scheduleRefresh();
     });
     const offRequest = window.peel.onServerRequest((request) => {
       setApprovals((current) => [...current.filter((item) => item.id !== request.id), request]);
     });
-    return () => { offConnection(); offNotification(); offRequest(); };
+    const offFlush = window.peel.onFlushRequest(async () => {
+      if (saveTimer.current !== null) window.clearTimeout(saveTimer.current);
+      saveTimer.current = null;
+      await window.peel.saveState(stateRef.current);
+    });
+    return () => { offConnection(); offNotification(); offRequest(); offFlush(); };
   }, [installState, mutate, readThread]);
 
   const activeSpace = state?.activeSpaceId ? state.spaces[state.activeSpaceId] ?? null : null;
@@ -104,18 +118,37 @@ export function App(): ReactNode {
 
   useEffect(() => {
     if (!connected || !activeNode) return;
-    void readThread(activeNode.threadId).then((snapshot) => {
+    const threadId = activeNode.threadId;
+    let cancelled = false;
+    let scrollTimer: number | null = null;
+    void readThread(threadId).then((snapshot) => {
+      if (cancelled || stateRef.current.activeThreadId !== threadId || stateRef.current.viewMode !== "focus") return;
       const latest = latestCompletedTurn(snapshot.thread);
       const currentState = stateRef.current;
       const spaceId = currentState.activeSpaceId;
-      const node = spaceId ? currentState.spaces[spaceId]?.nodes[activeNode.threadId] : null;
+      const node = spaceId ? currentState.spaces[spaceId]?.nodes[threadId] : null;
       if (latest && node && node.lastViewedTurnId !== latest.id) {
-        mutate((draft) => { draft.spaces[spaceId!]!.nodes[activeNode.threadId]!.lastViewedTurnId = latest.id; }, 500);
+        mutate((draft) => { draft.spaces[spaceId!]!.nodes[threadId]!.lastViewedTurnId = latest.id; }, 500);
       }
-      const scroll = stateRef.current.threadViews[activeNode.threadId]?.scrollTop ?? 0;
-      window.setTimeout(() => { const element = document.querySelector<HTMLElement>(".transcript"); if (element) element.scrollTop = scroll; }, 0);
+      const scroll = stateRef.current.threadViews[threadId]?.scrollTop ?? 0;
+      scrollTimer = window.setTimeout(() => {
+        if (cancelled || stateRef.current.activeThreadId !== threadId || stateRef.current.viewMode !== "focus") return;
+        const element = document.querySelector<HTMLElement>(".transcript");
+        if (element) element.scrollTop = scroll;
+      }, 0);
     }).catch((error) => setToast(messageOf(error)));
+    return () => {
+      cancelled = true;
+      if (scrollTimer !== null) window.clearTimeout(scrollTimer);
+    };
   }, [activeNode?.threadId, connected, mutate, readThread]);
+
+  useEffect(() => {
+    if (!connected || !activeNode || diffs[activeNode.threadId]) return;
+    void window.peel.getDiff(activeNode.cwd)
+      .then(({ summary }) => setDiffs((current) => ({ ...current, [activeNode.threadId]: summary })))
+      .catch(() => undefined);
+  }, [activeNode?.cwd, activeNode?.threadId, connected, diffs]);
 
   useEffect(() => {
     if (!connected || state?.viewMode !== "overview" || !activeSpace) return;
@@ -129,14 +162,14 @@ export function App(): ReactNode {
 
   useEffect(() => {
     const onKey = (event: globalThis.KeyboardEvent): void => {
-      if (event.key === "Escape" && forkDraft) setForkDraft(null);
+      if (event.key === "Escape" && forkDraft && !forkBusy) setForkDraft(null);
       if ((event.metaKey || event.ctrlKey) && event.key === "1") { event.preventDefault(); mutate((draft) => { draft.viewMode = "focus"; }, 0); }
       if ((event.metaKey || event.ctrlKey) && event.key === "2") { event.preventDefault(); mutate((draft) => { draft.viewMode = "overview"; }, 0); }
       if ((event.metaKey || event.ctrlKey) && event.key.toLowerCase() === "k") { event.preventDefault(); setShowThreadPicker(true); }
     };
     window.addEventListener("keydown", onKey);
     return () => window.removeEventListener("keydown", onKey);
-  }, [forkDraft, mutate]);
+  }, [forkBusy, forkDraft, mutate]);
 
   if (!state) return <div className="launch-screen"><div className="peel-mark">P</div><span>Opening Peel…</span></div>;
 
@@ -177,11 +210,16 @@ export function App(): ReactNode {
       });
       if (!result.ok) {
         setForkError(result.message);
-        if (result.preparedWorktree) {
+        if (result.preparedWorktree || result.preparedFork) {
           const preparedWorktree = result.preparedWorktree;
-          setForkDraft((current) => current ? { ...current, preparedWorktree } : current);
+          const preparedFork = result.preparedFork;
+          setForkDraft((current) => current ? {
+            ...current,
+            ...(preparedWorktree ? { preparedWorktree } : {}),
+            ...(preparedFork ? { preparedFork } : {}),
+          } : current);
         }
-        if (result.childThreadId) {
+        if (result.stage === "turn" && result.childThreadId) {
           const boot = await window.peel.bootstrap();
           installState(boot.state);
           setForkDraft(null);
@@ -190,9 +228,16 @@ export function App(): ReactNode {
         return;
       }
       const bootstrap = await window.peel.bootstrap();
+      if (result.persistenceWarning) {
+        bootstrap.state.threadViews[result.threadId] = {
+          draft: "",
+          scrollTop: bootstrap.state.threadViews[result.threadId]?.scrollTop ?? 0,
+        };
+        await window.peel.saveState(bootstrap.state);
+      }
       installState(bootstrap.state);
       setForkDraft(null);
-      setToast(result.worktreeName ? `Fork created in ${result.worktreeName}` : "Fork created");
+      setToast(result.persistenceWarning ? "Fork sent; local state recovered after a temporary save failure" : result.worktreeName ? `Fork created in ${result.worktreeName}` : "Fork created");
       void readThread(result.threadId);
     } catch (error) {
       setForkError(messageOf(error));
@@ -208,6 +253,17 @@ export function App(): ReactNode {
   };
 
   const currentDraft = activeNode ? state.threadViews[activeNode.threadId]?.draft ?? "" : "";
+  const renameThread = async (threadId: string, name: string): Promise<void> => {
+    if (!activeSpace) return;
+    const spaceId = activeSpace.id;
+    await window.peel.setThreadName(threadId, name, spaceId);
+    mutate((draft) => {
+      const node = draft.spaces[spaceId]?.nodes[threadId];
+      if (!node) return;
+      node.title = name;
+      node.titleOrigin = "manual";
+    }, 0);
+  };
   return <div className={`app ${state.viewMode} ${forkDraft ? "forking" : ""}`}>
     <SpaceSidebar
       state={state}
@@ -220,6 +276,7 @@ export function App(): ReactNode {
     <main className="workspace">
       {!activeSpace || !activeNode ? <Welcome connected={connected} error={connectionError} onStart={() => setShowThreadPicker(true)} /> : <>
         <TopBar
+          key={activeNode.threadId}
           space={activeSpace}
           node={activeNode}
           mode={state.viewMode}
@@ -232,16 +289,18 @@ export function App(): ReactNode {
             draft.activeSpaceId = next?.id ?? null;
             draft.activeThreadId = next?.rootThreadId ?? null;
           }, 0)}
-          onRenameThread={async (name) => installState(await window.peel.setThreadName(activeNode.threadId, name, activeSpace.id))}
+          onRenameThread={async (name) => await renameThread(activeNode.threadId, name)}
           onDiff={() => setShowDiff(true)}
           onOpenCodex={() => void window.peel.openTarget({ kind: "codex", cwd: activeNode.cwd, threadId: activeNode.threadId })}
         />
         {state.viewMode === "focus" ? <div className="focus-layout">
-          <LineageRail space={activeSpace} activeThreadId={activeNode.threadId} threads={threads} onSelect={selectThread}/>
+          <LineageRail space={activeSpace} activeThreadId={activeNode.threadId} threads={threads} onSelect={selectThread} onRename={renameThread}/>
           {activeSnapshot ? <Transcript
+            key={activeNode.threadId}
             thread={activeSnapshot.thread}
             reduced={activeSnapshot.reduced}
             node={activeNode}
+            diff={diffs[activeNode.threadId] ?? null}
             draft={currentDraft}
             approvals={approvals.filter((request) => (request.params as Record<string, unknown>).threadId === activeNode.threadId)}
             highlightTurnId={highlightTurnId}
@@ -256,9 +315,10 @@ export function App(): ReactNode {
             onSend={send}
             onBranch={(turn) => beginFork(turn.id)}
             onApproval={async (input) => { await window.peel.decideApproval(input); setApprovals((all) => all.filter((item) => item.id !== input.id)); }}
+            onDiff={() => setShowDiff(true)}
             onOpenCodex={() => void window.peel.openTarget({ kind: "codex", cwd: activeNode.cwd, threadId: activeNode.threadId })}
           /> : <ThreadLoading/>}
-          {forkDraft && <ForkComposer fork={forkDraft} parentTitle={activeNode.title} error={forkError} busy={forkBusy} onChange={setForkDraft} onCancel={() => setForkDraft(null)} onCommit={commitFork}/>} 
+          {forkDraft && <ForkComposer fork={forkDraft} parentTitle={activeNode.title} parentWorktreeName={activeNode.worktreeName} error={forkError} busy={forkBusy} onChange={setForkDraft} onCancel={() => setForkDraft(null)} onCommit={commitFork}/>}
         </div> : <Overview
           space={activeSpace}
           activeThreadId={activeNode.threadId}
@@ -267,6 +327,7 @@ export function App(): ReactNode {
           onCamera={(camera) => mutate((draft) => { draft.spaces[activeSpace.id]!.camera = camera; }, 400)}
           onNodePosition={(threadId, position) => mutate((draft) => { draft.spaces[activeSpace.id]!.nodes[threadId]!.position = position; }, 400)}
           onFocus={selectThread}
+          onRename={renameThread}
         />}
       </>}
     </main>
@@ -318,19 +379,21 @@ function TopBar({ space, node, mode, connected, onMode, onRenameSpace, onArchive
     <div className="segmented"><button className={mode === "focus" ? "active" : ""} onClick={() => onMode("focus")}><Icon name="chat"/> Focus <kbd>⌘1</kbd></button><button className={mode === "overview" ? "active" : ""} onClick={() => onMode("overview")}><Icon name="map"/> Overview <kbd>⌘2</kbd></button></div>
     <div className="topbar-actions">
       <button onClick={onDiff}><Icon name="diff"/> Diff</button>
-      <button onClick={onOpenCodex}><Icon name="external"/> Codex</button>
+      <button onClick={onOpenCodex} title="Copy this Thread ID, then open Codex"><Icon name="external"/> Copy ID & open Codex</button>
       <button className="icon-button" onClick={() => setMenu(!menu)}><Icon name="more"/></button>
       {menu && <div className="topbar-menu"><button onClick={() => { setEditingThread(true); setMenu(false); }}>Rename Thread</button><button onClick={() => { setEditingSpace(true); setMenu(false); }}>Rename Space</button><button className="danger" onClick={onArchive}>Archive Space</button></div>}
     </div>
   </header>;
 }
 
-function LineageRail({ space, activeThreadId, threads, onSelect }: {
+function LineageRail({ space, activeThreadId, threads, onSelect, onRename }: {
   space: SpaceRecord;
   activeThreadId: string;
   threads: Record<string, ThreadSnapshot>;
   onSelect(threadId: string, turnId?: string): void;
+  onRename(threadId: string, name: string): Promise<void>;
 }): ReactNode {
+  const [editing, setEditing] = useState<string | null>(null);
   const ordered = useMemo(() => treeOrder(space), [space]);
   const active = space.nodes[activeThreadId]!;
   return <aside className="lineage-rail">
@@ -343,7 +406,8 @@ function LineageRail({ space, activeThreadId, threads, onSelect }: {
       const latest = thread ? latestCompletedTurn(thread) : null;
       const newResult = Boolean(latest && node.lastViewedTurnId !== latest.id);
       const failed = thread?.status.type === "systemError" || thread?.turns.at(-1)?.status === "failed";
-      return <button key={node.threadId} className={node.threadId === activeThreadId ? "active" : ""} title={depth > 4 ? `Depth ${depth} · ${node.title}` : node.title} style={{ paddingLeft: 12 + Math.min(depth, 4) * 18 }} onClick={() => onSelect(node.threadId)}>
+      if (editing === node.threadId) return <div className="lineage-rename" key={node.threadId} style={{ paddingLeft: 12 + Math.min(depth, 4) * 18 }}><input autoFocus defaultValue={node.title} aria-label={`Rename ${node.title}`} onBlur={(event) => { const name = event.target.value.trim(); if (name && name !== node.title) void onRename(node.threadId, name); setEditing(null); }} onKeyDown={(event) => { if (event.key === "Enter") event.currentTarget.blur(); if (event.key === "Escape") setEditing(null); }}/></div>;
+      return <button key={node.threadId} className={node.threadId === activeThreadId ? "active" : ""} title={depth > 4 ? `Depth ${depth} · ${node.title}` : node.title} style={{ paddingLeft: 12 + Math.min(depth, 4) * 18 }} onClick={() => onSelect(node.threadId)} onDoubleClick={(event) => { event.preventDefault(); setEditing(node.threadId); }}>
         <span className={`node-dot ${running ? "running" : ""} ${flags.length ? "attention" : ""} ${newResult ? "new-result" : ""} ${failed ? "failed" : ""}`}/>
         <span><strong>{node.title}</strong><small>{relativeTime(thread?.updatedAt ?? node.createdAt)}</small></span>
       </button>;
@@ -396,7 +460,7 @@ function DiffDrawer({ node, onClose }: { node: SpaceNode; onClose(): void }): Re
         <div className="diff-summary"><strong>{value.summary.changedFileCount}</strong> changed files <span className="additions">+{value.summary.additions}</span><span className="deletions">−{value.summary.deletions}</span></div>
         <div className="file-list">{value.summary.files.map((file) => <div key={`${file.previousPath}-${file.path}`}><span className={`file-status ${file.status}`}>{file.status[0]?.toUpperCase()}</span><span>{file.previousPath ? `${file.previousPath} → ${file.path}` : file.path}</span><em><b>+{file.additions ?? "–"}</b> <i>−{file.deletions ?? "–"}</i></em></div>)}</div>
         <pre className="diff-patch">{value.patch || "No textual diff. Binary or metadata-only changes may still be listed above."}</pre>
-        <footer><button onClick={() => void window.peel.openTarget({ kind: "worktree", cwd: node.cwd })}><Icon name="folder"/> Open worktree</button><button className="primary-button" onClick={() => void window.peel.openTarget({ kind: "editor", cwd: node.cwd })}>Open in editor</button></footer>
+        <footer><button onClick={() => void window.peel.openTarget({ kind: "worktree", cwd: node.cwd })}><Icon name="folder"/> Open worktree</button><button onClick={() => void window.peel.openTarget({ kind: "codex", cwd: node.cwd, threadId: node.threadId })}><Icon name="external"/> Open in Codex</button><button className="primary-button" onClick={() => void window.peel.openTarget({ kind: "editor", cwd: node.cwd })}>Open in editor</button></footer>
       </>}
     </aside>
   </div>;

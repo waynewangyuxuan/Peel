@@ -43,7 +43,6 @@ try {
   await page.getByRole("button", { name: /Choose a Codex Chat/ }).click();
   await page.getByText("Spatial product direction").last().click();
   await page.getByLabel("Message").fill("Packaged draft survives a full restart");
-  await page.waitForTimeout(600);
   await application.close();
 
   application = await electron.launch({ executablePath: executable, env });
