@@ -1,0 +1,18 @@
+{
+  "acceptance_ids": [
+    "diff-and-open-facts"
+  ],
+  "evidence_id": "evidence-diff-and-open-facts",
+  "kind": "ticket_evidence",
+  "origin": "agent",
+  "recorded_at": "2026-08-25T22:10:00Z",
+  "refs": [
+    "packages/git-workspace/src/adapter.ts",
+    "packages/git-workspace/src/types.ts",
+    "packages/git-workspace/test/adapter.test.ts",
+    "packages/git-workspace/README.md"
+  ],
+  "schema_version": 1,
+  "summary": "The adapter returns changed-file count, per-file status, additions, deletions, binary flags, aggregate totals, and aggregate or per-file unified diffs including untracked files. NUL-delimited numstat preserves valid paths containing tabs. Explicit inert Worktree, Editor, and Codex intents pass lexical and realpath containment, rejecting in-worktree symlinks that resolve outside. The package contains no cleanup, commit, push, PR, branch graph, management, or comparison API.",
+  "ticket_id": "ticket-build-git-workspace-adapter"
+}

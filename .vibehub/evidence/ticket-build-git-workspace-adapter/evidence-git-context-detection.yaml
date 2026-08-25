@@ -1,0 +1,18 @@
+{
+  "acceptance_ids": [
+    "detect-git-context"
+  ],
+  "evidence_id": "evidence-git-context-detection",
+  "kind": "ticket_evidence",
+  "origin": "agent",
+  "recorded_at": "2026-08-25T22:10:00Z",
+  "refs": [
+    "packages/git-workspace/src/adapter.ts",
+    "packages/git-workspace/src/git-runner.ts",
+    "packages/git-workspace/test/adapter.test.ts",
+    "packages/git-workspace/VERIFICATION.md"
+  ],
+  "schema_version": 1,
+  "summary": "Read-only inspection resolves cwd, worktree root, main checkout, common Git directory, per-worktree Git directory, branch or detached identity, HEAD, linked-worktree status, and dirty state. Tests compare main and linked checkouts and confirm inspection leaves status unchanged; GIT_OPTIONAL_LOCKS=0 prevents optional index refresh locks.",
+  "ticket_id": "ticket-build-git-workspace-adapter"
+}

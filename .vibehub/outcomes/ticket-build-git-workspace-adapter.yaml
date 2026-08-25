@@ -1,0 +1,23 @@
+{
+  "accepted_acceptance_ids": [
+    "detect-git-context",
+    "create-worktree-safely",
+    "recover-partial-failure",
+    "diff-and-open-facts",
+    "temporary-repo-tests"
+  ],
+  "closed_at": "2026-08-25T21:21:29Z",
+  "evidence_ids": [
+    "evidence-git-context-detection",
+    "evidence-safe-worktree-creation",
+    "evidence-recoverable-worktree-failure",
+    "evidence-diff-and-open-facts",
+    "evidence-temporary-repo-tests"
+  ],
+  "kind": "ticket_outcome",
+  "schema_version": 1,
+  "status": "successful",
+  "summary": "Independent closeout accepted all five criteria after reviewing the exact Ticket, three Context references, complete package implementation, tests, documentation, and all five Evidence records. Read-only inspection resolves main versus linked worktree identity, branch or detached HEAD, Git directories, HEAD, and dirty state with optional locks disabled. Creation validates a nonempty pending Fork identity, Git context, absolute resolved target parent, broad/root boundaries, and a commit-resolved base ref before allocating a collision-free peel branch and direct-child path. Every creation failure is normalized with stage, retry and Current Workspace facts, unchanged pendingForkId, attempted identity, and only positively detected branch, registered-worktree, or leftover-directory artifacts. Diff and open facts provide per-file and aggregate counts, NUL-safe paths and rename mapping, tracked/untracked unified diffs, and inert Worktree/Editor/Codex targets with lexical and realpath containment; no cleanup, commit, push, PR, branch dashboard, management, or comparison surface exists. Independent verification passed 10/10 disposable-repository tests, strict TypeScript build, package dry run, project and Ticket validation, plus adversarial probes for detached HEAD, read-only status, home-root rejection, tab-containing modified and renamed paths, and symlink escape rejection. Fixture cleanup is limited to each mkdtemp-owned root.",
+  "ticket_id": "ticket-build-git-workspace-adapter",
+  "unresolved_acceptance_ids": []
+}
