@@ -1,0 +1,11 @@
+{
+  "schema_version": 1,
+  "kind": "room",
+  "room_id": "product",
+  "description": "Peel 的产品定义、版本边界与跨模块体验契约。",
+  "boundary": "拥有 Peel 的长期产品意图、核心领域模型、版本范围和发布门槛；不拥有具体实现方案、单个组件设计或执行计划。",
+  "anchors": [
+    "docs/product/source/"
+  ],
+  "stale": false
+}

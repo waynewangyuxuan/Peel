@@ -1,0 +1,49 @@
+{
+  "context_id": "change-original-project-registration-superseded",
+  "detail": "原始 PRD 和 Demo 仍保留 Codex Project → multiple Spaces、Project 页面、Add to Space、无 Fork relation 的 membership，以及一个 Thread 可引用在多个 Space 的设计。这些是历史来源证据，不再是 v0.1/v0.2 的 active product contract。后续讨论明确改为 Desktop Thread-first：任意 Chat 创建一个新 Space Root；Space 只通过真实 Fork 扩展；不处理 Chat 被拖进/移出 Project；不加入无关 Chat、Forest 或 Cross-project graph。未来若加入 Project，只作为服务端 Context inheritance overlay，不恢复原来的 membership topology。任何从旧 Demo 或 PRD 自动蒸馏出的 Project-first 结论都必须让位于这条变更。",
+  "evidence": [
+    {
+      "note": "第 3、7、9、10 章保存被取代的 Project-first 与 membership 设计。",
+      "ref": "docs/product/source/spatial-thread-workspace-prd-v0-original.md"
+    },
+    {
+      "note": "Demo sidebar/Why & Model/V0 scope 保存 Project → Spaces 的历史视觉表达。",
+      "ref": "docs/product/source/peel-demo-v0-original.html"
+    },
+    {
+      "note": "后续人类讨论明确选择 Thread-first、单 Root 真 Fork Tree 和当前忽略 Project。",
+      "ref": "conversation:2026-08-25-peel-v01-v02-scope"
+    }
+  ],
+  "kind": "context",
+  "relations": [
+    {
+      "target_context_id": "decision-thread-first-space-entry",
+      "type": "relates_to"
+    },
+    {
+      "target_context_id": "decision-project-optional-context-overlay",
+      "type": "relates_to"
+    },
+    {
+      "target_context_id": "decision-single-root-fork-tree",
+      "type": "relates_to"
+    }
+  ],
+  "schema_version": 1,
+  "source": {
+    "captured_at": "2026-08-25T18:34:18Z",
+    "quote": "我们先不去管 Project 概念，我们就纯粹地是用 Chat 这个概念来承载我们的这样一个产品。",
+    "ref": "conversation:2026-08-25-peel-v01-v02-scope"
+  },
+  "state": "active",
+  "summary": "原 PRD/Demo 的 Project-first、Add to Space 与多 Space membership 语义已被 Thread-first 单根树决定取代",
+  "tags": [
+    "supersession",
+    "project-first",
+    "add-to-space",
+    "thread-first",
+    "source-conflict"
+  ],
+  "type": "change"
+}

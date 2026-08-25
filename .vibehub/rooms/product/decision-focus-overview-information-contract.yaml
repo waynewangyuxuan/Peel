@@ -1,0 +1,41 @@
+{
+  "context_id": "decision-focus-overview-information-contract",
+  "detail": "Focus 必须像高质量 Codex/ChatGPT Chat：一个完整、未被 Canvas transform 的 Chat Surface，加一条克制的 persistent Fork Tree，只回答当前位置、Parent/Sibling/Child、注意力状态和轻量 Worktree 信息。Overview 中没有 Focus Chat 和 Composer，完整 Fork Tree 成为主界面，Card 用更高密度的确定性信息回答探索形状、各分支最近在做什么和需要注意什么。Overview 不是放大的 Focus Tree，Focus 也不应塞入 Summary/Latest Result。模式切换是同一组真实 Thread 的观察尺度变化，不是两套产品或两份状态。",
+  "evidence": [
+    {
+      "note": "第 3、4、8、9 章定义两种状态的目的与信息密度。",
+      "ref": "docs/product/source/spatial-thread-workspace-prd-v0-original.md"
+    },
+    {
+      "note": "Demo 同时提供 Focus Tree + Chat 与无 Composer 的 Overview Card 世界，形成可操作证据。",
+      "ref": "docs/product/source/peel-demo-v0-original.html"
+    }
+  ],
+  "kind": "context",
+  "relations": [
+    {
+      "target_context_id": "intent-spatial-thread-workspace",
+      "type": "relates_to"
+    },
+    {
+      "target_context_id": "contract-v01-core-spatial-fork-loop",
+      "type": "relates_to"
+    }
+  ],
+  "schema_version": 1,
+  "source": {
+    "captured_at": "2026-08-25T18:34:18Z",
+    "quote": "Focus 让用户继续工作；Overview 让用户看清这些工作是怎样分叉出来的。",
+    "ref": "distill:docs/product/source/spatial-thread-workspace-prd-v0-original.md#8-product-design-principles"
+  },
+  "state": "active",
+  "summary": "Focus 是工作状态，Overview 是识别状态，两者使用不同信息契约",
+  "tags": [
+    "focus",
+    "overview",
+    "information-contract",
+    "ux",
+    "chat-first"
+  ],
+  "type": "decision"
+}

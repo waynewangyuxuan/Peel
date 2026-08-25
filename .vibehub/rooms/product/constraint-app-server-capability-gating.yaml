@@ -1,0 +1,47 @@
+{
+  "context_id": "constraint-app-server-capability-gating",
+  "detail": "Peel 的基础 Thread Loop 可以依赖官方文档覆盖的 thread/list、thread/read、thread/fork(lastTurnId)、thread/name/set、thread/status/changed、Turn/Item streaming、Approval 和 turn/diff/updated。实验能力不能静默成为领域模型前提：例如 parentThreadId/ancestorThreadId filtering、分页 Turns/Items、WebSocket transport，以及本机 0.149 schema 中出现但公开稳定文档未承诺的 Project APIs/Realtime voice。客户端启动时必须探测方法和 experimentalApi capability，把功能映射为 stable / experimental-enabled / unavailable；不可用时隐藏或降级，不伪造数据。Project association 和继承属于可选实验，Thread-first Loop 必须在 Project API 完全缺失时成立。New Worktree 不以未证实的 App Server 方法为前提。",
+  "evidence": [
+    {
+      "note": "官方文档确认 Thread/Fork/Name/Status/Diff/Approval 主路径，并明确标识多项 experimental API 和 WebSocket transport。",
+      "ref": "https://learn.chatgpt.com/docs/app-server"
+    },
+    {
+      "note": "本机 schema 审计发现 Project 与 Realtime 相关方法存在实验面，但不等同公开稳定契约。",
+      "ref": "local-schema:codex-app-server-0.149.0"
+    },
+    {
+      "note": "用户决定 Project 能力缺失时完全回到 Thread/Chat 模型。",
+      "ref": "conversation:2026-08-25-peel-v01-v02-scope"
+    }
+  ],
+  "kind": "context",
+  "relations": [
+    {
+      "target_context_id": "decision-app-server-adapter-architecture",
+      "type": "depends_on"
+    },
+    {
+      "target_context_id": "decision-project-optional-context-overlay",
+      "type": "relates_to"
+    }
+  ],
+  "schema_version": 1,
+  "source": {
+    "captured_at": "2026-08-25T18:34:18Z",
+    "quote": "它如果根本就不提供我们去看这个 Desktop Project 的这个能力，那我们就不用管了。",
+    "ref": "conversation:2026-08-25-codex-app-server-capability-audit"
+  },
+  "state": "active",
+  "summary": "Peel 必须区分稳定、实验和缺失的 App Server 能力，并在启动时做 capability detection",
+  "tags": [
+    "capability-gating",
+    "app-server",
+    "stable",
+    "experimental",
+    "project-api",
+    "realtime",
+    "fallback"
+  ],
+  "type": "constraint"
+}

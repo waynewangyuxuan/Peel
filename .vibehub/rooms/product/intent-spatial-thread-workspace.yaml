@@ -1,0 +1,33 @@
+{
+  "context_id": "intent-spatial-thread-workspace",
+  "detail": "Peel 是面向 Codex Desktop 的空间化 Chat 工作区。Codex 继续拥有 Conversation、Turn、Transcript、执行和运行状态；Peel 负责把真实 Thread 的 Fork lineage、稳定空间位置和跨分支注意力组织成 Focus 与 Overview 两种视图。首要价值不是复刻 Codex，也不是制作一张好看的图，而是让用户在产生多个分支后，能够更容易理解非当前分支、回到它并继续工作。",
+  "evidence": [
+    {
+      "note": "用户要求在审阅 PRD、Demo 和 Codex App Server 能力后，沉淀 v0.1 与 v0.2 的产品边界。",
+      "ref": "conversation:2026-08-25-peel-v01-v02-scope"
+    },
+    {
+      "note": "原始 PRD 将完整 Chat 体验、精确 Fork 来源和稳定空间记忆定义为核心价值。",
+      "ref": "docs/product/source/spatial-thread-workspace-prd-v0-original.md"
+    }
+  ],
+  "kind": "context",
+  "relations": [],
+  "schema_version": 1,
+  "source": {
+    "captured_at": "2026-08-25T08:03:50Z",
+    "quote": "Codex owns the conversation. We make its branches visible.",
+    "ref": "conversation:2026-08-25-peel-v01-v02-scope"
+  },
+  "state": "active",
+  "summary": "Peel 让真实 Codex Chat 的分叉可见、可理解、可返回，而不复制或取代 Codex",
+  "tags": [
+    "peel",
+    "product-thesis",
+    "desktop",
+    "codex",
+    "spatial",
+    "fork"
+  ],
+  "type": "intent"
+}

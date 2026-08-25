@@ -1,0 +1,46 @@
+{
+  "context_id": "contract-success-and-dogfood-measurement",
+  "detail": "Activation 要求用户从已有 Chat 在 30 秒内创建第一个 Fork，且无需理解 Node/Edge/Graph/Git 术语。Core Utility 的关键证据是：拥有至少两个 Fork 的 Space 中，用户通过 Tree/Overview 返回非当前 Branch；用户不打开 Transcript 也能判断各 Branch 大致方向与状态；能准确回答当前 Thread 的 Parent 与 Sibling。Reliability 包括 Draft 丢失率 0、Fork Edge 与真实 lineage 一致、Node 意外位移率 0、Worktree 失败不丢 Prompt、Rename 同步目标 >99%。Dogfood 记录 Fork turn、Space size、fork-from-fork、Focus/Overview 使用、workspace/worktree 选择、Diff/Rename 行为、数日后重返 Branch 和最有辨识力的 Card 信息。指标用于决定 v0.2 scale、Project inheritance 与未来 Convergence，而不是证明活跃度本身。",
+  "evidence": [
+    {
+      "note": "第 13、14、15 章提供 UX acceptance、量化目标、Dogfood signals 与风险对照。",
+      "ref": "docs/product/source/spatial-thread-workspace-prd-v0-original.md"
+    },
+    {
+      "note": "此前讨论确认 North Star 和 30–50 Node Visual test。",
+      "ref": "conversation:2026-08-25-peel-v01-v02-scope"
+    }
+  ],
+  "kind": "context",
+  "relations": [
+    {
+      "target_context_id": "intent-spatial-thread-workspace",
+      "type": "relates_to"
+    },
+    {
+      "target_context_id": "contract-v01-core-spatial-fork-loop",
+      "type": "relates_to"
+    },
+    {
+      "target_context_id": "contract-v02-scale-continuity-context",
+      "type": "relates_to"
+    }
+  ],
+  "schema_version": 1,
+  "source": {
+    "captured_at": "2026-08-25T18:34:18Z",
+    "quote": "用户会因为空间结构而更容易返回、理解并继续非当前分支。",
+    "ref": "distill:docs/product/source/spatial-thread-workspace-prd-v0-original.md#14-success-metrics"
+  },
+  "state": "active",
+  "summary": "Peel 的成功以用户理解、返回并继续非当前分支为核心，而非 Fork 数或图的美观",
+  "tags": [
+    "success-metrics",
+    "dogfood",
+    "activation",
+    "reliability",
+    "core-utility",
+    "north-star"
+  ],
+  "type": "contract"
+}

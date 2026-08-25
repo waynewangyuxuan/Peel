@@ -1,0 +1,672 @@
+<!doctype html>
+<html lang="zh-CN">
+<head>
+<meta charset="utf-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1" />
+<title>Spatial Thread Workspace — Product & UX Foundation</title>
+<!--
+  Spatial Thread Workspace — self-contained product / UX prototype.
+  No external assets or dependencies. Copy this file directly into a project and open it in a browser.
+-->
+<style>
+  :root {
+    --page:#e9e9e6;
+    --surface:#ffffff;
+    --surface-2:#f7f7f5;
+    --surface-3:#f1f1ee;
+    --canvas:#f6f6f3;
+    --ink:#20201f;
+    --ink-2:#4f4f4b;
+    --muted:#777772;
+    --muted-2:#9b9b95;
+    --line:#e4e4df;
+    --line-2:#d4d4ce;
+    --dark:#232322;
+    --green:#397552;
+    --red:#a04a45;
+    --amber:#9b6a26;
+    --blue:#4b6587;
+    --shadow:0 24px 70px rgba(0,0,0,.13),0 4px 16px rgba(0,0,0,.05);
+    --soft-shadow:0 10px 32px rgba(0,0,0,.085),0 1px 5px rgba(0,0,0,.035);
+    --topbar-h:58px;
+    --sidebar-w:226px;
+    --tree-w:248px;
+    --app-header-h:58px;
+  }
+
+  *{box-sizing:border-box}
+  html,body{width:100%;height:100%;margin:0}
+  body{
+    overflow:hidden;background:var(--page);color:var(--ink);
+    font-family:ui-sans-serif,-apple-system,BlinkMacSystemFont,"Segoe UI",sans-serif;
+    -webkit-font-smoothing:antialiased;text-rendering:optimizeLegibility;
+  }
+  button,input,textarea,select{font:inherit;color:inherit}
+  button{cursor:pointer}
+  svg{display:block}
+
+  .topbar{
+    height:var(--topbar-h);display:grid;grid-template-columns:minmax(270px,1fr) auto minmax(270px,1fr);
+    align-items:center;gap:16px;padding:0 18px;border-bottom:1px solid rgba(0,0,0,.09);
+    background:rgba(248,248,246,.95);backdrop-filter:blur(18px);position:relative;z-index:1000;
+  }
+  .brand{display:flex;align-items:center;gap:11px;min-width:0}
+  .brand-mark{
+    width:31px;height:31px;display:grid;place-items:center;border-radius:10px;background:#fff;
+    border:1px solid var(--line-2);box-shadow:0 1px 4px rgba(0,0,0,.055);flex:0 0 31px;
+  }
+  .brand-copy{min-width:0}
+  .brand-copy strong{display:block;font-size:12.8px;letter-spacing:-.01em;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+  .brand-copy small{display:block;margin-top:2px;font-size:10px;color:var(--muted);white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+  .top-tabs{display:flex;align-items:center;gap:4px;padding:4px;border:1px solid var(--line-2);border-radius:12px;background:#ededeb}
+  .top-tab{height:31px;padding:0 14px;border:0;border-radius:9px;background:transparent;font-size:11px;color:#6b6b66}
+  .top-tab:hover{color:var(--ink)}
+  .top-tab.active{background:#fff;color:var(--ink);box-shadow:0 1px 5px rgba(0,0,0,.1)}
+  .top-actions{display:flex;justify-content:flex-end;align-items:center;gap:7px;min-width:0}
+  .top-action{
+    height:32px;padding:0 10px;border:1px solid var(--line-2);border-radius:9px;background:#fff;
+    display:flex;align-items:center;gap:7px;font-size:10.5px;white-space:nowrap;
+  }
+  .top-action:hover{background:#f2f2ef}
+  .top-action.primary{background:var(--dark);border-color:var(--dark);color:#fff}
+  .top-action.primary:hover{background:#393937}
+
+  .page-panel{height:calc(100% - var(--topbar-h));display:none;padding:10px}
+  .page-panel.active{display:block}
+
+  /* ---------- Interactive prototype ---------- */
+  .app-window{
+    width:100%;height:100%;display:flex;overflow:hidden;border-radius:16px;background:#fff;
+    border:1px solid rgba(0,0,0,.08);box-shadow:var(--shadow);
+  }
+  .product-sidebar{
+    width:var(--sidebar-w);flex:0 0 var(--sidebar-w);background:var(--surface-2);padding:10px 8px 9px;
+    border-right:1px solid rgba(0,0,0,.035);display:flex;flex-direction:column;min-width:0;
+  }
+  .sidebar-head{height:42px;display:flex;align-items:center;justify-content:space-between;padding:0 4px 7px}
+  .sidebar-brand{display:flex;align-items:center;gap:9px;font-size:13.5px;font-weight:640}
+  .orb{width:27px;height:27px;border-radius:50%;display:grid;place-items:center;background:var(--dark);color:#fff;font-size:11px}
+  .icon-button{width:32px;height:32px;border:0;border-radius:9px;background:transparent;display:grid;place-items:center;color:#62625e}
+  .icon-button:hover{background:#eaeae7;color:var(--ink)}
+  .sidebar-action{
+    width:100%;height:38px;border:0;border-radius:9px;background:transparent;padding:0 10px;
+    display:flex;align-items:center;gap:10px;text-align:left;font-size:12.2px;
+  }
+  .sidebar-action:hover{background:#eaeae7}
+  .sidebar-section{padding:17px 10px 7px;color:#8d8d87;font-size:10.2px;display:flex;align-items:center;justify-content:space-between}
+  .sidebar-section button{border:0;background:transparent;padding:0;color:#8d8d87;font-size:14px;line-height:1}
+  .sidebar-list{display:flex;flex-direction:column;gap:2px}
+  .sidebar-item{
+    height:35px;padding:0 10px;border-radius:8px;display:flex;align-items:center;gap:9px;min-width:0;
+    color:#51514d;font-size:11.8px;
+  }
+  .sidebar-item:hover{background:#eaeae7}
+  .sidebar-item.active{background:#e5e5e1;color:var(--ink)}
+  .sidebar-item span{white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+  .space-glyph{width:15px;height:15px;position:relative;flex:0 0 15px}
+  .space-glyph::before,.space-glyph::after{content:"";position:absolute;width:4px;height:4px;border:1px solid #989892;border-radius:50%;background:var(--surface-2)}
+  .space-glyph::before{left:1px;top:5px}
+  .space-glyph::after{right:1px;top:1px;box-shadow:0 8px 0 -1px var(--surface-2),0 8px 0 0 #989892}
+  .space-glyph i{position:absolute;left:5px;right:5px;top:7px;height:1px;background:#989892;transform:rotate(-27deg);transform-origin:left}
+  .project-pill{font-size:8px;border:1px solid #d8d8d2;border-radius:999px;padding:2px 5px;color:#80807a;margin-left:auto}
+  .sidebar-spacer{flex:1}
+  .profile{display:flex;align-items:center;gap:9px;border-radius:9px;padding:7px 8px}
+  .profile:hover{background:#eaeae7}
+  .avatar{width:28px;height:28px;border-radius:50%;background:#dcd7ce;display:grid;place-items:center;font-size:10px;font-weight:700}
+  .profile strong{display:block;font-size:11.5px}.profile small{display:block;margin-top:1px;color:var(--muted);font-size:9.3px}
+
+  .app-main{flex:1;min-width:0;position:relative;overflow:hidden;background:#fff}
+  .app-header{
+    position:absolute;z-index:40;left:0;right:0;top:0;height:var(--app-header-h);padding:0 16px 0 18px;
+    display:flex;align-items:center;justify-content:space-between;background:rgba(255,255,255,.91);
+    border-bottom:1px solid rgba(0,0,0,.05);backdrop-filter:blur(17px);
+  }
+  .app-header-left{min-width:0;display:flex;align-items:center;gap:9px}
+  .title-button{height:32px;max-width:420px;border:0;border-radius:8px;background:transparent;padding:0 6px;display:flex;align-items:center;gap:6px;font-size:13.4px;font-weight:640;min-width:0}
+  .title-button:hover{background:#f3f3f0}
+  .title-button span{white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+  .inline-title-input{height:31px;width:min(380px,38vw);border:1px solid #c9c9c3;border-radius:8px;background:#fff;padding:0 9px;outline:0;font-size:13px;font-weight:620}
+  .breadcrumb{font-size:10.2px;color:var(--muted);border-left:1px solid var(--line-2);padding-left:9px;white-space:nowrap}
+  .app-header-actions{display:flex;align-items:center;gap:5px}
+  .header-button{
+    height:31px;border:1px solid var(--line);border-radius:9px;background:#fff;padding:0 10px;
+    display:flex;align-items:center;gap:7px;font-size:10.5px;
+  }
+  .header-button:hover{background:#f5f5f2;border-color:#d4d4ce}
+  .mode-toggle{display:flex;align-items:center;gap:3px;padding:3px;background:#f0f0ed;border:1px solid #deded9;border-radius:10px}
+  .mode-toggle button{height:27px;border:0;border-radius:7px;padding:0 9px;background:transparent;color:#6c6c67;font-size:9.8px}
+  .mode-toggle button.active{background:#fff;color:var(--ink);box-shadow:0 1px 4px rgba(0,0,0,.08)}
+
+  .workspace{position:absolute;inset:var(--app-header-h) 0 0;overflow:hidden}
+  .focus-stage{position:absolute;inset:0;display:flex;background:#fff;opacity:1;transform:scale(1);transition:opacity .22s ease,transform .4s cubic-bezier(.2,.75,.2,1)}
+  .focus-stage.hidden{opacity:0;transform:scale(.976);pointer-events:none}
+  .lineage-rail{
+    width:var(--tree-w);flex:0 0 var(--tree-w);background:#fafaf8;border-right:1px solid var(--line);
+    padding:17px 12px 14px;overflow:auto;
+  }
+  .lineage-head{display:flex;align-items:center;justify-content:space-between;padding:0 6px 10px}
+  .lineage-head strong{font-size:11px}.lineage-head small{font-size:9.3px;color:var(--muted)}
+  .lineage-note{margin:0 4px 13px;padding:9px 10px;border:1px solid #e8e8e4;background:#fff;border-radius:10px;color:#7b7b76;font-size:9.6px;line-height:1.45}
+  .tree-root,.tree-root ul{list-style:none;margin:0;padding:0}
+  .tree-root ul{margin-left:15px;padding-left:13px;border-left:1px solid #dcdcd7}
+  .tree-root li{position:relative}.tree-root ul>li::before{content:"";position:absolute;left:-13px;top:20px;width:12px;border-top:1px solid #dcdcd7}
+  .tree-row{min-height:40px;margin:2px 0;border-radius:9px;padding:6px 8px;display:flex;align-items:center;gap:8px;transition:background .15s ease;position:relative}
+  .tree-row:hover{background:#efefec}.tree-row.active{background:#e7e7e3}
+  .thread-dot{width:7px;height:7px;border:1px solid #9a9a95;border-radius:50%;background:#fff;flex:0 0 7px;position:relative}
+  .tree-row.active .thread-dot{background:var(--dark);border-color:var(--dark)}
+  .thread-dot.running{border-color:var(--blue);background:var(--blue);animation:pulse 1.3s ease-in-out infinite}
+  .thread-dot.approval{border-color:var(--amber);background:var(--amber)}
+  .thread-dot.failed{border-color:var(--red);background:var(--red)}
+  .thread-dot.new-result::after{content:"";position:absolute;width:4px;height:4px;border-radius:50%;background:#4b6587;right:-4px;top:-4px;border:1px solid #fafaf8}
+  @keyframes pulse{0%,100%{opacity:.55}50%{opacity:1}}
+  .tree-copy{min-width:0;flex:1}.tree-title{font-size:11.1px;line-height:1.2;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}.tree-meta{margin-top:3px;font-size:8.9px;color:#8b8b85;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+  .tree-badge{font-size:8px;border:1px solid #dbdbd6;border-radius:999px;padding:2px 5px;background:#fff;color:#696965;white-space:nowrap}
+  .tree-title-input{width:100%;height:23px;border:1px solid #c9c9c3;border-radius:6px;background:#fff;padding:0 5px;font-size:10.7px;outline:0}
+
+  .chat-surface{position:relative;flex:1;min-width:0;height:100%;overflow:hidden;display:flex;flex-direction:column;background:#fff}
+  .transcript-scroller{flex:1;overflow:auto;overscroll-behavior:contain;scrollbar-width:thin;scrollbar-color:#d0d0ca transparent}
+  .transcript{max-width:760px;margin:0 auto;padding:43px 27px 185px}
+  .fork-context{
+    margin:0 0 28px;padding:10px 12px;border:1px solid #e4e4df;border-radius:11px;background:#fafaf8;
+    display:flex;align-items:flex-start;gap:9px;color:#666661;font-size:10.4px;line-height:1.45;
+  }
+  .fork-context button{border:0;background:transparent;padding:0;color:#333331;text-decoration:underline;text-underline-offset:3px}
+  .draft-banner{margin:0 0 22px;padding:10px 12px;border:1px dashed #d3d3cd;border-radius:11px;background:#fbfbf9;color:#74746f;font-size:9.8px;line-height:1.45;display:flex;align-items:flex-start;gap:8px}
+  .message{position:relative;margin:0 0 28px;font-size:14px;line-height:1.62;letter-spacing:-.006em}
+  .message.flash{animation:turnFlash 1.25s ease}
+  @keyframes turnFlash{0%{background:#fff5c9;box-shadow:0 0 0 8px #fff5c9}100%{background:transparent;box-shadow:0 0 0 8px transparent}}
+  .message.user{display:flex;justify-content:flex-end}.user-bubble{max-width:78%;border-radius:19px;background:#f1f1ef;padding:10px 15px}
+  .assistant-body p{margin:0 0 11px}.assistant-body p:last-child{margin-bottom:0}.assistant-body ul{margin:9px 0 0 19px;padding:0}.assistant-body li{margin:5px 0}.assistant-body strong{font-weight:660}.assistant-body code{font-family:ui-monospace,SFMono-Regular,Menlo,monospace;font-size:12.2px;background:#f2f2ef;border-radius:5px;padding:2px 5px}
+  .activity-block{margin:12px 0 0;border:1px solid #e5e5e0;border-radius:11px;background:#fafaf8;padding:10px 11px;color:#666661;font-size:10.4px}
+  .activity-title{display:flex;align-items:center;gap:7px;color:#3d3d3a;margin-bottom:6px}.activity-line{display:flex;align-items:center;gap:7px;padding:2px 0}
+  .message-actions{height:27px;display:flex;align-items:center;gap:1px;margin-top:6px;opacity:0;transform:translateY(-2px);transition:.16s ease}
+  .message:hover .message-actions,.message.last-assistant .message-actions{opacity:1;transform:translateY(0)}
+  .msg-action{height:27px;border:0;background:transparent;border-radius:7px;padding:0 7px;display:flex;align-items:center;gap:5px;color:#72726e;font-size:10.4px}
+  .msg-action:hover{background:#f2f2ef;color:var(--ink)}
+  .branch-anchor{position:absolute;right:-25px;top:6px;width:14px;height:14px;border-radius:50%;border:1px solid #bcbcb6;background:#fff;opacity:0;transition:.15s ease}
+  .message:hover .branch-anchor,.message.last-assistant .branch-anchor{opacity:1}.branch-anchor::after{content:"";position:absolute;width:4px;height:4px;border-radius:50%;background:#5e5e5a;left:4px;top:4px}.branch-anchor:hover{transform:scale(1.15);border-color:#777772}
+
+  .composer-wrap{position:absolute;z-index:20;left:0;right:0;bottom:0;padding:56px 24px 17px;background:linear-gradient(to bottom,rgba(255,255,255,0),rgba(255,255,255,.94) 30%,#fff 62%);pointer-events:none}
+  .composer-shell{max-width:760px;margin:0 auto;pointer-events:auto}
+  .fork-runtime-row{display:none;align-items:center;justify-content:space-between;margin:0 7px 7px;padding:0 2px;color:#777772;font-size:9.5px}
+  .fork-runtime-row.visible{display:flex}
+  .runtime-select{height:27px;border:1px solid #ddddD7;border-radius:9px;background:#fff;padding:0 8px;font-size:9.5px;outline:0}
+  .composer{min-height:58px;border:1px solid #deded9;border-radius:27px;background:#fff;box-shadow:0 2px 12px rgba(0,0,0,.07);padding:9px 10px 9px 11px;display:flex;align-items:flex-end;gap:7px}
+  .composer:focus-within{border-color:#c7c7c1;box-shadow:0 3px 16px rgba(0,0,0,.09)}
+  .composer textarea{flex:1;min-height:38px;max-height:130px;border:0;outline:0;resize:none;background:transparent;padding:9px 3px 7px;line-height:1.42;font-size:13.4px}
+  .composer textarea::placeholder{color:#999994}
+  .composer-tool{width:38px;height:38px;flex:0 0 38px;border:0;border-radius:50%;background:transparent;display:grid;place-items:center;color:#5e5e5a}
+  .composer-tool:hover{background:#f1f1ee;color:var(--ink)}.composer-tool.send{background:var(--dark);color:#fff}.composer-tool.send:hover{background:#393937}.composer-tool.listening{background:#fff0ee;color:#b5483f;animation:micPulse 1.05s ease-in-out infinite}
+  @keyframes micPulse{0%,100%{transform:scale(1)}50%{transform:scale(1.09)}}
+  .composer-caption{text-align:center;margin-top:7px;color:#a4a49e;font-size:8.8px}
+
+  /* Overview */
+  .overview-stage{position:absolute;inset:0;background:var(--canvas);overflow:hidden;opacity:0;transform:scale(1.025);pointer-events:none;transition:opacity .24s ease,transform .42s cubic-bezier(.2,.75,.2,1)}
+  .overview-stage.visible{opacity:1;transform:scale(1);pointer-events:auto}
+  .overview-stage::before{content:"";position:absolute;inset:0;opacity:.16;pointer-events:none;background-image:radial-gradient(circle,#b7b7b1 1px,transparent 1.1px);background-size:28px 28px;mask-image:linear-gradient(to bottom,rgba(0,0,0,.4),rgba(0,0,0,.08))}
+  .overview-toolbar{position:absolute;z-index:12;left:18px;right:18px;top:16px;display:flex;align-items:flex-start;justify-content:space-between;pointer-events:none}
+  .overview-title{pointer-events:auto;padding:9px 11px;border:1px solid rgba(0,0,0,.07);border-radius:11px;background:rgba(255,255,255,.86);backdrop-filter:blur(15px);box-shadow:0 2px 8px rgba(0,0,0,.045)}
+  .overview-title strong{display:block;font-size:12px}.overview-title small{display:block;margin-top:3px;color:var(--muted);font-size:9.5px}
+  .overview-controls{pointer-events:auto;display:flex;gap:4px;padding:4px;border:1px solid rgba(0,0,0,.08);border-radius:11px;background:rgba(255,255,255,.86);backdrop-filter:blur(15px)}
+  .overview-control{width:31px;height:30px;border:0;border-radius:8px;background:transparent;color:#656560}.overview-control:hover{background:#efefec;color:var(--ink)}
+  .overview-viewport{position:absolute;inset:0;overflow:hidden}.overview-world{position:absolute;left:0;top:0;width:1380px;height:760px;transform-origin:0 0}.overview-edges{position:absolute;inset:0;width:1380px;height:760px;overflow:visible;pointer-events:none}.overview-edge{fill:none;stroke:#bcbcb6;stroke-width:1.2;opacity:.78}.overview-edge.active{stroke:#555551;stroke-width:1.7;opacity:.95}
+  .overview-node{position:absolute;width:294px;min-height:205px;border:1px solid #deded9;border-radius:15px;background:rgba(255,255,255,.97);box-shadow:var(--soft-shadow);padding:13px 14px 12px;transition:transform .18s ease,box-shadow .18s ease,border-color .18s ease;user-select:none}
+  .overview-node:hover{transform:translateY(-3px);border-color:#c3c3bd;box-shadow:0 15px 42px rgba(0,0,0,.105),0 2px 7px rgba(0,0,0,.04)}
+  .overview-node.dragging{transform:none!important;box-shadow:0 18px 44px rgba(0,0,0,.14);cursor:grabbing}.overview-node.root-node{min-height:194px}
+  .node-top{display:flex;align-items:flex-start;justify-content:space-between;gap:10px}.node-title-wrap{min-width:0}.node-kicker{font-size:8.2px;text-transform:uppercase;letter-spacing:.08em;color:#91918c;margin-bottom:5px}.node-title{font-size:13px;font-weight:650;letter-spacing:-.015em;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;cursor:text}.node-title-input{width:100%;height:27px;border:1px solid #c9c9c3;border-radius:7px;background:#fff;padding:0 6px;font-size:12.5px;font-weight:630;outline:0}
+  .node-state{flex:0 0 auto;display:flex;align-items:center;gap:5px;color:#777773;font-size:8.5px}.node-state i{width:6px;height:6px;border-radius:50%;background:#757570}.node-state i.running{background:var(--blue);animation:pulse 1.3s ease-in-out infinite}.node-state i.approval{background:var(--amber)}.node-state i.failed{background:var(--red)}
+  .node-origin{margin-top:10px;padding:7px 8px;border-radius:9px;background:#f7f7f4;color:#72726d;font-size:8.9px;line-height:1.35;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}.node-origin strong{color:#444441;font-weight:600}
+  .node-fact{border-top:1px solid #ecece8;padding-top:8px;margin-top:8px;display:grid;grid-template-columns:54px 1fr;gap:7px;font-size:9.3px;line-height:1.38}.fact-label{color:#999993}.fact-copy{color:#41413e;min-width:0;display:-webkit-box;-webkit-line-clamp:2;-webkit-box-orient:vertical;overflow:hidden}
+  .node-footer{margin-top:10px;display:flex;align-items:center;justify-content:space-between;gap:8px;color:#92928d;font-size:8.7px}.node-foot-left,.node-foot-right{display:flex;align-items:center;gap:6px;min-width:0}.node-pill{position:relative;border:1px solid #deded9;border-radius:999px;padding:3px 6px;background:#fff;color:#666662;white-space:nowrap}.node-pill.clickable:hover{border-color:#bebeb8;color:var(--ink)}
+  .subagent-popover{position:absolute;z-index:90;left:50%;bottom:calc(100% + 8px);width:238px;transform:translateX(-50%) translateY(5px);opacity:0;pointer-events:none;transition:.16s ease;border:1px solid #dcdcd6;border-radius:11px;background:#fff;box-shadow:var(--soft-shadow);padding:9px;color:var(--ink);white-space:normal}
+  .node-pill:hover .subagent-popover{opacity:1;transform:translateX(-50%) translateY(0)}
+  .agent-row{padding:6px;border-radius:8px;background:#fafaf8;margin-bottom:5px}.agent-row:last-child{margin-bottom:0}.agent-head{display:flex;align-items:center;justify-content:space-between;gap:8px;font-size:9px;font-weight:620}.agent-task{margin-top:3px;color:#757570;font-size:8.5px;line-height:1.35}.agent-status{font-weight:500;color:#777772}.agent-status.running{color:var(--blue)}
+  .overview-hint{position:absolute;z-index:10;left:50%;bottom:18px;transform:translateX(-50%);padding:8px 11px;border:1px solid rgba(0,0,0,.08);border-radius:10px;background:rgba(255,255,255,.88);backdrop-filter:blur(14px);color:#747470;font-size:9.3px;box-shadow:0 2px 8px rgba(0,0,0,.04)}
+
+  /* Drawers and overlays */
+  .drawer-backdrop{position:absolute;z-index:70;inset:0;background:rgba(0,0,0,.15);opacity:0;pointer-events:none;transition:opacity .2s ease}.drawer-backdrop.visible{opacity:1;pointer-events:auto}
+  .diff-drawer{position:absolute;z-index:80;right:0;top:0;bottom:0;width:min(560px,52vw);background:#fff;border-left:1px solid var(--line);box-shadow:-18px 0 50px rgba(0,0,0,.11);transform:translateX(102%);transition:transform .34s cubic-bezier(.2,.75,.2,1);display:flex;flex-direction:column}.diff-drawer.visible{transform:translateX(0)}
+  .drawer-header{height:58px;flex:0 0 58px;display:flex;align-items:center;justify-content:space-between;padding:0 15px 0 18px;border-bottom:1px solid var(--line)}.drawer-header strong{font-size:12.5px}.drawer-header small{display:block;margin-top:2px;color:var(--muted);font-size:9.5px}.drawer-body{flex:1;overflow:auto;padding:16px;background:#fafaf8}.diff-summary{display:flex;align-items:center;justify-content:space-between;gap:10px;margin-bottom:12px}.diff-summary strong{font-size:11px}.diff-stats{display:flex;gap:7px;font-size:9.5px}.stat-add{color:var(--green)}.stat-del{color:var(--red)}.file-card{border:1px solid #e2e2dd;border-radius:11px;overflow:hidden;background:#fff;margin-bottom:10px}.file-head{height:37px;padding:0 11px;display:flex;align-items:center;justify-content:space-between;border-bottom:1px solid #ecece8;font-family:ui-monospace,SFMono-Regular,Menlo,monospace;font-size:9.5px}.file-body{font-family:ui-monospace,SFMono-Regular,Menlo,monospace;font-size:9.2px;line-height:1.5;overflow:auto}.diff-line{display:grid;grid-template-columns:30px 30px 1fr;min-width:480px}.diff-line span{padding:1px 7px}.ln{color:#aaa;text-align:right;border-right:1px solid #efefeb;user-select:none}.code{white-space:pre}.diff-line.add{background:#edf7f0}.diff-line.del{background:#fbefee}.diff-line.add .code{color:#285f3f}.diff-line.del .code{color:#8b403b}
+  .peel-layer{position:absolute;z-index:95;inset:0;background:rgba(255,255,255,.91);backdrop-filter:blur(4px);opacity:0;pointer-events:none;transition:opacity .18s ease}.peel-layer.visible{opacity:1;pointer-events:auto}.peel-source,.peel-child{position:absolute;top:50%;width:306px;min-height:146px;transform:translateY(-50%);border:1px solid #d9d9d4;border-radius:15px;background:#fff;box-shadow:var(--soft-shadow);padding:14px}.peel-source{left:14%}.peel-child{right:13%;opacity:0;transform:translateY(-50%) scale(.96)}.peel-layer.visible .peel-child{animation:childIn .62s .22s cubic-bezier(.2,.75,.2,1) forwards}.peel-line{position:absolute;top:50%;left:calc(14% + 306px);right:calc(13% + 306px);height:1px;background:#777773;transform-origin:left;transform:scaleX(0)}.peel-layer.visible .peel-line{animation:lineGrow .55s .08s cubic-bezier(.2,.75,.2,1) forwards}.peel-kicker{font-size:8.3px;letter-spacing:.08em;text-transform:uppercase;color:#969691}.peel-title{margin-top:7px;font-size:13px;font-weight:650}.peel-copy{margin-top:8px;color:#6d6d69;font-size:10.4px;line-height:1.45}@keyframes lineGrow{to{transform:scaleX(1)}}@keyframes childIn{to{opacity:1;transform:translateY(-50%) scale(1)}}
+  .toast{position:absolute;z-index:120;left:50%;bottom:18px;transform:translate(-50%,12px);opacity:0;padding:9px 12px;border-radius:10px;background:#252524;color:#fff;font-size:9.8px;box-shadow:var(--soft-shadow);pointer-events:none;transition:.2s ease}.toast.visible{opacity:1;transform:translate(-50%,0)}
+
+  /* ---------- Documentation panels ---------- */
+  .docs-shell{height:100%;overflow:auto;border:1px solid rgba(0,0,0,.08);border-radius:16px;background:#fff;box-shadow:var(--shadow)}
+  .docs-inner{max-width:1180px;margin:0 auto;padding:72px 52px 90px}
+  .docs-eyebrow{font-size:10px;text-transform:uppercase;letter-spacing:.11em;color:#8d8d87}
+  .docs-hero h1{margin:12px 0 15px;font-size:46px;line-height:1.04;letter-spacing:-.048em;font-weight:650;max-width:900px}.docs-hero p{margin:0;max-width:780px;font-size:17px;line-height:1.58;color:#62625d;letter-spacing:-.01em}.hero-thesis{margin-top:30px;padding:20px 22px;border:1px solid var(--line);border-radius:16px;background:#fafaf8;font-size:19px;line-height:1.45;letter-spacing:-.02em}.hero-thesis strong{font-weight:650}
+  .docs-section{margin-top:74px}.section-heading{display:flex;align-items:flex-end;justify-content:space-between;gap:30px;padding-bottom:18px;border-bottom:1px solid var(--line)}.section-heading h2{margin:0;font-size:25px;letter-spacing:-.035em;font-weight:640}.section-heading p{margin:0;max-width:590px;color:#74746f;font-size:12.5px;line-height:1.55;text-align:right}
+  .model-diagram{margin-top:28px;display:grid;grid-template-columns:220px 40px 1fr;align-items:stretch;gap:0}.model-project{border:1px solid #dcdcd6;border-radius:16px;background:#fafaf8;padding:18px}.model-label{font-size:9px;text-transform:uppercase;letter-spacing:.09em;color:#969690}.model-project h3,.space-model h3{margin:8px 0 7px;font-size:15px;letter-spacing:-.02em}.model-project p,.space-model p{margin:0;color:#73736e;font-size:10.5px;line-height:1.5}.model-arrow{display:grid;place-items:center;color:#8a8a85}.spaces-stack{display:grid;grid-template-columns:repeat(3,1fr);gap:14px}.space-model{border:1px solid #dcdcd6;border-radius:16px;background:#fff;padding:16px;min-height:170px}.space-model.active{border-color:#aaa9a2;box-shadow:var(--soft-shadow)}.mini-tree{margin-top:15px;font-size:10px;color:#5d5d59}.mini-tree div{padding:5px 7px;border-radius:7px}.mini-tree .indent{margin-left:14px;border-left:1px solid #d9d9d3}.mini-tree .selected{background:#efefec;color:#222220}
+  .definition-grid{margin-top:22px;display:grid;grid-template-columns:repeat(4,1fr);gap:12px}.definition-card{border:1px solid var(--line);border-radius:14px;background:#fff;padding:15px}.definition-card strong{display:block;font-size:12.5px;margin-bottom:7px}.definition-card p{margin:0;color:#73736e;font-size:10.5px;line-height:1.5}.definition-card .why{margin-top:10px;padding-top:9px;border-top:1px solid #ededE9;color:#464643}
+  .ownership{margin-top:22px;display:grid;grid-template-columns:1fr 1fr;gap:14px}.ownership-card{border:1px solid var(--line);border-radius:15px;padding:18px;background:#fafaf8}.ownership-card h3{margin:0 0 13px;font-size:14px}.ownership-card ul{margin:0;padding:0;list-style:none;display:grid;grid-template-columns:repeat(2,1fr);gap:8px}.ownership-card li{padding:8px 9px;border-radius:8px;background:#fff;border:1px solid #e7e7e2;font-size:10px;color:#5f5f5a}
+  .reason-grid{margin-top:24px;display:grid;grid-template-columns:repeat(3,1fr);gap:14px}.reason-card{border:1px solid var(--line);border-radius:15px;padding:17px;background:#fff}.reason-number{font-size:9px;color:#95958f}.reason-card h3{margin:8px 0 8px;font-size:14px;letter-spacing:-.02em}.reason-card p{margin:0;color:#72726d;font-size:10.7px;line-height:1.55}
+
+  .focus-overview-grid{margin-top:28px;display:grid;grid-template-columns:1fr 1fr;gap:18px}.contract-card{border:1px solid var(--line);border-radius:17px;padding:20px;background:#fff}.contract-card.overview{background:#fafaf8}.contract-head{display:flex;align-items:center;justify-content:space-between;gap:16px}.contract-head h3{margin:0;font-size:18px;letter-spacing:-.025em}.contract-tag{font-size:9px;border:1px solid #d8d8d2;border-radius:999px;padding:4px 7px;color:#73736e;background:#fff}.contract-quote{margin:18px 0;padding:13px 14px;border-radius:11px;background:#f5f5f2;font-size:13px;line-height:1.5}.contract-list{display:grid;gap:8px}.contract-row{display:grid;grid-template-columns:118px 1fr;gap:12px;padding:8px 0;border-top:1px solid #ecece8;font-size:10.4px;line-height:1.45}.contract-row:first-child{border-top:0}.contract-row strong{font-weight:620}.contract-row span{color:#72726d}
+  .flow{margin-top:28px;display:grid;grid-template-columns:repeat(5,1fr);gap:10px}.flow-step{position:relative;border:1px solid var(--line);border-radius:14px;padding:16px;background:#fff;min-height:150px}.flow-step:not(:last-child)::after{content:"→";position:absolute;right:-16px;top:50%;transform:translateY(-50%);z-index:2;color:#9b9b95;background:#fff;padding:2px}.flow-step small{font-size:8.5px;text-transform:uppercase;letter-spacing:.08em;color:#999993}.flow-step h3{margin:8px 0 8px;font-size:13px}.flow-step p{margin:0;color:#74746f;font-size:10px;line-height:1.5}.flow-step.emphasis{border-color:#aaa9a2;box-shadow:var(--soft-shadow)}
+  .principle-grid{margin-top:24px;display:grid;grid-template-columns:repeat(3,1fr);gap:14px}.principle-card{border:1px solid var(--line);border-radius:15px;padding:17px;background:#fff}.principle-card h3{margin:0 0 8px;font-size:13px}.principle-card p{margin:0;color:#72726d;font-size:10.5px;line-height:1.55}.principle-card strong{color:#393936}
+  .scope-grid{margin-top:24px;display:grid;grid-template-columns:1fr 1fr;gap:14px}.scope-card{border:1px solid var(--line);border-radius:15px;padding:18px;background:#fafaf8}.scope-card h3{margin:0 0 12px;font-size:14px}.scope-card ul{margin:0;padding-left:18px;color:#666661;font-size:10.6px;line-height:1.7}.scope-card.non-goal{background:#fff}
+  .footer-statement{margin-top:76px;padding-top:28px;border-top:1px solid var(--line);display:flex;align-items:flex-start;justify-content:space-between;gap:30px}.footer-statement strong{font-size:22px;line-height:1.3;letter-spacing:-.03em;max-width:540px}.footer-statement p{margin:0;color:#74746f;font-size:11px;line-height:1.6;max-width:420px}
+
+  @media(max-width:1100px){
+    :root{--sidebar-w:205px;--tree-w:226px}.topbar{grid-template-columns:minmax(230px,1fr) auto minmax(230px,1fr)}
+    .definition-grid,.principle-grid{grid-template-columns:repeat(2,1fr)}.spaces-stack{grid-template-columns:1fr}.flow{grid-template-columns:1fr 1fr}.flow-step::after{display:none}
+  }
+  @media(max-width:850px){
+    :root{--sidebar-w:0px;--tree-w:210px}.product-sidebar{display:none}.topbar{grid-template-columns:1fr auto}.top-actions{display:none}.brand-copy small{display:none}.docs-inner{padding:52px 28px 70px}.docs-hero h1{font-size:38px}.model-diagram{grid-template-columns:1fr}.model-arrow{padding:12px}.definition-grid,.reason-grid,.focus-overview-grid,.principle-grid,.ownership,.scope-grid{grid-template-columns:1fr}.section-heading{display:block}.section-heading p{text-align:left;margin-top:8px}.flow{grid-template-columns:1fr}
+  }
+</style>
+</head>
+<body>
+<header class="topbar">
+  <div class="brand">
+    <div class="brand-mark" aria-hidden="true">
+      <svg width="16" height="16" viewBox="0 0 24 24" fill="none"><circle cx="6" cy="12" r="2.5" stroke="currentColor"/><circle cx="18" cy="6" r="2.5" stroke="currentColor"/><circle cx="18" cy="18" r="2.5" stroke="currentColor"/><path d="M8.3 11.1 15.5 7M8.3 12.9l7.2 4.1" stroke="currentColor" stroke-linecap="round"/></svg>
+    </div>
+    <div class="brand-copy"><strong>Spatial Thread Workspace</strong><small>Product & UX foundation · working prototype</small></div>
+  </div>
+  <nav class="top-tabs" aria-label="Document sections">
+    <button class="top-tab active" data-panel="prototype">Prototype</button>
+    <button class="top-tab" data-panel="model">Why & Model</button>
+    <button class="top-tab" data-panel="ux">UX Contract</button>
+  </nav>
+  <div class="top-actions">
+    <button class="top-action" id="copyBriefButton">Copy UX brief</button>
+    <button class="top-action primary" id="copyHtmlButton">Copy HTML</button>
+  </div>
+</header>
+
+<section class="page-panel active" id="panel-prototype">
+  <div class="app-window">
+    <aside class="product-sidebar">
+      <div class="sidebar-head">
+        <div class="sidebar-brand"><div class="orb">S</div><span>Spatial</span></div>
+        <button class="icon-button" aria-label="Collapse sidebar" data-toast="Sidebar stays secondary to the space itself.">
+          <svg width="16" height="16" viewBox="0 0 24 24" fill="none"><rect x="4" y="5" width="16" height="14" rx="2.5" stroke="currentColor"/><path d="M9 5v14" stroke="currentColor"/></svg>
+        </button>
+      </div>
+      <button class="sidebar-action" data-toast="Search opens existing Codex chats without registering them automatically.">
+        <svg width="15" height="15" viewBox="0 0 24 24" fill="none"><circle cx="11" cy="11" r="6.5" stroke="currentColor" stroke-width="1.6"/><path d="m16 16 4 4" stroke="currentColor" stroke-width="1.6" stroke-linecap="round"/></svg>
+        Search Codex chats
+      </button>
+      <button class="sidebar-action" data-toast="A Space is a curated problem-specific fork graph, not another Project.">
+        <svg width="15" height="15" viewBox="0 0 24 24" fill="none"><path d="M12 5v14M5 12h14" stroke="currentColor" stroke-width="1.6" stroke-linecap="round"/></svg>
+        New space
+      </button>
+      <div class="sidebar-section"><span>Project</span></div>
+      <div class="sidebar-list">
+        <div class="sidebar-item"><span>spatial-codex</span><span class="project-pill">Codex</span></div>
+      </div>
+      <div class="sidebar-section"><span>Spaces</span><button aria-label="New space">+</button></div>
+      <div class="sidebar-list">
+        <div class="sidebar-item active"><div class="space-glyph"><i></i></div><span>Fork interaction</span></div>
+        <div class="sidebar-item"><div class="space-glyph"><i></i></div><span>App Server integration</span></div>
+        <div class="sidebar-item"><div class="space-glyph"><i></i></div><span>Product positioning</span></div>
+      </div>
+      <div class="sidebar-section"><span>Recent chats</span></div>
+      <div class="sidebar-list">
+        <div class="sidebar-item"><span>Codex fork semantics</span></div>
+        <div class="sidebar-item"><span>Worktree behavior</span></div>
+        <div class="sidebar-item"><span>Thread title sync</span></div>
+      </div>
+      <div class="sidebar-spacer"></div>
+      <div class="profile"><div class="avatar">WW</div><div><strong>Wayne</strong><small>Codex connected</small></div></div>
+    </aside>
+
+    <main class="app-main">
+      <header class="app-header">
+        <div class="app-header-left">
+          <button class="title-button" id="headerTitleButton" title="Rename thread"><span id="headerTitle">Overview information</span><svg width="11" height="11" viewBox="0 0 24 24" fill="none"><path d="m4 20 4.4-1 10.3-10.3a2 2 0 0 0 0-2.8l-.6-.6a2 2 0 0 0-2.8 0L5 15.6 4 20Z" stroke="currentColor" stroke-width="1.5"/></svg></button>
+          <span class="breadcrumb">spatial-codex / Fork interaction</span>
+        </div>
+        <div class="app-header-actions">
+          <button class="header-button" id="diffButton"><svg width="14" height="14" viewBox="0 0 24 24" fill="none"><path d="M6 3v12a4 4 0 0 0 4 4h1M18 21V9a4 4 0 0 0-4-4h-1" stroke="currentColor" stroke-width="1.6" stroke-linecap="round"/><circle cx="6" cy="19" r="2" stroke="currentColor"/><circle cx="18" cy="5" r="2" stroke="currentColor"/></svg><span id="diffButtonLabel">spatial-ui · 3 files</span></button>
+          <div class="mode-toggle"><button class="active" id="focusToggle">Focus</button><button id="overviewToggle">Overview</button></div>
+          <button class="icon-button" aria-label="More" data-toast="Open in Codex remains an escape hatch."><svg width="16" height="16" viewBox="0 0 24 24" fill="currentColor"><circle cx="5" cy="12" r="1.5"/><circle cx="12" cy="12" r="1.5"/><circle cx="19" cy="12" r="1.5"/></svg></button>
+        </div>
+      </header>
+
+      <div class="workspace">
+        <section class="focus-stage" id="focusStage">
+          <aside class="lineage-rail">
+            <div class="lineage-head"><strong>Fork tree</strong><small>navigation</small></div>
+            <div class="lineage-note">Focus keeps the tree compact: location, siblings, status, and lightweight worktree context.</div>
+            <div id="lineageTree"></div>
+          </aside>
+          <section class="chat-surface">
+            <div class="transcript-scroller" id="transcriptScroller"><div class="transcript" id="transcript"></div></div>
+            <div class="composer-wrap">
+              <div class="composer-shell">
+                <div class="fork-runtime-row" id="forkRuntimeRow"><span>First Send commits this fork.</span><select class="runtime-select" id="runtimeSelect"><option value="current">Current workspace</option><option value="worktree">Create new worktree</option></select></div>
+                <div class="composer">
+                  <button class="composer-tool" aria-label="Attach" data-toast="Attachments follow the normal Codex chat contract."><svg width="17" height="17" viewBox="0 0 24 24" fill="none"><path d="M12 5v14M5 12h14" stroke="currentColor" stroke-width="1.7" stroke-linecap="round"/></svg></button>
+                  <textarea id="composerInput" rows="1" placeholder="Message Codex"></textarea>
+                  <button class="composer-tool" id="micButton" aria-label="Dictate"><svg width="17" height="17" viewBox="0 0 24 24" fill="none"><rect x="9" y="3" width="6" height="11" rx="3" stroke="currentColor" stroke-width="1.6"/><path d="M6.5 11.5a5.5 5.5 0 0 0 11 0M12 17v4M9 21h6" stroke="currentColor" stroke-width="1.6" stroke-linecap="round"/></svg></button>
+                  <button class="composer-tool send" id="sendButton" aria-label="Send"><svg width="16" height="16" viewBox="0 0 24 24" fill="none"><path d="m5 12 14-7-5.5 14-2.2-5.3L5 12Z" stroke="currentColor" stroke-width="1.7" stroke-linejoin="round"/></svg></button>
+                </div>
+                <div class="composer-caption">Voice inserts editable text. Thread drafts and scroll positions are preserved independently.</div>
+              </div>
+            </div>
+          </section>
+        </section>
+
+        <section class="overview-stage" id="overviewStage">
+          <div class="overview-toolbar">
+            <div class="overview-title"><strong>Fork interaction</strong><small>No focused chat · richer deterministic information</small></div>
+            <div class="overview-controls">
+              <button class="overview-control" id="zoomOutButton" aria-label="Zoom out">−</button>
+              <button class="overview-control" id="zoomResetButton" aria-label="Reset zoom">1</button>
+              <button class="overview-control" id="zoomInButton" aria-label="Zoom in">+</button>
+            </div>
+          </div>
+          <div class="overview-viewport" id="overviewViewport"><div class="overview-world" id="overviewWorld"><svg class="overview-edges" id="overviewEdges"></svg><div id="overviewNodes"></div></div></div>
+          <div class="overview-hint">Drag cards to build spatial memory · double-click a title to rename · click a card to focus</div>
+        </section>
+
+        <div class="drawer-backdrop" id="drawerBackdrop"></div>
+        <aside class="diff-drawer" id="diffDrawer">
+          <div class="drawer-header"><div><strong id="drawerTitle">Worktree diff</strong><small id="drawerSubtitle">spatial-ui · deterministic Git metadata</small></div><button class="icon-button" id="closeDrawerButton" aria-label="Close"><svg width="16" height="16" viewBox="0 0 24 24" fill="none"><path d="m6 6 12 12M18 6 6 18" stroke="currentColor" stroke-width="1.6" stroke-linecap="round"/></svg></button></div>
+          <div class="drawer-body" id="drawerBody"></div>
+        </aside>
+
+        <div class="peel-layer" id="peelLayer">
+          <div class="peel-source"><div class="peel-kicker">Exact completed turn</div><div class="peel-title" id="peelSourceTitle">Overview information</div><div class="peel-copy">The spatial gesture communicates provenance. It does not replace the stable Focus shell.</div></div>
+          <div class="peel-line"></div>
+          <div class="peel-child"><div class="peel-kicker">Local fork draft</div><div class="peel-title">New branch</div><div class="peel-copy">Composer appears immediately. No durable Codex thread or worktree is created until First Send.</div></div>
+        </div>
+        <div class="toast" id="toast">Copied</div>
+      </div>
+    </main>
+  </div>
+</section>
+
+<section class="page-panel" id="panel-model">
+  <div class="docs-shell"><div class="docs-inner">
+    <div class="docs-hero">
+      <div class="docs-eyebrow">Product thesis</div>
+      <h1>Codex owns the conversation.<br>We make its branches visible.</h1>
+      <p>这个产品不是另一个 Codex Client，也不是通用 Canvas。它只接管一个非常具体的时刻：当线性 Chat 开始产生多条值得独立探索的路径时，让这些路径继续以可见、可返回、可执行的结构存在。</p>
+      <div class="hero-thesis"><strong>Project 是工作发生的地方；Space 是一个问题展开的形状。</strong> 普通 Chat 继续留在 Codex。只有值得 Fork 的探索，才被用户主动注册进 Space。</div>
+    </div>
+
+    <section class="docs-section">
+      <div class="section-heading"><h2>Project → Space 是一对多</h2><p>Project 长期存在、边界较大；Space 围绕一个具体问题形成。把两者合并，会把所有普通 Chat 强行拖进空间图。</p></div>
+      <div class="model-diagram">
+        <div class="model-project"><div class="model-label">Codex project</div><h3>spatial-codex</h3><p>Repo、instructions、files、shared context，以及 Local / Worktree 执行边界。</p></div>
+        <div class="model-arrow"><svg width="23" height="23" viewBox="0 0 24 24" fill="none"><path d="M5 12h14M14 7l5 5-5 5" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/></svg></div>
+        <div class="spaces-stack">
+          <div class="space-model active"><div class="model-label">Space A</div><h3>Fork interaction</h3><p>围绕 Focus、Overview 和 Branch-from-here 的产品问题。</p><div class="mini-tree"><div>Product framing</div><div class="indent"><div class="selected">Frontend UX</div><div>Codex lineage</div></div></div></div>
+          <div class="space-model"><div class="model-label">Space B</div><h3>App Server integration</h3><p>围绕 Thread lifecycle、events 和 persistence 的工程探索。</p></div>
+          <div class="space-model"><div class="model-label">Space C</div><h3>Product positioning</h3><p>围绕用户、边界和长期演进的独立思考空间。</p></div>
+        </div>
+      </div>
+    </section>
+
+    <section class="docs-section">
+      <div class="section-heading"><h2>五个对象，只有两个进入主图</h2><p>Thread 与 Fork Edge 是空间结构；Project、Worktree 和 Subagent 提供上下文，但不应该制造第二套图。</p></div>
+      <div class="definition-grid">
+        <div class="definition-card"><strong>Project</strong><p>长期共享的代码与上下文边界。</p><p class="why">Why：沿用 Codex 已有对象，不重新发明 Project。</p></div>
+        <div class="definition-card"><strong>Space</strong><p>用户主动策展、围绕一个问题形成的 Fork Workspace。</p><p class="why">Why：不是每一条普通 Chat 都值得进入空间。</p></div>
+        <div class="definition-card"><strong>Thread</strong><p>真实、可继续执行的 Codex Chat。</p><p class="why">Why：空间对象必须拥有真实历史，而不是复制出来的卡片。</p></div>
+        <div class="definition-card"><strong>Fork Edge</strong><p>Parent、Child 与准确 Fork Turn。</p><p class="why">Why：Edge 只表达 Conversation lineage，不表达任意依赖。</p></div>
+        <div class="definition-card"><strong>Worktree</strong><p>某条 Thread 当前运行的代码环境。</p><p class="why">Why：只作为名字、Diff 等 metadata，不做 Execution Dashboard。</p></div>
+        <div class="definition-card"><strong>Subagent</strong><p>Parent Thread 内部的后台工作。</p><p class="why">Why：折叠在 Activity 和 Overview indicator 中，避免变成 AgentMap。</p></div>
+      </div>
+    </section>
+
+    <section class="docs-section">
+      <div class="section-heading"><h2>Source of truth</h2><p>产品成立的前提，是我们不再实现一套 Conversation backend。空间层必须保持薄。</p></div>
+      <div class="ownership">
+        <div class="ownership-card"><h3>Codex owns</h3><ul><li>Project</li><li>Thread history</li><li>Turn / Item</li><li>Thread name</li><li>Runtime status</li><li>Approval</li><li>Worktree / cwd</li><li>Git state</li></ul></div>
+        <div class="ownership-card"><h3>Spatial owns</h3><ul><li>Space</li><li>Membership</li><li>Fork position</li><li>Camera state</li><li>Collapsed subtrees</li><li>Last viewed state</li><li>Local fork draft</li><li>Scroll / draft</li></ul></div>
+      </div>
+    </section>
+
+    <section class="docs-section">
+      <div class="section-heading"><h2>为什么不是另外三种产品</h2><p>边界不是为了保守，而是为了保护真正有差异化的 Chat → Fork → Space 体验。</p></div>
+      <div class="reason-grid">
+        <div class="reason-card"><div class="reason-number">01</div><h3>不是 Codex replacement</h3><p>普通交互仍然可以发生在 Codex。我们让用户搜索和注册已有 Chat，并始终保留 Open in Codex。</p></div>
+        <div class="reason-card"><div class="reason-number">02</div><h3>不是 Graph editor</h3><p>用户不能任意画 Edge。完整 Chat 不缩放在节点里。Graph underneath, Chat on top。</p></div>
+        <div class="reason-card"><div class="reason-number">03</div><h3>不是 execution dashboard</h3><p>Worktree、Diff、Subagent 都是 Thread 的附加证据，不成为新的一级导航体系。</p></div>
+      </div>
+    </section>
+
+    <div class="footer-statement"><strong>当一个问题开始分叉，把它带进 Space；当用户进入某条路径，让界面重新变回一流的 Chat。</strong><p>产品的深度来自 Codex Thread 可以真实执行，但 V0 的结构只围绕 Thread Fork 建立。</p></div>
+  </div></div>
+</section>
+
+<section class="page-panel" id="panel-ux">
+  <div class="docs-shell"><div class="docs-inner">
+    <div class="docs-hero">
+      <div class="docs-eyebrow">UX foundation</div>
+      <h1>Focus 让用户继续工作。<br>Overview 让用户看清工作如何分叉。</h1>
+      <p>两种状态不是 Chat 页面和 Graph 页面，而是同一批 Thread 在不同观察尺度下的两套信息契约。近距离保护阅读与输入；拉远后提高识别密度。</p>
+    </div>
+
+    <section class="docs-section">
+      <div class="section-heading"><h2>Focus 与 Overview</h2><p>Overview 不是把左侧 Tree 放大。它在 Transcript 退场后，使用额外空间展示更多确定性信息。</p></div>
+      <div class="focus-overview-grid">
+        <div class="contract-card">
+          <div class="contract-head"><h3>Focus</h3><span class="contract-tag">work state</span></div>
+          <div class="contract-quote">“我现在在哪里？下一条相关路径在哪里？”</div>
+          <div class="contract-list">
+            <div class="contract-row"><strong>Main surface</strong><span>一个 full-fidelity Chat，保持 Codex / ChatGPT 的阅读、Composer、Streaming 与 Approval 体验。</span></div>
+            <div class="contract-row"><strong>Fork tree</strong><span>常驻但克制：Title、层级、当前节点、必要状态、轻量 Worktree / Diff 提示。</span></div>
+            <div class="contract-row"><strong>Information</strong><span>低密度。隐藏 Summary、Latest Result 等解释性内容，保护当前工作。</span></div>
+            <div class="contract-row"><strong>Why</strong><span>用户绝大部分时间是在 Chat 中工作，不是在管理一张图。</span></div>
+          </div>
+        </div>
+        <div class="contract-card overview">
+          <div class="contract-head"><h3>Overview</h3><span class="contract-tag">recognition state</span></div>
+          <div class="contract-quote">“整个探索是什么形状？每条路径最近做了什么？”</div>
+          <div class="contract-list">
+            <div class="contract-row"><strong>Main surface</strong><span>没有 Focus Chat，没有 Composer；完整 Fork Tree 成为主界面。</span></div>
+            <div class="contract-row"><strong>Cards</strong><span>Title、Branched from、Fork snippet、Latest user、Latest result、Status、Worktree、Diff、Subagents。</span></div>
+            <div class="contract-row"><strong>Information</strong><span>高密度但确定性。所有重要 Snippet 都能回到真实 Turn。</span></div>
+            <div class="contract-row"><strong>Why</strong><span>Transcript 不可见后，用户需要更多信息来识别节点，而不是依赖 AI 猜测。</span></div>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <section class="docs-section">
+      <div class="section-heading"><h2>Hero flow：Branch from here</h2><p>空间能力从熟悉的 Chat 行为中长出来。Peel 是关系生成的动作；Focus 是关系生成后的稳定工作状态。</p></div>
+      <div class="flow">
+        <div class="flow-step"><small>01 · Existing chat</small><h3>Search & open</h3><p>先以普通 Chat 读取已有 Codex Thread。阅读本身不自动注册进 Space。</p></div>
+        <div class="flow-step"><small>02 · Exact turn</small><h3>Branch from here</h3><p>从一个 Completed Turn 创建 Branch。也可以使用 Peel handle 作为高带宽快捷方式。</p></div>
+        <div class="flow-step emphasis"><small>03 · Local preview</small><h3>Fork Draft</h3><p>Composer 立即获得焦点；可选择 Current workspace / New worktree；Escape 可取消。</p></div>
+        <div class="flow-step"><small>04 · Durable change</small><h3>First-send commit</h3><p>第一次 Send 才创建真实 Codex Fork 与可选 Worktree。失败不丢 Prompt。</p></div>
+        <div class="flow-step"><small>05 · Stable shell</small><h3>Focus / Overview</h3><p>Child 成为真实 Thread；Tree 更新；用户可以继续工作或 Zoom out 理解全局。</p></div>
+      </div>
+    </section>
+
+    <section class="docs-section">
+      <div class="section-heading"><h2>六条 UX 底层原则</h2><p>后续增加 Diff、Convergence 或 GitHub 时，这些原则拥有更高否决权，防止产品逐渐变形。</p></div>
+      <div class="principle-grid">
+        <div class="principle-card"><h3>Chat first, Space second</h3><p><strong>普通状态先像一个好的 Chat。</strong> 空间结构只在 Fork 和 Overview 时成为主视觉。</p></div>
+        <div class="principle-card"><h3>Graph underneath, Chat on top</h3><p><strong>完整 Chat 永远在 screen space。</strong> 不把长 Transcript 和 Composer 缩放进 Canvas node。</p></div>
+        <div class="principle-card"><h3>Deterministic before interpretive</h3><p><strong>先展示可验证事实。</strong> V0 不让模型擅自宣布 Decision、Conclusion 或 Open Question。</p></div>
+        <div class="principle-card"><h3>Stable spatial memory</h3><p><strong>新增 Child 不重排旧节点。</strong> Overview 位置可拖动、可持久化，自动整理必须显式触发。</p></div>
+        <div class="principle-card"><h3>Execution is metadata</h3><p><strong>Worktree 是标签，Diff 是证据。</strong> Canvas 的 Edge 永远只表达 Chat Fork。</p></div>
+        <div class="principle-card"><h3>Familiar first, Peel second</h3><p><strong>Branch from here 是标准入口。</strong> Peel 拖拽提供更直接的空间感，但不能成为唯一学习成本。</p></div>
+      </div>
+    </section>
+
+    <section class="docs-section">
+      <div class="section-heading"><h2>V0 scope</h2><p>Start off correctly 的意思不是从一开始做得多，而是先把最难逆转的信息架构与交互语义做对。</p></div>
+      <div class="scope-grid">
+        <div class="scope-card"><h3>V0 must feel complete</h3><ul><li>Project → multiple Spaces</li><li>Search / register existing Codex Chat</li><li>Focus Tree + full-fidelity Chat</li><li>Branch from exact Turn</li><li>Peel transition + Fork Draft</li><li>First-send commit</li><li>Current workspace / New worktree option</li><li>Branched from exact return</li><li>Deterministic Overview cards</li><li>Stable node positions</li><li>Inline rename synced to Codex</li><li>Voice dictation in Composer</li><li>Lightweight Diff and Subagent indicators</li></ul></div>
+        <div class="scope-card non-goal"><h3>Explicitly deferred</h3><ul><li>Generic graph editing</li><li>Project / execution management dashboard</li><li>Git branch graph</li><li>All Subagents as main nodes</li><li>Automatic Decision / Open Question inference</li><li>Compare → Select → Integrate</li><li>Convergence checkpoint</li><li>GitHub Issue / PR workflow</li><li>Replacing every Codex interaction</li></ul></div>
+      </div>
+    </section>
+
+    <div class="footer-statement"><strong>Focus protects the quality of the present conversation. Overview protects the memory of the whole exploration.</strong><p>如果后续能力破坏其中任何一条，它就不应该进入主界面。</p></div>
+  </div></div>
+</section>
+
+<script>
+const icon = (name,size=14) => {
+  const icons={
+    branch:`<svg width="${size}" height="${size}" viewBox="0 0 24 24" fill="none"><path d="M7 5v8a4 4 0 0 0 4 4h6M13 7h4v4" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"/><circle cx="7" cy="5" r="2" stroke="currentColor"/><circle cx="17" cy="17" r="2" stroke="currentColor"/></svg>`,
+    copy:`<svg width="${size}" height="${size}" viewBox="0 0 24 24" fill="none"><rect x="8" y="8" width="10" height="11" rx="2" stroke="currentColor"/><path d="M15 8V6a2 2 0 0 0-2-2H6a2 2 0 0 0-2 2v8a2 2 0 0 0 2 2h2" stroke="currentColor"/></svg>`,
+    check:`<svg width="${size}" height="${size}" viewBox="0 0 24 24" fill="none"><path d="m6 12 4 4 8-9" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"/></svg>`,
+    dots:`<svg width="${size}" height="${size}" viewBox="0 0 24 24" fill="currentColor"><circle cx="5" cy="12" r="1.5"/><circle cx="12" cy="12" r="1.5"/><circle cx="19" cy="12" r="1.5"/></svg>`,
+    info:`<svg width="${size}" height="${size}" viewBox="0 0 24 24" fill="none"><circle cx="12" cy="12" r="9" stroke="currentColor"/><path d="M12 11v6M12 7.5h.01" stroke="currentColor" stroke-width="1.6" stroke-linecap="round"/></svg>`
+  };return icons[name]||"";
+};
+
+const threads={
+  root:{id:'root',parent:null,title:'Spatial fork UX',titleOrigin:'manual',status:'idle',turns:34,updated:'1h ago',worktree:'main',files:0,subagents:[],forkSnippet:'',latestUser:'How should a linear Codex chat become spatial without turning into a graph tool?',latestResult:'Keep one full-fidelity chat in Focus; reveal the complete topology only in Overview.',pos:{x:70,y:270},messages:[
+    {role:'user',html:'I want a spatial LLM thinking tool built on real Codex forks. The chat experience should stay very close to Codex.'},
+    {role:'assistant',html:'Then the core should not be “a canvas with chat nodes.” It should be a familiar chat surface with a real fork structure underneath.'},
+    {role:'assistant',html:'A Project can contain multiple Spaces. Each Space starts from one registered Codex thread and grows only when the user deliberately branches.',activity:{title:'Product boundary aligned',lines:['Project → multiple Spaces','Thread is the primary object','Worktree remains metadata']}}
+  ]},
+  frontend:{id:'frontend',parent:'root',forkTurn:'root-3',title:'Frontend interaction',titleOrigin:'generated',status:'new-result',turns:22,updated:'8m ago',worktree:'spatial-ui',files:4,subagents:[{name:'Explorer',role:'UX research',task:'Inspect how Codex returns to the exact branched-from turn.',status:'Completed'},{name:'Prototype',role:'UI builder',task:'Test Focus ↔ Overview motion without scaling the chat DOM.',status:'Running'}],forkSnippet:'“The interaction design will be the most important part.”',latestUser:'How should Focus and Overview divide information?',latestResult:'Focus is navigation; Overview is recognition. The two views need different information contracts.',pos:{x:390,y:115},messages:[
+    {role:'user',html:'The interaction design is going to be the most important part. It should feel like Codex, not a workflow builder.'},
+    {role:'assistant',html:'Use a compact persistent Fork Tree next to one full-fidelity Chat. The stable working state should not expose canvas tools.'},
+    {role:'assistant',html:'The spatial layer appears when the user branches and when they deliberately enter Overview.',activity:{title:'2 subagents worked on this turn',lines:['Explorer verified the branched-from return pattern','Prototype tested a screen-space Focus layer']}}
+  ]},
+  peel:{id:'peel',parent:'frontend',forkTurn:'frontend-3',title:'Peel transition',titleOrigin:'generated',status:'idle',turns:11,updated:'31m ago',worktree:'peel-motion',files:2,subagents:[],forkSnippet:'“The spatial layer appears when the user branches.”',latestUser:'Can the branch feel spatial without making the whole product a canvas?',latestResult:'Use Peel as a transient structural transition, then return to the stable Focus shell.',pos:{x:735,y:40},messages:[
+    {role:'user',html:'I like the spatial peel, but I do not want the whole app to feel like a free-form canvas.'},
+    {role:'assistant',html:'Use Peel as a <strong>moment of structural change</strong>. A new direction visibly grows from the exact completed turn.'},
+    {role:'assistant',html:'Once created, the new branch returns to the stable Focus layout. The persistent tree handles navigation afterward.'}
+  ]},
+  overview:{id:'overview',parent:'frontend',forkTurn:'frontend-3',title:'Overview information',titleOrigin:'manual',status:'new-result',turns:16,updated:'now',worktree:'spatial-ui',files:3,subagents:[{name:'Card audit',role:'Information design',task:'Separate deterministic facts from future AI interpretation.',status:'Completed'}],forkSnippet:'“Focus and Overview need different information contracts.”',latestUser:'Compared with the Focus fork tree, Overview can show more information about each chat, right?',latestResult:'Yes. Overview can show branched-from context, latest user, latest result, status, worktree, diff, and subagents.',pos:{x:735,y:286},messages:[
+    {role:'user',html:'Compared with the Focus fork tree, Overview can show more information about each chat, right?'},
+    {role:'assistant',html:'Yes. The two views answer different questions:<ul><li><strong>Focus:</strong> Where am I, and what can I switch to?</li><li><strong>Overview:</strong> What is each path doing, and what happened most recently?</li></ul>'},
+    {role:'assistant',html:'V0 should use deterministic information: Branched from, Fork snippet, latest user prompt, latest completed result, status, worktree, changed files, and subagents. AI-generated decisions can wait.',activity:{title:'Overview contract updated',lines:['Removed inferred Decision / Open Question','Added exact provenance and latest-turn snippets','Kept Git and Subagents secondary']}}
+  ]},
+  backend:{id:'backend',parent:'root',forkTurn:'root-3',title:'Codex lineage',titleOrigin:'generated',status:'approval',turns:19,updated:'22m ago',worktree:'main',files:1,subagents:[],forkSnippet:'“A Project can contain multiple Spaces.”',latestUser:'How thin can our layer remain if Codex owns the conversation?',latestResult:'Persist Space membership, Fork topology, positions, and view state; do not copy the transcript backend.',pos:{x:390,y:505},messages:[
+    {role:'user',html:'We have built software on Codex App Server before. How thin can our layer be?'},
+    {role:'assistant',html:'Codex should own Thread history, runtime status, names, approvals, Worktrees, and Git state.'},
+    {role:'assistant',html:'The app owns Space membership, Fork positions, camera state, and local view state. That keeps the product a spatial lens over real Codex chats.'}
+  ]},
+  worktree:{id:'worktree',parent:'backend',forkTurn:'backend-3',title:'Worktree context',titleOrigin:'generated',status:'idle',turns:13,updated:'12m ago',worktree:'fork-context',files:5,subagents:[],forkSnippet:'“Worktrees and Git state remain attached context.”',latestUser:'We should support current workspace vs new worktree without building an execution dashboard.',latestResult:'Expose the choice during Fork Draft; afterwards show only the worktree name and on-demand diff.',pos:{x:735,y:535},messages:[
+    {role:'user',html:'We should not pre-specialize too much for project or execution management.'},
+    {role:'assistant',html:'Agreed. A Fork Draft can offer <code>Current workspace</code> or <code>Create new worktree</code> without opening a modal.'},
+    {role:'assistant',html:'After creation, the node only needs a worktree label and a lightweight Diff entry. The canvas edge still means Chat Fork.'}
+  ]}
+};
+
+let activeId='overview';
+let mode='focus';
+let overviewScale=1;
+let draftCounter=0;
+let micTimer=null;
+
+const el={
+  focusStage:document.getElementById('focusStage'),overviewStage:document.getElementById('overviewStage'),lineageTree:document.getElementById('lineageTree'),transcript:document.getElementById('transcript'),transcriptScroller:document.getElementById('transcriptScroller'),composerInput:document.getElementById('composerInput'),sendButton:document.getElementById('sendButton'),micButton:document.getElementById('micButton'),forkRuntimeRow:document.getElementById('forkRuntimeRow'),runtimeSelect:document.getElementById('runtimeSelect'),headerTitle:document.getElementById('headerTitle'),headerTitleButton:document.getElementById('headerTitleButton'),diffButton:document.getElementById('diffButton'),diffButtonLabel:document.getElementById('diffButtonLabel'),focusToggle:document.getElementById('focusToggle'),overviewToggle:document.getElementById('overviewToggle'),overviewWorld:document.getElementById('overviewWorld'),overviewEdges:document.getElementById('overviewEdges'),overviewNodes:document.getElementById('overviewNodes'),overviewViewport:document.getElementById('overviewViewport'),peelLayer:document.getElementById('peelLayer'),peelSourceTitle:document.getElementById('peelSourceTitle'),diffDrawer:document.getElementById('diffDrawer'),drawerBackdrop:document.getElementById('drawerBackdrop'),drawerTitle:document.getElementById('drawerTitle'),drawerSubtitle:document.getElementById('drawerSubtitle'),drawerBody:document.getElementById('drawerBody'),closeDrawerButton:document.getElementById('closeDrawerButton'),toast:document.getElementById('toast')
+};
+
+function escapeHtml(value){return String(value).replace(/[&<>"']/g,ch=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#039;'}[ch]));}
+function childrenOf(id){return Object.values(threads).filter(t=>t.parent===id);}
+function statusLabel(status){return ({'idle':'Idle','running':'Running','approval':'Needs approval','failed':'Failed','new-result':'New result'})[status]||'Idle';}
+function statusClass(status){return status==='new-result'?'new-result':status;}
+function showToast(text){el.toast.textContent=text;el.toast.classList.add('visible');clearTimeout(showToast.t);showToast.t=setTimeout(()=>el.toast.classList.remove('visible'),1800);}
+
+function renderTree(){
+  const renderNode=t=>{
+    const children=childrenOf(t.id);
+    const meta=[`${t.turns} turns`,t.worktree].filter(Boolean).join(' · ');
+    return `<li><div class="tree-row ${t.id===activeId?'active':''}" data-thread="${t.id}"><span class="thread-dot ${statusClass(t.status)}"></span><div class="tree-copy"><div class="tree-title" data-rename-tree="${t.id}" title="Double-click to rename">${escapeHtml(t.title)}</div><div class="tree-meta">${escapeHtml(meta)}</div></div>${t.files?`<span class="tree-badge">${t.files}f</span>`:''}</div>${children.length?`<ul>${children.map(renderNode).join('')}</ul>`:''}</li>`;
+  };
+  el.lineageTree.innerHTML=`<ul class="tree-root">${renderNode(threads.root)}</ul>`;
+  el.lineageTree.querySelectorAll('.tree-row').forEach(row=>row.addEventListener('click',e=>{if(e.target.closest('[data-rename-tree]'))return;focusThread(row.dataset.thread);}));
+  el.lineageTree.querySelectorAll('[data-rename-tree]').forEach(title=>title.addEventListener('dblclick',e=>{e.stopPropagation();beginInlineRename(title,title.dataset.renameTree,'tree');}));
+}
+
+function renderChat(options={}){
+  const t=threads[activeId];
+  el.headerTitle.textContent=t.title;
+  el.diffButton.style.display=t.worktree?'flex':'none';
+  el.diffButtonLabel.textContent=t.worktree?`${t.worktree} · ${t.files||0} files`:'No worktree';
+  el.forkRuntimeRow.classList.toggle('visible',!!t.isDraft);
+  el.composerInput.placeholder=t.isDraft?'What direction do you want to explore?':'Message Codex';
+  const context=t.parent?`<div class="fork-context">${icon('branch',13)}<div>Branched from <button data-parent="${t.parent}">${escapeHtml(threads[t.parent].title)}</button> · returns to the exact fork turn</div></div>`:'';
+  const draft=t.isDraft?`<div class="draft-banner">${icon('info',13)}<div>This is a local Fork Draft. First Send creates the durable Codex child thread${el.runtimeSelect.value==='worktree'?' and a new worktree':''}. Escape cancels it without leaving an empty thread.</div></div>`:'';
+  const messages=t.messages.map((m,index)=>{
+    if(m.role==='user')return `<div class="message user" data-message-index="${index}"><div class="user-bubble">${m.html}</div></div>`;
+    const isLast=!t.messages.slice(index+1).some(x=>x.role==='assistant');
+    const activity=m.activity?`<div class="activity-block"><div class="activity-title">${icon('check',13)}<strong>${escapeHtml(m.activity.title)}</strong></div>${m.activity.lines.map(line=>`<div class="activity-line">${icon('check',11)}<span>${escapeHtml(line)}</span></div>`).join('')}</div>`:'';
+    return `<div class="message assistant ${isLast?'last-assistant':''}" data-message-index="${index}"><div class="assistant-body">${m.html}${activity}</div><div class="message-actions"><button class="msg-action copy-action">${icon('copy',12)} Copy</button><button class="msg-action branch-action">${icon('branch',12)} Branch from here</button><button class="msg-action">${icon('dots',13)}</button></div>${isLast?'<button class="branch-anchor" title="Peel a branch from this turn"></button>':''}</div>`;
+  }).join('');
+  el.transcript.innerHTML=context+draft+messages;
+  el.transcript.querySelectorAll('[data-parent]').forEach(btn=>btn.addEventListener('click',()=>focusThread(btn.dataset.parent,{highlight:true})));
+  el.transcript.querySelectorAll('.copy-action').forEach(btn=>btn.addEventListener('click',()=>showToast('Message copied')));
+  el.transcript.querySelectorAll('.branch-action,.branch-anchor').forEach(btn=>btn.addEventListener('click',startForkDraft));
+  requestAnimationFrame(()=>{el.transcriptScroller.scrollTop=el.transcriptScroller.scrollHeight;if(options.highlight){const target=el.transcript.querySelector('.message.last-assistant');if(target)target.classList.add('flash');}});
+}
+
+function focusThread(id,options={}){activeId=id;setMode('focus');renderTree();renderChat(options);}
+function setMode(next){mode=next;const overview=next==='overview';el.focusStage.classList.toggle('hidden',overview);el.overviewStage.classList.toggle('visible',overview);el.focusToggle.classList.toggle('active',!overview);el.overviewToggle.classList.toggle('active',overview);if(overview){renderOverview();el.headerTitle.textContent='Fork interaction';el.diffButton.style.display='none';}else{renderTree();renderChat();}}
+
+function startForkDraft(){
+  const parent=threads[activeId];if(parent.isDraft){showToast('Send or cancel the current Fork Draft first');return;}
+  el.peelSourceTitle.textContent=parent.title;el.peelLayer.classList.add('visible');
+  setTimeout(()=>{
+    draftCounter+=1;const id=`draft-${draftCounter}`;threads[id]={id,parent:parent.id,forkTurn:`${parent.id}-${parent.messages.length}`,title:'New branch',titleOrigin:'fallback',status:'idle',turns:0,updated:'draft',worktree:parent.worktree,files:0,subagents:[],forkSnippet:stripHtml(parent.messages[parent.messages.length-1]?.html||parent.latestResult).slice(0,110),latestUser:'',latestResult:'',pos:{x:parent.pos.x+345,y:parent.pos.y+120},messages:[],isDraft:true};activeId=id;el.peelLayer.classList.remove('visible');setMode('focus');renderTree();renderChat();el.composerInput.value='';setTimeout(()=>el.composerInput.focus(),60);
+  },760);
+}
+
+function cancelDraft(){const t=threads[activeId];if(!t?.isDraft)return false;const parent=t.parent;delete threads[activeId];activeId=parent;renderTree();renderChat();showToast('Fork Draft cancelled');return true;}
+
+function sendMessage(){
+  const t=threads[activeId];const value=el.composerInput.value.trim();if(!value)return;
+  if(t.isDraft){t.isDraft=false;t.title=temporaryTitle(value);t.titleOrigin='fallback';t.turns=1;t.updated='now';t.latestUser=value;t.status='running';if(el.runtimeSelect.value==='worktree'){t.worktree=`${slugify(t.title).slice(0,22)||'new-experiment'}`;}t.messages.push({role:'user',html:escapeHtml(value)});el.composerInput.value='';renderTree();renderChat();showToast('Durable Codex fork created on First Send');
+    setTimeout(()=>{t.messages.push({role:'assistant',html:'This branch is now a real Codex thread. The parent relation and exact fork turn remain visible in Focus and Overview.'});t.latestResult='This branch is now a real Codex thread with preserved provenance.';t.status='new-result';t.turns=2;t.updated='now';if(t.titleOrigin==='fallback'){t.title=generatedTitle(value);t.titleOrigin='generated';}renderTree();renderChat();},1150);
+  }else{t.messages.push({role:'user',html:escapeHtml(value)});t.latestUser=value;t.status='running';t.turns+=1;el.composerInput.value='';renderTree();renderChat();setTimeout(()=>{t.messages.push({role:'assistant',html:'The new turn completed. In a real build, this surface would reconcile streamed Codex items into the same Chat presentation.'});t.latestResult='The latest Codex turn completed and is now visible from Overview.';t.status='new-result';t.turns+=1;t.updated='now';renderTree();renderChat();},950);}
+}
+
+function temporaryTitle(value){const clean=value.replace(/\s+/g,' ').trim();return clean.length>42?clean.slice(0,42)+'…':clean;}
+function generatedTitle(value){const v=value.toLowerCase();if(v.includes('overview'))return'Overview card density';if(v.includes('worktree'))return'Worktree fork option';if(v.includes('title'))return'Thread naming behavior';return temporaryTitle(value).replace(/[?.!。！？]+$/,'');}
+function slugify(value){return value.toLowerCase().replace(/[^a-z0-9\u4e00-\u9fff]+/g,'-').replace(/^-|-$/g,'');}
+function stripHtml(value){const d=document.createElement('div');d.innerHTML=value;return d.textContent||'';}
+
+function beginHeaderRename(){const t=threads[activeId];const input=document.createElement('input');input.className='inline-title-input';input.value=t.title;el.headerTitleButton.replaceWith(input);input.focus();input.select();const finish=()=>{renameThread(activeId,input.value);input.replaceWith(el.headerTitleButton);renderTree();renderChat();};input.addEventListener('blur',finish,{once:true});input.addEventListener('keydown',e=>{if(e.key==='Enter'){e.preventDefault();input.blur();}if(e.key==='Escape'){input.value=t.title;input.blur();}});}
+function beginInlineRename(target,id,source){const t=threads[id];const input=document.createElement('input');input.className=source==='tree'?'tree-title-input':'node-title-input';input.value=t.title;target.replaceWith(input);input.focus();input.select();const finish=()=>{renameThread(id,input.value);if(source==='tree')renderTree();else renderOverview();if(id===activeId)renderChat();};input.addEventListener('blur',finish,{once:true});input.addEventListener('keydown',e=>{if(e.key==='Enter'){e.preventDefault();input.blur();}if(e.key==='Escape'){input.value=t.title;input.blur();}});}
+function renameThread(id,value){const t=threads[id];const next=value.trim();if(next){t.title=next;t.titleOrigin='manual';showToast('Thread name synced to Codex');}}
+
+function renderOverview(){
+  el.overviewWorld.style.transform=`translate(20px,20px) scale(${overviewScale})`;
+  const all=Object.values(threads).filter(t=>!t.isDraft);
+  el.overviewEdges.innerHTML=all.filter(t=>t.parent&&threads[t.parent]&&!threads[t.parent].isDraft).map(t=>edgePath(threads[t.parent],t,t.id===activeId||t.parent===activeId)).join('');
+  el.overviewNodes.innerHTML=all.map(t=>overviewCard(t)).join('');
+  el.overviewNodes.querySelectorAll('.overview-node').forEach(node=>{
+    node.addEventListener('click',e=>{if(e.target.closest('.node-pill,.node-title'))return;focusThread(node.dataset.thread);});
+    node.addEventListener('pointerdown',e=>startNodeDrag(e,node));
+  });
+  el.overviewNodes.querySelectorAll('[data-overview-title]').forEach(title=>title.addEventListener('dblclick',e=>{e.stopPropagation();beginInlineRename(title,title.dataset.overviewTitle,'overview');}));
+  el.overviewNodes.querySelectorAll('[data-diff-thread]').forEach(pill=>pill.addEventListener('click',e=>{e.stopPropagation();openDiff(pill.dataset.diffThread);}));
+}
+function edgePath(parent,child,active){const x1=parent.pos.x+294,y1=parent.pos.y+98,x2=child.pos.x,y2=child.pos.y+98,c1=x1+70,c2=x2-70;return `<path class="overview-edge ${active?'active':''}" d="M ${x1} ${y1} C ${c1} ${y1}, ${c2} ${y2}, ${x2} ${y2}"/>`;}
+function overviewCard(t){const agents=t.subagents||[];const agentPopover=agents.length?`<div class="subagent-popover">${agents.map(a=>`<div class="agent-row"><div class="agent-head"><span>${escapeHtml(a.name)} · ${escapeHtml(a.role)}</span><span class="agent-status ${a.status==='Running'?'running':''}">${escapeHtml(a.status)}</span></div><div class="agent-task">${escapeHtml(a.task)}</div></div>`).join('')}</div>`:'';return `<article class="overview-node ${!t.parent?'root-node':''}" data-thread="${t.id}" style="left:${t.pos.x}px;top:${t.pos.y}px"><div class="node-top"><div class="node-title-wrap"><div class="node-kicker">${t.parent?'Forked thread':'Space root'}</div><div class="node-title" data-overview-title="${t.id}" title="Double-click to rename">${escapeHtml(t.title)}</div></div><div class="node-state"><i class="${statusClass(t.status)}"></i>${statusLabel(t.status)}</div></div>${t.parent?`<div class="node-origin"><strong>Branched from ${escapeHtml(threads[t.parent].title)}</strong> · ${escapeHtml(t.forkSnippet)}</div>`:'<div class="node-origin"><strong>Registered root chat</strong> · existing Codex thread brought into this Space</div>'}<div class="node-fact"><span class="fact-label">Latest user</span><span class="fact-copy">${escapeHtml(t.latestUser||'No user turn yet')}</span></div><div class="node-fact"><span class="fact-label">Latest result</span><span class="fact-copy">${escapeHtml(t.latestResult||'No completed result yet')}</span></div><div class="node-footer"><div class="node-foot-left"><span>${t.turns} turns</span><span>·</span><span>${escapeHtml(t.updated)}</span></div><div class="node-foot-right">${t.worktree?`<span class="node-pill clickable" data-diff-thread="${t.id}">${escapeHtml(t.worktree)} · ${t.files}f</span>`:''}${agents.length?`<span class="node-pill">${agents.length} subagent${agents.length>1?'s':''}${agentPopover}</span>`:''}</div></div></article>`;}
+
+let dragState=null;
+function startNodeDrag(event,node){if(event.button!==0||event.target.closest('.node-pill,.node-title,input'))return;const t=threads[node.dataset.thread];dragState={node,t,startX:event.clientX,startY:event.clientY,origX:t.pos.x,origY:t.pos.y};node.classList.add('dragging');node.setPointerCapture(event.pointerId);node.addEventListener('pointermove',moveNode);node.addEventListener('pointerup',endNode,{once:true});}
+function moveNode(event){if(!dragState)return;const dx=(event.clientX-dragState.startX)/overviewScale,dy=(event.clientY-dragState.startY)/overviewScale;dragState.t.pos.x=Math.max(20,dragState.origX+dx);dragState.t.pos.y=Math.max(20,dragState.origY+dy);dragState.node.style.left=`${dragState.t.pos.x}px`;dragState.node.style.top=`${dragState.t.pos.y}px`;el.overviewEdges.innerHTML=Object.values(threads).filter(t=>!t.isDraft&&t.parent&&threads[t.parent]&&!threads[t.parent].isDraft).map(t=>edgePath(threads[t.parent],t,t.id===activeId||t.parent===activeId)).join('');}
+function endNode(event){if(!dragState)return;dragState.node.classList.remove('dragging');dragState.node.removeEventListener('pointermove',moveNode);dragState=null;showToast('Position saved to Space');}
+
+function openDiff(id=activeId){const t=threads[id];if(!t?.worktree)return;el.drawerTitle.textContent=`${t.title} · changes`;el.drawerSubtitle.textContent=`${t.worktree} · ${t.files||0} changed files`;el.drawerBody.innerHTML=diffMarkup(t);el.diffDrawer.classList.add('visible');el.drawerBackdrop.classList.add('visible');}
+function closeDiff(){el.diffDrawer.classList.remove('visible');el.drawerBackdrop.classList.remove('visible');}
+function diffMarkup(t){return `<div class="diff-summary"><strong>Worktree diff</strong><div class="diff-stats"><span class="stat-add">+${Math.max(24,t.files*38)}</span><span class="stat-del">−${Math.max(7,t.files*11)}</span></div></div><div class="file-card"><div class="file-head"><span>src/ui/ThreadSurface.tsx</span><span>modified</span></div><div class="file-body"><div class="diff-line"><span class="ln">41</span><span class="ln">41</span><span class="code">  const activeThread = useSpaceThread(activeId)</span></div><div class="diff-line del"><span class="ln">42</span><span class="ln"></span><span class="code">- return &lt;CanvasChatNode thread={activeThread} /&gt;</span></div><div class="diff-line add"><span class="ln"></span><span class="ln">42</span><span class="code">+ return &lt;ScreenSpaceThreadSurface thread={activeThread} /&gt;</span></div><div class="diff-line add"><span class="ln"></span><span class="ln">43</span><span class="code">+ // Keep full chat outside the transformed world layer.</span></div></div></div><div class="file-card"><div class="file-head"><span>src/space/lineage-store.ts</span><span>modified</span></div><div class="file-body"><div class="diff-line add"><span class="ln"></span><span class="ln">18</span><span class="code">+ forkedAtTurnId: string</span></div><div class="diff-line add"><span class="ln"></span><span class="ln">19</span><span class="code">+ position: { x: number; y: number }</span></div><div class="diff-line add"><span class="ln"></span><span class="ln">20</span><span class="code">+ lastViewedTurnId?: string</span></div></div></div><div class="file-card"><div class="file-head"><span>Prototype note</span><span>scope</span></div><div style="padding:12px;color:#6e6e69;font-size:10px;line-height:1.55">Diff is an on-demand evidence surface. It does not create a second Git graph or execution dashboard.</div></div>`;}
+
+function startMic(){if(el.micButton.classList.contains('listening'))return;el.micButton.classList.add('listening');showToast('Listening…');clearTimeout(micTimer);micTimer=setTimeout(()=>{el.micButton.classList.remove('listening');const text='Let’s explore whether Overview should show more deterministic information for every fork.';el.composerInput.value=(el.composerInput.value?el.composerInput.value+' ':'')+text;el.composerInput.focus();showToast('Transcript inserted — edit before sending');},1300);}
+
+function copyText(text,success){if(navigator.clipboard&&window.isSecureContext){navigator.clipboard.writeText(text).then(()=>showToast(success)).catch(()=>fallbackCopy(text,success));}else fallbackCopy(text,success);}
+function fallbackCopy(text,success){const ta=document.createElement('textarea');ta.value=text;ta.style.position='fixed';ta.style.opacity='0';document.body.appendChild(ta);ta.select();try{document.execCommand('copy');showToast(success);}catch(e){showToast('Copy is blocked by this browser');}ta.remove();}
+
+const uxBrief=`Spatial Thread Workspace — Product & UX Foundation\n\nPRODUCT THESIS\nCodex owns the conversation. We make its branches visible.\n\nRELATIONSHIP\n- One Codex Project can contain multiple Spaces.\n- Project = long-lived code and context boundary.\n- Space = a user-curated fork workspace around one problem.\n- Thread = a real Codex chat.\n- Fork Edge = parent thread + child thread + exact fork turn.\n- Worktree = optional thread metadata, not a second graph.\n- Subagents remain folded into parent activity and Overview indicators.\n\nPRIMARY UX\n1. Focus: persistent compact Fork Tree + one full-fidelity Codex/ChatGPT-like chat.\n2. Overview: no focused chat; the full fork graph uses richer deterministic cards.\n3. Focus answers “Where am I and what can I switch to?”\n4. Overview answers “What shape did the exploration take and what happened in each path?”\n\nOVERVIEW V0 DATA\nThread title; Branched from parent; exact fork-turn snippet; latest user prompt; latest completed result; last active time; turn count; Running / Needs approval / New result / Failed; worktree name; changed-file count; subagent count/status. Do not infer Decisions or Open Questions in V0.\n\nBRANCH FLOW\nExisting chat → Branch from exact completed turn → transient Peel transition → local Fork Draft → optional Current workspace / New worktree → First Send creates durable Codex fork → child returns to stable Focus shell. Escape cancels the local draft.\n\nNAMING\nFirst user prompt becomes the temporary title. After the first turn, a shorter title may be generated. Inline rename is available in Tree and Overview and syncs back to Codex. A manually renamed title is never automatically overwritten.\n\nUX PRINCIPLES\n- Chat first, Space second.\n- Graph underneath, Chat on top.\n- Deterministic before interpretive.\n- Stable spatial memory: new children do not reshuffle existing nodes.\n- Execution is context, not product structure.\n- Familiar Branch-from-here first; Peel gesture second.\n\nV0 NON-GOALS\nNot a Codex replacement, generic graph editor, execution dashboard, Git branch graph, agent control room, automatic semantic merge, Compare/Convergence workflow, or GitHub project-management surface.`;
+
+// Top-level panel navigation
+document.querySelectorAll('.top-tab').forEach(tab=>tab.addEventListener('click',()=>{document.querySelectorAll('.top-tab').forEach(t=>t.classList.toggle('active',t===tab));document.querySelectorAll('.page-panel').forEach(p=>p.classList.toggle('active',p.id===`panel-${tab.dataset.panel}`));}));
+document.querySelectorAll('[data-toast]').forEach(btn=>btn.addEventListener('click',()=>showToast(btn.dataset.toast)));
+document.getElementById('copyBriefButton').addEventListener('click',()=>copyText(uxBrief,'UX brief copied'));
+document.getElementById('copyHtmlButton').addEventListener('click',()=>copyText('<!doctype html>\n'+document.documentElement.outerHTML,'Self-contained HTML copied'));
+
+el.focusToggle.addEventListener('click',()=>setMode('focus'));el.overviewToggle.addEventListener('click',()=>setMode('overview'));el.diffButton.addEventListener('click',()=>openDiff(activeId));el.closeDrawerButton.addEventListener('click',closeDiff);el.drawerBackdrop.addEventListener('click',closeDiff);el.headerTitleButton.addEventListener('click',beginHeaderRename);el.sendButton.addEventListener('click',sendMessage);el.micButton.addEventListener('click',startMic);el.composerInput.addEventListener('keydown',e=>{if(e.key==='Enter'&&!e.shiftKey){e.preventDefault();sendMessage();}if(e.key==='Escape')cancelDraft();});el.runtimeSelect.addEventListener('change',()=>renderChat());
+document.getElementById('zoomInButton').addEventListener('click',()=>{overviewScale=Math.min(1.25,overviewScale+.1);renderOverview();});document.getElementById('zoomOutButton').addEventListener('click',()=>{overviewScale=Math.max(.7,overviewScale-.1);renderOverview();});document.getElementById('zoomResetButton').addEventListener('click',()=>{overviewScale=1;renderOverview();});
+window.addEventListener('keydown',e=>{if(e.key==='Escape'&&!cancelDraft())closeDiff();});
+
+renderTree();renderChat();
+</script>
+</body>
+</html>

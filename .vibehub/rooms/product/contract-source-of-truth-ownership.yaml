@@ -1,0 +1,38 @@
+{
+  "context_id": "contract-source-of-truth-ownership",
+  "detail": "Codex 是 Thread ID、Transcript、Turn/Item、Thread Name、Runtime Status、Approval、cwd/Worktree、Git State 和 Subagent Thread 的 Source of Truth。Peel 拥有 Space、Fork Edge 的产品记录与准确 Turn Anchor、Node/Camera Position、Collapsed State、Last Viewed、Local Fork Draft，以及每 Thread 的 Scroll/Composer Draft。Thread Title 在 Peel Rename 时写回 Codex；Peel 不长期维护 Shadow Title。启动、重连或事件丢失后，应从 Codex 事实重建派生状态；Peel 本地数据不能覆盖真实 Transcript、执行状态或 Git 结果。",
+  "evidence": [
+    {
+      "note": "第 7、8、11 章定义 Thread、空间 metadata 与双方所有权。",
+      "ref": "docs/product/source/spatial-thread-workspace-prd-v0-original.md"
+    },
+    {
+      "note": "Demo 的 Why & Model 面板将 Codex owns 与 Spatial owns 分栏表达。",
+      "ref": "docs/product/source/peel-demo-v0-original.html"
+    }
+  ],
+  "kind": "context",
+  "relations": [
+    {
+      "target_context_id": "intent-spatial-thread-workspace",
+      "type": "relates_to"
+    }
+  ],
+  "schema_version": 1,
+  "source": {
+    "captured_at": "2026-08-25T18:34:18Z",
+    "quote": "我们不复制完整 Transcript 作为自己的 Source of Truth。",
+    "ref": "distill:docs/product/source/spatial-thread-workspace-prd-v0-original.md#11-source-of-truth"
+  },
+  "state": "active",
+  "summary": "Codex 拥有 Conversation 与执行事实，Peel 只拥有空间组织和本地视图状态",
+  "tags": [
+    "source-of-truth",
+    "ownership",
+    "codex",
+    "peel",
+    "sync",
+    "shadow-state"
+  ],
+  "type": "contract"
+}

@@ -1,0 +1,37 @@
+{
+  "context_id": "decision-project-optional-context-overlay",
+  "detail": "v0.1 完全以 Chat/Thread 为入口和 Source of Truth，不要求读取、创建或展示 Codex Project。用户现在可以在 Codex 中把任何 Chat 拖进或移出 Project，Peel 不响应，也不因此改变 Space 的成员、Root 或 Fork topology。后续只有在真实使用证明有价值且 Codex Server 能力足够稳定时，才引入 Project 联动：优先让新 Fork 默认继承服务端已经定义的 Project instructions、sources 与 workspace roots，而不是由 Peel 复制一份 Project 内容。即使引入，Project 也只是可选 Context Overlay，不成为 Space 的必需父对象。",
+  "evidence": [
+    {
+      "note": "用户明确选择当前忽略 Chat 与 Codex Project 的归属变化，并把默认继承作为未来联动方向。",
+      "ref": "conversation:2026-08-25-peel-v01-v02-scope"
+    },
+    {
+      "note": "本机实验 schema 暴露 Project 与 projectId 相关能力，但公开稳定契约尚不足以让 Project 成为 Peel 的基础依赖。",
+      "ref": "local-schema:codex-app-server-0.149.0"
+    }
+  ],
+  "kind": "context",
+  "relations": [
+    {
+      "target_context_id": "decision-single-root-fork-tree",
+      "type": "depends_on"
+    }
+  ],
+  "schema_version": 1,
+  "source": {
+    "captured_at": "2026-08-25T08:03:50Z",
+    "quote": "现在你可以在 codex 里把对应的 chat（任何 chat）给拖进 project，we simply dont give a shit right now。后面看看怎么做……继承默认全部的这个内容。",
+    "ref": "conversation:2026-08-25-peel-v01-v02-scope"
+  },
+  "state": "active",
+  "summary": "Codex Project 暂不进入 Peel 领域模型，未来只作为可选的继承式上下文联动",
+  "tags": [
+    "project",
+    "codex-project",
+    "deferred",
+    "inheritance",
+    "domain-model"
+  ],
+  "type": "decision"
+}

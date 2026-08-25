@@ -1,0 +1,51 @@
+{
+  "context_id": "contract-fork-creation-lifecycle",
+  "detail": "用户只能从 Completed Turn 创建 Fork。标准入口是消息操作中的 Branch from here；Peel Handle 是同义的高带宽入口，不能成为唯一入口。触发后 150ms 内出现 Local Fork Draft、Child Surface 和已可见的 Parent/Child provenance，Composer 立即聚焦；此时不创建 Durable Thread 或 Worktree，Escape 取消且不留下空对象。First Send 才准备可选 Worktree、调用 thread/fork 并传 lastTurnId、保存 parentThreadId/childThreadId/forkedAtTurnId/createdAt，再在 Child 中开始第一轮。Worktree 失败时保留 Prompt 并可 Retry/切回 Current Workspace；Fork 失败保留完整 Draft；Fork 成功但 First Turn 失败保留 Child 可 Retry。任何失败不得丢失 Composer 内容。Child 的 Branched from 可返回 Parent 的准确 Fork Turn并短暂高亮；往返恢复各自 Scroll 与 Draft。",
+  "evidence": [
+    {
+      "note": "9.4 与 UX Acceptance Criteria 完整定义 Draft、First Send、失败恢复和精确返回。",
+      "ref": "docs/product/source/spatial-thread-workspace-prd-v0-original.md"
+    },
+    {
+      "note": "Demo 可操作地实现了 Branch action、Peel transition、Local Draft、Escape 和 First Send 状态转换。",
+      "ref": "docs/product/source/peel-demo-v0-original.html"
+    },
+    {
+      "note": "官方 App Server 文档确认 thread/fork 支持 lastTurnId，且拒绝 in-progress lastTurnId。",
+      "ref": "https://learn.chatgpt.com/docs/app-server"
+    }
+  ],
+  "kind": "context",
+  "relations": [
+    {
+      "target_context_id": "decision-thread-first-space-entry",
+      "type": "depends_on"
+    },
+    {
+      "target_context_id": "decision-single-root-fork-tree",
+      "type": "depends_on"
+    },
+    {
+      "target_context_id": "contract-v01-core-spatial-fork-loop",
+      "type": "relates_to"
+    }
+  ],
+  "schema_version": 1,
+  "source": {
+    "captured_at": "2026-08-25T18:34:18Z",
+    "quote": "第一次 Send 才创建真实 Codex Fork 与可选 Worktree。失败不丢 Prompt。",
+    "ref": "distill:docs/product/source/spatial-thread-workspace-prd-v0-original.md#9-4-branch-from-here"
+  },
+  "state": "active",
+  "summary": "Branch from here 先产生可取消的本地 Fork Draft，First Send 才创建真实 Child",
+  "tags": [
+    "fork",
+    "branch-from-here",
+    "peel",
+    "fork-draft",
+    "first-send",
+    "recovery",
+    "lineage"
+  ],
+  "type": "contract"
+}

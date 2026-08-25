@@ -1,0 +1,42 @@
+{
+  "context_id": "contract-overview-deterministic-card-data",
+  "detail": "每个 durable Thread Card 必须包含 Thread Title；Root/Branched from Parent；准确 Fork Turn Snippet；Latest User Prompt Snippet；Latest Completed Assistant Result Snippet；Last Active Time；Turn Count；Running/Needs Approval/New Result/Failed；可选 Worktree Name、Changed File Count；可选 Subagent Count/Status。每个重要 Snippet 必须能回到真实 Turn。Local Fork Draft 不进入 durable Overview。v0.1/v0.2 不显示模型推断的 Decision、Conclusion、Open Question、Rejected Direction；未来 Interpretation Layer 必须显式标注来源和更新时间。Overview 不包含完整 Transcript 或 Composer，点击 Card 回到 Focus。",
+  "evidence": [
+    {
+      "note": "9.6、Risk 1 与 Risk 4 定义 Card 字段、可信度和禁用推断。",
+      "ref": "docs/product/source/spatial-thread-workspace-prd-v0-original.md"
+    },
+    {
+      "note": "Demo Card 展示 Parent、Fork snippet、Latest user/result、Status、Worktree、files 与 subagents。",
+      "ref": "docs/product/source/peel-demo-v0-original.html"
+    }
+  ],
+  "kind": "context",
+  "relations": [
+    {
+      "target_context_id": "decision-focus-overview-information-contract",
+      "type": "depends_on"
+    },
+    {
+      "target_context_id": "contract-v01-core-spatial-fork-loop",
+      "type": "relates_to"
+    }
+  ],
+  "schema_version": 1,
+  "source": {
+    "captured_at": "2026-08-25T18:34:18Z",
+    "quote": "V0 仅使用确定性信息；所有 Snippet 指向真实 Turn。",
+    "ref": "distill:docs/product/source/spatial-thread-workspace-prd-v0-original.md#9-6-overview-mode"
+  },
+  "state": "active",
+  "summary": "Overview Card 只展示可追溯的高密度确定性信息，不推断用户结论",
+  "tags": [
+    "overview",
+    "card",
+    "deterministic",
+    "data-contract",
+    "traceability",
+    "no-inference"
+  ],
+  "type": "contract"
+}

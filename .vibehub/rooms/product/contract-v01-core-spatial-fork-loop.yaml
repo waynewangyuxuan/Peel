@@ -1,0 +1,53 @@
+{
+  "context_id": "contract-v01-core-spatial-fork-loop",
+  "detail": "【版本目标】v0.1 证明：在真实 Codex Chat 上创建多个分支后，用户会因为空间结构而更容易理解、返回并继续非当前分支。它是 Desktop-only、Thread-first 的首个可持续 Dogfood 版本，不是静态 Demo。\n\n【入口与模型】用户可以搜索或选择任意已有 Codex Thread，以它创建一个新 Space Root；Space 此后只接受真实 Fork 后代。Peel 不读取或展示 Codex Project，不提供 Add unrelated Chat、Forest、任意 Edge 或 Cross-project Space。\n\n【Focus】提供日常可用的完整 Chat 主路径：Transcript、Streaming、Composer、Command/File Change、Approval、错误与核心 Codex Item；未知 Item 必须有安全占位并可 Open in Codex。每个 Thread 独立保存 Draft 与 Scroll，切换后可恢复；Streaming 不制造 Scroll Jump。Voice Dictation 是 P0：录音转成可编辑文字并插入同一个 Draft，发送前始终可修改。\n\n【Fork】Completed Turn 同时提供菜单里的 Branch from here 和 Peel Drag Gesture。入口先在 150ms 内创建可取消的 Local Fork Draft，不提前创建 Thread 或 Worktree；First Send 才调用真实 thread/fork(lastTurnId) 并开始 Child Turn。保存 parentThreadId、childThreadId、forkedAtTurnId 和 createdAt；Child 可以从 Branched from 精确返回 Parent Turn。Fork、First Turn 或 Worktree 失败都不得丢失 Prompt。\n\n【执行位置】First Send 前可选择 Current Workspace 或 Create a New Worktree。New Worktree 由独立 Git Workspace Adapter 落地；失败时保留 Draft，并允许 Retry 或切回 Current Workspace。Worktree 不改变 Fork Tree。Focus/Overview 显示 Worktree 名和 changed-files 数量，并提供轻量 Diff Surface；不实现 Git Dashboard、Branch Management、Commit/Push/PR 主流程。\n\n【Focus Tree 与 Overview】Focus 保留紧凑持久的 lineage tree；Overview 移除 Composer 和完整 Transcript，展示整棵 Fork Tree。Card 只使用可追溯的确定性信息：Title、Parent、Fork Turn Snippet、Latest User、Latest Completed Result、Last Active、Turn Count、Running/Needs Approval/New Result/Failed、Worktree、Changed Files 和 Subagent Count/Status。Node 可拖动且位置持久化；新增 Child 不移动既有 Node；Edge 只能表达 Fork。\n\n【命名与 Activity】First Prompt 产生确定性临时标题，首轮完成后可生成短标题并通过 thread/name/set 写回 Codex；用户手动 Rename 后永不被自动覆盖。Subagent 在 Parent Activity 内折叠显示，主图只提供 Count/Status 与可用的真实任务信息，不把 Subagent 画成主节点。\n\n【恢复与逃生口】每条 Thread 都可 Open in Codex；Space 可 Rename 与 Archive。任何 Codex Item 暂未完整支持时，用户仍能识别它并跳回原生 Codex。\n\n【发布门槛】(1) 从已有 Chat 到第一个真实 Fork 不超过 30 秒且无需理解 Graph/Git 术语；(2) Fork lineage 与 lastTurnId 完全一致，可准确往返 Parent/Child；(3) Draft 丢失率为 0，失败路径均可继续；(4) Rename 同步成功率目标 >99%，手动名不被覆盖；(5) 重启后 Node Position、Draft、Scroll 保持；(6) Voice transcript 发送前可编辑；(7) New Worktree 成功时可进入并查看 Diff，失败时不污染 Space；(8) Overview 足以让用户不打开 Transcript 也能区分分支方向和注意力状态；(9) 用 30–50 Node 的合成 Space 完成视觉与交互压测，至少保证图不破坏、节点可定位、Focus 可进入；(10) Dogfood 中观察到用户通过 Tree/Overview 返回至少一个非当前 Branch。",
+  "evidence": [
+    {
+      "note": "用户确认 Desktop/Chat-first，要求 Voice 不延期，并指出现有 VibeHub Codex adapter 经验可复用到 Thread 与 Workspace 集成。",
+      "ref": "conversation:2026-08-25-peel-v01-v02-scope"
+    },
+    {
+      "note": "PRD 的 P0、UX acceptance、success metrics 和 failure recovery 为本版本契约的主要来源。",
+      "ref": "docs/product/source/spatial-thread-workspace-prd-v0-original.md"
+    },
+    {
+      "note": "Demo 已验证 Focus/Overview、Peel Draft、Diff、Dictation、Rename、Status 和 Subagent Indicator 的产品形态。",
+      "ref": "docs/product/source/peel-demo-v0-original.html"
+    }
+  ],
+  "kind": "context",
+  "relations": [
+    {
+      "target_context_id": "decision-single-root-fork-tree",
+      "type": "depends_on"
+    },
+    {
+      "target_context_id": "intent-spatial-thread-workspace",
+      "type": "relates_to"
+    },
+    {
+      "target_context_id": "decision-project-optional-context-overlay",
+      "type": "relates_to"
+    }
+  ],
+  "schema_version": 1,
+  "source": {
+    "captured_at": "2026-08-25T08:03:50Z",
+    "quote": "voice dictation 不能推……focus on 桌面端……哪怕纯 chat 我也接受。",
+    "ref": "conversation:2026-08-25-peel-v01-v02-scope"
+  },
+  "state": "active",
+  "summary": "Peel v0.1 交付完整、可靠、可 Dogfood 的 Spatial Fork 核心闭环",
+  "tags": [
+    "v0-1",
+    "release-contract",
+    "focus",
+    "overview",
+    "fork",
+    "voice-dictation",
+    "worktree",
+    "diff",
+    "subagent"
+  ],
+  "type": "contract"
+}

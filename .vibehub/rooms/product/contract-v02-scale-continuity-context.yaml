@@ -1,0 +1,51 @@
+{
+  "context_id": "contract-v02-scale-continuity-context",
+  "detail": "【版本目标】v0.2 不再补 v0.1 的基础功能，而是让已经被证明有用的 Spatial Fork Loop 能承载长期、反复、与原生 Codex 并行的工作。核心发布主题是 Scale 与 Continuity；Project 联动是 capability-gated 的实验轨道，不是领域模型前提。\n\n【Scale】让 30–50 Node 的真实 Space 仍可快速定位和恢复上下文：Keyboard-first Overview Navigation、Collapse/Park Subtree、Show Recent Only、Space Search、Pin Thread 和显式 Tidy Layout。默认布局继续稳定；只有用户触发 Tidy 才允许整体重排。Focus Tree 根据当前路径、Sibling、直接 Child 和注意力状态渐进折叠。\n\n【External Continuity】发现用户在原生 Codex 中从 Space Thread 新建的真实 Fork，并在能够验证 parent/turn anchor 时安全注册；无法恢复准确 Fork Turn 时必须标记 Unknown/Needs confirmation，绝不伪造 Edge。增强未知 Codex Item Renderer、外部 Rename/Status 同步、Subagent Activity 展开和中断后的 Event Reconciliation，使 Peel 与 Codex Desktop 可以交替使用而不产生 Shadow State。\n\n【Project Context Experiment】当 Codex Server 稳定暴露 Project association 时，Peel 可以识别 Root/Thread 的可选 projectId，并让新 Fork 默认继承服务端 Project 的 instructions、sources 和 workspace roots；Peel 不复制这些内容，也不因为用户把 Chat 拖进或移出 Project 而重写 Space topology。无能力、无 Project 或 Project API 降级时，所有 v0.2 核心功能仍按纯 Thread 模式工作。该实验是否成为正式发布能力，由 Dogfood 价值和 API 稳定性决定，不阻塞 v0.2 的 Scale/Continuity 发布。\n\n【仍不进入 v0.2】Cross-project Space、Multi-root/Forest、任意 Add to Space、用户手绘 Edge、AI 推断的 Decision/Open Question、Multi-agent Control Room、Git Dashboard、自动 Merge、完整 Compare/Convergence。Compare/Convergence 只有在真实使用证明用户反复返回多个分支并产生明确收敛需求后才立项。\n\n【发布门槛】(1) 30–50 Node 下可用键盘、搜索、折叠与空间操作在可控步骤内定位任意已知 Thread；(2) Collapse/Park/Filter 可逆，且非 Tidy 操作不改变保存的位置；(3) 外部 Fork 同步无重复节点，准确 Anchor 可验证，未知 Anchor 被诚实标记；(4) App 重启或事件断线后能从 Codex Source of Truth 重建一致状态；(5) Project API 完全不可用时，纯 Thread 工作流无功能退化；若开启 Project Experiment，新 Fork 的继承由服务端完成，Peel 不维护 Project 内容副本；(6) Dogfood 指标证明大 Space 中用户仍会返回非当前 Branch，并能判断注意力优先级。",
+  "evidence": [
+    {
+      "note": "用户确认大规模 Visual 必须测试，同时选择把 Codex Project 联动留给后续实战，并倾向默认继承全部 Project Context。",
+      "ref": "conversation:2026-08-25-peel-v01-v02-scope"
+    },
+    {
+      "note": "原 PRD 的 P1、30–50 Node 验收与 Future Direction 为 v0.2 的 Scale/Continuity 边界提供基础。",
+      "ref": "docs/product/source/spatial-thread-workspace-prd-v0-original.md"
+    },
+    {
+      "note": "本机实验 schema 显示 project/list 与 projectId 相关能力可以探索，但尚不应成为稳定依赖。",
+      "ref": "local-schema:codex-app-server-0.149.0"
+    }
+  ],
+  "kind": "context",
+  "relations": [
+    {
+      "target_context_id": "contract-v01-core-spatial-fork-loop",
+      "type": "depends_on"
+    },
+    {
+      "target_context_id": "decision-project-optional-context-overlay",
+      "type": "relates_to"
+    },
+    {
+      "target_context_id": "intent-spatial-thread-workspace",
+      "type": "relates_to"
+    }
+  ],
+  "schema_version": 1,
+  "source": {
+    "captured_at": "2026-08-25T08:03:50Z",
+    "quote": "这个 visual 的这个，是要测试的……后面再在实战中引入这个，跟 project 的联动。",
+    "ref": "conversation:2026-08-25-peel-v01-v02-scope"
+  },
+  "state": "active",
+  "summary": "Peel v0.2 将核心闭环扩展到大 Space、外部 Codex 连续性与可选上下文继承",
+  "tags": [
+    "v0-2",
+    "release-contract",
+    "scale",
+    "navigation",
+    "continuity",
+    "external-fork",
+    "project-inheritance"
+  ],
+  "type": "contract"
+}

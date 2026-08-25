@@ -1,0 +1,46 @@
+{
+  "context_id": "contract-stable-spatial-layout",
+  "detail": "Root 使用稳定起始位置；新 Child 增量放在 Parent 右侧或下游，Sibling 保持可辨识间距。用户可拖动 Card，位置和 Camera State 持久化；重新打开 Space 不改变位置。新增 Child、状态更新、过滤或折叠不得自动洗牌既有 Node。Tidy Layout 可以存在，但只能由用户显式触发。Edge 低对比且只表达 Fork，Active Path/Hover 时增强；用户不能绘制任意 Edge或用颜色虚构 Branch 类型。v0.1 使用 30–50 Node 合成数据验证不破坏、可定位和可进入；v0.2 再交付键盘导航、Collapse/Park、Show Recent、Search、Pin 与大规模舒适性。",
+  "evidence": [
+    {
+      "note": "Stable Spatial Memory、Spatial Layout、Overview acceptance 与 Risk 5 定义位置契约。",
+      "ref": "docs/product/source/spatial-thread-workspace-prd-v0-original.md"
+    },
+    {
+      "note": "Demo 支持拖动 Card、实时重绘 Edge、Zoom 和 Position saved 反馈，但仅约 6 个节点。",
+      "ref": "docs/product/source/peel-demo-v0-original.html"
+    },
+    {
+      "note": "用户确认 Visual scale 必须专门测试。",
+      "ref": "conversation:2026-08-25-peel-v01-v02-scope"
+    }
+  ],
+  "kind": "context",
+  "relations": [
+    {
+      "target_context_id": "contract-overview-deterministic-card-data",
+      "type": "depends_on"
+    },
+    {
+      "target_context_id": "contract-v02-scale-continuity-context",
+      "type": "relates_to"
+    }
+  ],
+  "schema_version": 1,
+  "source": {
+    "captured_at": "2026-08-25T18:34:18Z",
+    "quote": "新增一个 Fork 不能导致已有节点整体重新排列。",
+    "ref": "distill:docs/product/source/spatial-thread-workspace-prd-v0-original.md#9-7-spatial-layout"
+  },
+  "state": "active",
+  "summary": "Overview 优先稳定空间记忆：新增 Child 不移动既有节点，整体整理必须显式触发",
+  "tags": [
+    "overview",
+    "layout",
+    "spatial-memory",
+    "position",
+    "edge",
+    "scale"
+  ],
+  "type": "contract"
+}

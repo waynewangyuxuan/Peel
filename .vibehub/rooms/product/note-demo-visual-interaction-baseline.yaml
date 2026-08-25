@@ -1,0 +1,52 @@
+{
+  "context_id": "note-demo-visual-interaction-baseline",
+  "detail": "Demo 使用中性桌面工作台视觉：约 226px product sidebar、248px lineage rail、760px 最大 Transcript，完整 Chat 保持 screen-space；Focus/Overview 以约 220–420ms opacity/scale transition 切换。Overview 使用固定 world、294px Card、低对比曲线 Edge、Zoom 和 Card drag；Focus 提供 Header Rename、Fork Tree、Transcript/Activity、Composer、Voice、runtime selector。Branch action 触发约 760ms Peel provenance transition，随后进入 Local Fork Draft；First Send 才转 durable，模拟 running → new-result 与自动短标题。Worktree pill 打开 Diff drawer；Subagent pill hover 展示 Name/Role/Task/Status。该 Demo 约 6 个节点，Transcript 很短，数据和后端行为是模拟的，因此只作为信息架构、状态过渡、视觉层级和交互语义证据；30–50 Node、真实 Streaming/Approval/Activity、失败恢复和 App Server fidelity 必须另测。Demo 中的 Project sidebar/Project → Spaces 文案已被后续 Thread-first 决定取代。具体 CSS token 和 motion 数值以原始 HTML 为准。",
+  "evidence": [
+    {
+      "note": "自包含 HTML 中的 CSS、DOM、prototype state 和 event handlers 是本 Context 的直接证据。",
+      "ref": "docs/product/source/peel-demo-v0-original.html"
+    },
+    {
+      "note": "用户要求 Demo 不仅无损保存，还应被 Room 充分吸收。",
+      "ref": "conversation:2026-08-25-room-full-product-absorption"
+    }
+  ],
+  "kind": "context",
+  "relations": [
+    {
+      "target_context_id": "decision-focus-overview-information-contract",
+      "type": "relates_to"
+    },
+    {
+      "target_context_id": "contract-fork-creation-lifecycle",
+      "type": "relates_to"
+    },
+    {
+      "target_context_id": "contract-stable-spatial-layout",
+      "type": "relates_to"
+    },
+    {
+      "target_context_id": "change-original-project-registration-superseded",
+      "type": "relates_to"
+    }
+  ],
+  "schema_version": 1,
+  "source": {
+    "captured_at": "2026-08-25T18:34:18Z",
+    "quote": "Focus protects the quality of the present conversation. Overview protects the memory of the whole exploration.",
+    "ref": "distill:docs/product/source/peel-demo-v0-original.html"
+  },
+  "state": "active",
+  "summary": "原始 Demo 是 Focus/Overview、Peel、Diff、Voice 与 Card density 的可运行交互基线，但不是规模或后端证据",
+  "tags": [
+    "demo",
+    "visual-baseline",
+    "interaction",
+    "motion",
+    "focus",
+    "overview",
+    "peel",
+    "limitations"
+  ],
+  "type": "note"
+}

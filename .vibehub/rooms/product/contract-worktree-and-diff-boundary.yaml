@@ -1,0 +1,46 @@
+{
+  "context_id": "contract-worktree-and-diff-boundary",
+  "detail": "Git-backed Parent 的 Fork Draft 在 First Send 前提供非 Modal 的 Current Workspace / Create a New Worktree 选择；Parent 已在 Worktree 时显示 Continue in this worktree / Create a New Worktree。用户可在 First Send 前修改，默认策略在 Dogfood 后确认。New Worktree 必须通过独立 Git Workspace Adapter 实现，不能假设 App Server 存在专用 create-worktree 方法；创建失败保留 Prompt 并允许 Retry 或切回当前环境。Worktree 只作为 Thread metadata，显示 Name 与 Changed File Count。点击打开临时 Diff Surface：文件列表、additions/deletions、file/hunk diff、Open Worktree、Open in Editor/Codex；退出后恢复原 Focus/Overview。v0.1 不实现 Worktree Dashboard、Git Graph、Branch Management、Commit/Push/PR 主流程或多个 Worktree 自动比较。",
+  "evidence": [
+    {
+      "note": "9.4、9.8、Risk 3 与 Risk 6 定义 Worktree/Diff 的交互和边界。",
+      "ref": "docs/product/source/spatial-thread-workspace-prd-v0-original.md"
+    },
+    {
+      "note": "Demo 提供 Fork runtime selector、Worktree pill 和 on-demand Diff drawer。",
+      "ref": "docs/product/source/peel-demo-v0-original.html"
+    },
+    {
+      "note": "官方文档确认 turn/diff/updated 提供每 Turn 聚合 unified diff；未据此推断 Worktree 创建能力。",
+      "ref": "https://learn.chatgpt.com/docs/app-server"
+    }
+  ],
+  "kind": "context",
+  "relations": [
+    {
+      "target_context_id": "contract-fork-creation-lifecycle",
+      "type": "depends_on"
+    },
+    {
+      "target_context_id": "contract-v01-core-spatial-fork-loop",
+      "type": "relates_to"
+    }
+  ],
+  "schema_version": 1,
+  "source": {
+    "captured_at": "2026-08-25T18:34:18Z",
+    "quote": "这里很多其实不用推，我们有……很深的和 codex server 交互的逻辑，可以改改拿过来用，那个 adapter。",
+    "ref": "conversation:2026-08-25-peel-v01-v02-scope"
+  },
+  "state": "active",
+  "summary": "New Worktree 与轻量 Diff 是 v0.1 Fork 上下文，但不能演化成第二套执行或 Git 产品",
+  "tags": [
+    "worktree",
+    "diff",
+    "git",
+    "workspace-adapter",
+    "v0-1",
+    "boundary"
+  ],
+  "type": "contract"
+}

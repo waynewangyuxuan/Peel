@@ -1,0 +1,46 @@
+{
+  "context_id": "contract-voice-dictation-draft",
+  "detail": "Composer 必须提供 Dictation：Record → Transcribe → Insert editable text → User reviews/edits → Send。录音前后都可以继续键盘输入，转写只插入当前 Thread 的同一个 Draft，绝不自动发送。Draft 按 Thread 保存，切换 Thread 或进入其他分支不丢失；Overview 没有 Composer，因此不录音。v0.1 不增加技术词提示、自定义 vocabulary、额外 Prompt 或关键词配置。具体转写协议可以 capability-gated，但产品能力不得从 v0.1 延期；底层能力变化时应替换 adapter，而不是删除交互。",
+  "evidence": [
+    {
+      "note": "用户明确否决延期 Voice Dictation。",
+      "ref": "conversation:2026-08-25-peel-v01-v02-scope"
+    },
+    {
+      "note": "9.9 定义可编辑转写、共享 Draft、Thread persistence 与非目标。",
+      "ref": "docs/product/source/spatial-thread-workspace-prd-v0-original.md"
+    },
+    {
+      "note": "Demo 的麦克风状态和 Transcript inserted—edit before sending 行为提供交互证据。",
+      "ref": "docs/product/source/peel-demo-v0-original.html"
+    }
+  ],
+  "kind": "context",
+  "relations": [
+    {
+      "target_context_id": "contract-focus-chat-fidelity",
+      "type": "depends_on"
+    },
+    {
+      "target_context_id": "contract-v01-core-spatial-fork-loop",
+      "type": "relates_to"
+    }
+  ],
+  "schema_version": 1,
+  "source": {
+    "captured_at": "2026-08-25T18:34:18Z",
+    "quote": "voice dictation 不能推。",
+    "ref": "conversation:2026-08-25-peel-v01-v02-scope"
+  },
+  "state": "active",
+  "summary": "Voice Dictation 是 v0.1 P0，并与键盘输入共享同一个可编辑 Thread Draft",
+  "tags": [
+    "voice",
+    "dictation",
+    "composer",
+    "draft",
+    "v0-1",
+    "p0"
+  ],
+  "type": "contract"
+}

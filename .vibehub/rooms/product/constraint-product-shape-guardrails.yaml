@@ -1,0 +1,48 @@
+{
+  "context_id": "constraint-product-shape-guardrails",
+  "detail": "设计和实现评审必须检查六类失败：(1) Graph Viewer：图好看但仍要逐个打开 Chat 才能理解；用确定性高密度 Card 和可追溯 Snippet 缓解。(2) Codex Clone：大量复刻原生功能掩盖 Spatial Fork；用 Open in Codex 和主路径聚焦缓解。(3) Agent/Execution Dashboard：Worktree、Diff、Subagent/Test 成为主界面；坚持它们是 Thread metadata/activity。(4) Overview 不可信：模型误判 Decision/Conclusion；v0.1/v0.2 只显示事实。(5) Spatial Memory 失败：自动布局洗牌；位置持久化且 Tidy 只能显式触发。(6) Worktree friction：每次 Fork 强迫理解 Git；选择器轻量、仅 Git-backed 显示、默认继承当前环境方向且 First Send 前可改。新增 Project、Compare、Convergence、GitHub 或高级 Agent 能力时，若破坏 Focus Chat fidelity、真实 Fork semantics、deterministic Overview 或 stable spatial memory，就不应进入主界面。",
+  "evidence": [
+    {
+      "note": "第 15 章逐项定义六类风险与 mitigation；第 5、8、16 章提供否决原则。",
+      "ref": "docs/product/source/spatial-thread-workspace-prd-v0-original.md"
+    },
+    {
+      "note": "Why & Model 与 UX Contract 面板将三种产品边界和六条 UX principle 作为可视化评审基线。",
+      "ref": "docs/product/source/peel-demo-v0-original.html"
+    }
+  ],
+  "kind": "context",
+  "relations": [
+    {
+      "target_context_id": "decision-non-goals-and-convergence-gate",
+      "type": "relates_to"
+    },
+    {
+      "target_context_id": "decision-focus-overview-information-contract",
+      "type": "relates_to"
+    },
+    {
+      "target_context_id": "contract-stable-spatial-layout",
+      "type": "relates_to"
+    }
+  ],
+  "schema_version": 1,
+  "source": {
+    "captured_at": "2026-08-25T18:34:18Z",
+    "quote": "边界不是为了保守，而是为了保护真正有差异化的 Chat → Fork → Space 体验。",
+    "ref": "distill:docs/product/source/spatial-thread-workspace-prd-v0-original.md#15-risks-and-mitigations"
+  },
+  "state": "active",
+  "summary": "任何新功能都必须通过六类产品形变风险检查，保护 Chat → Fork → Space 的差异化主链",
+  "tags": [
+    "risk",
+    "guardrail",
+    "graph-viewer",
+    "codex-clone",
+    "execution-dashboard",
+    "trust",
+    "spatial-memory",
+    "worktree-friction"
+  ],
+  "type": "constraint"
+}

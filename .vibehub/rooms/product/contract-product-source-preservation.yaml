@@ -1,0 +1,50 @@
+{
+  "context_id": "contract-product-source-preservation",
+  "detail": "Peel 采用两层产品知识：Source Archive 无损保存用户提供的原始 PRD 与自包含 Demo HTML；VibeHub Context 提供可检索的当前决策、版本边界与理由。原始文件使用 *-original 命名，不允许原地改写；任何修订都新增版本化文件。Demo 是第一等产品证据和交互契约，必须保持单文件可直接运行，不能只留下截图、摘要或 Feature 清单。结构化 Context 天然是有损提炼，因此规划和实现涉及交互细节、视觉行为或被省略的边界时，必须同时查询对应原始材料。若旧 Source 与之后明确的人类决策冲突，两者都保留，并以后来的明确决策作为当前方向。",
+  "evidence": [
+    {
+      "note": "原始 PRD 已逐字节保存；SHA-256 为 e86e8d4d4af6b83e22e2377b1f45ab5def0962f26ebce920be901c28ac9226b6。",
+      "ref": "docs/product/source/spatial-thread-workspace-prd-v0-original.md"
+    },
+    {
+      "note": "原始自包含 Demo HTML 已逐字节保存；SHA-256 为 0501a3f17a46d50c4d1bdbd47eb954e9d0353f6a332b81222e8ec33289c89e16。",
+      "ref": "docs/product/source/peel-demo-v0-original.html"
+    },
+    {
+      "note": "Source Archive manifest 记录不可原地改写、版本化新增和冲突保留规则。",
+      "ref": "docs/product/source/README.md"
+    }
+  ],
+  "kind": "context",
+  "relations": [
+    {
+      "target_context_id": "intent-spatial-thread-workspace",
+      "type": "relates_to"
+    },
+    {
+      "target_context_id": "contract-v01-core-spatial-fork-loop",
+      "type": "relates_to"
+    },
+    {
+      "target_context_id": "contract-v02-scale-continuity-context",
+      "type": "relates_to"
+    }
+  ],
+  "schema_version": 1,
+  "source": {
+    "captured_at": "2026-08-25T08:03:50Z",
+    "quote": "包括我们之前给你的 demo html 要直接沉淀一下……我还担心，你沉淀的有信息 loss。",
+    "ref": "conversation:2026-08-25-preserve-prd-demo-without-loss"
+  },
+  "state": "active",
+  "summary": "原始 PRD 与可运行 Demo 必须无损保存，结构化 Context 不能替代源材料",
+  "tags": [
+    "source-archive",
+    "information-loss",
+    "prd",
+    "demo",
+    "traceability",
+    "preservation"
+  ],
+  "type": "contract"
+}

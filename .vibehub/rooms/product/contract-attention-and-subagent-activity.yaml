@@ -1,0 +1,46 @@
+{
+  "context_id": "contract-attention-and-subagent-activity",
+  "detail": "Focus Tree 和 Overview 对非 Focus Thread 只使用 Running、Needs approval、New result、Failed 四类需要用户注意的状态；Idle 不显示。New result 必须由 latestCompletedTurnId 与 lastViewedTurnId 的确定性比较产生，不由模型判断。Subagent 属于 Parent Thread 中某个 Turn 的后台 Activity，不进入主 Fork Tree、不改变 Space layout。Overview 可显示 Subagent Count/Status，Hover/展开优先使用真实 Agent Name/Nickname、Role、第一条 Delegated Task、Runtime Status 与 Latest Completed Result Snippet；不得自动生成额外 Summary。点击可以查看 Activity 或打开对应 Thread，但主导航仍是用户 Chat Fork Tree。",
+  "evidence": [
+    {
+      "note": "7.6、9.10、9.11 与 Risk 3 定义注意力状态和 Subagent 边界。",
+      "ref": "docs/product/source/spatial-thread-workspace-prd-v0-original.md"
+    },
+    {
+      "note": "Demo 在 Tree/Card 使用状态点，并在 Card Hover 展示两个 Subagent 的 Name/Role/Task/Status。",
+      "ref": "docs/product/source/peel-demo-v0-original.html"
+    },
+    {
+      "note": "官方文档列出 thread/status/changed、waitingOnApproval 和 collabToolCall item，可作为真实事件来源。",
+      "ref": "https://learn.chatgpt.com/docs/app-server"
+    }
+  ],
+  "kind": "context",
+  "relations": [
+    {
+      "target_context_id": "contract-overview-deterministic-card-data",
+      "type": "relates_to"
+    },
+    {
+      "target_context_id": "contract-source-of-truth-ownership",
+      "type": "relates_to"
+    }
+  ],
+  "schema_version": 1,
+  "source": {
+    "captured_at": "2026-08-25T18:34:18Z",
+    "quote": "Subagent 不影响 Space 的主布局。",
+    "ref": "distill:docs/product/source/spatial-thread-workspace-prd-v0-original.md#9-10-thread-status-and-attention"
+  },
+  "state": "active",
+  "summary": "非当前 Thread 只显示四类可行动注意力；Subagent 折叠为 Parent Activity 而非主图节点",
+  "tags": [
+    "attention",
+    "status",
+    "new-result",
+    "subagent",
+    "activity",
+    "deterministic"
+  ],
+  "type": "contract"
+}

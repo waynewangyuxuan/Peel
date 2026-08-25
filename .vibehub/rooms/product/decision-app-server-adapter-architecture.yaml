@@ -1,0 +1,47 @@
+{
+  "context_id": "decision-app-server-adapter-architecture",
+  "detail": "本地 VibeHub workbench 的 hook-adapters.ts 和 verify-codex-plugin.mjs 是可复用的协议边界与测试模式：它们规范化 Codex hook payload，并验证 initialize → initialized → thread/start 与 MCP ready。但它们不是 Peel 可直接搬用的完整 Thread client，现有代码没有覆盖 thread/list/read/fork、turn/start、Approval reducer、turn/diff/updated 或 durable event reconciliation。Peel 应提取四个清晰边界：AppServerTransport 负责 stdio/JSON-RPC handshake、request correlation 与 reconnect；ThreadClient 封装 list/read/fork/name/turn/approval；EventReducer 将 Thread/Turn/Item stream 归一为可重建 UI state；GitWorkspaceAdapter 单独负责 New Worktree 和本地 Git 事实。复用的是 adapter discipline、wire verification 和 canonical event 思路，而不是把 VibeHub hook adapter 当作 drop-in client。",
+  "evidence": [
+    {
+      "note": "现有 adapter 规范化 Codex/Claude hook identity、prompt、cwd 与 apply_patch touches，并显式处理 subagent hook。",
+      "ref": "/Users/waynewang/Vibehub/workbench/packages/cli/src/hook-adapters.ts"
+    },
+    {
+      "note": "现有验证脚本启动 codex app-server，完成初始化和 thread/start，并等待 VibeHub MCP ready。",
+      "ref": "/Users/waynewang/Vibehub/workbench/scripts/verify-codex-plugin.mjs"
+    },
+    {
+      "note": "官方文档将 App Server 定位为 rich client 的双向 JSON-RPC 接口，覆盖 history、approvals 和 streamed events。",
+      "ref": "https://learn.chatgpt.com/docs/app-server"
+    }
+  ],
+  "kind": "context",
+  "relations": [
+    {
+      "target_context_id": "contract-source-of-truth-ownership",
+      "type": "depends_on"
+    },
+    {
+      "target_context_id": "contract-v01-core-spatial-fork-loop",
+      "type": "relates_to"
+    }
+  ],
+  "schema_version": 1,
+  "source": {
+    "captured_at": "2026-08-25T18:34:18Z",
+    "quote": "本地的 vibehub-plugin……有很深的和 codex server 交互的逻辑，可以改改拿过来用，那个 adapter。",
+    "ref": "conversation:2026-08-25-peel-v01-v02-scope"
+  },
+  "state": "active",
+  "summary": "Peel 复用 VibeHub 的 Codex host 适配经验，但需要独立的 App Server rich-client 分层",
+  "tags": [
+    "app-server",
+    "adapter",
+    "transport",
+    "thread-client",
+    "event-reducer",
+    "workspace-adapter",
+    "vibehub"
+  ],
+  "type": "decision"
+}

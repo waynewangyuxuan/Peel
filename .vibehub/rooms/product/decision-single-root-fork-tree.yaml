@@ -1,0 +1,37 @@
+{
+  "context_id": "decision-single-root-fork-tree",
+  "detail": "用户可以从任意已有 Codex Chat 创建一个 Space，该 Chat 成为唯一 Root。之后 Space 只通过从现有节点的 Completed Turn 执行真实 Fork 来增长；每个非 Root Thread 在该 Space 中恰好有一个 Parent，并记录准确的 forkedAtTurnId。Edge 只表达 Chat Fork，不表达 Git、Worktree、Subagent、依赖或用户手绘关系。v0.1/v0.2 不支持把无关 Chat 加入现有 Space、不支持 Forest、任意 Edge 或 Cross-project Graph。Worktree 只是 Thread 的执行位置，Subagent 只是 Parent Turn 的 Activity。",
+  "evidence": [
+    {
+      "note": "用户明确要求先采用最简单的单 Root、只通过 Fork 扩展的 Space 模型。",
+      "ref": "conversation:2026-08-25-peel-v01-v02-scope"
+    },
+    {
+      "note": "Demo 的核心交互已经使用 Parent/Child Fork lineage、Focus Tree 和 Overview Cards 表达这一结构。",
+      "ref": "docs/product/source/peel-demo-v0-original.html"
+    }
+  ],
+  "kind": "context",
+  "relations": [
+    {
+      "target_context_id": "intent-spatial-thread-workspace",
+      "type": "relates_to"
+    }
+  ],
+  "schema_version": 1,
+  "source": {
+    "captured_at": "2026-08-25T08:03:50Z",
+    "quote": "我们所有的 space，其实就是我们这边有一个 thread，然后呢，它这个是不断在下面 fork 出去。",
+    "ref": "conversation:2026-08-25-peel-v01-v02-scope"
+  },
+  "state": "active",
+  "summary": "一个 Space 是一条 Root Thread 及其真实 Fork 后代组成的单根树",
+  "tags": [
+    "space",
+    "thread",
+    "fork-tree",
+    "domain-model",
+    "lineage"
+  ],
+  "type": "decision"
+}

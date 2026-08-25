@@ -1,0 +1,45 @@
+{
+  "context_id": "contract-thread-title-lifecycle",
+  "detail": "未 First Send 的 Fork Draft 显示 New branch。First Send 后第一条 User Prompt 经过确定性截断成为临时标题。第一轮完成后可以生成更短、可识别的标题，并通过 thread/name/set 写回真实 Codex Thread。用户可以在 Focus Tree、Overview Card 和 Thread Header Inline Rename；手动 Rename 同样写回 Codex。一旦 titleOrigin 变为 manual，任何自动命名都不得再次覆盖。Space Name 与 Thread Name 分离：默认来自 Root Title，但用户修改 Space Name 不写回 Thread。",
+  "evidence": [
+    {
+      "note": "9.5、Naming acceptance 与 Source of Truth 定义完整命名生命周期。",
+      "ref": "docs/product/source/spatial-thread-workspace-prd-v0-original.md"
+    },
+    {
+      "note": "Demo 在 Header、Tree、Overview 实现 Inline Rename，并模拟 fallback/generated/manual titleOrigin。",
+      "ref": "docs/product/source/peel-demo-v0-original.html"
+    },
+    {
+      "note": "官方 App Server 文档确认 thread/name/set 和 thread/name/updated，并说明 thread/list/read 会 hydrate name。",
+      "ref": "https://learn.chatgpt.com/docs/app-server"
+    }
+  ],
+  "kind": "context",
+  "relations": [
+    {
+      "target_context_id": "contract-fork-creation-lifecycle",
+      "type": "relates_to"
+    },
+    {
+      "target_context_id": "contract-source-of-truth-ownership",
+      "type": "relates_to"
+    }
+  ],
+  "schema_version": 1,
+  "source": {
+    "captured_at": "2026-08-25T18:34:18Z",
+    "quote": "用户手动 Rename 后，系统永远不再自动覆盖这个名称。",
+    "ref": "distill:docs/product/source/spatial-thread-workspace-prd-v0-original.md#9-5-thread-naming"
+  },
+  "state": "active",
+  "summary": "Thread Title 从 Draft fallback 到自动短标题再到不可覆盖的手动名称，并始终同步 Codex",
+  "tags": [
+    "thread-title",
+    "naming",
+    "rename",
+    "codex-sync",
+    "title-origin"
+  ],
+  "type": "contract"
+}

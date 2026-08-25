@@ -1,0 +1,42 @@
+{
+  "context_id": "decision-thread-first-space-entry",
+  "detail": "v0.1 的桌面入口是 Thread-first：用户搜索或选择任意已有 Codex Chat，先按普通 Chat 打开；需要空间化时，以该 Thread 创建一个新的 Space Root，或在第一次 Branch from here 时自动建立这个 Space。Peel 不要求用户先选择 Project，也不自动镜像任何 Project Chat 列表。现阶段不提供把无关 Thread 加进已有 Space 的 Add to Space；一个 Space 只能通过真实 Fork 从 Root 向下增长。Space Name 默认来自 Root Title，但属于 Peel，可独立 Rename；Archive Space 只隐藏 Peel 对象，不修改 Codex Thread。",
+  "evidence": [
+    {
+      "note": "用户明确选择 Desktop/Chat-first，并同意暂时不处理 Project 概念。",
+      "ref": "conversation:2026-08-25-peel-v01-v02-scope"
+    },
+    {
+      "note": "PRD 的 Search、Register、Create Space 与 First Branch 路径提供交互基础；Project/Add-to-Space 部分已被后续决定收窄。",
+      "ref": "docs/product/source/spatial-thread-workspace-prd-v0-original.md"
+    }
+  ],
+  "kind": "context",
+  "relations": [
+    {
+      "target_context_id": "decision-single-root-fork-tree",
+      "type": "depends_on"
+    },
+    {
+      "target_context_id": "decision-project-optional-context-overlay",
+      "type": "relates_to"
+    }
+  ],
+  "schema_version": 1,
+  "source": {
+    "captured_at": "2026-08-25T18:34:18Z",
+    "quote": "focus on 桌面端……哪怕纯 chat 我也接受的。",
+    "ref": "conversation:2026-08-25-peel-v01-v02-scope"
+  },
+  "state": "active",
+  "summary": "Peel 从任意 Codex Thread 直接创建 Space，不以 Project 页面或 Add to Space 作为入口",
+  "tags": [
+    "thread-first",
+    "entry",
+    "search",
+    "space",
+    "desktop",
+    "lifecycle"
+  ],
+  "type": "decision"
+}

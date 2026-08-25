@@ -1,0 +1,47 @@
+{
+  "context_id": "contract-product-context-coverage",
+  "detail": "Product Room 不能只保留几条高层结论。它必须把原始 PRD 的产品理由、领域模型、UX 契约、生命周期、边界、验收、风险与演进路径，Demo 的可观察交互和视觉基线，以及后续讨论对范围和技术可行性的修订，都沉淀为可检索的原子 Context。原始文件继续无损保留；Context 负责当前语义和检索，不能替代原文。每条蒸馏 Context 必须引用具体源文件或对话证据；当原始材料与后续明确讨论冲突时，保留冲突并以后续人类决定为准。规划和实现必须先查询 Context；涉及细节、视觉或遗漏风险时，还要读取对应原始来源。",
+  "evidence": [
+    {
+      "note": "1369 行原始 PRD 是完整产品语义来源。",
+      "ref": "docs/product/source/spatial-thread-workspace-prd-v0-original.md"
+    },
+    {
+      "note": "672 行自包含 Demo 是交互与视觉证据。",
+      "ref": "docs/product/source/peel-demo-v0-original.html"
+    },
+    {
+      "note": "用户明确要求 Room 同时吸收 PRD 与讨论，而不是只保存源文件。",
+      "ref": "conversation:2026-08-25-room-full-product-absorption"
+    }
+  ],
+  "kind": "context",
+  "relations": [
+    {
+      "target_context_id": "contract-product-source-preservation",
+      "type": "depends_on"
+    },
+    {
+      "target_context_id": "intent-spatial-thread-workspace",
+      "type": "relates_to"
+    }
+  ],
+  "schema_version": 1,
+  "source": {
+    "captured_at": "2026-08-25T18:34:18Z",
+    "quote": "prd 还有我们刚刚的讨论都应该被 room 充分的吸收和沉淀。",
+    "ref": "conversation:2026-08-25-room-full-product-absorption"
+  },
+  "state": "active",
+  "summary": "Product Room 必须同时吸收原始 PRD、可运行 Demo 和后续人类讨论，并保持逐项可追溯",
+  "tags": [
+    "coverage",
+    "traceability",
+    "room",
+    "prd",
+    "demo",
+    "discussion",
+    "information-loss"
+  ],
+  "type": "contract"
+}

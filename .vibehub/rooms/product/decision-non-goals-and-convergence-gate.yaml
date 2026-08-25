@@ -1,0 +1,42 @@
+{
+  "context_id": "decision-non-goals-and-convergence-gate",
+  "detail": "v0.1/v0.2 明确不成为 Codex replacement、通用 Graph Editor、Agent orchestration room、Git branch/worktree dashboard、Test dashboard、Task/Ticket manager、GitHub Issue/PR workflow、多人实时协作或自动语义解释器。主图没有任意 Edge、Git Branch、Subagent Node 或模型推断的 Decision/Open Question。Compare → Select → Integrate → Convergence 是未来方向，但只有 Dogfood 证明用户真实形成大量 Fork、反复返回多分支并出现明确收敛需求后才立项；它不等于自动合并 Chat 或 Git Merge，未来也必须让用户分别选择判断、原始 Turn、代码结果与 Open Question。",
+  "evidence": [
+    {
+      "note": "Non-goals、Risks 和 Future Direction 定义产品形变边界及收敛进入条件。",
+      "ref": "docs/product/source/spatial-thread-workspace-prd-v0-original.md"
+    },
+    {
+      "note": "Demo 的 UX brief 和 Why & Model 面板重复声明不是 Codex replacement、Graph editor 或 execution dashboard。",
+      "ref": "docs/product/source/peel-demo-v0-original.html"
+    }
+  ],
+  "kind": "context",
+  "relations": [
+    {
+      "target_context_id": "intent-spatial-thread-workspace",
+      "type": "relates_to"
+    },
+    {
+      "target_context_id": "contract-v02-scale-continuity-context",
+      "type": "relates_to"
+    }
+  ],
+  "schema_version": 1,
+  "source": {
+    "captured_at": "2026-08-25T18:34:18Z",
+    "quote": "但在用户真实形成大量 Fork 以前，不提前实现这套系统。",
+    "ref": "distill:docs/product/source/spatial-thread-workspace-prd-v0-original.md#5-non-goals"
+  },
+  "state": "active",
+  "summary": "Peel 只围绕真实 Chat Fork 建立结构；执行管理、自由图和收敛系统必须等待使用证据",
+  "tags": [
+    "non-goals",
+    "boundary",
+    "convergence",
+    "compare",
+    "future",
+    "product-focus"
+  ],
+  "type": "decision"
+}

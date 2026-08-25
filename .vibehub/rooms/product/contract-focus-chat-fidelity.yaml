@@ -1,0 +1,43 @@
+{
+  "context_id": "contract-focus-chat-fidelity",
+  "detail": "完整 Chat DOM 始终位于 screen space，不随 Overview camera 缩放。Focus 必须支持 Transcript、Markdown、代码块横向滚动、文本选择复制、Composer、Attachments、Voice、Streaming、Command/File Change、Approval、Activity、错误和核心 Codex Item。Streaming 不得造成 Scroll Jump；用户主动向上滚动后停止 Auto-follow。每个 Thread 独立保存 Composer Draft 与 Scroll Position，切换和重启后恢复。Approval 必须显示在产生它的 Thread 内。暂未识别的 Codex Item 要用安全、可辨认的 fallback renderer 展示，并提供 Open in Codex，而不是静默丢弃。",
+  "evidence": [
+    {
+      "note": "Goals、Focus Mode 和 UX Acceptance Criteria 定义完整 Chat 保真要求。",
+      "ref": "docs/product/source/spatial-thread-workspace-prd-v0-original.md"
+    },
+    {
+      "note": "Demo 的 Focus Surface、Transcript、Activity、Composer、Voice、Branch action 和固定布局是视觉基线。",
+      "ref": "docs/product/source/peel-demo-v0-original.html"
+    }
+  ],
+  "kind": "context",
+  "relations": [
+    {
+      "target_context_id": "decision-focus-overview-information-contract",
+      "type": "depends_on"
+    },
+    {
+      "target_context_id": "contract-v01-core-spatial-fork-loop",
+      "type": "relates_to"
+    }
+  ],
+  "schema_version": 1,
+  "source": {
+    "captured_at": "2026-08-25T18:34:18Z",
+    "quote": "Spatial UI 不能让 Chat 退化成‘Canvas 中的聊天框’。",
+    "ref": "distill:docs/product/source/spatial-thread-workspace-prd-v0-original.md#focus-fidelity"
+  },
+  "state": "active",
+  "summary": "Focus Chat 必须保持完整阅读、输入、Streaming、Approval 与恢复体验",
+  "tags": [
+    "focus",
+    "chat-fidelity",
+    "streaming",
+    "approval",
+    "draft",
+    "scroll",
+    "unknown-item"
+  ],
+  "type": "contract"
+}

@@ -1,0 +1,38 @@
+{
+  "context_id": "intent-primary-user-and-job",
+  "detail": "Primary User 是使用 Codex 处理真实工程或产品项目的个人开发者、产品工程师或 AI-native builder。他们在同一问题上会打开多条 Chat、从历史 Turn 创建 Branch、在一个 Repo 同时推进不同方向、可能使用多个 Worktree，并经常需要回到旧 Chat 恢复思路。核心 JTBD 是：当线性对话出现多个值得独立探索的方向时，把它们放进可见、可返回、可继续执行的结构，从而不依赖记忆管理来源；当多条相关 Chat/Worktree 并行时，看清从哪里分叉、各自在做什么，并快速进入任何路径。普通、没有分叉价值的 Chat 不需要进入 Peel。",
+  "evidence": [
+    {
+      "note": "Executive Summary、Why 与 Target User/JTBD 定义问题发生的时刻和首要用户。",
+      "ref": "docs/product/source/spatial-thread-workspace-prd-v0-original.md"
+    }
+  ],
+  "kind": "context",
+  "relations": [
+    {
+      "target_context_id": "intent-spatial-thread-workspace",
+      "type": "relates_to"
+    },
+    {
+      "target_context_id": "contract-success-and-dogfood-measurement",
+      "type": "relates_to"
+    }
+  ],
+  "schema_version": 1,
+  "source": {
+    "captured_at": "2026-08-25T18:34:18Z",
+    "quote": "扁平 Chat 列表已经不足以表达工作的关系。",
+    "ref": "distill:docs/product/source/spatial-thread-workspace-prd-v0-original.md#6-target-user"
+  },
+  "state": "active",
+  "summary": "Peel 首先服务已经用 Codex 做真实项目、并被多 Chat/多 Worktree 关系困扰的个人 Builder",
+  "tags": [
+    "target-user",
+    "jtbd",
+    "builder",
+    "developer",
+    "multi-chat",
+    "worktree"
+  ],
+  "type": "intent"
+}
