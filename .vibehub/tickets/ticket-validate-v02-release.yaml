@@ -1,0 +1,65 @@
+{
+  "acceptance": [
+    {
+      "acceptance_id": "refine-after-continuity-contract",
+      "criterion": "After External Continuity becomes Firm, this same Ticket is rewritten as Firm so every supported continuity behavior has an independent release check and no unsupported behavior is implied."
+    },
+    {
+      "acceptance_id": "retain-scale-release-proof",
+      "criterion": "The refined gate independently verifies the concrete large-space action bounds plus keyboard, search, pin, collapse/park, recent filtering, Focus Tree folding, and explicit Tidy across representative 30–50 Node Spaces without topology or unintended position changes."
+    },
+    {
+      "acceptance_id": "retain-thread-first-release-boundary",
+      "criterion": "The refined gate proves every released v0.2 function works with Project APIs disabled or unavailable, includes the spatial-utility human judgment and final shape review, and keeps the separate Project inheritance evaluation non-gating."
+    },
+    {
+      "acceptance_id": "human-large-space-utility",
+      "authority": "human",
+      "criterion": "Wayne dogfoods a large Space and explicitly confirms he can locate and prioritize non-current Branches without opening every Transcript; any release-blocking mismatch is recorded as human-origin evidence."
+    }
+  ],
+  "constraints": [
+    "Project inheritance evaluation is not a release dependency.",
+    "Human authority applies only to the large-Space utility judgment.",
+    "Validation discoveries become explicit follow-up Tickets."
+  ],
+  "context": "The v0.2 release gate covers Scale and the eventual Firm External Continuity contract only. Because that contract is still Draft, this validation Ticket also remains Draft and must be refined before execution. The independent Project inheritance evaluation may finish before or after this gate and must not become a dependency.",
+  "context_refs": [
+    {
+      "purpose": "Defines the v0.2 release contract and non-gating Project experiment.",
+      "ref": ".vibehub/rooms/product/contract-v02-scale-continuity-context.yaml"
+    },
+    {
+      "purpose": "Defines repeated-use and branch-return evidence.",
+      "ref": ".vibehub/rooms/product/contract-success-and-dogfood-measurement.yaml"
+    },
+    {
+      "purpose": "Defines the final product-shape review.",
+      "ref": ".vibehub/rooms/product/constraint-product-shape-guardrails.yaml"
+    },
+    {
+      "purpose": "Requires pure Thread operation and optional Project behavior.",
+      "ref": ".vibehub/rooms/product/decision-project-optional-context-overlay.yaml"
+    }
+  ],
+  "kind": "ticket",
+  "maturity": "draft",
+  "outcome": "Peel v0.2 has a refined independent release gate that proves repeated work in large Spaces and only the native-Codex continuity behavior supported by post-v0.1 evidence, with Project APIs remaining optional.",
+  "provenance_refs": [
+    "conversation:2026-08-25-plan-peel-v01-v02"
+  ],
+  "relations": [
+    {
+      "rationale": "The release gate must validate the completed large-Space navigation outcome.",
+      "target_ticket_id": "ticket-deliver-v02-scale-navigation",
+      "type": "depends_on"
+    },
+    {
+      "rationale": "The release gate must validate completed native-Codex continuity behavior.",
+      "target_ticket_id": "ticket-deliver-v02-external-continuity",
+      "type": "depends_on"
+    }
+  ],
+  "schema_version": 1,
+  "ticket_id": "ticket-validate-v02-release"
+}

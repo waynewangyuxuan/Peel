@@ -1,0 +1,19 @@
+{
+  "accepted_acceptance_ids": [
+    "compare-candidates",
+    "prove-top-candidate",
+    "select-and-record-architecture"
+  ],
+  "closed_at": "2026-08-25T20:38:35Z",
+  "evidence_ids": [
+    "evidence-desktop-shell-comparison",
+    "evidence-electron-shell-spike",
+    "evidence-electron-architecture-adr"
+  ],
+  "kind": "ticket_outcome",
+  "schema_version": 1,
+  "status": "successful",
+  "summary": "Independent closeout accepted all three criteria. ADR-0001 compares Electron 44, Tauri 2, and native SwiftUI plus WKWebView across every required dimension and selects Electron with explicit rejected alternatives, migration costs, and module/process boundaries. The exact preserved Demo and real local Codex 0.149.0 handshake were independently reproduced: verify:handshake passed in 62 ms and the auto-quitting verify:shell run found Focus, Overview, and Composer, completed the handshake in 69 ms, and exited 0. The spike contains no embedded secret patterns or Project API calls. Project and Ticket validation both passed.",
+  "ticket_id": "ticket-establish-desktop-shell",
+  "unresolved_acceptance_ids": []
+}

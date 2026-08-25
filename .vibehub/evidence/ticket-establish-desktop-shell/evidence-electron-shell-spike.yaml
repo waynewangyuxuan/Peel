@@ -1,0 +1,20 @@
+{
+  "acceptance_ids": [
+    "prove-top-candidate"
+  ],
+  "evidence_id": "evidence-electron-shell-spike",
+  "kind": "ticket_evidence",
+  "origin": "agent",
+  "recorded_at": "2026-08-25T20:34:20Z",
+  "refs": [
+    "spikes/desktop-shell-electron/VERIFICATION.md",
+    "spikes/desktop-shell-electron/main.cjs",
+    "spikes/desktop-shell-electron/app-server-probe.cjs",
+    "spikes/desktop-shell-electron/package-lock.json",
+    "docs/product/source/peel-demo-v0-original.html",
+    "command:cd spikes/desktop-shell-electron && npm run verify:shell"
+  ],
+  "schema_version": 1,
+  "summary": "The pinned Electron 44 spike loaded the exact preserved Demo in a sandboxed renderer, verified Focus, Overview, and Composer DOM surfaces, launched local Codex 0.149.0 as a child process, completed initialize/initialized in 94 ms, and exited successfully without stored credentials or Project APIs.",
+  "ticket_id": "ticket-establish-desktop-shell"
+}

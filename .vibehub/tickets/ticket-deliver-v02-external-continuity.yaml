@@ -1,0 +1,56 @@
+{
+  "acceptance": [
+    {
+      "acceptance_id": "refine-from-live-capabilities",
+      "criterion": "After v0.1 validation, the installed App Server schema, live adapter evidence, and observed external-Desktop behavior are re-read; this same Ticket is rewritten as Firm with independently checkable acceptance for only the continuity behaviors the server can actually support."
+    },
+    {
+      "acceptance_id": "preserve-honesty-boundary",
+      "criterion": "The refined plan never fabricates Parent or forkedAtTurnId, never infers lineage from title/content similarity, never imports unrelated or merely co-Project Threads, and specifies visible uncertainty or deliberate non-support wherever exact lineage cannot be verified."
+    },
+    {
+      "acceptance_id": "retain-continuity-direction",
+      "criterion": "The refined outcome covers external metadata/reconnect reconstruction and, only where Parent plus exact Turn anchor are verifiable, external Fork discovery; it includes duplicate prevention, stale-cache recovery, pure-Thread fallback, and protection of Peel-owned spatial metadata."
+    }
+  ],
+  "constraints": [
+    "Do not fabricate forkedAtTurnId or infer lineage from title/content similarity.",
+    "Do not automatically import a Project's Chats or add unrelated Threads to a Space.",
+    "Codex facts win; Peel-owned spatial metadata remains local and stable."
+  ],
+  "context": "v0.2 should tolerate users continuing work in Codex Desktop, but exact external-descendant and Turn-anchor capabilities are not yet proven against the installed live server. This Ticket deliberately remains Draft: when v0.1 validation completes, it must be refined in place using live evidence before implementation begins.",
+  "context_refs": [
+    {
+      "purpose": "Defines External Continuity and honest unknown-anchor behavior.",
+      "ref": ".vibehub/rooms/product/contract-v02-scale-continuity-context.yaml"
+    },
+    {
+      "purpose": "Defines reconciliation ownership and shadow-state prohibition.",
+      "ref": ".vibehub/rooms/product/contract-source-of-truth-ownership.yaml"
+    },
+    {
+      "purpose": "Constrains experimental descendant filters and fallback behavior.",
+      "ref": ".vibehub/rooms/product/constraint-app-server-capability-gating.yaml"
+    },
+    {
+      "purpose": "Prevents unrelated external Threads from changing topology.",
+      "ref": ".vibehub/rooms/product/decision-single-root-fork-tree.yaml"
+    }
+  ],
+  "kind": "ticket",
+  "maturity": "draft",
+  "outcome": "After v0.1 live evidence resolves App Server capability uncertainty, Peel has a firm, executable External Continuity contract for safely reconciling supported native-Codex changes without duplicate nodes, invented lineage, or shadow conversation state.",
+  "provenance_refs": [
+    "conversation:2026-08-25-plan-peel-v01-v02",
+    "https://learn.chatgpt.com/docs/app-server"
+  ],
+  "relations": [
+    {
+      "rationale": "Continuity work extends a verified v0.1 Source-of-Truth implementation.",
+      "target_ticket_id": "ticket-validate-v01-dogfood",
+      "type": "depends_on"
+    }
+  ],
+  "schema_version": 1,
+  "ticket_id": "ticket-deliver-v02-external-continuity"
+}

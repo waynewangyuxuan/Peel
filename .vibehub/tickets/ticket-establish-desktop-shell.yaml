@@ -1,0 +1,56 @@
+{
+  "acceptance": [
+    {
+      "acceptance_id": "compare-candidates",
+      "criterion": "A checked-in technical proposal compares at least Electron, Tauri, and any materially better candidate against App Server stdio process ownership, macOS packaging, microphone/dictation, local Git/worktree access, web-UI fidelity, accessibility, update model, testability, and security boundary."
+    },
+    {
+      "acceptance_id": "prove-top-candidate",
+      "criterion": "A minimal disposable spike for the leading candidate launches a desktop window using the preserved Demo or equivalent local surface and proves a child process can complete the App Server initialize/initialized handshake without embedding secrets or requiring Project APIs."
+    },
+    {
+      "acceptance_id": "select-and-record-architecture",
+      "criterion": "One shell is selected and recorded in a checked-in architecture ADR outside the Product Room, with rationale, rejected alternatives, migration cost, and process/module boundaries for AppServerTransport, ThreadClient, EventReducer, GitWorkspaceAdapter, UI state persistence, and native voice integration."
+    }
+  ],
+  "constraints": [
+    "Do not change the Thread-first, single-root Fork Tree product model to fit a framework.",
+    "Reuse the preserved Demo as interaction evidence, not as production architecture.",
+    "Do not treat experimental Project or Realtime APIs as required dependencies.",
+    "The spike becomes a production foundation only after the selected architecture and any required rework are recorded in the ADR."
+  ],
+  "context": "Peel is Desktop-only and currently has product sources but no implementation stack. Engineering must select and record the shell before adapter and UI implementation because process ownership, native capabilities, packaging, and test strategy change materially across Electron, Tauri, or another shell. This is an engineering architecture decision, not a protected product choice; the evidence and ADR make it reviewable and reversible.",
+  "context_refs": [
+    {
+      "purpose": "Defines the complete v0.1 desktop outcome the shell must support.",
+      "ref": ".vibehub/rooms/product/contract-v01-core-spatial-fork-loop.yaml"
+    },
+    {
+      "purpose": "Defines the intended rich-client adapter layers and reusable VibeHub patterns.",
+      "ref": ".vibehub/rooms/product/decision-app-server-adapter-architecture.yaml"
+    },
+    {
+      "purpose": "Constrains stable versus experimental protocol dependencies.",
+      "ref": ".vibehub/rooms/product/constraint-app-server-capability-gating.yaml"
+    },
+    {
+      "purpose": "Provides the runnable interaction and visual baseline for the shell spike.",
+      "ref": ".vibehub/rooms/product/note-demo-visual-interaction-baseline.yaml"
+    },
+    {
+      "purpose": "Preserves the exact self-contained prototype used by the spike.",
+      "ref": "docs/product/source/peel-demo-v0-original.html"
+    }
+  ],
+  "kind": "ticket",
+  "maturity": "firm",
+  "outcome": "Peel has an evidence-backed, checked-in desktop-shell architecture decision that proves how it will host the existing web prototype while owning local Codex App Server, voice, persistence, and Git integration.",
+  "provenance_refs": [
+    "conversation:2026-08-25-plan-peel-v01-v02",
+    "commit:0630dc68d2c8858e799fc6433e6f1c081c9e6bda",
+    "https://learn.chatgpt.com/docs/app-server"
+  ],
+  "relations": [],
+  "schema_version": 1,
+  "ticket_id": "ticket-establish-desktop-shell"
+}

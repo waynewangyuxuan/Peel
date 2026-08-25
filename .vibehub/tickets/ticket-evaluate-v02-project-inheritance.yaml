@@ -1,0 +1,64 @@
+{
+  "acceptance": [
+    {
+      "acceptance_id": "refresh-capability-audit",
+      "criterion": "The installed Codex App Server schema and official documentation are re-audited for Project association, Thread projectId, inheritance behavior, stability, and fallback, with stable versus experimental facts clearly separated."
+    },
+    {
+      "acceptance_id": "test-inheritance-if-available",
+      "criterion": "If the capability is available, a disposable experiment verifies whether a Fork can inherit Project instructions, sources, and workspace roots through the server without Peel copying them; unavailable capability is recorded as an honest result rather than a failure."
+    },
+    {
+      "acceptance_id": "evaluate-user-value",
+      "criterion": "The recommendation uses v0.1 dogfood evidence to identify a concrete user problem Project inheritance would solve and explains why pure Thread mode is or is not insufficient."
+    },
+    {
+      "acceptance_id": "preserve-domain-model",
+      "criterion": "The recommendation guarantees that moving a Chat into/out of Project never rewrites Space Root, membership, or Fork topology and that no-Project operation remains fully supported."
+    },
+    {
+      "acceptance_id": "recommend-next-action",
+      "criterion": "A checked-in conclusion recommends implement, defer, or reject with evidence, risks, capability gates, and the smallest follow-up Ticket boundary if implementation is justified."
+    }
+  ],
+  "constraints": [
+    "Do not implement Project UI or topology in this evaluation Ticket.",
+    "Project remains an optional Context Overlay, never a mandatory Space parent.",
+    "This Ticket does not block v0.2 Scale or External Continuity validation."
+  ],
+  "context": "Project linkage is an experiment, not a v0.2 release gate. The current local schema exposes experimental Project methods, while the active product model ignores Chat moves into/out of Project. This Ticket gathers current evidence and recommends implement, defer, or reject.",
+  "context_refs": [
+    {
+      "purpose": "Defines the only acceptable future Project relationship.",
+      "ref": ".vibehub/rooms/product/decision-project-optional-context-overlay.yaml"
+    },
+    {
+      "purpose": "Requires stability detection and pure Thread fallback.",
+      "ref": ".vibehub/rooms/product/constraint-app-server-capability-gating.yaml"
+    },
+    {
+      "purpose": "Prevents reintroducing obsolete Project-first and Add-to-Space semantics.",
+      "ref": ".vibehub/rooms/product/change-original-project-registration-superseded.yaml"
+    },
+    {
+      "purpose": "Defines Project inheritance as a non-gating v0.2 experiment.",
+      "ref": ".vibehub/rooms/product/contract-v02-scale-continuity-context.yaml"
+    }
+  ],
+  "kind": "ticket",
+  "maturity": "firm",
+  "outcome": "A capability- and dogfood-backed recommendation determines whether optional Codex Project context inheritance should enter Peel after v0.1, without implementing Project-first topology.",
+  "provenance_refs": [
+    "conversation:2026-08-25-peel-v01-v02-scope",
+    "local-schema:codex-app-server-0.149.0"
+  ],
+  "relations": [
+    {
+      "rationale": "The experiment is intentionally informed by real v0.1 usage rather than speculative architecture.",
+      "target_ticket_id": "ticket-validate-v01-dogfood",
+      "type": "depends_on"
+    }
+  ],
+  "schema_version": 1,
+  "ticket_id": "ticket-evaluate-v02-project-inheritance"
+}

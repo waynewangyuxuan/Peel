@@ -1,0 +1,127 @@
+{
+  "acceptance": [
+    {
+      "acceptance_id": "thread-first-entry",
+      "criterion": "The desktop app lists/searches existing Codex Threads, opens one in normal Focus Chat, and creates a Space whose only Root is that Thread without requiring or displaying Codex Project membership."
+    },
+    {
+      "acceptance_id": "focus-fidelity",
+      "criterion": "Focus renders the supported Codex transcript/item stream, Markdown/code, commands, file changes, approvals, errors, Activity, attachments, Composer, unknown-item fallback, and Open in Codex while preserving selection, scroll behavior, per-Thread Draft, and per-Thread Scroll across switching and restart."
+    },
+    {
+      "acceptance_id": "fork-first-send",
+      "criterion": "Branch from here and Peel create the same local Fork Draft from a completed Turn within 150ms; Escape leaves no durable Thread/worktree; First Send uses exact lastTurnId, optional Current/New Worktree, and never loses Prompt across Worktree, Fork, or First Turn failures."
+    },
+    {
+      "acceptance_id": "lineage-return",
+      "criterion": "Every non-Root node has exactly one Parent and accurate forkedAtTurnId; Branched from returns to and highlights the exact Parent Turn, and returning to the Child restores its prior Scroll and Draft."
+    },
+    {
+      "acceptance_id": "overview-and-layout",
+      "criterion": "Overview contains no Transcript or Composer, renders only the deterministic Card fields and real Fork Edges, allows Focus re-entry and Card drag, persists Node/Camera positions, and never moves existing nodes when a Child is added."
+    },
+    {
+      "acceptance_id": "real-voice-dictation",
+      "criterion": "The packaged desktop app captures real microphone audio and transcribes it into the current editable Thread Draft without auto-send; microphone denial, capture interruption, and transcription failure are recoverable and never erase or replace the existing Draft. A test-only fake text insertion cannot satisfy this criterion."
+    },
+    {
+      "acceptance_id": "naming-and-attention",
+      "criterion": "Temporary/generated/manual title lifecycle syncs through Codex and never overwrites manual names; Running/Needs approval/New result/Failed and folded Subagent indicators follow their deterministic contracts."
+    },
+    {
+      "acceptance_id": "worktree-diff",
+      "criterion": "Git-backed Forks can select Current or New Worktree before First Send; Worktree name and changed files appear as metadata; the lightweight Diff surface works and exits back to the prior mode without exposing prohibited Git-management workflows."
+    },
+    {
+      "acceptance_id": "packaged-desktop-lifecycle",
+      "criterion": "A production package builds from a clean checkout, launches outside the development server, owns App Server start/handshake/reconnect/shutdown, connects to local Codex, and restores Peel-owned Space membership, Drafts, Scroll, Node positions, and Camera position after a full application restart."
+    },
+    {
+      "acceptance_id": "automated-v01-journeys",
+      "criterion": "Automated tests cover Start Space, Focus streaming/approval, Draft cancel, successful Current/New Worktree First Send, each recoverable failure stage, exact Parent return, microphone permission and transcription failure at the native boundary, Voice editing/no-auto-send, Rename precedence, status/new-result, Diff, packaged restart restoration, and unsupported optional capabilities."
+    }
+  ],
+  "constraints": [
+    "Implement the active Thread-first model; do not reintroduce Project-first navigation, Add to Space, Forest, arbitrary Edge, or Cross-project graph from the historical Demo/PRD.",
+    "Codex owns conversation and execution facts; Peel owns only Space and view metadata.",
+    "Focus remains screen-space and full fidelity; Overview remains deterministic and contains no Composer.",
+    "Voice Dictation, New Worktree, Diff, basic Subagent information, and automatic short title are v0.1 P0.",
+    "Do not add generic graph editing, agent dashboard, Git dashboard, Project management, semantic interpretation, Compare, or Convergence."
+  ],
+  "context": "This is one coherent vertical product outcome, not a collection of disconnected UI components. It integrates the two adapters into the selected shell and must preserve the Demo's interaction hierarchy while applying the active Thread-first decisions that supersede its Project-first content.",
+  "context_refs": [
+    {
+      "purpose": "Canonical v0.1 release contract and gates.",
+      "ref": ".vibehub/rooms/product/contract-v01-core-spatial-fork-loop.yaml"
+    },
+    {
+      "purpose": "Prevents implementing obsolete Project-first Demo semantics.",
+      "ref": ".vibehub/rooms/product/change-original-project-registration-superseded.yaml"
+    },
+    {
+      "purpose": "Defines Focus rendering and restoration fidelity.",
+      "ref": ".vibehub/rooms/product/contract-focus-chat-fidelity.yaml"
+    },
+    {
+      "purpose": "Defines Draft, First Send, exact lineage, and recovery.",
+      "ref": ".vibehub/rooms/product/contract-fork-creation-lifecycle.yaml"
+    },
+    {
+      "purpose": "Defines Overview data fields and no-inference rule.",
+      "ref": ".vibehub/rooms/product/contract-overview-deterministic-card-data.yaml"
+    },
+    {
+      "purpose": "Defines position, camera, Edge, and non-reshuffle behavior.",
+      "ref": ".vibehub/rooms/product/contract-stable-spatial-layout.yaml"
+    },
+    {
+      "purpose": "Defines the non-deferrable Voice interaction.",
+      "ref": ".vibehub/rooms/product/contract-voice-dictation-draft.yaml"
+    },
+    {
+      "purpose": "Defines title generation, sync, and manual precedence.",
+      "ref": ".vibehub/rooms/product/contract-thread-title-lifecycle.yaml"
+    },
+    {
+      "purpose": "Defines status and folded Subagent behavior.",
+      "ref": ".vibehub/rooms/product/contract-attention-and-subagent-activity.yaml"
+    },
+    {
+      "purpose": "Defines New Worktree and lightweight Diff scope.",
+      "ref": ".vibehub/rooms/product/contract-worktree-and-diff-boundary.yaml"
+    },
+    {
+      "purpose": "Provides the interaction hierarchy and visual baseline with known limitations.",
+      "ref": ".vibehub/rooms/product/note-demo-visual-interaction-baseline.yaml"
+    },
+    {
+      "purpose": "Provides the exact runnable visual and interaction source; active Thread-first Context overrides its obsolete Project-first semantics.",
+      "ref": "docs/product/source/peel-demo-v0-original.html"
+    },
+    {
+      "purpose": "Provides the exact original PRD detail; active Product Room decisions override its superseded registration and Project assumptions.",
+      "ref": "docs/product/source/spatial-thread-workspace-prd-v0-original.md"
+    }
+  ],
+  "kind": "ticket",
+  "maturity": "firm",
+  "outcome": "A packaged Peel v0.1 desktop build delivers the complete real-Codex Spatial Fork loop from existing Thread discovery through Focus, Fork Draft, First Send, Overview, return, Voice, Worktree, Diff, naming, attention, and restoration.",
+  "provenance_refs": [
+    "conversation:2026-08-25-plan-peel-v01-v02",
+    "commit:0630dc68d2c8858e799fc6433e6f1c081c9e6bda"
+  ],
+  "relations": [
+    {
+      "rationale": "The v0.1 UI needs reliable real Thread operations and streamed state.",
+      "target_ticket_id": "ticket-build-appserver-adapter",
+      "type": "depends_on"
+    },
+    {
+      "rationale": "New Worktree and Diff are required v0.1 behavior.",
+      "target_ticket_id": "ticket-build-git-workspace-adapter",
+      "type": "depends_on"
+    }
+  ],
+  "schema_version": 1,
+  "ticket_id": "ticket-deliver-v01-spatial-loop"
+}

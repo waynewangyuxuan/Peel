@@ -1,0 +1,59 @@
+{
+  "acceptance": [
+    {
+      "acceptance_id": "detect-git-context",
+      "criterion": "The adapter detects whether a Thread cwd is Git-backed, resolves main repository versus linked worktree roots, and returns current branch/worktree identity without modifying the repository."
+    },
+    {
+      "acceptance_id": "create-worktree-safely",
+      "criterion": "Given a validated Git repository and requested Fork identity, the adapter creates a uniquely named branch/worktree at an explicit path, reports the resulting cwd, and never targets a broad or unresolved directory."
+    },
+    {
+      "acceptance_id": "recover-partial-failure",
+      "criterion": "Every failure stage returns a structured recoverable error and either leaves no new branch/worktree or reports the exact recoverable artifact; callers can Retry or choose Current Workspace without losing the pending Fork Prompt."
+    },
+    {
+      "acceptance_id": "diff-and-open-facts",
+      "criterion": "The adapter provides changed-file counts, file/addition/deletion summaries, diff retrieval, and explicit open-in-worktree/editor/Codex targets without implementing commit, push, PR, branch graph, or multi-worktree comparison workflows."
+    },
+    {
+      "acceptance_id": "temporary-repo-tests",
+      "criterion": "Automated tests in disposable repositories cover main checkout, linked worktree, dirty state, naming collision, invalid repository, creation failure, and cleanup/reporting behavior."
+    }
+  ],
+  "constraints": [
+    "Worktree is Thread metadata and never creates a second graph or Fork Edge.",
+    "No destructive cleanup may run against an unresolved or user-owned broad path.",
+    "Do not implement commit, push, PR, branch management, or automatic worktree comparison."
+  ],
+  "context": "New Worktree is v0.1 P0, but App Server does not provide a relied-upon create-worktree contract. The adapter must own local Git operations and structured facts without turning Peel into a Git dashboard or allowing partial failures to corrupt the Fork flow.",
+  "context_refs": [
+    {
+      "purpose": "Defines product scope, failure behavior, and Git non-goals.",
+      "ref": ".vibehub/rooms/product/contract-worktree-and-diff-boundary.yaml"
+    },
+    {
+      "purpose": "Requires First Send ordering and Prompt preservation.",
+      "ref": ".vibehub/rooms/product/contract-fork-creation-lifecycle.yaml"
+    },
+    {
+      "purpose": "Places GitWorkspaceAdapter outside the App Server client.",
+      "ref": ".vibehub/rooms/product/decision-app-server-adapter-architecture.yaml"
+    }
+  ],
+  "kind": "ticket",
+  "maturity": "firm",
+  "outcome": "Peel has a tested GitWorkspaceAdapter that safely creates and describes optional Fork worktrees while keeping failure recoverable and separate from Space topology.",
+  "provenance_refs": [
+    "conversation:2026-08-25-peel-v01-v02-scope"
+  ],
+  "relations": [
+    {
+      "rationale": "The selected and recorded shell fixes the native process and filesystem boundary used by the adapter.",
+      "target_ticket_id": "ticket-establish-desktop-shell",
+      "type": "depends_on"
+    }
+  ],
+  "schema_version": 1,
+  "ticket_id": "ticket-build-git-workspace-adapter"
+}

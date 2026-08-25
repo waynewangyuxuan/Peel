@@ -1,11 +1,29 @@
 {
-  "schema_version": 1,
-  "kind": "room",
-  "room_id": "product",
-  "description": "Peel 的产品定义、版本边界与跨模块体验契约。",
-  "boundary": "拥有 Peel 的长期产品意图、核心领域模型、版本范围和发布门槛；不拥有具体实现方案、单个组件设计或执行计划。",
+  "alignment": {
+    "anchor_hashes": [
+      {
+        "blob": "09be581d14190a33c6614f3c92ae97ecd6a1b0ab",
+        "path": "docs/product/source/README.md"
+      },
+      {
+        "blob": "617b0921e82fe9f1f9cbaf813091617f40ee7e97",
+        "path": "docs/product/source/peel-demo-v0-original.html"
+      },
+      {
+        "blob": "89aeb28725aa81c6be84a5d6f35302c5f2af97ae",
+        "path": "docs/product/source/spatial-thread-workspace-prd-v0-original.md"
+      }
+    ],
+    "checked_at": "2026-08-25T18:49:55.344Z",
+    "last_aligned_commit": "0630dc68d2c8858e799fc6433e6f1c081c9e6bda"
+  },
   "anchors": [
     "docs/product/source/"
   ],
+  "boundary": "拥有 Peel 的长期产品意图、核心领域模型、版本范围和发布门槛；不拥有具体实现方案、单个组件设计或执行计划。",
+  "description": "Peel 的产品定义、版本边界与跨模块体验契约。",
+  "kind": "room",
+  "room_id": "product",
+  "schema_version": 1,
   "stale": false
 }

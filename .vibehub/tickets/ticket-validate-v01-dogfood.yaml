@@ -1,0 +1,64 @@
+{
+  "acceptance": [
+    {
+      "acceptance_id": "stress-space",
+      "criterion": "A deterministic 30–50 Node fixture proves the graph remains intact, nodes remain locatable and focusable, existing positions never change unexpectedly, and long Transcript/code/Streaming/Approval/Activity states do not break the shell."
+    },
+    {
+      "acceptance_id": "reliability-gates",
+      "criterion": "Independent evidence verifies Draft loss rate 0 across tested failures, exact Fork Edge/lastTurnId agreement, Node unexpected movement 0, manual title precedence, restart restoration, and safe New Worktree failure behavior."
+    },
+    {
+      "acceptance_id": "entry-and-recovery-ux",
+      "criterion": "An evaluator unfamiliar with the implementation can go from an existing Thread to a real Fork in under 30 seconds without Node/Edge/Graph/Git terminology, and can recover from each induced First Send failure without losing input."
+    },
+    {
+      "acceptance_id": "human-spatial-utility",
+      "authority": "human",
+      "criterion": "Wayne dogfoods a Space with at least two Forks and explicitly confirms that Tree or Overview helped him identify, return to, and continue at least one non-current Branch; feedback and any release-blocking mismatch are recorded as human-origin evidence."
+    },
+    {
+      "acceptance_id": "shape-guardrail-review",
+      "criterion": "A product-shape review finds no generic graph editing, Project-first topology, execution dashboard, unmarked AI interpretation, unstable layout, or missing Open in Codex escape hatch in the release candidate."
+    }
+  ],
+  "constraints": [
+    "Do not accept the Ticket from screenshots or implementation summaries alone; exercise real state transitions and failure paths.",
+    "Human authority applies only to the spatial-utility dogfood judgment; mechanical criteria remain independently checkable.",
+    "Failures discovered here become new Tickets rather than being silently absorbed into validation."
+  ],
+  "context": "This is a real verification boundary after the complete vertical build. Automated acceptance can prove fidelity and recovery; the North Star requires human dogfood evidence that the spatial structure helps return to a non-current branch.",
+  "context_refs": [
+    {
+      "purpose": "Defines North Star, reliability, and dogfood evidence.",
+      "ref": ".vibehub/rooms/product/contract-success-and-dogfood-measurement.yaml"
+    },
+    {
+      "purpose": "Defines six product-deformation failure modes.",
+      "ref": ".vibehub/rooms/product/constraint-product-shape-guardrails.yaml"
+    },
+    {
+      "purpose": "Defines the release gates being verified.",
+      "ref": ".vibehub/rooms/product/contract-v01-core-spatial-fork-loop.yaml"
+    },
+    {
+      "purpose": "Separates the original Demo's valid UX baseline from its known scale/backend limitations.",
+      "ref": ".vibehub/rooms/product/note-demo-visual-interaction-baseline.yaml"
+    }
+  ],
+  "kind": "ticket",
+  "maturity": "firm",
+  "outcome": "Peel v0.1 is independently verified as a reliable spatial-return product rather than merely a functional Codex client or attractive graph.",
+  "provenance_refs": [
+    "conversation:2026-08-25-plan-peel-v01-v02"
+  ],
+  "relations": [
+    {
+      "rationale": "Dogfood and scale validation require a complete integrated v0.1 build.",
+      "target_ticket_id": "ticket-deliver-v01-spatial-loop",
+      "type": "depends_on"
+    }
+  ],
+  "schema_version": 1,
+  "ticket_id": "ticket-validate-v01-dogfood"
+}

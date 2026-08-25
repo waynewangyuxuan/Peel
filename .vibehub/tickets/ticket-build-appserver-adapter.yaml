@@ -1,0 +1,71 @@
+{
+  "acceptance": [
+    {
+      "acceptance_id": "transport-handshake",
+      "criterion": "AppServerTransport owns process lifecycle, initialize/initialized handshake, request correlation, cancellation, stderr/error propagation, graceful shutdown, and reconnect behavior for local stdio."
+    },
+    {
+      "acceptance_id": "thread-client-mainline",
+      "criterion": "ThreadClient provides typed list/search, read with turns, fork with exact completed lastTurnId, start turn, name set, status subscription, streamed Turn/Item events, approval responses, and aggregated turn diff access using the installed App Server schema."
+    },
+    {
+      "acceptance_id": "reconstructable-reducer",
+      "criterion": "EventReducer produces deterministic Thread/Turn/Item state from snapshots plus events, treats completed items as authoritative, survives duplicate/out-of-order reconnect replay where the protocol permits, and can rebuild from Codex after interruption without shadow Transcript state."
+    },
+    {
+      "acceptance_id": "capability-matrix",
+      "criterion": "Startup capability detection classifies each used method as stable, experimental-enabled, or unavailable; Project, paginated-item, Realtime, and other optional features degrade explicitly without breaking the Thread-first loop."
+    },
+    {
+      "acceptance_id": "adapter-verification",
+      "criterion": "Automated fixture tests cover protocol success and error paths, and an opt-in live smoke test against the locally installed Codex proves list/read/fork(lastTurnId)/turn/name/status/diff behavior without mutating unrelated user Threads."
+    }
+  ],
+  "constraints": [
+    "Codex remains Source of Truth for Transcript, Turn/Item, status, approval, cwd/worktree, Git state, and Subagent Threads.",
+    "Do not require Codex Project APIs for any mainline operation.",
+    "Do not reuse VibeHub hook-adapters.ts as if it were a drop-in Thread client.",
+    "Experimental methods must be gated and covered by explicit fallback behavior."
+  ],
+  "context": "The existing VibeHub hook adapter offers useful protocol discipline but is not a Thread client. This Ticket builds the production adapter inside the selected desktop architecture, separating transport, request client, capability detection, and event reduction so the UI never consumes raw wire events directly.",
+  "context_refs": [
+    {
+      "purpose": "Defines transport, client, reducer, and workspace boundaries.",
+      "ref": ".vibehub/rooms/product/decision-app-server-adapter-architecture.yaml"
+    },
+    {
+      "purpose": "Defines stable, experimental, and unavailable feature behavior.",
+      "ref": ".vibehub/rooms/product/constraint-app-server-capability-gating.yaml"
+    },
+    {
+      "purpose": "Prevents shadow conversation and execution state.",
+      "ref": ".vibehub/rooms/product/contract-source-of-truth-ownership.yaml"
+    },
+    {
+      "purpose": "Defines exact Fork and recovery semantics required from the adapter.",
+      "ref": ".vibehub/rooms/product/contract-fork-creation-lifecycle.yaml"
+    },
+    {
+      "purpose": "Defines the status and collab/subagent facts the reducer must expose.",
+      "ref": ".vibehub/rooms/product/contract-attention-and-subagent-activity.yaml"
+    }
+  ],
+  "kind": "ticket",
+  "maturity": "firm",
+  "outcome": "Peel has a tested rich-client Codex App Server adapter that exposes stable Thread operations and reconstructable event state without Project dependence.",
+  "provenance_refs": [
+    "conversation:2026-08-25-codex-app-server-capability-audit",
+    "https://learn.chatgpt.com/docs/app-server",
+    "/Users/waynewang/Vibehub/workbench/packages/cli/src/hook-adapters.ts",
+    "/Users/waynewang/Vibehub/workbench/scripts/verify-codex-plugin.mjs"
+  ],
+  "relations": [
+    {
+      "rationale": "The selected and recorded shell determines process ownership, runtime language, packaging, and test harness.",
+      "target_ticket_id": "ticket-establish-desktop-shell",
+      "type": "depends_on"
+    }
+  ],
+  "schema_version": 1,
+  "ticket_id": "ticket-build-appserver-adapter"
+}

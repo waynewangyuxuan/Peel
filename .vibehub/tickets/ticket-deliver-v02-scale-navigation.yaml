@@ -1,0 +1,63 @@
+{
+  "acceptance": [
+    {
+      "acceptance_id": "keyboard-navigation",
+      "criterion": "Keyboard-first Overview navigation can move through Parent, Child, Sibling, attention results, and search results, focus a selected Thread, and return without trapping focus or breaking standard text interaction."
+    },
+    {
+      "acceptance_id": "reversible-reduction",
+      "criterion": "Collapse/Park Subtree, Show Recent Only, Space Search, and Pin Thread are reversible, preserve underlying topology and positions, and clearly distinguish hidden from removed content."
+    },
+    {
+      "acceptance_id": "explicit-tidy",
+      "criterion": "Tidy Layout is the only operation allowed to reposition existing nodes globally, requires an explicit user action, produces a reviewable result, and preserves manual positions until invoked again."
+    },
+    {
+      "acceptance_id": "large-space-task-test",
+      "criterion": "Automated and evaluator-driven tests on 30–50 Node real-shape fixtures demonstrate that, after opening Overview, a known titled Thread is focusable within 4 deliberate actions, an approval-needed Thread and a recent result within 3 actions each, and a parked deep descendant within 5 actions; typing a search query counts as one action and opening Transcripts to hunt does not satisfy the test."
+    },
+    {
+      "acceptance_id": "focus-tree-folding",
+      "criterion": "Focus Tree progressively prioritizes Current Path, Siblings, direct Children, and attention states while allowing any hidden subtree to be deliberately expanded."
+    }
+  ],
+  "constraints": [
+    "Do not change Fork topology or saved positions during filter, collapse, park, search, or pin operations.",
+    "Do not add arbitrary Edge, AI-generated branch taxonomy, or Project grouping.",
+    "The Overview remains deterministic and the Focus Chat remains screen-space."
+  ],
+  "context": "v0.1 only proves that a 30–50 Node scene does not break. v0.2 must make that scale comfortable for repeated use through navigation and reduction tools while preserving the rule that non-Tidy operations never reshuffle saved positions.",
+  "context_refs": [
+    {
+      "purpose": "Canonical v0.2 Scale and Continuity scope.",
+      "ref": ".vibehub/rooms/product/contract-v02-scale-continuity-context.yaml"
+    },
+    {
+      "purpose": "Defines position stability, Tidy boundary, and scale progression.",
+      "ref": ".vibehub/rooms/product/contract-stable-spatial-layout.yaml"
+    },
+    {
+      "purpose": "Preserves the separate Focus and Overview roles.",
+      "ref": ".vibehub/rooms/product/decision-focus-overview-information-contract.yaml"
+    },
+    {
+      "purpose": "Defines deterministic attention states used by navigation.",
+      "ref": ".vibehub/rooms/product/contract-attention-and-subagent-activity.yaml"
+    }
+  ],
+  "kind": "ticket",
+  "maturity": "firm",
+  "outcome": "Large Peel Spaces support fast, reversible navigation and attention management across 30–50 real Thread nodes without sacrificing stable spatial memory.",
+  "provenance_refs": [
+    "conversation:2026-08-25-plan-peel-v01-v02"
+  ],
+  "relations": [
+    {
+      "rationale": "Scale features should build on a proven useful and reliable core loop.",
+      "target_ticket_id": "ticket-validate-v01-dogfood",
+      "type": "depends_on"
+    }
+  ],
+  "schema_version": 1,
+  "ticket_id": "ticket-deliver-v02-scale-navigation"
+}
