@@ -25,7 +25,7 @@ export function App(): ReactNode {
   const [forkBusy, setForkBusy] = useState(false);
   const [highlightTarget, setHighlightTarget] = useState<{ threadId: string; turnId: string } | null>(null);
   const [showThreadPicker, setShowThreadPicker] = useState(false);
-  const [showDiff, setShowDiff] = useState(false);
+  const [diffThreadId, setDiffThreadId] = useState<string | null>(null);
   const [toast, setToast] = useState<string | null>(null);
   const refreshTimers = useRef(new Map<string, number>());
   const refreshPending = useRef(new Set<string>());
@@ -299,7 +299,7 @@ export function App(): ReactNode {
             draft.activeThreadId = next?.rootThreadId ?? null;
           }, 0)}
           onRenameThread={async (name) => await renameThread(activeNode.threadId, name)}
-          onDiff={() => setShowDiff(true)}
+          onDiff={() => setDiffThreadId(activeNode.threadId)}
           onOpenCodex={() => void window.peel.openTarget({ kind: "codex", cwd: activeNode.cwd, threadId: activeNode.threadId })}
         />
         {state.viewMode === "focus" ? <div className="focus-layout">
@@ -326,7 +326,7 @@ export function App(): ReactNode {
             onSend={send}
             onBranch={(turn) => beginFork(turn.id)}
             onApproval={async (input) => { await window.peel.decideApproval(input); setApprovals((all) => all.filter((item) => item.id !== input.id)); }}
-            onDiff={() => setShowDiff(true)}
+            onDiff={() => setDiffThreadId(activeNode.threadId)}
             onOpenCodex={() => void window.peel.openTarget({ kind: "codex", cwd: activeNode.cwd, threadId: activeNode.threadId })}
           /> : <ThreadLoading/>}
           {forkDraft && <ForkComposer fork={forkDraft} parentTitle={activeNode.title} parentWorktreeName={activeNode.worktreeName} error={forkError} busy={forkBusy} onChange={setForkDraft} onCancel={() => setForkDraft(null)} onCommit={commitFork}/>}
@@ -339,6 +339,7 @@ export function App(): ReactNode {
           onNodePosition={(threadId, position) => mutate((draft) => { draft.spaces[activeSpace.id]!.nodes[threadId]!.position = position; }, 400)}
           onFocus={selectThread}
           onRename={renameThread}
+          onDiff={setDiffThreadId}
         />}
       </>}
     </main>
@@ -347,7 +348,7 @@ export function App(): ReactNode {
       setShowThreadPicker(false);
       setThreads({});
     }}/>} 
-    {showDiff && activeNode && <DiffDrawer node={activeNode} onClose={() => setShowDiff(false)} />}
+    {diffThreadId && activeSpace?.nodes[diffThreadId] && <DiffDrawer node={activeSpace.nodes[diffThreadId]} onClose={() => setDiffThreadId(null)} />}
     {toast && <div className="toast" onAnimationEnd={() => setToast(null)}>{toast}</div>}
   </div>;
 }

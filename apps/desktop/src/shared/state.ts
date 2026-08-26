@@ -1,6 +1,7 @@
 import type { PeelState, Point, SpaceNode, SpaceRecord, ThreadViewState } from "./contracts";
 
-const CARD_WIDTH = 296;
+const CARD_WIDTH = 294;
+const CARD_HEIGHT = 205;
 const CARD_GAP_X = 88;
 const CARD_GAP_Y = 38;
 
@@ -78,11 +79,11 @@ export function suggestedChildPosition(space: SpaceRecord, parentThreadId: strin
     for (const row of rowOffsets) {
       const candidate = {
         x: parent.position.x + column * (CARD_WIDTH + CARD_GAP_X),
-        y: parent.position.y + row * (186 + CARD_GAP_Y),
+        y: parent.position.y + row * (CARD_HEIGHT + CARD_GAP_Y),
       };
       const overlaps = nodes.some((node) =>
         Math.abs(node.position.x - candidate.x) < CARD_WIDTH + CARD_GAP_X / 2
-        && Math.abs(node.position.y - candidate.y) < 186 + CARD_GAP_Y / 2);
+        && Math.abs(node.position.y - candidate.y) < CARD_HEIGHT + CARD_GAP_Y / 2);
       if (!overlaps) return candidate;
     }
   }

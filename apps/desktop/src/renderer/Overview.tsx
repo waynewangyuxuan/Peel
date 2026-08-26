@@ -1,13 +1,12 @@
 import type { CodexThread } from "@peel/codex-app-server";
-import { useRef, useState, type PointerEvent, type ReactNode, type WheelEvent } from "react";
+import { useLayoutEffect, useMemo, useRef, useState, type KeyboardEvent, type PointerEvent, type ReactNode, type WheelEvent } from "react";
 import type { WorkspaceDiffSummary } from "@peel/git-workspace";
 
 import type { CameraState, Point, SpaceNode, SpaceRecord } from "../shared/contracts";
-import { Icon } from "./icons";
 import { clip, itemText, latestCompletedTurn, relativeTime } from "./lib";
 
-const CARD_WIDTH = 296;
-const CARD_HEIGHT = 188;
+const CARD_WIDTH = 294;
+const CARD_HEIGHT = 205;
 const MIN_SCALE = .08;
 
 interface OverviewProps {
@@ -19,14 +18,32 @@ interface OverviewProps {
   onNodePosition(threadId: string, position: Point): void;
   onFocus(threadId: string, turnId?: string): void;
   onRename(threadId: string, name: string): Promise<void>;
+  onDiff(threadId: string): void;
 }
 
-export function Overview({ space, activeThreadId, threads, diffs, onCamera, onNodePosition, onFocus, onRename }: OverviewProps): ReactNode {
+export function Overview({ space, activeThreadId, threads, diffs, onCamera, onNodePosition, onFocus, onRename, onDiff }: OverviewProps): ReactNode {
   const viewport = useRef<HTMLDivElement>(null);
   const pan = useRef<{ pointerId: number; origin: Point; camera: CameraState } | null>(null);
-  const drag = useRef<{ pointerId: number; threadId: string; origin: Point; position: Point } | null>(null);
+  const drag = useRef<{ pointerId: number; threadId: string; origin: Point; position: Point; moved: boolean } | null>(null);
+  const initializedSpace = useRef<string | null>(null);
+  const suppressOpen = useRef(false);
+  const [draggingThreadId, setDraggingThreadId] = useState<string | null>(null);
+  const [hoveredThreadId, setHoveredThreadId] = useState<string | null>(null);
   const nodes = Object.values(space.nodes);
   const bounds = graphBounds(nodes);
+  const emphasizedPath = useMemo(() => pathToRoot(space, hoveredThreadId ?? activeThreadId), [activeThreadId, hoveredThreadId, space]);
+  const untouchedInitialCamera = space.camera.x === 0
+    && space.camera.y === 0
+    && space.camera.scale === .86
+    && space.nodes[space.rootThreadId]?.position.x === 0
+    && space.nodes[space.rootThreadId]?.position.y === 0;
+
+  useLayoutEffect(() => {
+    if (!untouchedInitialCamera || initializedSpace.current === space.id) return;
+    initializedSpace.current = space.id;
+    const frame = requestAnimationFrame(() => onCamera(fitCamera(nodes, viewport.current)));
+    return () => cancelAnimationFrame(frame);
+  }, [nodes.length, onCamera, space.id, untouchedInitialCamera]);
 
   const beginPan = (event: PointerEvent<HTMLDivElement>): void => {
     if (event.button !== 0 || (event.target as HTMLElement).closest(".overview-card")) return;
@@ -42,6 +59,7 @@ export function Overview({ space, activeThreadId, threads, diffs, onCamera, onNo
       });
     }
     if (drag.current?.pointerId === event.pointerId) {
+      if (Math.hypot(event.clientX - drag.current.origin.x, event.clientY - drag.current.origin.y) > 4) drag.current.moved = true;
       onNodePosition(drag.current.threadId, {
         x: drag.current.position.x + (event.clientX - drag.current.origin.x) / space.camera.scale,
         y: drag.current.position.y + (event.clientY - drag.current.origin.y) / space.camera.scale,
@@ -50,7 +68,12 @@ export function Overview({ space, activeThreadId, threads, diffs, onCamera, onNo
   };
   const end = (event: PointerEvent<HTMLDivElement>): void => {
     if (pan.current?.pointerId === event.pointerId) pan.current = null;
-    if (drag.current?.pointerId === event.pointerId) drag.current = null;
+    if (drag.current?.pointerId === event.pointerId) {
+      suppressOpen.current = drag.current.moved;
+      drag.current = null;
+      setDraggingThreadId(null);
+      if (suppressOpen.current) requestAnimationFrame(() => { suppressOpen.current = false; });
+    }
     if (event.currentTarget.hasPointerCapture(event.pointerId)) event.currentTarget.releasePointerCapture(event.pointerId);
   };
   const wheel = (event: WheelEvent<HTMLDivElement>): void => {
@@ -77,13 +100,20 @@ export function Overview({ space, activeThreadId, threads, diffs, onCamera, onNo
       threadId: node.threadId,
       origin: { x: event.clientX, y: event.clientY },
       position: node.position,
+      moved: false,
     };
+    setDraggingThreadId(node.threadId);
   };
 
   return <div className="overview-shell">
     <div className="overview-toolbar">
-      <div><span className="eyebrow">Overview</span><strong>{nodes.length} directions</strong></div>
-      <div className="zoom-controls"><button onClick={() => onCamera({ ...space.camera, scale: Math.max(MIN_SCALE, space.camera.scale - .1) })}>−</button><span>{Math.round(space.camera.scale * 100)}%</span><button onClick={() => onCamera({ ...space.camera, scale: Math.min(1.45, space.camera.scale + .1) })}>+</button><button onClick={() => onCamera(fitCamera(nodes, viewport.current))}>Fit</button></div>
+      <div className="overview-identity"><strong>{space.name}</strong><span>{nodes.length} direction{nodes.length === 1 ? "" : "s"} · deterministic Thread context</span></div>
+      <div className="zoom-controls">
+        <button aria-label="Zoom out" title="Zoom out" onClick={() => onCamera({ ...space.camera, scale: Math.max(MIN_SCALE, space.camera.scale - .1) })}>−</button>
+        <span aria-label={`Zoom ${Math.round(space.camera.scale * 100)} percent`}>{Math.round(space.camera.scale * 100)}%</span>
+        <button aria-label="Zoom in" title="Zoom in" onClick={() => onCamera({ ...space.camera, scale: Math.min(1.45, space.camera.scale + .1) })}>+</button>
+        <button className="fit-button" aria-label="Fit Overview" title="Fit Overview" onClick={() => onCamera(fitCamera(nodes, viewport.current))}>Fit</button>
+      </div>
     </div>
     <div
       className="overview-viewport"
@@ -103,7 +133,7 @@ export function Overview({ space, activeThreadId, threads, diffs, onCamera, onNo
             const x2 = node.position.x;
             const y2 = node.position.y + CARD_HEIGHT / 2;
             const bend = Math.max(50, (x2 - x1) / 2);
-            return <path key={node.threadId} d={`M ${x1} ${y1} C ${x1 + bend} ${y1}, ${x2 - bend} ${y2}, ${x2} ${y2}`} />;
+            return <path className={emphasizedPath.has(node.threadId) ? "active" : ""} key={node.threadId} d={`M ${x1} ${y1} C ${x1 + bend} ${y1}, ${x2 - bend} ${y2}, ${x2} ${y2}`} />;
           })}
         </svg>
         {nodes.map((node) => <OverviewCard
@@ -114,26 +144,36 @@ export function Overview({ space, activeThreadId, threads, diffs, onCamera, onNo
           parentThread={node.parentThreadId ? threads[node.parentThreadId] ?? null : null}
           diff={diffs[node.threadId] ?? null}
           active={node.threadId === activeThreadId}
+          dragging={node.threadId === draggingThreadId}
           onPointerDown={(event) => beginNode(event, node)}
-          onFocus={onFocus}
+          onOpen={() => { if (!suppressOpen.current) onFocus(node.threadId); }}
+          onFocusTurn={(turnId) => onFocus(node.threadId, turnId)}
+          onFocusParent={(threadId, turnId) => onFocus(threadId, turnId)}
           onRename={onRename}
+          onDiff={() => onDiff(node.threadId)}
+          onHover={(hovered) => setHoveredThreadId(hovered ? node.threadId : null)}
         />)}
       </div>
-      <div className="overview-hint">Drag cards to organize · drag the canvas to pan · scroll to zoom</div>
+      <div className="overview-hint">Drag cards to build spatial memory · double-click a title to rename · click a card to focus</div>
     </div>
   </div>;
 }
 
-function OverviewCard({ node, parent, thread, parentThread, diff, active, onPointerDown, onFocus, onRename }: {
+function OverviewCard({ node, parent, thread, parentThread, diff, active, dragging, onPointerDown, onOpen, onFocusTurn, onFocusParent, onRename, onDiff, onHover }: {
   node: SpaceNode;
   parent: SpaceNode | null;
   thread: CodexThread | null;
   parentThread: CodexThread | null;
   diff: WorkspaceDiffSummary | null;
   active: boolean;
+  dragging: boolean;
   onPointerDown(event: PointerEvent<HTMLElement>): void;
-  onFocus(threadId: string, turnId?: string): void;
+  onOpen(): void;
+  onFocusTurn(turnId?: string): void;
+  onFocusParent(threadId: string, turnId?: string): void;
   onRename(threadId: string, name: string): Promise<void>;
+  onDiff(): void;
+  onHover(hovered: boolean): void;
 }): ReactNode {
   const [editing, setEditing] = useState(false);
   const latestTurn = thread ? latestCompletedTurn(thread) : null;
@@ -151,34 +191,51 @@ function OverviewCard({ node, parent, thread, parentThread, diff, active, onPoin
   const latestResultTurn = thread ? [...thread.turns].reverse().find((turn) => turn.status === "completed" && turn.items.some((item) => item.type === "agentMessage")) : undefined;
   const latestUser = latestUserTurn?.items.filter((item) => item.type === "userMessage").map(itemText).filter(Boolean).at(-1) ?? "";
   const latestResult = latestResultTurn?.items.filter((item) => item.type === "agentMessage").map(itemText).filter(Boolean).at(-1) ?? "";
+  const status = failed ? { label: "Failed", tone: "failed" }
+    : needsApproval ? { label: "Needs approval", tone: "approval" }
+      : isRunning ? { label: "Running", tone: "running" }
+        : newResult ? { label: "New result", tone: "result" }
+          : { label: "Idle", tone: "idle" };
+  const keyOpen = (event: KeyboardEvent<HTMLElement>): void => {
+    if (event.target !== event.currentTarget || (event.key !== "Enter" && event.key !== " ")) return;
+    event.preventDefault();
+    onOpen();
+  };
   return <article
-    className={`overview-card ${active ? "active" : ""}`}
+    className={`overview-card ${active ? "active" : ""} ${dragging ? "dragging" : ""}`}
     style={{ transform: `translate3d(${node.position.x}px, ${node.position.y}px, 0)` }}
     onPointerDown={onPointerDown}
-    onDoubleClick={() => onFocus(node.threadId)}
+    onPointerEnter={() => onHover(true)}
+    onPointerLeave={() => onHover(false)}
+    onClick={onOpen}
+    onKeyDown={keyOpen}
+    role="button"
+    tabIndex={0}
+    aria-label={`Open ${node.title}`}
   >
-    <div className="card-topline">
-      <div className="status-dots">
-        {isRunning && <span className="status-dot running" title="Running"/>}
-        {needsApproval && <span className="status-dot approval" title="Needs approval"/>}
-        {newResult && <span className="status-dot result" title="New result"/>}
-        {failed && <span className="status-dot failed" title="Failed"/>}
+    <div className="overview-card-surface">
+      <div className="card-heading">
+        <div className="card-title-wrap">
+          <div className="card-kicker">{parent ? "Forked Thread" : "Space Root"}</div>
+          {editing ? <input className="card-title-input" autoFocus defaultValue={node.title} aria-label={`Rename ${node.title}`} onPointerDown={(event) => event.stopPropagation()} onClick={(event) => event.stopPropagation()} onDoubleClick={(event) => event.stopPropagation()} onBlur={(event) => { const name = event.target.value.trim(); if (name && name !== node.title) void onRename(node.threadId, name); setEditing(false); }} onKeyDown={(event) => { if (event.key === "Enter") event.currentTarget.blur(); if (event.key === "Escape") setEditing(false); }}/>
+            : <h3 title={node.title} onClick={(event) => event.stopPropagation()} onDoubleClick={(event) => { event.stopPropagation(); setEditing(true); }}>{node.title}</h3>}
+        </div>
+        <div className={`card-status ${status.tone}`}><i className={`status-dot ${status.tone}`}/>{status.label}</div>
       </div>
-      <span>{relativeTime(thread?.updatedAt ?? node.createdAt)}</span>
-    </div>
-    {editing ? <input className="card-title-input" autoFocus defaultValue={node.title} aria-label={`Rename ${node.title}`} onPointerDown={(event) => event.stopPropagation()} onDoubleClick={(event) => event.stopPropagation()} onBlur={(event) => { const name = event.target.value.trim(); if (name && name !== node.title) void onRename(node.threadId, name); setEditing(false); }} onKeyDown={(event) => { if (event.key === "Enter") event.currentTarget.blur(); if (event.key === "Escape") setEditing(false); }}/>
-      : <h3 onDoubleClick={(event) => { event.stopPropagation(); setEditing(true); }}>{node.title}</h3>}
-    {parent && <button className="card-parent" onClick={(event) => { event.stopPropagation(); onFocus(parent.threadId, node.forkedAtTurnId ?? undefined); }}><Icon name="branch" size={12}/> {parent.title}{forkSnippet ? ` · ${clip(forkSnippet, 44)}` : ""}</button>}
-    <div className="card-snippets">
-      <button onClick={(event) => { event.stopPropagation(); onFocus(node.threadId, latestUserTurn?.id); }} disabled={!latestUserTurn}><span>You</span>{clip(latestUser || "No user message loaded", 76)}</button>
-      <button onClick={(event) => { event.stopPropagation(); onFocus(node.threadId, latestResultTurn?.id); }} disabled={!latestResultTurn}><span>Result</span>{clip(latestResult || "No completed result", 76)}</button>
-    </div>
-    <div className="card-meta">
-      <span>{thread?.turns.length ?? 0} turns</span>
-      {node.worktreeName && <span><Icon name="folder" size={12}/>{node.worktreeName}</span>}
-      {diff && <span>{diff.changedFileCount} changed</span>}
-      {subagentCount > 0 && <span>{subagentCount} subagent{subagentCount === 1 ? "" : "s"} · {subagentRunning ? "Running" : "Done"}</span>}
-      <button onClick={(event) => { event.stopPropagation(); onFocus(node.threadId); }}>Open <Icon name="chevron" size={12}/></button>
+      {parent ? <button className="card-origin" onClick={(event) => { event.stopPropagation(); onFocusParent(parent.threadId, node.forkedAtTurnId ?? undefined); }}>
+        <strong>Branched from {parent.title}</strong>{forkSnippet && <span> · “{clip(forkSnippet, 52)}”</span>}
+      </button> : <div className="card-origin"><strong>Registered root chat</strong><span> · existing Codex Thread brought into this Space</span></div>}
+      <div className="card-facts">
+        <button onClick={(event) => { event.stopPropagation(); onFocusTurn(latestUserTurn?.id); }} disabled={!latestUserTurn}><span>Latest user</span><b>{clip(latestUser || "No user message loaded", 92)}</b></button>
+        <button onClick={(event) => { event.stopPropagation(); onFocusTurn(latestResultTurn?.id); }} disabled={!latestResultTurn}><span>Latest result</span><b>{clip(latestResult || "No completed result", 92)}</b></button>
+      </div>
+      <footer className="card-footer">
+        <div className="card-foot-facts"><span>{thread?.turns.length ?? 0} turns</span><i>·</i><span>{relativeTime(thread?.updatedAt ?? node.createdAt)}</span></div>
+        <div className="card-pills">
+          {(node.worktreeName || diff) && <button className="card-pill" title="Open changes" onClick={(event) => { event.stopPropagation(); onDiff(); }}>{node.worktreeName ?? "Workspace"}{diff ? ` · ${diff.changedFileCount}f` : ""}</button>}
+          {subagentCount > 0 && <span className="card-pill" title={`${subagentCount} subagent${subagentCount === 1 ? "" : "s"} · ${subagentRunning ? "Running" : "Done"}`}>{subagentCount} subagent{subagentCount === 1 ? "" : "s"} · {subagentRunning ? "Running" : "Done"}</span>}
+        </div>
+      </footer>
     </div>
   </article>;
 }
@@ -191,13 +248,24 @@ function fitCamera(nodes: SpaceNode[], viewport: HTMLDivElement | null): CameraS
   const minY = Math.min(...ys);
   const maxX = Math.max(...xs) + CARD_WIDTH;
   const maxY = Math.max(...ys) + CARD_HEIGHT;
-  const padding = 100;
-  const scale = Math.max(MIN_SCALE, Math.min(1.1, Math.min((viewport.clientWidth - padding * 2) / (maxX - minX), (viewport.clientHeight - padding * 2) / (maxY - minY))));
+  const paddingX = Math.min(110, viewport.clientWidth * .1);
+  const paddingY = Math.min(105, viewport.clientHeight * .12);
+  const scale = Math.max(MIN_SCALE, Math.min(1, Math.min((viewport.clientWidth - paddingX * 2) / (maxX - minX), (viewport.clientHeight - paddingY * 2) / (maxY - minY))));
   return {
     scale,
     x: (viewport.clientWidth - (maxX - minX) * scale) / 2 - minX * scale,
     y: (viewport.clientHeight - (maxY - minY) * scale) / 2 - minY * scale,
   };
+}
+
+function pathToRoot(space: SpaceRecord, threadId: string | null): Set<string> {
+  const path = new Set<string>();
+  let cursor = threadId ? space.nodes[threadId] : undefined;
+  while (cursor) {
+    path.add(cursor.threadId);
+    cursor = cursor.parentThreadId ? space.nodes[cursor.parentThreadId] : undefined;
+  }
+  return path;
 }
 
 function graphBounds(nodes: SpaceNode[]): { minX: number; minY: number; width: number; height: number } {

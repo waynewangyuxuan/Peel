@@ -41,7 +41,7 @@ describe("Peel state model", () => {
     for (const node of nodes) {
       for (const other of nodes) {
         if (node.threadId === other.threadId) continue;
-        expect(Math.abs(node.position.x - other.position.x) >= 296 || Math.abs(node.position.y - other.position.y) >= 188).toBe(true);
+        expect(Math.abs(node.position.x - other.position.x) >= 294 || Math.abs(node.position.y - other.position.y) >= 205).toBe(true);
       }
     }
     expect(Math.max(...nodes.map((node) => node.position.x)) - Math.min(...nodes.map((node) => node.position.x))).toBeLessThan(3_000);
