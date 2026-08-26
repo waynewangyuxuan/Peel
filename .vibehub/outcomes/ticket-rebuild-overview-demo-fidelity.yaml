@@ -1,0 +1,22 @@
+{
+  "accepted_acceptance_ids": [
+    "demo-canvas-composition",
+    "demo-card-anatomy",
+    "spatial-hierarchy-and-edges",
+    "overview-interaction-craft",
+    "overview-visual-and-scale-regression"
+  ],
+  "closed_at": "2026-08-26T10:21:56Z",
+  "evidence_ids": [
+    "evidence-overview-demo-composition",
+    "evidence-overview-card-interactions",
+    "evidence-overview-visual-scale-regression",
+    "evidence-overview-full-verification"
+  ],
+  "kind": "ticket_outcome",
+  "schema_version": 1,
+  "status": "successful",
+  "summary": "Independent closeout accepted all five Overview Demo-fidelity criteria at exact HEAD 40e187215da4835b8aa5dbc03e69b9279f238711 after reading the exact Ticket, every Context reference including the complete preserved Demo HTML, the successful direct prerequisite Outcome and its acceptance-linked Evidence, all four current Evidence records, the complete implementation and test diff, and the relevant production source and tests. The production Overview is a full mode canvas with floating identity and zoom controls over a faded grid; the exact root=(0,0), camera=(0,0,.86) sentinel receives one balanced camera fit without changing node positions, while the component does not rewrite a non-sentinel persisted camera. Cards use the Demo-aligned 294x205 geometry and deterministic high-density kicker, title, status, provenance, exact latest-user/latest-result, turn/time, optional worktree/change, and subagent facts with bounded copy. Edges are computed from the true card sides and vertical centers, remain restrained by default, and emphasize the active or hovered ancestor path without altering authoritative topology or positions. Code inspection confirmed pointer pan, pointer-centered wheel zoom, explicit Fit, drag with hover suppression, card and exact-turn navigation, parent provenance return, rename, Diff/worktree actions, immediate restrained feedback, no Overview entrance delay, keyboard card-open/zoom/Fit/Diff paths, and the global reduced-motion override. Independent fresh visual inspection compared /private/tmp/peel-demo-overview.png with production ui-overview-2.png, ui-overview-6.png, ui-overview-6-narrow.png, and overview-50.png: the 2-node state is centered and readable at 100%, the 6-node hierarchy is deliberate at 1440x960 and contained/readable at 1000x720, and the 50-node Fit preserves a legible structural overview with all real edges. Independent verification passed all 46 repository tests, the complete adapter/native Speech/renderer/main/preload build, and the production Electron journey 1/1 in 38.8 seconds. The fresh journey regenerated and revalidated 2/6/50-node screenshots, 49 real edges for 50 nodes after restart, zero unexpected position changes, narrow-window containment, keyboard re-entry to Focus, and the retained Picker, Focus, Markdown, Activity, Fork, Voice, Approval, Diff, failure-recovery, draft, streaming, and restart behavior. No acceptance IDs remain unresolved.",
+  "ticket_id": "ticket-rebuild-overview-demo-fidelity",
+  "unresolved_acceptance_ids": []
+}
