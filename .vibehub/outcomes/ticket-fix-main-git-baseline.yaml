@@ -1,0 +1,21 @@
+{
+  "accepted_acceptance_ids": [
+    "resolve-main-separately",
+    "diff-against-main",
+    "worktree-starts-from-main",
+    "surface-and-safety-regression",
+    "temporary-repository-proof"
+  ],
+  "closed_at": "2026-08-26T09:18:01Z",
+  "evidence_ids": [
+    "evidence-main-baseline-resolution-and-diff",
+    "evidence-main-diff-surface-regression",
+    "evidence-main-worktree-ancestry-and-safety"
+  ],
+  "kind": "ticket_outcome",
+  "schema_version": 1,
+  "status": "successful",
+  "summary": "Independent closeout accepted all five main-baseline criteria at exact commit fcc94bea11f7ee757e78954d3a0edfa15ea5c5f4 after reading the exact Ticket and both Context references, both successful prerequisite Outcomes and their Evidence, all three acceptance-linked Evidence records, and the full diff from db24863^ through HEAD. Source review confirmed that Diff resolves local refs/heads/main and then merge-base(main, current HEAD), while omitted-base Worktree creation validates refs/heads/main and passes the resolved commit ID to the sole allowed git worktree add mutation; no checkout, switch, reset, fetch, branch-default mutation, commit, push, or comparison-management API was introduced. A read-only smoke in the real checkout reported currentBranch codex/ticket-fix-main-git-baseline separately from baseBranch main, baseCommit 0630dc68d2c8858e799fc6433e6f1c081c9e6bda, and 136 changed files. Independent disposable-repository probing represented committed, staged, unstaged, renamed, binary, and untracked changes in summary and patch data, exercised full and per-file Diff, and proved that both a Ticket-branch invoker and a linked-worktree invoker created their requested branches from the exact local main commit. The probe also proved that current checkouts, main, pre-existing refs, local Git config, and pre-existing worktree registrations stayed unchanged apart from the two explicitly requested branch/worktree pairs. In a repository with no local main, summary Diff, full Diff, and omitted-base creation all returned main-ref-unavailable; creation preserved pendingForkId, reported no artifacts, and left refs, checkout, config, and worktrees unchanged. Independent verification passed the Git adapter suite 12/12, the full repository suite 44/44, the complete build, diff check, and the exact-HEAD Electron journey 1/1 in 37.6 seconds. Direct inspection of the regenerated ui-diff.png showed the readable, unclipped 'Compared with main' label alongside changed-file and line facts. Existing NUL-safe tab filenames, realpath containment, untracked content, naming collision, partial-failure recovery, Worktree metadata, and prohibited Git-management boundaries remain covered. No acceptance IDs remain unresolved.",
+  "ticket_id": "ticket-fix-main-git-baseline",
+  "unresolved_acceptance_ids": []
+}
