@@ -40,7 +40,7 @@ const root = {
   gitInfo: null,
   name: "Review Inkstone Legacy product migration and narrative architecture across multiple directions",
   turns: [
-    turn("turn-1", "Map the core navigation", "## Direction\nUse a **full-fidelity** Focus view and a spatial Overview.\n\n> Keep the Chat readable before exposing execution detail.\n\n| Surface | Contract |\n| --- | --- |\n| Focus | Full conversation fidelity |\n| Overview | Deterministic spatial context |\n\n1. Keep `chat` in screen space.\n2. Render structured content semantically.\n\n- [x] Parse GFM tables\n- [ ] Continue polishing\n\n~~Raw pipe text~~ becomes a real table.\n\n<script>window.__peelUnsafe = true</script>\n\n```ts\nconst spatialSurface = 'a-very-long-code-line-that-must-remain-unwrapped-and-scroll-horizontally-across-the-full-focus-transcript-without-changing-the-reading-layout';\n```"),
+    turn("turn-1", "Map the core navigation", "## Direction\nUse a **full-fidelity** Focus view and a spatial Overview.\n\n> Keep the Chat readable before exposing execution detail.\n\n> **我们的护城河不是 AI 会写，而是你的 taste 能够通过一套可观测的生产系统被放大。**\n\n> 人负责高杠杆决策和抽样验收；系统负责实现、检查、修复和定位风险。\n\n| Surface | Contract |\n| --- | --- |\n| Focus | Full conversation fidelity |\n| Overview | Deterministic spatial context |\n\n1. Keep `chat` in screen space.\n2. Render structured content semantically.\n\n- [x] Parse GFM tables\n- [ ] Continue polishing\n\n~~Raw pipe text~~ becomes a real table.\n\n<script>window.__peelUnsafe = true</script>\n\n```ts\nconst spatialSurface = 'a-very-long-code-line-that-must-remain-unwrapped-and-scroll-horizontally-across-the-full-focus-transcript-without-changing-the-reading-layout';\n```"),
     { ...turn("turn-2", "Make Forks trustworthy", "Create a local draft first, then fork on the first send."), items: [
       item("userMessage", "turn-2-u", "Make Forks trustworthy"),
       item("agentMessage", "turn-2-a", "Create a local draft first, then fork on the first send."),
@@ -186,8 +186,8 @@ reader.on("line", (line) => {
     const agent = item("agentMessage", `${turnId}-a`, "");
     started.items.push(agent);
     notify("item/started", { threadId: thread.id, turnId, item: agent });
-    const fragments = Array.from({ length: 12 }, (_, index) => index === 0 ? "A streamed result for this direction. " : `Streaming segment ${index}. `);
-    fragments.forEach((delta, index) => setTimeout(() => notify("item/agentMessage/delta", { threadId: thread.id, turnId, itemId: agent.id, delta }), 25 + index * 20));
+    const fragments = Array.from({ length: 12 }, (_, index) => index === 0 ? "**A streamed result" : index === 1 ? " for this direction.** " : `Streaming segment ${index}. `);
+    fragments.forEach((delta, index) => setTimeout(() => notify("item/agentMessage/delta", { threadId: thread.id, turnId, itemId: agent.id, delta }), index === 0 ? 25 : 220 + index * 20));
     setTimeout(() => {
       agent.text = `${fragments.join("")}\n${Array.from({ length: 34 }, (_, index) => `Completed output line ${index + 1} keeps the transcript tall enough to verify bottom-follow behavior.`).join("\n")}`;
       notify("item/completed", { threadId: thread.id, turnId, item: agent });
@@ -198,7 +198,7 @@ reader.on("line", (line) => {
       notify("turn/completed", { threadId: thread.id, turn: started });
       notify("thread/status/changed", { threadId: thread.id, status: thread.status });
       send({ id: ++requestIndex, method: "item/commandExecution/requestApproval", params: { threadId: thread.id, turnId, command: "npm test" } });
-    }, 300);
+    }, 520);
     return;
   }
   if (method === "turn/interrupt" || method === "thread/delete") return send({ id, result: {} });

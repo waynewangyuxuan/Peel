@@ -192,14 +192,31 @@ test("real Thread-first Fork loop, recovery surfaces, scale, and restart", async
   await page.locator(".thread-result").first().click();
   await expect(page.getByRole("heading", { name: rootTitle })).toBeVisible();
   await expect(page.getByRole("heading", { name: "Direction", exact: true })).toBeVisible();
-  await expect(page.locator(".agent-message strong")).toHaveText("full-fidelity");
+  await expect(page.locator(".agent-message strong").first()).toHaveText("full-fidelity");
   await expect(page.locator(".agent-message table")).toBeVisible();
-  await expect(page.locator(".agent-message blockquote")).toContainText("Keep the Chat readable");
+  await expect(page.locator(".agent-message blockquote")).toHaveCount(3);
+  await expect(page.locator(".agent-message blockquote").first()).toContainText("Keep the Chat readable");
+  await expect(page.locator(".agent-message blockquote").nth(1)).toContainText("我们的护城河不是 AI 会写");
   await expect(page.locator(".agent-message del")).toHaveText("Raw pipe text");
   expect(await page.evaluate(() => Boolean((window as unknown as { __peelUnsafe?: boolean }).__peelUnsafe))).toBe(false);
+  expect(await page.locator(".agent-message").first().evaluate((element) => element.innerText.split("\n").filter((line) => line.trimStart().startsWith(">")))).toEqual([]);
+  const quoteCraft = await page.locator(".agent-message blockquote").first().evaluate((element) => {
+    const style = getComputedStyle(element);
+    return { borderLeftWidth: style.borderLeftWidth, backgroundColor: style.backgroundColor, paddingLeft: style.paddingLeft };
+  });
+  expect(quoteCraft).toMatchObject({ borderLeftWidth: "3px", paddingLeft: "13px" });
+  expect(quoteCraft.backgroundColor).not.toBe("rgba(0, 0, 0, 0)");
   await page.locator(".agent-message table").scrollIntoViewIfNeeded();
   await page.waitForTimeout(100);
   await page.screenshot({ path: join(desktopRoot, "test-results/ui-focus-markdown.png") });
+  const code = page.locator(".markdown-code").first();
+  await expect(code.locator(".markdown-code-header > span")).toHaveText("ts");
+  const clipboardBeforeCopy = await app!.evaluate(({ clipboard }) => clipboard.readText());
+  await code.getByRole("button", { name: "Copy code" }).click();
+  await expect(code.getByRole("button", { name: "Copied" })).toBeVisible();
+  expect(await app!.evaluate(({ clipboard }) => clipboard.readText())).toContain("const spatialSurface");
+  await app!.evaluate(({ clipboard }, value) => clipboard.writeText(value), clipboardBeforeCopy);
+  await page.screenshot({ path: join(desktopRoot, "test-results/ui-focus-markdown-code.png") });
   const reasoning = page.locator(".activity-item").filter({ hasText: "Reasoning" });
   await reasoning.locator("summary").click();
   await expect(reasoning.locator("strong")).toHaveText("Planning collaborative reasoning framework");
@@ -236,6 +253,7 @@ test("real Thread-first Fork loop, recovery surfaces, scale, and restart", async
   await app!.evaluate(({ BrowserWindow }) => BrowserWindow.getAllWindows()[0]?.setSize(1000, 720));
   await expect.poll(() => page.evaluate(() => window.innerWidth)).toBe(1000);
   await assertContainedNavigation();
+  await page.screenshot({ path: join(desktopRoot, "test-results/ui-focus-markdown-narrow.png") });
   await app!.evaluate(({ BrowserWindow }) => BrowserWindow.getAllWindows()[0]?.setSize(1440, 960));
   await expect.poll(() => page.evaluate(() => window.innerWidth)).toBe(1440);
   const codeLayout = await page.locator(".code-block").evaluate((element) => ({
@@ -305,6 +323,9 @@ test("real Thread-first Fork loop, recovery surfaces, scale, and restart", async
   await page.locator(".fork-surface textarea").fill("Try a compact navigation direction");
   await page.getByRole("button", { name: "Create & send" }).click();
   await expect(page.locator(".lineage-tree button")).toHaveCount(2);
+  const streamingAgent = page.locator(".turn").last().locator(".agent-message");
+  await expect(streamingAgent.locator("strong")).toContainText("A streamed result");
+  expect(await streamingAgent.innerText()).not.toContain("**");
   await page.locator(".transcript").evaluate((element) => {
     element.scrollTop = element.scrollHeight;
     element.dispatchEvent(new Event("scroll"));

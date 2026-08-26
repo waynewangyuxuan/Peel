@@ -114,7 +114,7 @@ kbd { margin-left: auto; border: 0; color: var(--faint); font-size: 10px; font-f
 .rail-footnote { display: flex; gap: 6px; align-items: center; margin: 20px 10px; color: var(--faint); font-size: 9.5px; }
 
 .transcript-column { flex: 1 1 auto; display: grid; grid-template-rows: minmax(0, 1fr) auto; min-width: 440px; min-height: 0; background: var(--paper); }
-.transcript { overflow-y: auto; overscroll-behavior: contain; padding: 0 max(28px, calc((100% - 760px) / 2)); scroll-behavior: auto; }
+.transcript { overflow-y: auto; overscroll-behavior: contain; padding: 0 max(28px, calc((100% - 760px) / 2)); scroll-behavior: auto; scrollbar-width: thin; scrollbar-color: #cecec8 transparent; }
 .thread-intro { padding: 43px 0 30px; border-bottom: 1px solid var(--line); }
 .eyebrow { color: #91918c; font-size: 8.8px; text-transform: uppercase; letter-spacing: .1em; font-weight: 600; }
 .thread-intro h1 { margin: 8px 0 6px; font-size: 24px; line-height: 1.18; font-weight: 640; letter-spacing: -.018em; }
@@ -131,11 +131,12 @@ kbd { margin-left: auto; border: 0; color: var(--faint); font-size: 10px; font-f
 .markdown-body > :first-child { margin-top: 0; }
 .markdown-body > :last-child { margin-bottom: 0; }
 .markdown-body p { margin: 0 0 11px; }
-.markdown-body h1, .markdown-body h2, .markdown-body h3, .markdown-body h4 { margin: 20px 0 8px; line-height: 1.28; letter-spacing: -.012em; }
+.markdown-body h1, .markdown-body h2, .markdown-body h3, .markdown-body h4, .markdown-body h5, .markdown-body h6 { margin: 20px 0 8px; line-height: 1.28; letter-spacing: -.012em; }
 .markdown-body h1 { font-size: 20px; font-weight: 670; }
 .markdown-body h2 { font-size: 16.5px; font-weight: 650; }
 .markdown-body h3 { font-size: 14.5px; font-weight: 640; }
 .markdown-body h4 { font-size: 13.5px; font-weight: 640; }
+.markdown-body h5, .markdown-body h6 { font-size: 13px; font-weight: 640; }
 .markdown-body ul, .markdown-body ol { margin: 8px 0 13px; padding-left: 23px; }
 .markdown-body ul ul, .markdown-body ul ol, .markdown-body ol ul, .markdown-body ol ol { margin: 4px 0 5px; }
 .markdown-body li { margin: 4px 0; padding-left: 2px; }
@@ -169,9 +170,12 @@ kbd { margin-left: auto; border: 0; color: var(--faint); font-size: 10px; font-f
 .copy-code { display: inline-flex; align-items: center; gap: 5px; min-height: 27px; padding: 4px 6px; border: 0; border-radius: 6px; background: transparent; color: #d4d3cd; font: inherit; transition: color 100ms ease, background-color 100ms ease, transform 80ms var(--ease-out); }
 .copy-code:active { transform: scale(.96); background: rgba(255,255,255,.12); }
 .copy-code:focus-visible { outline: 2px solid rgba(255,255,255,.65); outline-offset: 1px; }
-.markdown-code .code-block { margin: 0; padding: 14px 15px 16px; border: 0; border-radius: 0; background: transparent; color: inherit; font-size: 11px; line-height: 1.58; white-space: pre; overflow-x: auto; overflow-wrap: normal; }
+.markdown-code .code-block { margin: 0; padding: 14px 15px 16px; border: 0; border-radius: 0; background: transparent; color: inherit; font-size: 11px; line-height: 1.58; white-space: pre; overflow-x: auto; overflow-wrap: normal; scrollbar-width: thin; scrollbar-color: #666661 transparent; }
+.markdown-code .code-block::-webkit-scrollbar { height: 8px; }
+.markdown-code .code-block::-webkit-scrollbar-track { background: transparent; }
+.markdown-code .code-block::-webkit-scrollbar-thumb { border: 2px solid #20201e; border-radius: 999px; background: #666661; }
 .user-markdown { max-width: 100%; }
-.user-markdown h1, .user-markdown h2, .user-markdown h3, .user-markdown h4 { margin-top: 12px; font-size: 1em; }
+.user-markdown h1, .user-markdown h2, .user-markdown h3, .user-markdown h4, .user-markdown h5, .user-markdown h6 { margin-top: 12px; font-size: 1em; }
 .user-markdown blockquote { background: rgba(255,255,255,.55); }
 .user-markdown .markdown-table-wrap { background: var(--paper); }
 @media (hover: hover) and (pointer: fine) {
