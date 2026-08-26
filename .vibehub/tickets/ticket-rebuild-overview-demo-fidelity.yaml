@@ -1,0 +1,67 @@
+{
+  "acceptance": [
+    {
+      "acceptance_id": "demo-canvas-composition",
+      "criterion": "At 1440x960 and 1000x720, Overview uses the preserved Demo's full-canvas composition: no separate full-width toolbar band, a restrained floating identity/count control and floating zoom controls sit over the canvas, and the grid fades into the background. New Spaces and legacy Spaces still at the exact untouched root=(0,0), camera=(0,0,.86) sentinel receive one balanced initial Camera without moving Nodes; any non-sentinel persisted Camera remains unchanged, while explicit Fit makes representative 2-node and 6-node graphs occupy a deliberate readable field rather than clinging to the top-left above a mostly empty viewport."
+    },
+    {
+      "acceptance_id": "demo-card-anatomy",
+      "criterion": "At 100% zoom every durable Thread card closely follows the Demo's 294px-wide, approximately 205px-min-height high-density anatomy and visual hierarchy: Root/Forked Thread kicker, readable title, explicit deterministic status, Branched-from/Fork snippet provenance, separate Latest user and Latest result facts, last-active time, turn count, and optional Worktree, changed-file, and Subagent pills; long content clamps cleanly without turning the card into tiny undifferentiated rows."
+    },
+    {
+      "acceptance_id": "spatial-hierarchy-and-edges",
+      "criterion": "Fork edges attach to the true card geometry, remain low contrast by default, and strengthen along the active path; Root, parent, child, sibling, and current Thread are visually recognizable from structure and state rather than arbitrary color, while existing persisted positions and Fork topology remain authoritative."
+    },
+    {
+      "acceptance_id": "overview-interaction-craft",
+      "criterion": "Card open, exact-snippet return, rename, pan, zoom-at-pointer, Fit, drag, and Diff/worktree affordances remain keyboard and pointer usable; press and fine-pointer hover feedback is immediate and restrained, repeated Focus/Overview switching is not delayed by decorative motion, dragging does not fight hover transforms, and reduced-motion behavior is preserved."
+    },
+    {
+      "acceptance_id": "overview-visual-and-scale-regression",
+      "criterion": "Production Electron evidence includes directly inspected settled screenshots for the preserved Demo Overview, Peel's 2-node Overview, a deterministic 6-node branching Overview, and the 50-node Fit state; automated assertions retain all nodes and real edges, zero unexpected position changes, readable deterministic card fields, narrow-window containment, and successful re-entry to Focus without regressing the delivered Focus, Fork, Voice, Diff, approval, streaming, or restart journey."
+    }
+  ],
+  "constraints": [
+    "The preserved Demo HTML is the visual and interaction authority; do not run a new direction exercise or introduce a competing graph/dashboard style.",
+    "Overview uses only deterministic Codex and Peel-owned topology/view facts; do not add AI-inferred conclusions, decisions, priorities, arbitrary edges, or branch-type colors.",
+    "Do not automatically rearrange existing Nodes when entering Overview, receiving status updates, or adding a child. A one-time initial Camera is allowed only for the exact untouched legacy/new sentinel named in acceptance; non-sentinel persisted Camera stays authoritative, later Camera changes require explicit pan, zoom, or Fit, and Node positions change only through explicit drag or child creation.",
+    "The 6-node reference may use deterministic synthetic test data, but production rendering must remain the exact same component and data contract used for real Threads.",
+    "Overview contains no Transcript or Composer, and card/snippet actions return to the existing first-class Focus Chat.",
+    "High-frequency mode switches, pan, zoom, and drag must prioritize responsiveness; animate only transform/opacity when motion materially communicates state."
+  ],
+  "context": "Direct dogfood after the Focus repair established that the production Overview is still seriously unacceptable relative to the preserved Demo. The current implementation borrows surface tokens but changes the composition into a 53px toolbar band over a largely empty canvas, anchors small cards at the upper-left, collapses the Demo's explicit provenance and fact hierarchy into tiny rows, weakens spatial path recognition, and was previously accepted without a sufficiently demanding Demo-to-production Overview comparison. This Ticket rebuilds the production Overview to the already-decided Demo rather than proposing a new direction.",
+  "context_refs": [
+    {
+      "purpose": "Authoritative decision that production v0.1 UI must directly follow the preserved Demo rather than select another direction.",
+      "ref": ".vibehub/rooms/product/decision-demo-authoritative-v01-ui-direction.yaml"
+    },
+    {
+      "purpose": "Defines the exact deterministic information and traceability every Overview card must expose.",
+      "ref": ".vibehub/rooms/product/contract-overview-deterministic-card-data.yaml"
+    },
+    {
+      "purpose": "Protects stable positions, real Fork edges, active-path emphasis, explicit Fit, and the 30–50 node boundary.",
+      "ref": ".vibehub/rooms/product/contract-stable-spatial-layout.yaml"
+    },
+    {
+      "purpose": "Original self-contained visual and interaction authority, including the six-node Overview composition and card anatomy.",
+      "ref": "docs/product/source/peel-demo-v0-original.html"
+    }
+  ],
+  "kind": "ticket",
+  "maturity": "firm",
+  "outcome": "Peel Overview becomes a deliberate, high-density spatial workspace that is recognizably faithful to the preserved Demo in composition, card hierarchy, edges, states, and interaction quality while retaining real deterministic data and stable large-Space behavior.",
+  "provenance_refs": [
+    "conversation:2026-08-26-overview-seriously-unacceptable",
+    ".vibehub/outcomes/ticket-deliver-v01-ui-polish.yaml"
+  ],
+  "relations": [
+    {
+      "rationale": "The rebuilt Overview must preserve the completed shared shell, title, Markdown, and Focus interaction repairs in the exact production baseline.",
+      "target_ticket_id": "ticket-fix-focus-chat-content-and-navigation",
+      "type": "depends_on"
+    }
+  ],
+  "schema_version": 1,
+  "ticket_id": "ticket-rebuild-overview-demo-fidelity"
+}
