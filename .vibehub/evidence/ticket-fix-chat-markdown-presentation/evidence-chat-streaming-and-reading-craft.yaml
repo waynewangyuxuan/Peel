@@ -1,0 +1,21 @@
+{
+  "acceptance_ids": [
+    "streaming-markdown-stability",
+    "chatgpt-like-reading-craft"
+  ],
+  "evidence_id": "evidence-chat-streaming-and-reading-craft",
+  "kind": "ticket_evidence",
+  "origin": "agent",
+  "recorded_at": "2026-08-26T20:27:11Z",
+  "refs": [
+    "commit:5db56d7",
+    "commit:102edd2",
+    "apps/desktop/test-results/ui-focus-markdown.png generated and directly inspected from the production Electron journey",
+    "apps/desktop/test-results/ui-focus-markdown-code.png generated and directly inspected from the production Electron journey",
+    "apps/desktop/test-results/ui-focus-markdown-narrow.png generated and directly inspected from the production Electron journey",
+    "apps/desktop/e2e/v01-journey.spec.ts"
+  ],
+  "schema_version": 1,
+  "summary": "Streaming uses a render-only projection for unfinished emphasis, inline and fenced code, blockquotes, lists, links, and incomplete table headers; completed message strings still parse verbatim. Parameterized tests prove those partial states render semantically without exposing their orphan delimiters, and the Electron fixture holds an unmatched opening ** on screen before the closing fragment arrives while asserting that the displayed text contains no **. Direct inspection at 1440x960 and 1000x720 confirmed restrained quote blocks with no > marker, readable nested Reasoning content, bounded GFM tables, compact user bubbles, and a dark code surface with language, horizontal-only scrolling, selectable text, pointer/keyboard Copy code, immediate Copied feedback, and a real clipboard write that the test restores.",
+  "ticket_id": "ticket-fix-chat-markdown-presentation"
+}

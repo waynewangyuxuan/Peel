@@ -1,0 +1,18 @@
+{
+  "acceptance_ids": [
+    "focus-journey-regression"
+  ],
+  "evidence_id": "evidence-chat-markdown-full-regression",
+  "kind": "ticket_evidence",
+  "origin": "agent",
+  "recorded_at": "2026-08-26T20:27:11Z",
+  "refs": [
+    "commit:102edd2",
+    "command:npm test passes all 55 tests across Codex adapter, Git/worktree adapter, and desktop",
+    "command:npm run build passes both adapters, desktop typecheck, native Speech helper, renderer, Electron main, and preload builds",
+    "command:npm run test:e2e --workspace @peel/desktop passes the 39.3 second production Electron journey"
+  ],
+  "schema_version": 1,
+  "summary": "The exact final production build passes the complete repository test and build surfaces plus the full Electron journey. The journey exercises the real-payload-derived quote fixture, tables, unsafe-content rejection, code language/copy/clipboard and horizontal scrolling, selection, unfinished streaming Markdown, wide and narrow screenshots, and retains the existing Thread Picker latency/pagination/race paths, Focus navigation, Activity, Fork and recovery, Worktree, Voice, Approval, Overview, Diff, scale, draft, scroll, persistence, and restart behavior.",
+  "ticket_id": "ticket-fix-chat-markdown-presentation"
+}

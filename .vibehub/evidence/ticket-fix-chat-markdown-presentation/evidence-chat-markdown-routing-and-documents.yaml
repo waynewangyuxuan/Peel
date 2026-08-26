@@ -1,0 +1,21 @@
+{
+  "acceptance_ids": [
+    "all-prose-markdown-routing",
+    "commonmark-gfm-document-fidelity"
+  ],
+  "evidence_id": "evidence-chat-markdown-routing-and-documents",
+  "kind": "ticket_evidence",
+  "origin": "agent",
+  "recorded_at": "2026-08-26T20:27:11Z",
+  "refs": [
+    "commit:5db56d7",
+    "commit:102edd2",
+    "apps/desktop/src/renderer/Markdown.tsx",
+    "apps/desktop/src/renderer/Transcript.tsx",
+    "apps/desktop/test/markdown.test.tsx",
+    "apps/desktop/e2e/fixtures/codex"
+  ],
+  "schema_version": 1,
+  "summary": "One safe MarkdownContent route now presents user messages, agent messages, Reasoning prose, Subagent prose, and error prose while Command output and file facts retain explicit preformatted treatment. The renderer covers CommonMark/GFM headings through h6, breaks, emphasis, strikethrough, nested quotes and lists, tasks, rules, safe links and bounded image policy, inline/fenced code with language, and bounded tables. Raw HTML remains disabled, default URL sanitization rejects javascript URLs, remote Markdown images become explicit outbound links, and data/blob images remain locally renderable. Unit and Electron fixtures include a minimal redacted shape copied from the inspected live Codex Thread: three ordinary leading > paragraphs become blockquote DOM, the pipe table becomes table DOM, and no literal quote control line remains.",
+  "ticket_id": "ticket-fix-chat-markdown-presentation"
+}
