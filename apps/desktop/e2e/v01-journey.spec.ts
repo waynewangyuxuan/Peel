@@ -368,17 +368,40 @@ test("real Thread-first Fork loop, recovery surfaces, scale, and restart", async
   await page.locator(".lineage-rename input").fill("Lineage branch name");
   await page.locator(".lineage-rename input").press("Enter");
   await expect(page.locator(".thread-name")).toHaveText("Lineage branch name");
+  const positionsBeforeFirstOverview = await page.evaluate(() => window.peel.bootstrap().then((payload) => Object.fromEntries(Object.entries(payload.state.spaces[payload.state.activeSpaceId!]!.nodes).map(([id, node]) => [id, node.position]))));
   await page.locator(".segmented button").nth(1).click();
+  await expect(page.locator(".overview-card")).toHaveCount(2);
+  await expect(page.locator(".overview-edges path")).toHaveCount(1);
+  await expect(page.locator(".overview-edges path.active")).toHaveCount(1);
   const branchCard = page.locator(".overview-card").filter({ hasText: "Lineage branch name" });
   await branchCard.locator("h3").dblclick();
   await page.getByLabel("Rename Lineage branch name").fill("Overview branch name");
   await page.getByLabel("Rename Lineage branch name").press("Enter");
   const renamedBranchCard = page.locator(".overview-card").filter({ hasText: "Overview branch name" });
   await expect(renamedBranchCard).toBeVisible();
-  await page.waitForTimeout(350);
+  await expect(renamedBranchCard.locator("h3")).toHaveAttribute("title", "Overview branch name");
+  await expect(renamedBranchCard.getByText("Latest user", { exact: true })).toBeVisible();
+  await expect(renamedBranchCard.getByText("Latest result", { exact: true })).toBeVisible();
+  await page.waitForTimeout(500);
+  const initialOverviewLayout = await page.locator(".overview-viewport").evaluate((viewport) => {
+    const frame = viewport.getBoundingClientRect();
+    const cards = [...document.querySelectorAll<HTMLElement>(".overview-card")].map((card) => card.getBoundingClientRect());
+    const toolbar = document.querySelector<HTMLElement>(".overview-toolbar")!;
+    const shell = document.querySelector<HTMLElement>(".overview-shell")!.getBoundingClientRect();
+    return {
+      cardsFit: cards.every((card) => card.left >= frame.left && card.top >= frame.top && card.right <= frame.right && card.bottom <= frame.bottom),
+      cardsReadable: cards.every((card) => card.width >= 293 && card.height >= 204),
+      centeredWithin: Math.abs((Math.min(...cards.map((card) => card.left)) + Math.max(...cards.map((card) => card.right))) / 2 - (frame.left + frame.right) / 2),
+      toolbarPosition: getComputedStyle(toolbar).position,
+      canvasStartsAtShellTop: Math.abs(frame.top - shell.top) < 1,
+    };
+  });
+  expect(initialOverviewLayout).toMatchObject({ cardsFit: true, cardsReadable: true, toolbarPosition: "absolute", canvasStartsAtShellTop: true });
+  expect(initialOverviewLayout.centeredWithin).toBeLessThan(2);
+  expect(await page.evaluate(() => window.peel.bootstrap().then((payload) => Object.fromEntries(Object.entries(payload.state.spaces[payload.state.activeSpaceId!]!.nodes).map(([id, node]) => [id, node.position]))))).toEqual(positionsBeforeFirstOverview);
   await expect(page.locator(".toast")).toHaveCount(0, { timeout: 5_000 });
-  await page.screenshot({ path: join(desktopRoot, "test-results/ui-overview.png") });
-  await renamedBranchCard.locator(".card-snippets button").nth(1).click();
+  await page.screenshot({ path: join(desktopRoot, "test-results/ui-overview-2.png") });
+  await renamedBranchCard.locator(".card-facts button").nth(1).click();
   await expect(page.locator('.turn.highlighted[data-turn-id="turn-3"]')).toBeVisible();
 
   const draft = page.getByLabel("Message");
@@ -439,7 +462,7 @@ test("real Thread-first Fork loop, recovery surfaces, scale, and restart", async
   await expect(page.locator(".current-workspace-note")).toContainText("Continue in this worktree");
   await page.keyboard.press("Escape");
   await page.locator(".segmented button").nth(1).click();
-  await expect(page.locator(".overview-card").getByText("peel/isolated-worktree-direction", { exact: true })).toBeVisible();
+  await expect(page.locator(".overview-card").getByRole("button", { name: "Open changes for peel/isolated-worktree-direction" })).toBeVisible();
 
   await writeFile(join(repository, "root-non-git-once"), "1");
   await startFreshSpace();
@@ -580,17 +603,63 @@ test("real Thread-first Fork loop, recovery surfaces, scale, and restart", async
   await launch();
   await expect(page.getByLabel("Message")).toHaveValue("Close-fast draft survives without waiting for debounce");
 
+  const demoState = await page.evaluate(() => window.peel.bootstrap().then((payload) => payload.state));
+  demoState.activeSpaceId = firstSpaceId;
+  demoState.activeThreadId = "thread-child-1";
+  demoState.viewMode = "overview";
+  const demoSpace = demoState.spaces[firstSpaceId]!;
+  const root = demoSpace.nodes[demoSpace.rootThreadId]!;
+  const child = demoSpace.nodes["thread-child-1"]!;
+  const grandchild = Object.values(demoSpace.nodes).find((node) => node.threadId !== root.threadId && node.threadId !== child.threadId)!;
+  demoSpace.nodes = {
+    [root.threadId]: { ...root, position: { x: 70, y: 270 } },
+    [child.threadId]: { ...child, position: { x: 390, y: 115 } },
+    [grandchild.threadId]: { ...grandchild, position: { x: 735, y: 40 }, title: "UI visual system", titleOrigin: "automatic", lastViewedTurnId: null },
+    "synthetic-demo-navigation": { ...root, threadId: "synthetic-demo-navigation", parentThreadId: child.threadId, forkedAtTurnId: "turn-3", createdAt: Date.now() + 2, position: { x: 735, y: 286 }, title: "Navigation and command palette", titleOrigin: "automatic", lastViewedTurnId: null },
+    "synthetic-demo-backend": { ...root, threadId: "synthetic-demo-backend", parentThreadId: root.threadId, forkedAtTurnId: "turn-2", createdAt: Date.now() + 3, position: { x: 390, y: 505 }, title: "Codex backend integration", titleOrigin: "automatic", lastViewedTurnId: null },
+    "synthetic-demo-worktree": { ...root, threadId: "synthetic-demo-worktree", parentThreadId: "synthetic-demo-backend", forkedAtTurnId: "turn-2", createdAt: Date.now() + 4, position: { x: 735, y: 535 }, title: "Isolated worktree direction", titleOrigin: "automatic", lastViewedTurnId: null },
+  };
+  demoSpace.camera = { x: 20, y: 20, scale: 1 };
+  await page.evaluate(async (state) => { await window.peel.saveState(state); location.reload(); }, demoState);
+  await expect(page.locator(".overview-card")).toHaveCount(6);
+  await expect(page.locator(".overview-edges path")).toHaveCount(5);
+  await page.getByRole("button", { name: "Fit", exact: true }).click();
+  await expect(page.locator(".overview-edges path.active")).toHaveCount(1);
+  const worktreeCard = page.locator(".overview-card").filter({ hasText: "Isolated worktree direction" });
+  await worktreeCard.hover();
+  await expect(page.locator(".overview-edges path.active")).toHaveCount(2);
+  await expect(worktreeCard.getByText("Branched from Codex backend integration", { exact: false })).toBeVisible();
+  await page.screenshot({ path: join(desktopRoot, "test-results/ui-overview-6.png") });
+  await app!.evaluate(({ BrowserWindow }) => BrowserWindow.getAllWindows()[0]?.setSize(1000, 720));
+  await expect.poll(() => page.evaluate(() => window.innerWidth)).toBe(1000);
+  await page.getByRole("button", { name: "Fit", exact: true }).click();
+  const narrowOverviewFit = await page.locator(".overview-viewport").evaluate((viewport) => {
+    const frame = viewport.getBoundingClientRect();
+    const cards = [...document.querySelectorAll<HTMLElement>(".overview-card")].map((card) => card.getBoundingClientRect());
+    const controls = document.querySelector<HTMLElement>(".zoom-controls")!.getBoundingClientRect();
+    return {
+      pageFits: document.documentElement.scrollWidth === window.innerWidth,
+      cardsFit: cards.every((card) => card.left >= frame.left - 1 && card.top >= frame.top - 1 && card.right <= frame.right + 1 && card.bottom <= frame.bottom + 1),
+      controlsFit: controls.left >= frame.left && controls.right <= frame.right && controls.top >= frame.top && controls.bottom <= frame.bottom,
+      cardWidth: Math.min(...cards.map((card) => card.width)),
+    };
+  });
+  expect(narrowOverviewFit).toMatchObject({ pageFits: true, cardsFit: true, controlsFit: true });
+  expect(narrowOverviewFit.cardWidth).toBeGreaterThan(175);
+  await page.screenshot({ path: join(desktopRoot, "test-results/ui-overview-6-narrow.png") });
+  await app!.evaluate(({ BrowserWindow }) => BrowserWindow.getAllWindows()[0]?.setSize(1440, 960));
+  await expect.poll(() => page.evaluate(() => window.innerWidth)).toBe(1440);
+
   const scaleState = await page.evaluate(() => window.peel.bootstrap().then((payload) => payload.state));
-  scaleState.activeSpaceId = firstSpaceId;
-  scaleState.activeThreadId = "thread-child-1";
-  scaleState.viewMode = "overview";
   const scaleSpace = scaleState.spaces[firstSpaceId]!;
-  const root = scaleSpace.nodes[scaleSpace.rootThreadId]!;
-  for (let index = 0; index < 46; index += 1) {
-    const id = `synthetic-${index}`;
-    scaleSpace.nodes[id] = { ...root, threadId: id, parentThreadId: scaleSpace.rootThreadId, forkedAtTurnId: "turn-2", createdAt: Date.now() + index, position: suggestedChildPosition(scaleSpace, scaleSpace.rootThreadId), title: `Scale direction ${index}`, titleOrigin: "automatic", lastViewedTurnId: null };
+  const scaleRoot = scaleSpace.nodes[scaleSpace.rootThreadId]!;
+  scaleSpace.nodes["synthetic-scale-45"] = { ...scaleRoot, threadId: "synthetic-scale-45", parentThreadId: scaleSpace.rootThreadId, forkedAtTurnId: "turn-2", createdAt: Date.now() + 45, position: suggestedChildPosition(scaleSpace, scaleSpace.rootThreadId), title: "Scale direction 45", titleOrigin: "automatic", lastViewedTurnId: null };
+  for (let index = 0; Object.keys(scaleSpace.nodes).length < 49; index += 1) {
+    const id = `synthetic-scale-${index}`;
+    if (scaleSpace.nodes[id]) continue;
+    scaleSpace.nodes[id] = { ...scaleRoot, threadId: id, parentThreadId: scaleSpace.rootThreadId, forkedAtTurnId: "turn-2", createdAt: Date.now() + index, position: suggestedChildPosition(scaleSpace, scaleSpace.rootThreadId), title: `Scale direction ${index}`, titleOrigin: "automatic", lastViewedTurnId: null };
   }
-  scaleSpace.nodes["synthetic-failed"] = { ...root, threadId: "synthetic-failed", parentThreadId: scaleSpace.rootThreadId, forkedAtTurnId: "turn-2", createdAt: Date.now() + 48, position: suggestedChildPosition(scaleSpace, scaleSpace.rootThreadId), title: "Failed direction", titleOrigin: "automatic", lastViewedTurnId: null };
+  scaleSpace.nodes["synthetic-failed"] = { ...scaleRoot, threadId: "synthetic-failed", parentThreadId: scaleSpace.rootThreadId, forkedAtTurnId: "turn-2", createdAt: Date.now() + 49, position: suggestedChildPosition(scaleSpace, scaleSpace.rootThreadId), title: "Failed direction", titleOrigin: "automatic", lastViewedTurnId: null };
   scaleSpace.camera = { x: 70, y: 60, scale: .42 };
   await page.evaluate(async (state) => { await window.peel.saveState(state); location.reload(); }, scaleState);
   await expect(page.locator(".overview-card")).toHaveCount(50);
@@ -621,10 +690,10 @@ test("real Thread-first Fork loop, recovery surfaces, scale, and restart", async
   expect(fitResult).toEqual({ cardsFit: true, pathsFit: true });
   await page.screenshot({ path: join(desktopRoot, "test-results/overview-50.png") });
   const lateCard = page.locator(".overview-card").filter({ hasText: "Scale direction 45" });
-  await lateCard.getByRole("button", { name: "Open" }).click();
+  await lateCard.getByRole("button", { name: "Open Scale direction 45" }).press("Enter");
   await expect(page.locator(".thread-name")).toHaveText("Scale direction 45");
   await page.locator(".segmented button").nth(1).click();
-  await page.locator(".overview-card").filter({ has: page.getByRole("heading", { name: "Overview branch name", exact: true }) }).getByRole("button", { name: "Open" }).click();
+  await page.locator(".overview-card").filter({ has: page.getByRole("heading", { name: "Overview branch name", exact: true }) }).getByRole("button", { name: "Open Overview branch name" }).press("Enter");
   await expect(page.getByLabel("Message")).toHaveValue("Close-fast draft survives without waiting for debounce");
   await page.waitForTimeout(250);
   await page.screenshot({ path: join(desktopRoot, "test-results/focus-restored.png") });

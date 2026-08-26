@@ -1,5 +1,5 @@
 import type { CodexThread } from "@peel/codex-app-server";
-import { useLayoutEffect, useMemo, useRef, useState, type KeyboardEvent, type PointerEvent, type ReactNode, type WheelEvent } from "react";
+import { useLayoutEffect, useMemo, useRef, useState, type PointerEvent, type ReactNode, type WheelEvent } from "react";
 import type { WorkspaceDiffSummary } from "@peel/git-workspace";
 
 import type { CameraState, Point, SpaceNode, SpaceRecord } from "../shared/contracts";
@@ -112,7 +112,7 @@ export function Overview({ space, activeThreadId, threads, diffs, onCamera, onNo
         <button aria-label="Zoom out" title="Zoom out" onClick={() => onCamera({ ...space.camera, scale: Math.max(MIN_SCALE, space.camera.scale - .1) })}>−</button>
         <span aria-label={`Zoom ${Math.round(space.camera.scale * 100)} percent`}>{Math.round(space.camera.scale * 100)}%</span>
         <button aria-label="Zoom in" title="Zoom in" onClick={() => onCamera({ ...space.camera, scale: Math.min(1.45, space.camera.scale + .1) })}>+</button>
-        <button className="fit-button" aria-label="Fit Overview" title="Fit Overview" onClick={() => onCamera(fitCamera(nodes, viewport.current))}>Fit</button>
+        <button className="fit-button" aria-label="Fit" title="Fit Overview" onClick={() => onCamera(fitCamera(nodes, viewport.current))}>Fit</button>
       </div>
     </div>
     <div
@@ -191,16 +191,11 @@ function OverviewCard({ node, parent, thread, parentThread, diff, active, draggi
   const latestResultTurn = thread ? [...thread.turns].reverse().find((turn) => turn.status === "completed" && turn.items.some((item) => item.type === "agentMessage")) : undefined;
   const latestUser = latestUserTurn?.items.filter((item) => item.type === "userMessage").map(itemText).filter(Boolean).at(-1) ?? "";
   const latestResult = latestResultTurn?.items.filter((item) => item.type === "agentMessage").map(itemText).filter(Boolean).at(-1) ?? "";
-  const status = failed ? { label: "Failed", tone: "failed" }
-    : needsApproval ? { label: "Needs approval", tone: "approval" }
-      : isRunning ? { label: "Running", tone: "running" }
-        : newResult ? { label: "New result", tone: "result" }
-          : { label: "Idle", tone: "idle" };
-  const keyOpen = (event: KeyboardEvent<HTMLElement>): void => {
-    if (event.target !== event.currentTarget || (event.key !== "Enter" && event.key !== " ")) return;
-    event.preventDefault();
-    onOpen();
-  };
+  const statuses = failed ? [{ label: "Failed", tone: "failed" }]
+    : needsApproval ? [{ label: "Needs approval", tone: "approval" }, ...(newResult ? [{ label: "New result", tone: "result" }] : [])]
+      : isRunning ? [{ label: "Running", tone: "running" }, ...(newResult ? [{ label: "New result", tone: "result" }] : [])]
+        : newResult ? [{ label: "New result", tone: "result" }]
+          : [{ label: "Idle", tone: "idle" }];
   return <article
     className={`overview-card ${active ? "active" : ""} ${dragging ? "dragging" : ""}`}
     style={{ transform: `translate3d(${node.position.x}px, ${node.position.y}px, 0)` }}
@@ -208,19 +203,18 @@ function OverviewCard({ node, parent, thread, parentThread, diff, active, draggi
     onPointerEnter={() => onHover(true)}
     onPointerLeave={() => onHover(false)}
     onClick={onOpen}
-    onKeyDown={keyOpen}
-    role="button"
-    tabIndex={0}
-    aria-label={`Open ${node.title}`}
+    role="group"
+    aria-label={node.title}
   >
     <div className="overview-card-surface">
+      <button className="card-open-button" aria-label={`Open ${node.title}`} onClick={(event) => { event.stopPropagation(); onOpen(); }}/>
       <div className="card-heading">
         <div className="card-title-wrap">
           <div className="card-kicker">{parent ? "Forked Thread" : "Space Root"}</div>
           {editing ? <input className="card-title-input" autoFocus defaultValue={node.title} aria-label={`Rename ${node.title}`} onPointerDown={(event) => event.stopPropagation()} onClick={(event) => event.stopPropagation()} onDoubleClick={(event) => event.stopPropagation()} onBlur={(event) => { const name = event.target.value.trim(); if (name && name !== node.title) void onRename(node.threadId, name); setEditing(false); }} onKeyDown={(event) => { if (event.key === "Enter") event.currentTarget.blur(); if (event.key === "Escape") setEditing(false); }}/>
             : <h3 title={node.title} onClick={(event) => event.stopPropagation()} onDoubleClick={(event) => { event.stopPropagation(); setEditing(true); }}>{node.title}</h3>}
         </div>
-        <div className={`card-status ${status.tone}`}><i className={`status-dot ${status.tone}`}/>{status.label}</div>
+        <div className="card-status-group">{statuses.map((status) => <div className={`card-status ${status.tone}`} key={status.tone}><i className={`status-dot ${status.tone}`}/>{status.label}</div>)}</div>
       </div>
       {parent ? <button className="card-origin" onClick={(event) => { event.stopPropagation(); onFocusParent(parent.threadId, node.forkedAtTurnId ?? undefined); }}>
         <strong>Branched from {parent.title}</strong>{forkSnippet && <span> · “{clip(forkSnippet, 52)}”</span>}
@@ -232,7 +226,12 @@ function OverviewCard({ node, parent, thread, parentThread, diff, active, draggi
       <footer className="card-footer">
         <div className="card-foot-facts"><span>{thread?.turns.length ?? 0} turns</span><i>·</i><span>{relativeTime(thread?.updatedAt ?? node.createdAt)}</span></div>
         <div className="card-pills">
-          {(node.worktreeName || diff) && <button className="card-pill" title="Open changes" onClick={(event) => { event.stopPropagation(); onDiff(); }}>{node.worktreeName ?? "Workspace"}{diff ? ` · ${diff.changedFileCount}f` : ""}</button>}
+          {(node.worktreeName || diff) && <button
+            className="card-pill"
+            aria-label={`Open changes for ${node.worktreeName ?? "workspace"}`}
+            title={`${node.worktreeName ?? "Workspace"}${diff ? ` · ${diff.changedFileCount} changed file${diff.changedFileCount === 1 ? "" : "s"}` : ""}`}
+            onClick={(event) => { event.stopPropagation(); onDiff(); }}
+          >{node.worktreeName ?? "Workspace"}{diff ? ` · ${diff.changedFileCount}f` : ""}</button>}
           {subagentCount > 0 && <span className="card-pill" title={`${subagentCount} subagent${subagentCount === 1 ? "" : "s"} · ${subagentRunning ? "Running" : "Done"}`}>{subagentCount} subagent{subagentCount === 1 ? "" : "s"} · {subagentRunning ? "Running" : "Done"}</span>}
         </div>
       </footer>
