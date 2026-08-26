@@ -1,0 +1,24 @@
+{
+  "acceptance_ids": [
+    "overview-visual-and-scale-regression"
+  ],
+  "evidence_id": "evidence-overview-visual-scale-regression",
+  "kind": "ticket_evidence",
+  "origin": "agent",
+  "recorded_at": "2026-08-26T10:15:56Z",
+  "refs": [
+    "commit:cf68b500b20fa56857c845883c3351d826964c92",
+    "command:npm run typecheck --workspace @peel/desktop",
+    "command:npm test --workspace @peel/desktop passes 7 files and 17 tests",
+    "command:npm run build:renderer --workspace @peel/desktop",
+    "command:npm run test:e2e --workspace @peel/desktop passes 1/1 in 36.9 seconds",
+    "apps/desktop/e2e/v01-journey.spec.ts",
+    "apps/desktop/test-results/ui-overview-2.png",
+    "apps/desktop/test-results/ui-overview-6.png",
+    "apps/desktop/test-results/ui-overview-6-narrow.png",
+    "apps/desktop/test-results/overview-50.png"
+  ],
+  "schema_version": 1,
+  "summary": "At exact HEAD the desktop typecheck, all 17 desktop unit tests, renderer production build, and the complete 36.9-second Electron journey pass. The journey covers two-node initial camera and zero-position-change truth, six-node Demo-faithful composition at 1440x960 and 1000x720, simultaneous deterministic statuses, 50 retained cards and 49 real edges after restart, explicit Fit containment, keyboard re-entry to a late Thread and the original branch, and the previously delivered Picker, Focus, Markdown, activity, Fork, Voice, Approval, Diff, recovery, draft, scroll, and restart behaviors. Fresh settled screenshots for the Demo, production two-node, six-node wide/narrow, and 50-node Fit states were directly inspected; no visual state uses a separate toolbar band or top-left card pile.",
+  "ticket_id": "ticket-rebuild-overview-demo-fidelity"
+}

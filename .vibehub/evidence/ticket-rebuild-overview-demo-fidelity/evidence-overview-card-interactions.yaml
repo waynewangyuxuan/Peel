@@ -1,0 +1,23 @@
+{
+  "acceptance_ids": [
+    "demo-card-anatomy",
+    "overview-interaction-craft"
+  ],
+  "evidence_id": "evidence-overview-card-interactions",
+  "kind": "ticket_evidence",
+  "origin": "agent",
+  "recorded_at": "2026-08-26T10:15:56Z",
+  "refs": [
+    "commit:8fbef1e",
+    "commit:cf68b500b20fa56857c845883c3351d826964c92",
+    "apps/desktop/src/renderer/Overview.tsx",
+    "apps/desktop/src/renderer/App.tsx",
+    "apps/desktop/src/renderer/styles.css",
+    "apps/desktop/e2e/v01-journey.spec.ts",
+    "apps/desktop/test-results/ui-overview-2.png generated and directly inspected from production Electron",
+    "apps/desktop/test-results/ui-overview-6.png generated and directly inspected from production Electron"
+  ],
+  "schema_version": 1,
+  "summary": "The exact production card component now uses the Demo's 294x205 high-density hierarchy: Space Root or Forked Thread kicker, full title disclosure, deterministic Idle/Running/Needs approval/New result/Failed states without losing simultaneous approval and unseen-result facts, exact root or Branched-from provenance, separate Latest user and Latest result actions, turn/time facts, and optional full-title Worktree/diff and Subagent pills. Pointer card-open, exact-turn facts, provenance return, rename, drag, pan, pointer-centered zoom, Fit, and targeted Diff are preserved; a dedicated keyboard open control avoids nested-button semantics, fine-pointer hover lifts only the card surface, drag cancels hover lift, mode switching has no decorative entrance delay, press feedback is immediate, and the global reduced-motion rule still collapses transitions.",
+  "ticket_id": "ticket-rebuild-overview-demo-fidelity"
+}
