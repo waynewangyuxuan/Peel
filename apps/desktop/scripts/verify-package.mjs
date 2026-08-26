@@ -12,6 +12,7 @@ const executable = join(bundle, "Contents/MacOS/Peel");
 const resources = join(bundle, "Contents/Resources");
 const helper = join(resources, "app.asar.unpacked/native/bin/peel-speech");
 const fixture = join(desktopRoot, "e2e/fixtures/codex");
+const rootTitle = "Review Inkstone Legacy product migration and narrative architecture across multiple directions";
 const scratch = await mkdtemp(join(tmpdir(), "peel-package-smoke-"));
 const userData = join(scratch, "user-data");
 
@@ -41,7 +42,7 @@ try {
   let application = await electron.launch({ executablePath: executable, env });
   let page = await application.firstWindow();
   await page.getByRole("button", { name: /Choose a Codex Chat/ }).click();
-  await page.getByText("Spatial product direction").last().click();
+  await page.getByText(rootTitle).last().click();
   await page.getByLabel("Message").fill("Packaged draft survives a full restart");
   await application.close();
 
