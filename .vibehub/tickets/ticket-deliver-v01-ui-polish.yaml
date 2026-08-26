@@ -1,0 +1,56 @@
+{
+  "acceptance": [
+    {
+      "acceptance_id": "refine-after-direction",
+      "criterion": "After the human visual-direction and Thread Picker discovery Outcomes exist, this Ticket is rewritten as maturity firm with the selected direction's exact surface, token, state, motion and accessibility acceptance instead of proceeding from this draft."
+    },
+    {
+      "acceptance_id": "retain-product-contracts",
+      "criterion": "The refined implementation preserves Thread-first entry, Focus fidelity, deterministic Overview, exact Fork lineage, recoverable First Send, Voice Draft safety, Worktree/Diff boundaries and persisted view state."
+    },
+    {
+      "acceptance_id": "visual-regression-set",
+      "criterion": "The refined implementation defines and verifies representative light/dark, empty/loading/error, Focus/Fork/Overview/Diff and scale screenshots, including the final Thread Picker cold, warm, provisional-search, Load more, exhaustion and recoverable-error states, so polish does not depend on one happy-path frame."
+    }
+  ],
+  "constraints": [
+    "Do not execute while maturity remains draft.",
+    "Do not trade full-fidelity Transcript readability or deterministic Overview facts for decorative novelty.",
+    "Do not reintroduce Project-first navigation, arbitrary graph editing or semantic AI interpretation."
+  ],
+  "context": "The implementation direction is intentionally deferred until the visual proposal, human selection, and final Thread Picker states are complete. Once unblocked, this same Ticket must be refined in place with direction-specific, screenshot-verifiable acceptance before execution.",
+  "context_refs": [
+    {
+      "purpose": "Records why a broad UI polish delivery is needed.",
+      "ref": ".vibehub/rooms/product/note-v01-ui-direction-and-polish-gap.yaml"
+    },
+    {
+      "purpose": "Provides the historical visual and interaction evidence.",
+      "ref": ".vibehub/rooms/product/note-demo-visual-interaction-baseline.yaml"
+    },
+    {
+      "purpose": "Protects delivered behavior through the visual refactor.",
+      "ref": ".vibehub/rooms/product/contract-v01-core-spatial-fork-loop.yaml"
+    }
+  ],
+  "kind": "ticket",
+  "maturity": "draft",
+  "outcome": "Peel's production desktop surfaces feel cohesive, deliberate and product-ready in the Wayne-approved visual direction without regressing the v0.1 behavior contract.",
+  "provenance_refs": [
+    "conversation:2026-08-26-dogfood-ui-search-feedback"
+  ],
+  "relations": [
+    {
+      "rationale": "The chosen target direction determines the real implementation acceptance.",
+      "target_ticket_id": "ticket-decide-v01-visual-direction",
+      "type": "depends_on"
+    },
+    {
+      "rationale": "The broad polish pass must style and verify the final functional Picker states rather than an obsolete one-page surface.",
+      "target_ticket_id": "ticket-optimize-thread-picker-discovery",
+      "type": "depends_on"
+    }
+  ],
+  "schema_version": 1,
+  "ticket_id": "ticket-deliver-v01-ui-polish"
+}

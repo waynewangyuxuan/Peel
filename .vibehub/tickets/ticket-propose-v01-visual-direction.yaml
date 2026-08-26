@@ -1,0 +1,56 @@
+{
+  "acceptance": [
+    {
+      "acceptance_id": "current-surface-audit",
+      "criterion": "A checked-in audit covers Welcome, Thread Picker, Focus, Fork Draft, Overview, Diff and Voice/error states using current screenshots, and names concrete hierarchy, density, typography, spacing, material, state and motion mismatches rather than saying only that the UI is unpolished."
+    },
+    {
+      "acceptance_id": "baseline-reconciliation",
+      "criterion": "The audit distinguishes useful interaction and visual hierarchy from the preserved Demo from obsolete Project-first semantics and from production constraints introduced by real Transcript, Approval, Voice, Worktree and 30–50-node states."
+    },
+    {
+      "acceptance_id": "comparable-target-directions",
+      "criterion": "Two or three cohesive target directions are shown on the same representative surfaces with explicit token, typography, spacing, material, icon, state and motion implications plus implementation tradeoffs."
+    }
+  ],
+  "constraints": [
+    "Do not reinterpret the feedback as permission for an unreviewed broad CSS rewrite.",
+    "Do not restore obsolete Project-first content from the original Demo.",
+    "Keep Focus full-fidelity and screen-space and Overview deterministic.",
+    "Visual comparisons must use the same product facts and representative states."
+  ],
+  "context": "Dogfood says the feature set is promising but the UI direction has drifted and the delivery feels functionally complete rather than polished. Because that judgment spans hierarchy, typography, spacing, material, state expression and motion, implementation should not guess. This agent-authority Ticket produces the evidence and comparable proposals but does not select a direction for Wayne.",
+  "context_refs": [
+    {
+      "purpose": "Captures the authoritative human dogfood judgment and required decision boundary.",
+      "ref": ".vibehub/rooms/product/note-v01-ui-direction-and-polish-gap.yaml"
+    },
+    {
+      "purpose": "Defines the preserved Demo's valid visual and interaction evidence plus its limitations.",
+      "ref": ".vibehub/rooms/product/note-demo-visual-interaction-baseline.yaml"
+    },
+    {
+      "purpose": "Protects the distinct Focus and Overview information roles during visual exploration.",
+      "ref": ".vibehub/rooms/product/decision-focus-overview-information-contract.yaml"
+    },
+    {
+      "purpose": "Provides the exact runnable baseline for comparison.",
+      "ref": "docs/product/source/peel-demo-v0-original.html"
+    }
+  ],
+  "kind": "ticket",
+  "maturity": "firm",
+  "outcome": "Peel has a screenshot-grounded visual audit and two or three concrete, comparable target-direction proposals ready for Wayne's separate decision.",
+  "provenance_refs": [
+    "conversation:2026-08-26-dogfood-ui-search-feedback"
+  ],
+  "relations": [
+    {
+      "rationale": "The audit must evaluate the complete real v0.1 surface rather than the historical prototype alone.",
+      "target_ticket_id": "ticket-deliver-v01-spatial-loop",
+      "type": "depends_on"
+    }
+  ],
+  "schema_version": 1,
+  "ticket_id": "ticket-propose-v01-visual-direction"
+}

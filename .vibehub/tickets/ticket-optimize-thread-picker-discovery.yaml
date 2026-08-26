@@ -1,0 +1,65 @@
+{
+  "acceptance": [
+    {
+      "acceptance_id": "cursor-pagination",
+      "criterion": "The desktop IPC and service accept normalized term plus cursor, request 30 items per page, preserve App Server nextCursor, append de-duplicated pages, expose an explicit Load more action while another page exists, and show an honest end state instead of a fixed 50-item ceiling."
+    },
+    {
+      "acceptance_id": "warm-cache-and-deduplication",
+      "criterion": "After Codex connects, the recent-Chat first page is warmed without delaying bootstrap; identical term-plus-cursor responses are cached for exactly 15,000ms, and concurrent identical queries share one App Server request."
+    },
+    {
+      "acceptance_id": "responsive-warm-and-provisional-search",
+      "criterion": "With an automated App Server fixture delaying thread/list by 750ms, a completed warm page reopens in the Picker within 100ms with no additional request; typing a term shows matching warm-page Chats provisionally within 100ms while the authoritative server search continues, and repeating a completed identical query within the 15,000ms TTL resolves within 100ms with no additional request."
+    },
+    {
+      "acceptance_id": "search-race-safety",
+      "criterion": "Rapid typing, clearing, closing, reopening, and Load more cannot allow a late response for an older term or cursor to replace or append into the current result set; current results remain usable while refresh feedback is non-blocking."
+    },
+    {
+      "acceptance_id": "picker-feedback-and-accessibility",
+      "criterion": "Cold loading, background search, page loading, result count, more-results availability, exhaustion, empty state, and recoverable errors are distinguishable without hiding the search field or trapping keyboard focus."
+    },
+    {
+      "acceptance_id": "discovery-regression-coverage",
+      "criterion": "Automated tests exercise more than 50 available Threads, cursor propagation, de-duplication, warm/in-flight cache behavior, delayed out-of-order searches, Load more, and selection of a result beyond the first page while preserving the existing Thread-first Start Space flow."
+    }
+  ],
+  "constraints": [
+    "Do not preload full Transcripts or copy Codex-owned conversation state into a Peel search index.",
+    "Do not conflate Codex Chat discovery with v0.2 search inside an existing Space.",
+    "Keep App Server cursor semantics authoritative; do not synthesize completeness when nextCursor is present.",
+    "This Ticket may polish the Thread Picker's loading and pagination states but must not become the broad visual redesign."
+  ],
+  "context": "v0.1 proved real Thread discovery but hard-coded one 50-item request and made every Picker open or term change wait for App Server. Dogfood exposed both the ceiling and latency. This Ticket fixes the discovery path without pulling v0.2 Space Search or broad UI restyling into the change.",
+  "context_refs": [
+    {
+      "purpose": "Captures the human dogfood report, confirmed v0.1 causes, and intended discovery behavior.",
+      "ref": ".vibehub/rooms/product/intent-fast-scalable-thread-discovery.yaml"
+    },
+    {
+      "purpose": "Keeps existing Codex Chats as the sole Space entry model.",
+      "ref": ".vibehub/rooms/product/decision-thread-first-space-entry.yaml"
+    },
+    {
+      "purpose": "Prevents a shadow Peel transcript/search database.",
+      "ref": ".vibehub/rooms/product/contract-source-of-truth-ownership.yaml"
+    }
+  ],
+  "kind": "ticket",
+  "maturity": "firm",
+  "outcome": "Thread Picker has a measurably fast warm path, searches without stale-result races, and progressively exposes every matching Codex Chat instead of silently stopping at 50.",
+  "provenance_refs": [
+    "conversation:2026-08-26-dogfood-ui-search-feedback",
+    "commit:1e9843dad477d34e2000ccda7b463aa3e361f809"
+  ],
+  "relations": [
+    {
+      "rationale": "This is a focused dogfood repair to the delivered v0.1 Thread-first entry surface.",
+      "target_ticket_id": "ticket-deliver-v01-spatial-loop",
+      "type": "depends_on"
+    }
+  ],
+  "schema_version": 1,
+  "ticket_id": "ticket-optimize-thread-picker-discovery"
+}

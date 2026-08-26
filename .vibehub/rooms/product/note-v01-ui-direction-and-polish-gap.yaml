@@ -1,0 +1,45 @@
+{
+  "context_id": "note-v01-ui-direction-and-polish-gap",
+  "detail": "用户 dogfood 后认为功能整体不错，但视觉方向已经跑偏，交付呈现像完成了功能而没有完成打磨。这不是单个颜色或间距缺陷，而是需要以原始 Demo、当前真实功能密度和桌面端使用感为证据，重新审查信息层级、Typography、Spacing、Material、状态表达、Motion 与各 Surface 的一致性。广泛重写样式前应先交付可比较的视觉审计与目标方向，让用户确认方向，再进入实现。",
+  "evidence": [
+    {
+      "note": "用户对当前可运行 v0.1 的直接视觉质量判断。",
+      "ref": "conversation:2026-08-26-dogfood-ui-search-feedback"
+    },
+    {
+      "note": "原始 Demo 是已有的视觉层级与交互语义基线。",
+      "ref": "docs/product/source/peel-demo-v0-original.html"
+    },
+    {
+      "note": "Room 已明确 Demo 可用于视觉层级、状态过渡和交互语义，而非生产实现的逐像素模板。",
+      "ref": ".vibehub/rooms/product/note-demo-visual-interaction-baseline.yaml"
+    }
+  ],
+  "kind": "context",
+  "relations": [
+    {
+      "target_context_id": "note-demo-visual-interaction-baseline",
+      "type": "relates_to"
+    },
+    {
+      "target_context_id": "decision-focus-overview-information-contract",
+      "type": "relates_to"
+    }
+  ],
+  "schema_version": 1,
+  "source": {
+    "captured_at": "2026-08-26T07:51:54Z",
+    "quote": "UI 比较跑偏了吧，我觉得 UI 跑得稍微有点偏。然后交付一句就是没有打磨。",
+    "ref": "conversation:2026-08-26-dogfood-ui-search-feedback"
+  },
+  "state": "active",
+  "summary": "v0.1 功能方向可用，但当前 UI 偏离预期且缺少产品级打磨",
+  "tags": [
+    "dogfood",
+    "ui",
+    "visual-direction",
+    "polish",
+    "design-review"
+  ],
+  "type": "note"
+}

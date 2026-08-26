@@ -1,0 +1,45 @@
+{
+  "context_id": "intent-fast-scalable-thread-discovery",
+  "detail": "用户在真实 dogfood 中观察到 Thread Picker 像是只能列出 50 个 Codex Chats，并且打开列表与输入搜索词后的等待明显。代码核查确认 v0.1 把 thread/list 固定为 limit 50，UI 没有 cursor 分页；每个搜索词都等待 180ms 后重新请求 App Server，且没有缓存、请求去重、旧响应隔离或渐进加载。产品要求是：最近 Chats 首屏应快速出现；超过首屏的数据可以继续加载，不应被静默截断；搜索期间保留可用结果并提供明确但不阻塞的反馈；快速输入或重复查询不得被迟到的旧响应覆盖。",
+  "evidence": [
+    {
+      "note": "用户在真实应用中直接报告了列表上限感和搜索等待。",
+      "ref": "conversation:2026-08-26-dogfood-ui-search-feedback"
+    },
+    {
+      "note": "当前 searchThreads 固定发送 limit 50。",
+      "ref": "apps/desktop/src/main/peel-service.ts"
+    },
+    {
+      "note": "当前 ThreadPicker 只有单页请求、180ms debounce 和阻塞式 loading，没有分页、缓存或旧响应隔离。",
+      "ref": "apps/desktop/src/renderer/App.tsx"
+    }
+  ],
+  "kind": "context",
+  "relations": [
+    {
+      "target_context_id": "contract-v01-core-spatial-fork-loop",
+      "type": "relates_to"
+    },
+    {
+      "target_context_id": "contract-success-and-dogfood-measurement",
+      "type": "relates_to"
+    }
+  ],
+  "schema_version": 1,
+  "source": {
+    "captured_at": "2026-08-26T07:51:54Z",
+    "quote": "我怎么感觉你是不是怎么只能列50个还是怎么着，而且我觉得你这个列的这个时间，就是搜的时间比较久啊，能不能在这方面优化一下。",
+    "ref": "conversation:2026-08-26-dogfood-ui-search-feedback"
+  },
+  "state": "active",
+  "summary": "Thread Picker 不应暴露固定 50 条上限，打开、搜索和继续加载都应快速且可感知",
+  "tags": [
+    "dogfood",
+    "thread-picker",
+    "search",
+    "pagination",
+    "performance"
+  ],
+  "type": "intent"
+}
