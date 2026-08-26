@@ -19,6 +19,12 @@ export function Icon({ name, size = 16 }: { name: string; size?: number }): Reac
     arrowBack: <><path d="m15 18-6-6 6-6"/></>,
     stop: <rect x="7" y="7" width="10" height="10" rx="1" fill="currentColor"/>,
     retry: <><path d="M20 11a8 8 0 1 0-2 6"/><path d="M20 5v6h-6"/></>,
+    check: <path d="m5 12 4 4L19 6"/>,
+    terminal: <><path d="m5 7 4 5-4 5"/><path d="M12 17h7"/></>,
+    file: <><path d="M6 3h8l4 4v14H6Z"/><path d="M14 3v5h5"/></>,
+    reasoning: <><path d="M9 18h6M10 21h4"/><path d="M8.5 15.5A7 7 0 1 1 15.5 15.5C14.4 16.3 14 17 14 18h-4c0-1-.4-1.7-1.5-2.5Z"/></>,
+    agent: <><circle cx="12" cy="8" r="3"/><path d="M5 20c.7-4 3-6 7-6s6.3 2 7 6"/></>,
+    warning: <><path d="M12 4 3 20h18Z"/><path d="M12 9v5M12 17h.01"/></>,
   };
   return <svg aria-hidden="true" width={size} height={size} viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.75" strokeLinecap="round" strokeLinejoin="round">{paths[name]}</svg>;
 }

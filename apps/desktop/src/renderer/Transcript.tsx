@@ -6,6 +6,7 @@ import type { ApprovalDecisionInput, ForkDraft, SpaceNode } from "../shared/cont
 import { Icon } from "./icons";
 import { itemText } from "./lib";
 import { startPcmRecorder, type RecorderSession } from "./audio";
+import { MarkdownContent } from "./Markdown";
 
 interface TranscriptProps {
   thread: CodexThread;
@@ -232,7 +233,7 @@ function TurnView({ turn, reduced, highlighted, onBranch, onOpenCodex }: {
 }): ReactNode {
   const items = reduced?.items ?? turn.items.map((item) => ({ item, completed: true, streamedText: "" }));
   return <section className={`turn ${highlighted ? "highlighted" : ""}`} data-turn-id={turn.id}>
-    {items.map(({ item, streamedText }) => <ItemView key={item.id} item={item} streamedText={streamedText} onOpenCodex={onOpenCodex}/>) }
+    {items.map(({ item, streamedText, completed }) => <ItemView key={item.id} item={item} streamedText={streamedText} streaming={!completed} onOpenCodex={onOpenCodex}/>) }
     <div className="turn-actions">
       <span>{turn.status === "inProgress" ? "Running" : turn.status}</span>
       {turn.status === "completed" && <button onClick={onBranch}><Icon name="branch" size={14}/> Branch from here</button>}
@@ -279,60 +280,68 @@ function PeelHandle({ onPeel }: { onPeel(): void }): ReactNode {
   </button>;
 }
 
-function ItemView({ item, streamedText, onOpenCodex }: { item: ThreadItem; streamedText: string; onOpenCodex(): void }): ReactNode {
+function ItemView({ item, streamedText, streaming, onOpenCodex }: { item: ThreadItem; streamedText: string; streaming: boolean; onOpenCodex(): void }): ReactNode {
   const text = itemText(item) + streamedText;
   if (item.type === "userMessage") return <article className="message user-message">{text || "User message"}</article>;
-  if (item.type === "agentMessage") return <article className="message agent-message"><RichText text={text}/></article>;
-  if (item.type === "reasoning") return <details className="activity-item"><summary>Reasoning</summary><pre>{text || "Reasoning activity"}</pre></details>;
-  if (item.type === "commandExecution") return <details className="activity-item command" open><summary>Command · {String(item.status ?? "activity")}</summary><pre>{text || String(item.command ?? "Command output")}</pre></details>;
-  if (item.type === "fileChange") return <details className="activity-item file-change"><summary>File changes · {Array.isArray(item.changes) ? item.changes.length : 1}</summary><pre>{text || JSON.stringify(item.changes ?? {}, null, 2)}</pre></details>;
-  if (item.type === "collabAgentToolCall" || item.type === "subAgentActivity") return <details className="activity-item subagent"><summary>Subagent activity</summary><pre>{text || safeJson(item)}</pre></details>;
-  if (item.type === "error") return <div className="item-error">{text || String(item.message ?? "Codex reported an error")}</div>;
+  if (item.type === "agentMessage") return <article className="message agent-message"><MarkdownContent text={text} streaming={streaming}/></article>;
+  if (item.type === "reasoning") return <ActivityDisclosure icon="reasoning" label="Reasoning" state={activityState(item, streaming)} defaultOpen={streaming}>
+    <MarkdownContent text={text || "Reasoning activity"} streaming={streaming}/>
+  </ActivityDisclosure>;
+  if (item.type === "commandExecution") {
+    const state = activityState(item, streaming);
+    return <ActivityDisclosure icon="terminal" label={commandLabel(item, state)} state={state} defaultOpen={state === "active"}>
+      <pre className="activity-output">{text || String(item.command ?? "Command output")}</pre>
+    </ActivityDisclosure>;
+  }
+  if (item.type === "fileChange") {
+    const count = Array.isArray(item.changes) ? item.changes.length : 1;
+    return <ActivityDisclosure icon="file" label={`Changed ${count} file${count === 1 ? "" : "s"}`} state={activityState(item, streaming)}>
+      <pre className="activity-output">{text || JSON.stringify(item.changes ?? {}, null, 2)}</pre>
+    </ActivityDisclosure>;
+  }
+  if (item.type === "collabAgentToolCall" || item.type === "subAgentActivity") return <ActivityDisclosure icon="agent" label="Subagent activity" state={activityState(item, streaming)} defaultOpen={streaming}>
+    <MarkdownContent text={text || safeJson(item)} streaming={streaming}/>
+  </ActivityDisclosure>;
+  if (item.type === "error") return <ActivityDisclosure icon="warning" label="Codex hit an issue" state="failed">
+    <MarkdownContent text={text || String(item.message ?? "Codex reported an error")}/>
+  </ActivityDisclosure>;
   return <div className="unknown-item"><span>Codex item: {item.type}</span><button onClick={onOpenCodex}>Copy ID & open Codex <Icon name="external" size={12}/></button></div>;
 }
 
-function RichText({ text }: { text: string }): ReactNode {
-  if (!text) return <span className="stream-caret">▋</span>;
-  const sections = text.split(/(```[\s\S]*?```)/g);
-  return <>{sections.map((section, index) => section.startsWith("```")
-    ? <pre className="code-block" key={index}><code>{section.replace(/^```[^\n]*\n?/, "").replace(/```$/, "")}</code></pre>
-    : <MarkdownSection key={index} text={section}/>)}</>;
+type ActivityState = "completed" | "active" | "failed";
+
+function ActivityDisclosure({ icon, label, state, defaultOpen = false, children }: {
+  icon: string;
+  label: string;
+  state: ActivityState;
+  defaultOpen?: boolean;
+  children: ReactNode;
+}): ReactNode {
+  return <details className={`activity-item ${state}`} open={defaultOpen}>
+    <summary>
+      <span className="activity-icon"><Icon name={icon} size={13}/></span>
+      <span className="activity-label">{label}</span>
+      {state !== "completed" && <span className="activity-status">{state === "active" ? "Working" : "Needs attention"}</span>}
+      <Icon name="chevron" size={12}/>
+    </summary>
+    <div className="activity-body">{children}</div>
+  </details>;
 }
 
-function MarkdownSection({ text }: { text: string }): ReactNode {
-  const lines = text.split("\n");
-  const result: ReactNode[] = [];
-  let bullets: string[] = [];
-  const flushBullets = (): void => {
-    if (!bullets.length) return;
-    result.push(<ul key={`list-${result.length}`}>{bullets.map((line, index) => <li key={index}>{inlineMarkdown(line)}</li>)}</ul>);
-    bullets = [];
-  };
-  for (const line of lines) {
-    const bullet = line.match(/^\s*[-*]\s+(.+)/);
-    if (bullet?.[1]) { bullets.push(bullet[1]); continue; }
-    flushBullets();
-    const heading = line.match(/^(#{1,4})\s+(.+)/);
-    if (heading?.[2]) {
-      const level = heading[1]!.length;
-      result.push(level <= 2 ? <h3 key={result.length}>{inlineMarkdown(heading[2])}</h3> : <h4 key={result.length}>{inlineMarkdown(heading[2])}</h4>);
-    } else if (line.trim()) {
-      result.push(<p key={result.length}>{inlineMarkdown(line)}</p>);
-    }
-  }
-  flushBullets();
-  return <>{result}</>;
+function activityState(item: ThreadItem, streaming: boolean): ActivityState {
+  const status = String(item.status ?? "").toLowerCase();
+  if (status.includes("fail") || status.includes("error") || status.includes("declin")) return "failed";
+  if (streaming || status.includes("progress") || status.includes("running") || status.includes("started")) return "active";
+  return "completed";
 }
 
-function inlineMarkdown(text: string): ReactNode[] {
-  const tokens = text.split(/(\*\*[^*]+\*\*|`[^`]+`|\[[^\]]+\]\(https?:\/\/[^)]+\))/g);
-  return tokens.filter(Boolean).map((token, index) => {
-    if (token.startsWith("**") && token.endsWith("**")) return <strong key={index}>{token.slice(2, -2)}</strong>;
-    if (token.startsWith("`") && token.endsWith("`")) return <code key={index}>{token.slice(1, -1)}</code>;
-    const link = token.match(/^\[([^\]]+)\]\((https?:\/\/[^)]+)\)$/);
-    if (link?.[1] && link[2]) return <a key={index} href={link[2]} target="_blank" rel="noreferrer">{link[1]}</a>;
-    return token;
-  });
+function commandLabel(item: ThreadItem, state: ActivityState): string {
+  const raw = Array.isArray(item.command) ? item.command.join(" ") : String(item.command ?? "command");
+  const command = raw.replace(/\s+/g, " ").trim();
+  const concise = command.length > 76 ? `${command.slice(0, 75)}…` : command;
+  if (state === "active") return `Running ${concise}`;
+  if (state === "failed") return `${concise} failed`;
+  return `Ran ${concise}`;
 }
 
 function ApprovalCard({ request, onDecide }: {
