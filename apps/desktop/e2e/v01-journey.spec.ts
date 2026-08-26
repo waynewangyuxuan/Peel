@@ -347,6 +347,8 @@ test("real Thread-first Fork loop, recovery surfaces, scale, and restart", async
   await installMediaCapture();
   await page.getByTitle("Dictate into draft").click();
   await expect(page.getByTitle("Stop dictation")).toBeVisible();
+  await page.waitForTimeout(150);
+  await page.screenshot({ path: join(desktopRoot, "test-results/ui-voice-recording.png") });
   await page.evaluate(() => (window as unknown as { peelCaptureTrack?: MediaStreamTrack }).peelCaptureTrack?.dispatchEvent(new Event("ended")));
   await expect(page.getByText(/Microphone capture stopped/)).toBeVisible();
   await expect(draft).toHaveValue("This draft must survive restart");
@@ -358,6 +360,7 @@ test("real Thread-first Fork loop, recovery surfaces, scale, and restart", async
   await writeFile(join(repository, "delay-speech"), "1");
   await page.getByTitle("Stop dictation").click();
   await expect(page.getByText("Transcribing…")).toBeVisible();
+  await page.screenshot({ path: join(desktopRoot, "test-results/ui-voice-transcribing.png") });
   await draft.fill("This draft must survive restart plus words typed while transcribing");
   await expect(draft).toHaveValue("This draft must survive restart plus words typed while transcribing dictated editable words");
   const turnsAfterVoice = (await readFile(rpcLog, "utf8")).match(/"method":"turn\/start"/g)?.length ?? 0;
@@ -369,6 +372,8 @@ test("real Thread-first Fork loop, recovery surfaces, scale, and restart", async
   await expect(page.getByTitle("Stop dictation")).toBeVisible();
   await page.getByTitle("Stop dictation").click();
   await expect(page.getByText(/Forced transcription failure/)).toBeVisible();
+  await page.waitForTimeout(100);
+  await page.screenshot({ path: join(desktopRoot, "test-results/ui-voice-error.png") });
   await expect(draft).toHaveValue("This draft must survive restart");
   await page.evaluate(() => {
     Object.defineProperty(navigator.mediaDevices, "getUserMedia", { configurable: true, value: async () => { throw new DOMException("Permission denied", "NotAllowedError"); } });
@@ -581,6 +586,7 @@ test("real Thread-first Fork loop, recovery surfaces, scale, and restart", async
   await page.locator(".segmented button").nth(1).click();
   await page.locator(".overview-card").filter({ has: page.getByRole("heading", { name: "Overview branch name", exact: true }) }).getByRole("button", { name: "Open" }).click();
   await expect(page.getByLabel("Message")).toHaveValue("Close-fast draft survives without waiting for debounce");
+  await page.waitForTimeout(250);
   await page.screenshot({ path: join(desktopRoot, "test-results/focus-restored.png") });
   await writeFile(join(repository, "DIFF_TEST.md"), "diff drawer exact file and patch\n");
   await page.getByRole("button", { name: /Diff/ }).click();
