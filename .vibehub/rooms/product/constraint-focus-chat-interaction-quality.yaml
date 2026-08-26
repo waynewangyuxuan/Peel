@@ -1,0 +1,57 @@
+{
+  "context_id": "constraint-focus-chat-interaction-quality",
+  "detail": "Production UI quality is judged by use, not palette resemblance or checklist completeness. Space and Thread titles must remain contained at supported widths, never create horizontal navigation scroll, and expose the complete current identity when visual truncation is necessary. Focus must render assistant and Reasoning content through a safe, real CommonMark/GFM pipeline so tables, blockquotes, headings, lists, emphasis, links, fenced code and streaming text never leak raw syntax. Command, File Change, Reasoning, Subagent and failure facts remain available but use a compact Chat-like disclosure hierarchy: human labels, secondary visual weight, completed detail collapsed by default, active/error states immediately legible, and Markdown parsed inside readable detail. The original Demo remains the overall material and spacing authority; ChatGPT/Codex interaction conventions guide content hierarchy and micro-interaction quality rather than creating a new visual direction.",
+  "evidence": [
+    {
+      "note": "A long Space title expands the grid item and produces a horizontal scrollbar in the fixed product rail.",
+      "ref": "conversation:2026-08-26-focus-chat-ui-dogfood#screenshot-1"
+    },
+    {
+      "note": "Reasoning renders raw ** emphasis syntax inside a heavy generic preformatted card.",
+      "ref": "conversation:2026-08-26-focus-chat-ui-dogfood#screenshot-2"
+    },
+    {
+      "note": "An assistant Markdown table renders as literal pipe-delimited text rather than a semantic table.",
+      "ref": "conversation:2026-08-26-focus-chat-ui-dogfood#screenshot-3"
+    },
+    {
+      "note": "The Demo defines compact contained navigation and secondary integrated Activity treatment within a first-class Chat surface.",
+      "ref": "docs/product/source/peel-demo-v0-original.html"
+    }
+  ],
+  "kind": "context",
+  "relations": [
+    {
+      "target_context_id": "contract-focus-chat-fidelity",
+      "type": "depends_on"
+    },
+    {
+      "target_context_id": "decision-demo-authoritative-v01-ui-direction",
+      "type": "relates_to"
+    },
+    {
+      "target_context_id": "note-v01-ui-direction-and-polish-gap",
+      "type": "relates_to"
+    }
+  ],
+  "schema_version": 1,
+  "source": {
+    "captured_at": "2026-08-26T09:23:25Z",
+    "quote": "左边的这个 space，这都是 bug……当前会话名字很长，我们怎么知道它的名字……reasoning 没有做解析……各种 Markdown 解析是非常重要的体验。",
+    "ref": "conversation:2026-08-26-focus-chat-ui-dogfood"
+  },
+  "state": "active",
+  "summary": "Demo-like styling is insufficient unless Focus Chat feels readable, discoverable, contained, and structurally faithful to Codex content",
+  "tags": [
+    "focus",
+    "chat-fidelity",
+    "markdown",
+    "reasoning",
+    "activity",
+    "title",
+    "overflow",
+    "micro-interaction",
+    "dogfood"
+  ],
+  "type": "constraint"
+}

@@ -1,0 +1,65 @@
+{
+  "acceptance": [
+    {
+      "acceptance_id": "space-list-containment",
+      "criterion": "At the production 226px rail and compact 196px rail, long ASCII and CJK Space or Thread names never widen the navigation, create horizontal scrolling, cover controls, or break selected and hover states; the complete name remains available from keyboard focus and pointer hover."
+    },
+    {
+      "acceptance_id": "current-thread-identity",
+      "criterion": "Long current Space and Thread names receive flexible but bounded top-bar space, preserve the complete title in the Focus transcript introduction, and expose the complete title through an accessible hover and focus affordance, so the current conversation can be identified without renaming it."
+    },
+    {
+      "acceptance_id": "markdown-gfm-fidelity",
+      "criterion": "Assistant messages and Reasoning render safe CommonMark/GFM including tables, blockquotes, headings, ordered and unordered lists, task lists, emphasis, strikethrough, links, fenced and inline code, and soft line breaks; raw HTML is not executed and partial streaming content remains legible and selectable."
+    },
+    {
+      "acceptance_id": "activity-hierarchy",
+      "criterion": "Reasoning, command, file-change, subagent, and failure items use compact Chat-like human labels and disclosure hierarchy; completed details are collapsed by default, active and failed states remain immediately legible, raw Markdown is parsed where appropriate, and technical details remain keyboard-accessible on demand."
+    },
+    {
+      "acceptance_id": "visual-behavior-regression",
+      "criterion": "Production-backed unit and desktop E2E evidence proves title containment without horizontal overflow, complete-title discovery, parsed table and Reasoning content, compact activity presentation, and retention of the delivered Focus, Overview, Fork, Voice, Diff, streaming, scroll-restoration, and approval behavior."
+    }
+  ],
+  "constraints": [
+    "Use the preserved Demo as the authority for material, spacing, restraint, and overall visual direction; this repair must not introduce a competing redesign.",
+    "Use ChatGPT and Codex interaction conventions only as a behavioral reference for content hierarchy and disclosure, without copying branding or assets.",
+    "Use a mature safe Markdown renderer rather than extending Peel's partial parser; do not enable executable raw HTML.",
+    "Preserve selectable and copyable transcript content, horizontally scrollable code and wide tables, streaming updates, scroll restoration, approvals, and source-of-truth boundaries.",
+    "Frequent title and activity affordances must respond immediately and must not add slow decorative animation."
+  ],
+  "context": "Direct desktop dogfood against the preserved Demo exposed product-quality failures rather than a new visual-direction problem: long Space names widen the rail and create horizontal scrolling, truncated current titles are not discoverable, Reasoning shows literal Markdown, GFM tables remain pipe text, and command/failure activity is presented as heavy technical cards. This Ticket brings the production Focus Chat up to the already-approved Demo and full-fidelity chat contract.",
+  "context_refs": [
+    {
+      "purpose": "Authoritative interaction-quality constraints captured from the desktop dogfood screenshots and discussion.",
+      "ref": ".vibehub/rooms/product/constraint-focus-chat-interaction-quality.yaml"
+    },
+    {
+      "purpose": "Existing contract requiring Focus to preserve full-fidelity Codex and ChatGPT chat behavior.",
+      "ref": ".vibehub/rooms/product/contract-focus-chat-fidelity.yaml"
+    },
+    {
+      "purpose": "Existing decision that the preserved Demo remains the v0.1 UI direction and material authority.",
+      "ref": ".vibehub/rooms/product/decision-demo-authoritative-v01-ui-direction.yaml"
+    },
+    {
+      "purpose": "Original interactive Demo used for direct visual and interaction comparison.",
+      "ref": "docs/product/source/peel-demo-v0-original.html"
+    }
+  ],
+  "kind": "ticket",
+  "maturity": "firm",
+  "outcome": "Peel Focus Chat becomes a first-class readable conversation surface with contained navigation, discoverable long titles, safe full Markdown rendering, and compact human activity hierarchy aligned with the approved Demo.",
+  "provenance_refs": [
+    "conversation:2026-08-26-focus-chat-ui-dogfood"
+  ],
+  "relations": [
+    {
+      "rationale": "This is a focused product-quality repair to the already-delivered v0.1 polished Focus and Overview surfaces.",
+      "target_ticket_id": "ticket-deliver-v01-ui-polish",
+      "type": "depends_on"
+    }
+  ],
+  "schema_version": 1,
+  "ticket_id": "ticket-fix-focus-chat-content-and-navigation"
+}
