@@ -77,7 +77,7 @@ kbd { margin-left: auto; border: 0; color: var(--faint); font-size: 10px; font-f
 .topbar-menu button:hover { background: var(--panel-2); }
 .topbar-menu button.danger { color: var(--red); }
 
-.focus-layout { display: flex; min-width: 0; min-height: 0; overflow: hidden; background: var(--paper); animation: focus-in 220ms var(--ease-out) both; }
+.focus-layout { position: relative; display: flex; min-width: 0; min-height: 0; overflow: hidden; background: var(--paper); animation: focus-in 220ms var(--ease-out) both; }
 @keyframes focus-in { from { opacity: 0; transform: scale(.976); } to { opacity: 1; transform: scale(1); } }
 .lineage-rail { flex: 0 0 248px; min-width: 0; padding: 17px 12px 14px; border-right: 1px solid var(--line); background: #fafaf8; overflow: auto; scrollbar-width: thin; scrollbar-color: #d0d0ca transparent; }
 .branched-from { width: calc(100% - 8px); margin: 0 4px 18px; display: flex; align-items: center; gap: 8px; padding: 8px; text-align: left; border: 1px solid var(--line); border-radius: 8px; background: var(--paper); }
@@ -303,8 +303,9 @@ kbd { margin-left: auto; border: 0; color: var(--faint); font-size: 10px; font-f
 @media (max-width: 1120px) {
   .app { grid-template-columns: 196px minmax(0, 1fr); }
   .lineage-rail { flex-basis: 216px; }
+  .topbar { grid-template-columns: minmax(0, 1fr) auto minmax(0, 1fr); gap: 8px; padding-right: 10px; }
   .topbar-actions > button:not(.icon-button) { font-size: 0; gap: 0; }
-  .fork-surface { flex-basis: 350px; }
+  .fork-surface { position: absolute; z-index: 25; top: 0; right: 0; bottom: 0; width: min(420px, calc(100% - 80px)); box-shadow: -18px 0 50px rgba(0,0,0,.12); }
 }
 
 @media (prefers-reduced-motion: reduce) {

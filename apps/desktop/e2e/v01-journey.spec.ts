@@ -105,6 +105,7 @@ test("real Thread-first Fork loop, recovery surfaces, scale, and restart", async
   });
   expect(warmOpenMs).toBeLessThan(100);
   await expect(page.locator(".thread-result")).toHaveCount(30);
+  await page.waitForTimeout(250);
   await page.screenshot({ path: join(desktopRoot, "test-results/ui-thread-picker.png") });
   await page.waitForTimeout(150);
   const threadListsAfterWarmOpen = (await readFile(rpcLog, "utf8")).match(/"method":"thread\/list"/g)?.length ?? 0;
@@ -226,7 +227,28 @@ test("real Thread-first Fork loop, recovery surfaces, scale, and restart", async
   });
   expect(forkLatency).toBeLessThan(150);
   await page.locator(".fork-surface textarea").fill("Cancel this local-only direction");
+  await page.waitForTimeout(250);
   await page.screenshot({ path: join(desktopRoot, "test-results/ui-fork-draft.png") });
+  await app!.evaluate(({ BrowserWindow }) => BrowserWindow.getAllWindows()[0]?.setSize(1000, 720));
+  await expect.poll(() => page.evaluate(() => window.innerWidth)).toBe(1000);
+  await page.waitForTimeout(300);
+  const narrowForkLayout = await page.evaluate(() => {
+    const primary = document.querySelector<HTMLElement>(".fork-footer .primary-button")!.getBoundingClientRect();
+    const fork = document.querySelector<HTMLElement>(".fork-surface")!.getBoundingClientRect();
+    return {
+      viewport: { width: window.innerWidth, height: window.innerHeight },
+      fork: { left: fork.left, right: fork.right, top: fork.top, bottom: fork.bottom },
+      primary: { left: primary.left, right: primary.right, top: primary.top, bottom: primary.bottom },
+      pageFits: document.documentElement.scrollWidth === window.innerWidth,
+      forkFits: fork.left >= -1 && fork.right <= window.innerWidth + 1,
+      primaryFits: primary.left >= -1 && primary.right <= window.innerWidth + 1 && primary.bottom <= window.innerHeight + 1,
+    };
+  });
+  if (!narrowForkLayout.pageFits || !narrowForkLayout.forkFits || !narrowForkLayout.primaryFits) {
+    throw new Error(`Narrow Fork layout is clipped: ${JSON.stringify(narrowForkLayout)}`);
+  }
+  await app!.evaluate(({ BrowserWindow }) => BrowserWindow.getAllWindows()[0]?.setSize(1440, 960));
+  await expect.poll(() => page.evaluate(() => window.innerWidth)).toBe(1440);
   await page.keyboard.press("Escape");
   await expect(page.locator(".fork-surface")).toHaveCount(0);
   const beforeSend = await readFile(rpcLog, "utf8");
@@ -313,6 +335,8 @@ test("real Thread-first Fork loop, recovery surfaces, scale, and restart", async
   await page.getByLabel("Rename Lineage branch name").press("Enter");
   const renamedBranchCard = page.locator(".overview-card").filter({ hasText: "Overview branch name" });
   await expect(renamedBranchCard).toBeVisible();
+  await page.waitForTimeout(350);
+  await expect(page.locator(".toast")).toHaveCount(0, { timeout: 5_000 });
   await page.screenshot({ path: join(desktopRoot, "test-results/ui-overview.png") });
   await renamedBranchCard.locator(".card-snippets button").nth(1).click();
   await expect(page.locator('.turn.highlighted[data-turn-id="turn-3"]')).toBeVisible();
