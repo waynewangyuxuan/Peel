@@ -174,7 +174,7 @@ export function Transcript({
     }}>
       <div className="thread-intro">
         <div className="eyebrow">Thread</div>
-        <h1>{node.title}</h1>
+        <h1 title={node.title}>{node.title}</h1>
         <p>{thread.cwd}</p>
         <div className="thread-runtime">
           {node.worktreeName && <span><Icon name="folder" size={12}/>{node.worktreeName}</span>}

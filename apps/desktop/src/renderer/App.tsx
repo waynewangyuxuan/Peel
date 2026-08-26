@@ -358,7 +358,19 @@ function SpaceSidebar({ state, onSelect, onNew }: { state: PeelState; onSelect(s
     <div className="drag-region"/>
     <div className="brand"><span className="peel-mark small">P</span><strong>Peel</strong></div>
     <div className="sidebar-heading"><span>Spaces</span><button onClick={onNew} title="Start from a Codex Chat"><Icon name="plus"/></button></div>
-    <nav>{spaces.map((space) => <button key={space.id} className={space.id === state.activeSpaceId ? "selected" : ""} onClick={() => onSelect(space)}><span className="space-glyph"><Icon name="branch" size={14}/></span><span><strong>{space.name}</strong><small>{Object.keys(space.nodes).length} direction{Object.keys(space.nodes).length === 1 ? "" : "s"}</small></span></button>)}</nav>
+    <nav>{spaces.map((space) => {
+      const directionCount = Object.keys(space.nodes).length;
+      return <button
+        key={space.id}
+        className={space.id === state.activeSpaceId ? "selected" : ""}
+        onClick={() => onSelect(space)}
+        title={space.name}
+        aria-label={`${space.name}, ${directionCount} direction${directionCount === 1 ? "" : "s"}`}
+      >
+        <span className="space-glyph"><Icon name="branch" size={14}/></span>
+        <span className="space-copy"><strong>{space.name}</strong><small>{directionCount} direction{directionCount === 1 ? "" : "s"}</small></span>
+      </button>;
+    })}</nav>
     <button className="new-space-button" onClick={onNew}><Icon name="plus"/> New Space <kbd>⌘K</kbd></button>
   </aside>;
 }
@@ -381,10 +393,10 @@ function TopBar({ space, node, mode, connected, onMode, onRenameSpace, onArchive
   return <header className="topbar">
     <div className="topbar-title">
       {editingSpace ? <input autoFocus defaultValue={space.name} onBlur={(event) => { if (event.target.value.trim()) onRenameSpace(event.target.value.trim()); setEditingSpace(false); }} onKeyDown={(event) => { if (event.key === "Enter") event.currentTarget.blur(); }}/>
-        : <button className="space-name" onDoubleClick={() => setEditingSpace(true)}>{space.name}</button>}
+        : <button className="space-name title-disclosure" title={space.name} data-full-title={space.name} aria-label={`Current Space: ${space.name}. Double-click to rename.`} onDoubleClick={() => setEditingSpace(true)}><span>{space.name}</span></button>}
       <span>/</span>
       {editingThread ? <input autoFocus defaultValue={node.title} onBlur={(event) => { const name = event.target.value.trim(); if (name && name !== node.title) void onRenameThread(name); setEditingThread(false); }} onKeyDown={(event) => { if (event.key === "Enter") event.currentTarget.blur(); }}/>
-        : <button className="thread-name" onDoubleClick={() => setEditingThread(true)}>{node.title}</button>}
+        : <button className="thread-name title-disclosure" title={node.title} data-full-title={node.title} aria-label={`Current Thread: ${node.title}. Double-click to rename.`} onDoubleClick={() => setEditingThread(true)}><span>{node.title}</span></button>}
       <span className={`connection ${connected ? "online" : ""}`} title={connected ? "Codex connected" : "Codex unavailable"}/>
     </div>
     <div className="segmented"><button className={mode === "focus" ? "active" : ""} onClick={() => onMode("focus")}><Icon name="chat"/> Focus <kbd>⌘1</kbd></button><button className={mode === "overview" ? "active" : ""} onClick={() => onMode("overview")}><Icon name="map"/> Overview <kbd>⌘2</kbd></button></div>
