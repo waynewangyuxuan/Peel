@@ -36,6 +36,7 @@ const api: PeelApi = {
   getWorkspace: async (cwd) => await ipcRenderer.invoke(IPC.getWorkspace, cwd),
   getDiff: async (cwd) => await ipcRenderer.invoke(IPC.getDiff, cwd),
   openTarget: async (input: OpenTargetInput) => { await ipcRenderer.invoke(IPC.openTarget, input); },
+  copyText: async (text: string) => { await ipcRenderer.invoke(IPC.copyText, text); },
   transcribeWav: async (bytes) => await ipcRenderer.invoke(IPC.transcribeWav, bytes) as VoiceTranscription,
   decideApproval: async (input: ApprovalDecisionInput) => { await ipcRenderer.invoke(IPC.decideApproval, input); },
   onCodexNotification: (listener: (payload: AppServerNotification) => void) =>

@@ -107,6 +107,7 @@ function registerIpc(peel: PeelService, voice: VoiceService): void {
   ipcMain.handle(IPC.transcribeWav, async (_event, bytes: ArrayBuffer) =>
     await voice.transcribe(new Uint8Array(bytes)));
   ipcMain.handle(IPC.decideApproval, (_event, input: ApprovalDecisionInput) => peel.decideApproval(input));
+  ipcMain.handle(IPC.copyText, (_event, text: string) => { clipboard.writeText(text); });
   ipcMain.handle(IPC.openTarget, async (_event, input: OpenTargetInput) => {
     if (input.kind === "codex") {
       if (input.threadId) clipboard.writeText(input.threadId);

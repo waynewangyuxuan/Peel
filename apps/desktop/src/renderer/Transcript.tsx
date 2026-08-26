@@ -280,9 +280,9 @@ function PeelHandle({ onPeel }: { onPeel(): void }): ReactNode {
   </button>;
 }
 
-function ItemView({ item, streamedText, streaming, onOpenCodex }: { item: ThreadItem; streamedText: string; streaming: boolean; onOpenCodex(): void }): ReactNode {
+export function ItemView({ item, streamedText, streaming, onOpenCodex }: { item: ThreadItem; streamedText: string; streaming: boolean; onOpenCodex(): void }): ReactNode {
   const text = itemText(item) + streamedText;
-  if (item.type === "userMessage") return <article className="message user-message">{text || "User message"}</article>;
+  if (item.type === "userMessage") return <article className="message user-message"><MarkdownContent text={text || "User message"} className="user-markdown"/></article>;
   if (item.type === "agentMessage") return <article className="message agent-message"><MarkdownContent text={text} streaming={streaming}/></article>;
   if (item.type === "reasoning") return <ActivityDisclosure icon="reasoning" label="Reasoning" state={activityState(item, streaming)} defaultOpen={streaming}>
     <MarkdownContent text={text || "Reasoning activity"} streaming={streaming}/>

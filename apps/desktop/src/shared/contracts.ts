@@ -162,6 +162,7 @@ export interface PeelApi {
   getWorkspace(cwd: string): Promise<WorkspaceContext>;
   getDiff(cwd: string): Promise<{ summary: WorkspaceDiffSummary; patch: string }>;
   openTarget(input: OpenTargetInput): Promise<void>;
+  copyText(text: string): Promise<void>;
   transcribeWav(bytes: ArrayBuffer): Promise<VoiceTranscription>;
   decideApproval(input: ApprovalDecisionInput): Promise<void>;
   onCodexNotification(listener: (notification: AppServerNotification) => void): () => void;
@@ -182,6 +183,7 @@ export const IPC = {
   getWorkspace: "peel:workspace:inspect",
   getDiff: "peel:workspace:diff",
   openTarget: "peel:open",
+  copyText: "peel:clipboard:write",
   transcribeWav: "peel:voice:transcribe",
   decideApproval: "peel:approval:decide",
   codexNotification: "peel:event:codex",
