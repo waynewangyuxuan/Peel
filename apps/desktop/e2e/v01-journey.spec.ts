@@ -13,6 +13,7 @@ const here = dirname(fileURLToPath(import.meta.url));
 const desktopRoot = resolve(here, "..");
 const codexMock = join(here, "fixtures/codex");
 const speechHelper = join(here, "fixtures/speech-helper");
+const rootTitle = "Review Inkstone Legacy product migration and narrative architecture across multiple directions";
 let scratch = "";
 let repository = "";
 let userData = "";
@@ -72,7 +73,7 @@ async function startFreshSpace(): Promise<void> {
   await page.getByRole("button", { name: /New Space/ }).click();
   await expect(page.locator(".thread-picker")).toBeVisible();
   await page.locator(".thread-results button").first().click();
-  await expect(page.getByRole("heading", { name: "Spatial product direction" })).toBeVisible({ timeout: 15_000 });
+  await expect(page.getByRole("heading", { name: rootTitle })).toBeVisible({ timeout: 15_000 });
 }
 
 async function installMediaCapture(): Promise<void> {
@@ -189,15 +190,51 @@ test("real Thread-first Fork loop, recovery surfaces, scale, and restart", async
   await page.getByRole("button", { name: /New Space/ }).click();
   await expect(page.locator(".thread-picker")).toBeVisible();
   await page.locator(".thread-result").first().click();
-  await expect(page.getByRole("heading", { name: "Spatial product direction" })).toBeVisible();
+  await expect(page.getByRole("heading", { name: rootTitle })).toBeVisible();
   await expect(page.getByRole("heading", { name: "Direction", exact: true })).toBeVisible();
   await expect(page.locator(".agent-message strong")).toHaveText("full-fidelity");
-  await expect(page.getByText("Command · completed")).toBeVisible();
-  await expect(page.getByText("File changes · 1")).toBeVisible();
+  await expect(page.locator(".agent-message table")).toBeVisible();
+  await expect(page.locator(".agent-message blockquote")).toContainText("Keep the Chat readable");
+  await expect(page.locator(".agent-message del")).toHaveText("Raw pipe text");
+  expect(await page.evaluate(() => Boolean((window as unknown as { __peelUnsafe?: boolean }).__peelUnsafe))).toBe(false);
+  const reasoning = page.locator(".activity-item").filter({ hasText: "Reasoning" });
+  await reasoning.locator("summary").click();
+  await expect(reasoning.locator("strong")).toHaveText("Planning collaborative reasoning framework");
+  await expect(reasoning.locator("blockquote")).toContainText("understand the result");
+  await expect(page.getByText("Ran npm test")).toBeVisible();
+  await expect(page.getByText("Changed 1 file")).toBeVisible();
   await expect(page.getByText("Subagent activity")).toBeVisible();
-  await expect(page.getByText("A recoverable fixture error")).toBeVisible();
+  const issue = page.locator(".activity-item.failed").filter({ hasText: "Codex hit an issue" });
+  await expect(issue).toBeVisible();
+  await issue.locator("summary").click();
+  await expect(issue).toContainText("A recoverable fixture error");
   await expect(page.getByText("Codex item: futureCapability")).toBeVisible();
+  await expect(page.locator(".thread-name")).toHaveAttribute("title", rootTitle);
+  await expect(page.locator(".thread-name")).toHaveAttribute("aria-label", `Current Thread: ${rootTitle}. Double-click to rename.`);
+  const assertContainedNavigation = async (): Promise<void> => {
+    const layout = await page.locator(".space-sidebar nav").evaluate((nav) => {
+      const selected = nav.querySelector<HTMLElement>("button.selected")!;
+      const navBounds = nav.getBoundingClientRect();
+      const buttonBounds = selected.getBoundingClientRect();
+      return {
+        clientWidth: nav.clientWidth,
+        scrollWidth: nav.scrollWidth,
+        selectedFits: buttonBounds.left >= navBounds.left - 1 && buttonBounds.right <= navBounds.right + 1,
+        title: selected.title,
+      };
+    });
+    expect(layout.scrollWidth).toBe(layout.clientWidth);
+    expect(layout.selectedFits).toBe(true);
+    expect(layout.title).toBe(rootTitle);
+  };
+  await assertContainedNavigation();
+  await page.locator(".thread-name").hover();
   await page.screenshot({ path: join(desktopRoot, "test-results/ui-focus.png") });
+  await app!.evaluate(({ BrowserWindow }) => BrowserWindow.getAllWindows()[0]?.setSize(1000, 720));
+  await expect.poll(() => page.evaluate(() => window.innerWidth)).toBe(1000);
+  await assertContainedNavigation();
+  await app!.evaluate(({ BrowserWindow }) => BrowserWindow.getAllWindows()[0]?.setSize(1440, 960));
+  await expect.poll(() => page.evaluate(() => window.innerWidth)).toBe(1440);
   const codeLayout = await page.locator(".code-block").evaluate((element) => ({
     whiteSpace: getComputedStyle(element).whiteSpace,
     overflowX: getComputedStyle(element).overflowX,
@@ -322,7 +359,7 @@ test("real Thread-first Fork loop, recovery surfaces, scale, and restart", async
   await page.locator(".thread-name").dblclick();
   await page.locator(".topbar-title input").fill("Must not rename the parent");
   await page.locator(".branched-from").click();
-  await expect(page.locator(".thread-name")).toHaveText("Spatial product direction");
+  await expect(page.locator(".thread-name")).toHaveText(rootTitle);
   await page.locator(".lineage-tree button").nth(1).click();
   await page.locator(".lineage-tree button").nth(1).dblclick();
   await page.locator(".lineage-rename input").fill("Lineage branch name");
@@ -403,7 +440,7 @@ test("real Thread-first Fork loop, recovery surfaces, scale, and restart", async
 
   await writeFile(join(repository, "root-non-git-once"), "1");
   await startFreshSpace();
-  await expect(page.getByRole("heading", { name: "Spatial product direction" })).toBeVisible();
+  await expect(page.getByRole("heading", { name: rootTitle })).toBeVisible();
   await page.locator(".turn-actions button").last().click();
   await page.locator(".fork-surface textarea").fill("Worktree failure keeps this prompt");
   await page.getByText("Create a new worktree").click();

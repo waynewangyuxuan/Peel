@@ -38,12 +38,13 @@ const root = {
   agentNickname: null,
   agentRole: null,
   gitInfo: null,
-  name: "Spatial product direction",
+  name: "Review Inkstone Legacy product migration and narrative architecture across multiple directions",
   turns: [
-    turn("turn-1", "Map the core navigation", "## Direction\nUse a **full-fidelity** Focus view and a spatial Overview.\n- Keep `chat` in screen space.\n```ts\nconst spatialSurface = 'a-very-long-code-line-that-must-remain-unwrapped-and-scroll-horizontally-across-the-full-focus-transcript-without-changing-the-reading-layout';\n```"),
+    turn("turn-1", "Map the core navigation", "## Direction\nUse a **full-fidelity** Focus view and a spatial Overview.\n\n> Keep the Chat readable before exposing execution detail.\n\n| Surface | Contract |\n| --- | --- |\n| Focus | Full conversation fidelity |\n| Overview | Deterministic spatial context |\n\n1. Keep `chat` in screen space.\n2. Render structured content semantically.\n\n- [x] Parse GFM tables\n- [ ] Continue polishing\n\n~~Raw pipe text~~ becomes a real table.\n\n<script>window.__peelUnsafe = true</script>\n\n```ts\nconst spatialSurface = 'a-very-long-code-line-that-must-remain-unwrapped-and-scroll-horizontally-across-the-full-focus-transcript-without-changing-the-reading-layout';\n```"),
     { ...turn("turn-2", "Make Forks trustworthy", "Create a local draft first, then fork on the first send."), items: [
       item("userMessage", "turn-2-u", "Make Forks trustworthy"),
       item("agentMessage", "turn-2-a", "Create a local draft first, then fork on the first send."),
+      item("reasoning", "turn-2-reasoning", "**Planning collaborative reasoning framework**\n\n1. Preserve exact parent provenance.\n2. Keep technical activity secondary.\n\n> The user should understand the result before the machinery."),
       item("commandExecution", "turn-2-command", "npm test\nAll checks passed", { status: "completed", command: "npm test" }),
       item("fileChange", "turn-2-files", "", { changes: [{ path: "src/focus.tsx", diff: "+ renderFocus()" }] }),
       item("subAgentActivity", "turn-2-subagent", "Inspect deterministic card fields", { status: "running" }),
