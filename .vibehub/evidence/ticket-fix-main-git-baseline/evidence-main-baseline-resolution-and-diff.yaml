@@ -1,0 +1,21 @@
+{
+  "acceptance_ids": [
+    "resolve-main-separately",
+    "diff-against-main"
+  ],
+  "evidence_id": "evidence-main-baseline-resolution-and-diff",
+  "kind": "ticket_evidence",
+  "origin": "agent",
+  "recorded_at": "2026-08-26T09:11:38Z",
+  "refs": [
+    "commit:4e8ca8c9813c86004e323cc04a9ddea1a0d7d304",
+    "packages/git-workspace/src/adapter.ts",
+    "packages/git-workspace/src/types.ts",
+    "packages/git-workspace/test/adapter.test.ts",
+    "command:npm test --workspace @peel/git-workspace passes 12/12",
+    "command:read-only real-checkout GitWorkspaceAdapter smoke reports current Ticket branch separately from baseBranch main"
+  ],
+  "schema_version": 1,
+  "summary": "GitWorkspaceAdapter now resolves refs/heads/main independently from the active HEAD and derives the Diff comparison commit with merge-base(main, current HEAD). Summary, full patch, and per-file patch use that commit, while untracked files are appended explicitly. A read-only smoke in the real Peel checkout reported currentBranch=codex/ticket-fix-main-git-baseline, baseBranch=main, baseCommit=0630dc68d2c8858e799fc6433e6f1c081c9e6bda, and 133 changed files, proving the current Ticket branch is not substituted as the baseline. Missing main produces main-ref-unavailable instead of falling back to HEAD.",
+  "ticket_id": "ticket-fix-main-git-baseline"
+}
