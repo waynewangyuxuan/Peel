@@ -27,7 +27,7 @@ test.beforeAll(async () => {
   rpcLog = join(repository, "peel-mock-rpc.jsonl");
   await chmod(codexMock, 0o755);
   await chmod(speechHelper, 0o755);
-  await exec("git", ["init", repository]);
+  await exec("git", ["init", "--initial-branch=main", repository]);
   await exec("git", ["config", "user.email", "peel@example.test"], { cwd: repository });
   await exec("git", ["config", "user.name", "Peel Test"], { cwd: repository });
   await writeFile(join(repository, "README.md"), "# Peel fixture\n");
@@ -591,6 +591,7 @@ test("real Thread-first Fork loop, recovery surfaces, scale, and restart", async
   await writeFile(join(repository, "DIFF_TEST.md"), "diff drawer exact file and patch\n");
   await page.getByRole("button", { name: /Diff/ }).click();
   await expect(page.getByText("Workspace changes")).toBeVisible();
+  await expect(page.getByText("Compared with main", { exact: true })).toBeVisible();
   await expect(page.getByText("DIFF_TEST.md", { exact: true })).toBeVisible();
   await expect(page.locator(".diff-patch")).toContainText("diff drawer exact file and patch");
   await expect(page.getByRole("button", { name: "Open in Codex" })).toBeVisible();

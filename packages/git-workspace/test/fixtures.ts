@@ -16,9 +16,10 @@ export async function temporaryRepository(): Promise<TemporaryRepository> {
   const worktrees = join(root, "worktrees");
   await mkdir(repository);
   await mkdir(worktrees);
-  git(["init", "-q"], repository);
+  git(["init", "-q", "--initial-branch=main"], repository);
   await writeFile(join(repository, "README.md"), "one\n", "utf8");
-  git(["add", "README.md"], repository);
+  await writeFile(join(repository, "tracked.txt"), "tracked\n", "utf8");
+  git(["add", "README.md", "tracked.txt"], repository);
   git(
     ["-c", "user.name=Peel Test", "-c", "user.email=test@peel.invalid", "commit", "-qm", "fixture"],
     repository,

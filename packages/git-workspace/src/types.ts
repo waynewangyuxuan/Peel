@@ -86,6 +86,8 @@ export interface ChangedFileSummary {
 
 export interface WorkspaceDiffSummary {
   cwd: string;
+  baseBranch: string;
+  baseCommit: string;
   changedFileCount: number;
   additions: number;
   deletions: number;

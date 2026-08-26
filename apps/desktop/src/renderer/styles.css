@@ -277,7 +277,7 @@ kbd { margin-left: auto; border: 0; color: var(--faint); font-size: 10px; font-f
 .diff-drawer > header { display: flex; justify-content: space-between; padding: 18px 18px 14px; border-bottom: 1px solid var(--line); }
 .diff-drawer h2 { margin: 6px 0 0; font-size: 18px; font-weight: 640; letter-spacing: -.012em; }
 .drawer-error, .drawer-loading { padding: 30px 23px; color: var(--muted); }.drawer-error { color: var(--red); }
-.diff-summary { padding: 13px 22px; color: var(--muted); border-bottom: 1px solid var(--line); }.diff-summary strong { color: var(--ink); }.additions { margin-left: 12px; color: var(--green); }.deletions { margin-left: 5px; color: var(--red); }
+.diff-summary { display: flex; align-items: center; justify-content: space-between; gap: 16px; padding: 13px 22px; color: var(--muted); border-bottom: 1px solid var(--line); }.diff-summary strong, .diff-summary b { color: var(--ink); }.diff-summary small { white-space: nowrap; }.additions { margin-left: 12px; color: var(--green); }.deletions { margin-left: 5px; color: var(--red); }
 .file-list { max-height: 190px; overflow: auto; border-bottom: 1px solid var(--line); }
 .file-list > div { display: grid; grid-template-columns: 18px 1fr auto; gap: 7px; align-items: center; padding: 7px 22px; font-family: ui-monospace, SFMono-Regular, Menlo, monospace; font-size: 9.5px; }
 .file-list > div:hover { background: var(--panel); }

@@ -12,7 +12,8 @@ Codex App Server client and from Peel's Space/Fork graph.
 - `createWorktree()` requires an existing absolute target parent, rejects broad
   or repository-root targets, allocates a unique `peel/<slug>` branch and direct
   child path, resolves the requested base ref to a validated commit ID, then
-  uses one `git worktree add` operation.
+  uses one `git worktree add` operation. When no base is supplied, the local
+  `refs/heads/main` commit is used rather than the active branch.
 - Every creation failure is a `GitWorkspaceError` containing the failed stage,
   exact attempted branch/path, positively detected partial artifacts, current
   workspace fallback, and the unchanged `pendingForkId` needed to recover the
@@ -20,7 +21,9 @@ Codex App Server client and from Peel's Space/Fork graph.
   directories are distinguished.
 - `getDiffSummary()` and `getDiff()` expose changed files, line totals, binary
   flags, and unified file/hunk data for tracked and untracked files. Numstat is
-  NUL-delimited so every valid Git path—including tabs—is preserved.
+  NUL-delimited so every valid Git path—including tabs—is preserved. Diff uses
+  the merge base of local `main` and the current HEAD, so committed branch work
+  remains visible alongside staged, unstaged, and untracked changes.
 - `getOpenTargets()` returns explicit Worktree, Editor, and Codex navigation
   intents. Lexical and realpath containment both run before a file target is
   returned, so an in-worktree symlink cannot open outside the checkout. The

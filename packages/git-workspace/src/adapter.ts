@@ -36,6 +36,9 @@ interface PorcelainEntry {
   status: ChangedFileStatus;
 }
 
+const DEFAULT_BRANCH = "main";
+const DEFAULT_BRANCH_REF = "refs/heads/main";
+
 export class GitWorkspaceAdapter {
   readonly #runner: GitRunner;
 
@@ -131,9 +134,9 @@ export class GitWorkspaceAdapter {
     }
 
     const targetParent = await this.#validateTargetParent(input.targetParent, context, input.pendingForkId);
+    const requestedBase = input.baseRef ?? DEFAULT_BRANCH_REF;
     let baseCommit: string;
     try {
-      const requestedBase = input.baseRef ?? "HEAD";
       const resolvedBase = await this.#runner.run(
         ["rev-parse", "--verify", "--end-of-options", `${requestedBase}^{commit}`],
         { cwd: context.worktreeRoot },
@@ -141,7 +144,7 @@ export class GitWorkspaceAdapter {
       baseCommit = resolvedBase.stdout.trim();
       if (!/^[0-9a-f]{40,64}$/i.test(baseCommit)) throw new Error("Git returned an invalid base commit ID");
     } catch (error) {
-      throw workspaceError("allocate-identity", "invalid-base-ref", error, {
+      throw workspaceError("allocate-identity", input.baseRef ? "invalid-base-ref" : "main-ref-unavailable", error, {
         pendingForkId: input.pendingForkId,
         currentWorkspaceCwd: context.worktreeRoot,
       });
@@ -160,7 +163,7 @@ export class GitWorkspaceAdapter {
     const retryWith: CreateWorktreeInput = {
       ...input,
       targetParent,
-      baseRef: input.baseRef ?? "HEAD",
+      baseRef: requestedBase,
     };
     try {
       await this.#runner.run(
@@ -218,13 +221,26 @@ export class GitWorkspaceAdapter {
   async getDiffSummary(cwd: string): Promise<WorkspaceDiffSummary> {
     const context = await this.#requireGitContext(cwd, "read-diff");
     try {
-      const [statusResult, trackedNumstat] = await Promise.all([
+      const comparisonBase = await this.#resolveDiffBase(context);
+      const [statusResult, trackedNames, trackedNumstat] = await Promise.all([
         this.#runner.run(["status", "--porcelain=v1", "-z", "--untracked-files=all"], {
           cwd: context.worktreeRoot,
         }),
-        this.#runner.run(["diff", "--numstat", "-z", "HEAD", "--"], { cwd: context.worktreeRoot }),
+        this.#runner.run(["diff", "--name-status", "-z", "--find-renames", comparisonBase.commit, "--"], {
+          cwd: context.worktreeRoot,
+        }),
+        this.#runner.run(["diff", "--numstat", "-z", comparisonBase.commit, "--"], {
+          cwd: context.worktreeRoot,
+        }),
       ]);
-      const entries = parsePorcelain(statusResult.stdout);
+      const entries = parseNameStatusZ(trackedNames.stdout);
+      const knownPaths = new Set(entries.map((entry) => entry.path));
+      for (const entry of parsePorcelain(statusResult.stdout)) {
+        if ((entry.status === "untracked" || entry.status === "unmerged") && !knownPaths.has(entry.path)) {
+          entries.push(entry);
+          knownPaths.add(entry.path);
+        }
+      }
       const numstat = parseNumstatZ(trackedNumstat.stdout);
       for (const entry of entries.filter((entry) => entry.status === "untracked")) {
         const absolute = await this.#safeFilePath(context.worktreeRoot, entry.path);
@@ -247,6 +263,8 @@ export class GitWorkspaceAdapter {
       });
       return {
         cwd: context.worktreeRoot,
+        baseBranch: comparisonBase.branch,
+        baseCommit: comparisonBase.commit,
         changedFileCount: files.length,
         additions: files.reduce((sum, file) => sum + (file.additions ?? 0), 0),
         deletions: files.reduce((sum, file) => sum + (file.deletions ?? 0), 0),
@@ -264,8 +282,9 @@ export class GitWorkspaceAdapter {
   async getDiff(cwd: string, path?: string): Promise<string> {
     const context = await this.#requireGitContext(cwd, "read-diff");
     try {
+      const comparisonBase = await this.#resolveDiffBase(context);
       if (!path) {
-        const tracked = await this.#runner.run(["diff", "--no-ext-diff", "HEAD", "--"], {
+        const tracked = await this.#runner.run(["diff", "--no-ext-diff", comparisonBase.commit, "--"], {
           cwd: context.worktreeRoot,
         });
         const status = await this.getDiffSummary(context.worktreeRoot);
@@ -280,7 +299,7 @@ export class GitWorkspaceAdapter {
       const summary = await this.getDiffSummary(context.worktreeRoot);
       const untracked = summary.files.some((file) => file.path === path && file.status === "untracked");
       if (untracked) return await this.#untrackedDiff(context.worktreeRoot, path);
-      const result = await this.#runner.run(["diff", "--no-ext-diff", "HEAD", "--", safePath], {
+      const result = await this.#runner.run(["diff", "--no-ext-diff", comparisonBase.commit, "--", safePath], {
         cwd: context.worktreeRoot,
       });
       return result.stdout;
@@ -308,6 +327,35 @@ export class GitWorkspaceAdapter {
     throw workspaceError(stage, "not-a-git-worktree", context.reason, {
       currentWorkspaceCwd: context.resolvedCwd,
     });
+  }
+
+  async #resolveDiffBase(context: GitContext): Promise<{ branch: string; commit: string }> {
+    let mainCommit: string;
+    try {
+      const result = await this.#runner.run(
+        ["rev-parse", "--verify", "--end-of-options", `${DEFAULT_BRANCH_REF}^{commit}`],
+        { cwd: context.worktreeRoot },
+      );
+      mainCommit = result.stdout.trim();
+      if (!/^[0-9a-f]{40,64}$/i.test(mainCommit)) throw new Error("Git returned an invalid main commit ID");
+    } catch (error) {
+      throw workspaceError("read-diff", "main-ref-unavailable", error, {
+        currentWorkspaceCwd: context.worktreeRoot,
+      });
+    }
+
+    try {
+      const result = await this.#runner.run(["merge-base", mainCommit, context.head], {
+        cwd: context.worktreeRoot,
+      });
+      const commit = result.stdout.trim();
+      if (!/^[0-9a-f]{40,64}$/i.test(commit)) throw new Error("Git returned an invalid merge-base commit ID");
+      return { branch: DEFAULT_BRANCH, commit };
+    } catch (error) {
+      throw workspaceError("read-diff", "main-merge-base-unavailable", error, {
+        currentWorkspaceCwd: context.worktreeRoot,
+      });
+    }
   }
 
   async #validateTargetParent(
@@ -468,6 +516,24 @@ function parsePorcelain(output: string): PorcelainEntry[] {
     let previousPath: string | null = null;
     if (code.includes("R") || code.includes("C")) previousPath = records[++index] || null;
     entries.push({ path, previousPath, status: statusFromCode(code) });
+  }
+  return entries;
+}
+
+function parseNameStatusZ(output: string): PorcelainEntry[] {
+  const records = output.split("\0");
+  const entries: PorcelainEntry[] = [];
+  for (let index = 0; index < records.length;) {
+    const code = records[index++];
+    if (!code) continue;
+    if (code.startsWith("R") || code.startsWith("C")) {
+      const previousPath = records[index++] || null;
+      const path = records[index++] || "";
+      if (path) entries.push({ path, previousPath, status: statusFromCode(code) });
+      continue;
+    }
+    const path = records[index++] || "";
+    if (path) entries.push({ path, previousPath: null, status: statusFromCode(code) });
   }
   return entries;
 }

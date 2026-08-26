@@ -98,6 +98,119 @@ test("reports dirty file counts, additions/deletions, full/file diffs, and open 
   }
 });
 
+test("uses main for divergent-branch Diff and default Worktree ancestry", async () => {
+  const fixture = await temporaryRepository();
+  try {
+    const mainCommit = git(["rev-parse", "refs/heads/main"], fixture.repository).trim();
+    git(["switch", "-q", "-c", "codex/ticket-baseline"], fixture.repository);
+    await writeFile(`${fixture.repository}/committed.txt`, "committed ticket work\n", "utf8");
+    git(["add", "committed.txt"], fixture.repository);
+    git(
+      ["-c", "user.name=Peel Test", "-c", "user.email=test@peel.invalid", "commit", "-qm", "ticket work"],
+      fixture.repository,
+    );
+    const ticketCommit = git(["rev-parse", "HEAD"], fixture.repository).trim();
+    git(["mv", "README.md", "RENAMED.md"], fixture.repository);
+    await writeFile(`${fixture.repository}/staged.txt`, "staged work\n", "utf8");
+    await writeFile(`${fixture.repository}/binary.bin`, Buffer.from([0, 1, 2, 3]));
+    git(["add", "staged.txt", "binary.bin"], fixture.repository);
+    await writeFile(`${fixture.repository}/tracked.txt`, "unstaged work\n", "utf8");
+    await writeFile(`${fixture.repository}/untracked.txt`, "untracked work\n", "utf8");
+
+    const adapter = new GitWorkspaceAdapter();
+    const branchBeforeDiff = git(["branch", "--show-current"], fixture.repository).trim();
+    const mainBeforeDiff = git(["rev-parse", "refs/heads/main"], fixture.repository).trim();
+    const configBeforeDiff = git(["config", "--local", "--list"], fixture.repository);
+    const summary = await adapter.getDiffSummary(fixture.repository);
+    assert.equal(summary.baseBranch, "main");
+    assert.equal(summary.baseCommit, mainCommit);
+    assert.equal(summary.files.find((file) => file.path === "committed.txt")?.status, "added");
+    assert.equal(summary.files.find((file) => file.path === "RENAMED.md")?.previousPath, "README.md");
+    assert.equal(summary.files.find((file) => file.path === "binary.bin")?.binary, true);
+    assert.equal(summary.files.find((file) => file.path === "staged.txt")?.status, "added");
+    assert.equal(summary.files.find((file) => file.path === "tracked.txt")?.status, "modified");
+    assert.equal(summary.files.find((file) => file.path === "untracked.txt")?.status, "untracked");
+    assert.match(await adapter.getDiff(fixture.repository), /committed ticket work/);
+    assert.match(await adapter.getDiff(fixture.repository), /untracked work/);
+    assert.match(await adapter.getDiff(fixture.repository, "committed.txt"), /committed ticket work/);
+    assert.equal(git(["branch", "--show-current"], fixture.repository).trim(), branchBeforeDiff);
+    assert.equal(git(["rev-parse", "refs/heads/main"], fixture.repository).trim(), mainBeforeDiff);
+    assert.equal(git(["config", "--local", "--list"], fixture.repository), configBeforeDiff);
+
+    const refsBeforeCreate = git(["for-each-ref", "--format=%(refname) %(objectname)", "refs/heads"], fixture.repository);
+    const created = await adapter.createWorktree({
+      repositoryCwd: fixture.repository,
+      targetParent: fixture.worktrees,
+      forkIdentity: "From Main",
+      pendingForkId: "draft-from-main",
+    });
+    assert.equal(created.retryWith.baseRef, "refs/heads/main");
+    assert.equal(git(["rev-parse", created.branch], fixture.repository).trim(), mainCommit);
+    assert.notEqual(git(["rev-parse", created.branch], fixture.repository).trim(), ticketCommit);
+    assert.equal(git(["branch", "--show-current"], fixture.repository).trim(), branchBeforeDiff);
+    assert.equal(git(["rev-parse", "refs/heads/main"], fixture.repository).trim(), mainBeforeDiff);
+    assert.equal(git(["config", "--local", "--list"], fixture.repository), configBeforeDiff);
+    const refsAfterCreate = git(["for-each-ref", "--format=%(refname) %(objectname)", "refs/heads"], fixture.repository)
+      .split("\n")
+      .filter((line) => line && !line.startsWith(`refs/heads/${created.branch} `))
+      .join("\n") + "\n";
+    assert.equal(refsAfterCreate, refsBeforeCreate);
+
+    await writeFile(`${created.cwd}/linked.txt`, "linked branch work\n", "utf8");
+    git(["add", "linked.txt"], created.cwd);
+    git(
+      ["-c", "user.name=Peel Test", "-c", "user.email=test@peel.invalid", "commit", "-qm", "linked work"],
+      created.cwd,
+    );
+    const linkedSummary = await adapter.getDiffSummary(created.cwd);
+    assert.equal(linkedSummary.baseBranch, "main");
+    assert.equal(linkedSummary.baseCommit, mainCommit);
+    assert.equal(linkedSummary.files.find((file) => file.path === "linked.txt")?.status, "added");
+  } finally {
+    await fixture.cleanup();
+  }
+});
+
+test("missing main fails Diff and omitted-base Worktree without falling back to HEAD", async () => {
+  const fixture = await temporaryRepository();
+  try {
+    git(["branch", "-m", "main", "trunk"], fixture.repository);
+    const adapter = new GitWorkspaceAdapter();
+    const refsBefore = git(["for-each-ref", "--format=%(refname) %(objectname)", "refs/heads"], fixture.repository);
+    const branchBefore = git(["branch", "--show-current"], fixture.repository).trim();
+    const configBefore = git(["config", "--local", "--list"], fixture.repository);
+    const worktreesBefore = git(["worktree", "list", "--porcelain"], fixture.repository);
+
+    await assert.rejects(
+      adapter.getDiffSummary(fixture.repository),
+      (error: unknown) => error instanceof GitWorkspaceError && error.details.code === "main-ref-unavailable",
+    );
+    await assert.rejects(
+      adapter.getDiff(fixture.repository),
+      (error: unknown) => error instanceof GitWorkspaceError && error.details.code === "main-ref-unavailable",
+    );
+    await assert.rejects(
+      adapter.createWorktree({
+        repositoryCwd: fixture.repository,
+        targetParent: fixture.worktrees,
+        forkIdentity: "Must Not Use Head",
+        pendingForkId: "draft-missing-main",
+      }),
+      (error: unknown) =>
+        error instanceof GitWorkspaceError &&
+        error.details.code === "main-ref-unavailable" &&
+        error.details.pendingForkId === "draft-missing-main" &&
+        error.details.artifacts.length === 0,
+    );
+    assert.equal(git(["for-each-ref", "--format=%(refname) %(objectname)", "refs/heads"], fixture.repository), refsBefore);
+    assert.equal(git(["branch", "--show-current"], fixture.repository).trim(), branchBefore);
+    assert.equal(git(["config", "--local", "--list"], fixture.repository), configBefore);
+    assert.equal(git(["worktree", "list", "--porcelain"], fixture.repository), worktreesBefore);
+  } finally {
+    await fixture.cleanup();
+  }
+});
+
 test("invalid repositories and broad or unresolved targets fail before mutation", async () => {
   const fixture = await temporaryRepository();
   try {
