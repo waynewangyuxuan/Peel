@@ -1,0 +1,68 @@
+{
+  "acceptance": [
+    {
+      "acceptance_id": "all-prose-markdown-routing",
+      "criterion": "Agent messages, user messages, Reasoning prose, Subagent prose, and error prose all use one safe Markdown document renderer; Command output, file patches, diffs, and other genuinely verbatim technical facts remain explicit preformatted surfaces. An automated route-level test proves no supported prose item silently falls back to raw text or JSON."
+    },
+    {
+      "acceptance_id": "commonmark-gfm-document-fidelity",
+      "criterion": "Completed messages correctly present headings, paragraphs and soft/hard breaks, emphasis/strong/strikethrough, multiline and nested blockquotes, ordered/unordered/nested/task lists, horizontal rules, autolinks and explicit links, images with safe responsive bounds, inline code, fenced code with language, and aligned GFM tables. A fixture derived from the inspected real Codex payload proves leading > lines become blockquote DOM and pipe tables become table DOM with no literal control-marker rows. Raw HTML stays disabled, unsafe URLs do not survive, and transcript text remains selectable."
+    },
+    {
+      "acceptance_id": "streaming-markdown-stability",
+      "criterion": "Representative incomplete streaming states for emphasis, inline code, fenced code, blockquotes, lists, links, and a table header remain readable without flashing orphaned Markdown delimiters or causing horizontal/page layout jumps; once the closing tokens arrive, the same content transitions to the final semantic structure without changing the authoritative message text."
+    },
+    {
+      "acceptance_id": "chatgpt-like-reading-craft",
+      "criterion": "At 1440x960 and 1000x720, directly inspected production Electron screenshots show a restrained ChatGPT-like reading hierarchy rather than raw or generic document output: quotes are clearly intentional without a visible > marker, nested lists keep hierarchy, tables are bounded and horizontally scroll only themselves, and fenced code has a language label, horizontal code scrolling, and a keyboard/pointer Copy code action with immediate feedback. Typography and spacing remain coherent in both assistant content and the compact user bubble."
+    },
+    {
+      "acceptance_id": "focus-journey-regression",
+      "criterion": "The complete repository tests, build, and production Electron journey pass while exercising the exact real-payload-derived Markdown fixture, wide and narrow screenshots, streaming completion, copy code, selection, unsafe-content rejection, and the retained Picker, Focus, Activity, Fork, Voice, Approval, Overview, Diff, recovery, scroll, draft, and restart paths."
+    }
+  ],
+  "constraints": [
+    "Use the existing Focus visual direction and ChatGPT's content hierarchy as the presentation reference; do not introduce a competing editor, document theme, or markdown configuration surface.",
+    "The authoritative Codex message string must never be rewritten or persisted differently. Any streaming repair is a render-only projection and the completed payload is parsed verbatim.",
+    "Do not execute raw HTML, javascript URLs, embedded scripts, or remote interactive content. Preserve the existing renderer sandbox and selectable text.",
+    "Do not render Command output, patches, diffs, or unknown machine facts as prose Markdown merely to hide their structure.",
+    "Standard CommonMark plus GFM and common incomplete streaming states are in scope; Mermaid, arbitrary HTML, and mathematical typesetting are not silently claimed as Markdown support.",
+    "The correction must preserve the completed Overview Demo-fidelity work and all existing Focus interaction behavior."
+  ],
+  "context": "Direct dogfood reports that raw Markdown markers such as a leading > are still perceptible in the Chat flow, which is unacceptable for a product intentionally narrowed around first-class Chat. Read-only inspection of the exact live Codex Thread confirms that its agentMessage payloads contain ordinary ASCII > blockquotes and GFM tables; an isolated window on the latest checked-in build currently produces blockquote and table DOM for that completed payload, so the correction must not pretend the library is wholly absent. The remaining product gap is that Markdown fidelity is not enforced across every prose route, user bubbles still render plain text, partial streaming structures can expose unfinished control syntax, blockquote styling is so weak that parsed content can still feel unprocessed, code lacks a finished language/copy surface, and existing fixtures are too idealized to protect real Codex content. This Ticket makes the Chat document renderer and its evidence comprehensive rather than patching one screenshot string.",
+  "context_refs": [
+    {
+      "purpose": "Requires first-class screen-space Chat, Markdown/code fidelity, selection, streaming stability, Activity, and safe unknown-item behavior.",
+      "ref": ".vibehub/rooms/product/contract-focus-chat-fidelity.yaml"
+    },
+    {
+      "purpose": "Keeps production work inside the already-selected v0.1 visual direction instead of starting another design exercise.",
+      "ref": ".vibehub/rooms/product/decision-demo-authoritative-v01-ui-direction.yaml"
+    },
+    {
+      "purpose": "Provides the preserved Focus transcript hierarchy and spacing baseline that remains authoritative alongside the user's explicit ChatGPT Markdown reference.",
+      "ref": "docs/product/source/peel-demo-v0-original.html"
+    },
+    {
+      "purpose": "Provides the prior Markdown implementation, safety guarantees, and claimed coverage that this dogfood correction must preserve and make truthful against real payloads.",
+      "ref": ".vibehub/outcomes/ticket-fix-focus-chat-content-and-navigation.yaml"
+    }
+  ],
+  "kind": "ticket",
+  "maturity": "firm",
+  "outcome": "Every human-readable Chat message is presented as a polished, safe CommonMark/GFM document instead of leaking Markdown control syntax, including real Codex payloads and incomplete streaming states.",
+  "provenance_refs": [
+    "conversation:2026-08-26-chat-markdown-source-markers",
+    "/private/tmp/peel-live-markdown.png",
+    ".vibehub/evidence/ticket-fix-focus-chat-content-and-navigation/evidence-focus-markdown-activity.yaml"
+  ],
+  "relations": [
+    {
+      "rationale": "This focused Chat Markdown correction must preserve the exact current integrated baseline, including the completed Focus renderer and Overview Demo-fidelity rebuild.",
+      "target_ticket_id": "ticket-rebuild-overview-demo-fidelity",
+      "type": "depends_on"
+    }
+  ],
+  "schema_version": 1,
+  "ticket_id": "ticket-fix-chat-markdown-presentation"
+}
