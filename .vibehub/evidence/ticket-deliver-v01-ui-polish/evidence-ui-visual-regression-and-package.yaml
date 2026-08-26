@@ -1,0 +1,22 @@
+{
+  "acceptance_ids": [
+    "visual-regression-set"
+  ],
+  "evidence_id": "evidence-ui-visual-regression-and-package",
+  "kind": "ticket_evidence",
+  "origin": "agent",
+  "recorded_at": "2026-08-26T08:41:59Z",
+  "refs": [
+    "docs/product/source/peel-demo-v0-original.html",
+    "apps/desktop/e2e/v01-journey.spec.ts",
+    "command:npm run test:e2e --workspace @peel/desktop creates six representative UI PNGs plus overview-50.png and focus-restored.png",
+    "command:npm test",
+    "command:npm run build",
+    "command:npm run package --workspace @peel/desktop",
+    "command:npm run verify:package --workspace @peel/desktop",
+    "command:npm run verify:live-codex --workspace @peel/desktop"
+  ],
+  "schema_version": 1,
+  "summary": "The stable visual set contains Welcome, Thread Picker, Focus with real Activity/error fallbacks, Local Fork Draft, two-node Overview, 50-node Fit, restored long Focus and the live Diff drawer. The screenshots are emitted only after modal/Fork/Overview motion settles, preventing transition frames from masquerading as reference UI, and were visually inspected alongside a 1440x960 headless render of the preserved Demo HTML. Verification passes all 42 repository tests, the full build, one 34.9-second Electron product journey, a rebuilt package with restoredDraft and nativeVoiceHelper true, and a read-only local Codex smoke with 30 initial Threads, a real nextCursor and 60 after Load more.",
+  "ticket_id": "ticket-deliver-v01-ui-polish"
+}
