@@ -197,6 +197,9 @@ test("real Thread-first Fork loop, recovery surfaces, scale, and restart", async
   await expect(page.locator(".agent-message blockquote")).toContainText("Keep the Chat readable");
   await expect(page.locator(".agent-message del")).toHaveText("Raw pipe text");
   expect(await page.evaluate(() => Boolean((window as unknown as { __peelUnsafe?: boolean }).__peelUnsafe))).toBe(false);
+  await page.locator(".agent-message table").scrollIntoViewIfNeeded();
+  await page.waitForTimeout(100);
+  await page.screenshot({ path: join(desktopRoot, "test-results/ui-focus-markdown.png") });
   const reasoning = page.locator(".activity-item").filter({ hasText: "Reasoning" });
   await reasoning.locator("summary").click();
   await expect(reasoning.locator("strong")).toHaveText("Planning collaborative reasoning framework");
