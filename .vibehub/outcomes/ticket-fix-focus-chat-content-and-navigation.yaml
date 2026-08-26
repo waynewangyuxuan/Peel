@@ -1,0 +1,21 @@
+{
+  "accepted_acceptance_ids": [
+    "space-list-containment",
+    "current-thread-identity",
+    "markdown-gfm-fidelity",
+    "activity-hierarchy",
+    "visual-behavior-regression"
+  ],
+  "closed_at": "2026-08-26T09:48:07Z",
+  "evidence_ids": [
+    "evidence-focus-title-containment",
+    "evidence-focus-markdown-activity",
+    "evidence-focus-chat-regression"
+  ],
+  "kind": "ticket_outcome",
+  "schema_version": 1,
+  "status": "successful",
+  "summary": "Independent closeout accepted all five Focus Chat repair criteria at exact commit 3c048af42d1e9aa6169efb9220c4e4e22d897e04 after reading the exact Ticket, all four Context references including the complete preserved Demo HTML, the successful direct prerequisite Outcome and its Evidence, all three acceptance-linked Evidence records, the complete implementation and lockfile diff, source, tests, package smoke, and generated visual references. The Space rail uses fixed 226px and compact 196px tracks, minmax(0,1fr) copy columns, explicit min-width boundaries and horizontal clipping; the same generic containment applies to long ASCII and CJK titles, while focusable buttons expose the full accessible name and pointer title. Long current Space and Thread names receive bounded flexible top-bar allocation, native and custom hover/focus disclosure, complete aria labels, and a full wrapping transcript introduction. Assistant and Reasoning content now share react-markdown 10.1.0 with remark-gfm and remark-breaks, raw HTML skipped and unsafe URLs removed; semantic headings, emphasis, blockquotes, ordered and unordered/task lists, tables, strikethrough, links, fenced and inline code, soft breaks, horizontal code/table overflow, and partial streaming output are supported without making transcript text unselectable. Reasoning, command, file-change, subagent, and failure facts use compact native details/summary disclosures with human labels; completed detail is collapsed, active and failure states retain immediate Working or Needs attention indicators, and Markdown or technical output remains keyboard-accessible on demand. Independent verification passed all 46 repository tests, the complete native/renderer/main build, dependency resolution, diff checks, and the exact-HEAD Electron journey 1/1 in 37.2 seconds. That journey proved containment at both widths, complete-title discovery, safe GFM, parsed Reasoning, compact Activity, long-code scrolling, and the retained Picker, Focus, Fork, Voice, Approval, Rename, restoration, 50-node Overview, Diff, failure and restart paths. Direct inspection of freshly generated ui-focus-markdown.png and ui-focus.png confirmed the contained rail, complete two-line transcript title, semantic table/blockquote/task-list/strikethrough/code presentation, unclipped long-code scroller, custom full-title tooltip, and restrained activity hierarchy. A fresh arm64 package was rebuilt from the exact production tree and its smoke passed with restoredDraft and nativeVoiceHelper true. No acceptance IDs remain unresolved.",
+  "ticket_id": "ticket-fix-focus-chat-content-and-navigation",
+  "unresolved_acceptance_ids": []
+}
