@@ -1,0 +1,61 @@
+{
+  "acceptance": [
+    {
+      "acceptance_id": "resolve-main-separately",
+      "criterion": "The adapter resolves local refs/heads/main independently from the active branch, never checks out, switches, rewrites, or treats the current Ticket branch as the default baseline, and returns an explicit recoverable error when main is unavailable instead of falling back to HEAD."
+    },
+    {
+      "acceptance_id": "diff-against-main",
+      "criterion": "Diff summary, full patch, and per-file patch compare the working tree to the merge base of main and current HEAD, so committed Ticket-branch changes plus staged, unstaged, renamed, binary, and untracked changes are represented; the returned Diff facts identify main as the comparison base."
+    },
+    {
+      "acceptance_id": "worktree-starts-from-main",
+      "criterion": "When baseRef is omitted, New Worktree creation resolves and starts from the current local main commit even when called from a different branch or linked worktree; an explicit internal baseRef remains validated and retry facts preserve the actual selected base."
+    },
+    {
+      "acceptance_id": "surface-and-safety-regression",
+      "criterion": "The desktop Diff surface visibly states that it is compared with main, and existing path containment, NUL-safe filenames, untracked content, failure recovery, Worktree metadata, and prohibited Git-management boundaries remain intact."
+    },
+    {
+      "acceptance_id": "temporary-repository-proof",
+      "criterion": "Disposable-repository tests exercise a main branch plus a divergent Ticket branch and a linked-worktree invocation; prove committed/staged/unstaged/renamed/binary/untracked Diff coverage; prove default Worktree ancestry from main rather than the Ticket branch; prove missing-main failure for both Diff and omitted-base Worktree creation; and prove that only the explicitly requested new Worktree branch/worktree artifacts are created while pre-existing refs, current checkout, main, and Git config remain unchanged."
+    }
+  ],
+  "constraints": [
+    "Do not run checkout, switch, reset, branch-default mutation, remote fetch, or other repository-changing commands to resolve the baseline; only the explicitly requested New Worktree branch/worktree creation may mutate Git state.",
+    "Use the local main ref; missing main is an explicit recoverable state and never an excuse to alias the active HEAD.",
+    "Keep Diff lightweight and read-only; do not add branch management, comparison selection, commit, push, or PR workflows.",
+    "Preserve user work and existing Worktree/Fork failure recovery semantics."
+  ],
+  "context": "Dogfood exposed that GitWorkspaceAdapter currently aliases the active HEAD to both the default New Worktree base and the Diff base. On a Ticket branch this hides committed Ticket changes from Diff and causes new Fork worktrees to inherit that Ticket branch. The product correction is explicit: current branch identity is metadata; main is the default comparison and creation baseline.",
+  "context_refs": [
+    {
+      "purpose": "Authoritative correction separating current Ticket branch identity from the main Git baseline.",
+      "ref": ".vibehub/rooms/product/constraint-main-git-baseline.yaml"
+    },
+    {
+      "purpose": "Retains the lightweight Diff/New Worktree product boundary and Git-management non-goals.",
+      "ref": ".vibehub/rooms/product/contract-worktree-and-diff-boundary.yaml"
+    }
+  ],
+  "kind": "ticket",
+  "maturity": "firm",
+  "outcome": "Peel treats local main as the immutable default Git baseline for lightweight Diff and New Worktree creation, independently of the active Ticket branch.",
+  "provenance_refs": [
+    "conversation:2026-08-26-main-diff-baseline-correction"
+  ],
+  "relations": [
+    {
+      "rationale": "This is a focused correction to the delivered GitWorkspaceAdapter baseline semantics.",
+      "target_ticket_id": "ticket-build-git-workspace-adapter",
+      "type": "depends_on"
+    },
+    {
+      "rationale": "The correction also changes the delivered polished Diff surface to expose main as its honest comparison base.",
+      "target_ticket_id": "ticket-deliver-v01-ui-polish",
+      "type": "depends_on"
+    }
+  ],
+  "schema_version": 1,
+  "ticket_id": "ticket-fix-main-git-baseline"
+}

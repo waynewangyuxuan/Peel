@@ -1,0 +1,37 @@
+{
+  "context_id": "constraint-main-git-baseline",
+  "detail": "Opening or working from a Ticket branch must never redefine the repository's default Git baseline. The current branch remains Thread/worktree metadata only. Unless an explicit internal baseRef is supplied, New Worktree creation starts from the local main branch, never from the current HEAD. The Diff surface compares the current working tree—including committed branch changes, staged changes, unstaged changes, and untracked files—against the main-line merge base, and identifies main as its comparison base. If main cannot be resolved, Peel must return an explicit recoverable error instead of silently falling back to the current branch.",
+  "evidence": [
+    {
+      "note": "The current implementation defaults New Worktree baseRef and all Diff commands to HEAD, which aliases the active Ticket branch.",
+      "ref": "packages/git-workspace/src/adapter.ts"
+    },
+    {
+      "note": "The existing contract owns New Worktree and lightweight Diff behavior but previously left the comparison baseline unspecified.",
+      "ref": ".vibehub/rooms/product/contract-worktree-and-diff-boundary.yaml"
+    }
+  ],
+  "kind": "context",
+  "relations": [
+    {
+      "target_context_id": "contract-worktree-and-diff-boundary",
+      "type": "relates_to"
+    }
+  ],
+  "schema_version": 1,
+  "source": {
+    "captured_at": "2026-08-26T08:59:43Z",
+    "quote": "不要把 git 的这个 default branch 变成这个 branch，diff 肯定是 main",
+    "ref": "conversation:2026-08-26-main-diff-baseline-correction"
+  },
+  "state": "active",
+  "summary": "Peel separates the current Ticket branch from the repository baseline; Diff and default new Worktrees use main",
+  "tags": [
+    "git",
+    "main",
+    "diff",
+    "worktree",
+    "baseline"
+  ],
+  "type": "constraint"
+}
