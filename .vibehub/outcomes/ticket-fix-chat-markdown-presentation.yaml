@@ -1,0 +1,21 @@
+{
+  "accepted_acceptance_ids": [
+    "all-prose-markdown-routing",
+    "commonmark-gfm-document-fidelity",
+    "streaming-markdown-stability",
+    "chatgpt-like-reading-craft",
+    "focus-journey-regression"
+  ],
+  "closed_at": "2026-08-26T20:32:54Z",
+  "evidence_ids": [
+    "evidence-chat-markdown-routing-and-documents",
+    "evidence-chat-streaming-and-reading-craft",
+    "evidence-chat-markdown-full-regression"
+  ],
+  "kind": "ticket_outcome",
+  "schema_version": 1,
+  "status": "successful",
+  "summary": "Independent closeout accepted all five Chat Markdown presentation criteria at exact HEAD bdf08565b70eda4ed560502dc7632b2f5d310f03 after reading the full Ticket, all Context references including the complete preserved Demo HTML, the successful dependency Outcomes, all three acceptance-linked Evidence records, the complete c495a5e..bdf0856 implementation and test diff, and the relevant renderer, IPC, fixture, style, and test source. Route inspection and the automated route-level test prove that user messages, agent messages, Reasoning, Subagent activity, and errors use the same safe MarkdownContent renderer, while command output and file-change facts remain explicit preformatted technical surfaces and unknown machine items retain an identifiable Open in Codex fallback. The renderer preserves completed authoritative text verbatim and covers CommonMark/GFM headings, paragraphs and breaks, emphasis, strong, strikethrough, nested quotes and lists, tasks, rules, safe autolinks and explicit links, bounded image handling, inline and fenced code with language, and bounded tables; raw HTML is skipped, javascript URLs are removed, remote Markdown images become outbound links, and local data/blob images remain bounded. A redacted real-Codex-payload fixture produces semantic blockquote and table DOM without literal quote or pipe-control rows. Streaming applies only a render projection for incomplete fences, inline code, emphasis, links, and table headers; parameterized tests cover emphasis, inline and fenced code, quotes, lists, links, and table headers, while the Electron journey holds an unmatched strong delimiter on screen and proves readable semantic output without exposing the delimiter before the authoritative completed item arrives. Fresh direct inspection of ui-focus-markdown.png, ui-focus-markdown-code.png, and ui-focus-markdown-narrow.png at the required wide and narrow sizes confirmed restrained ChatGPT-like hierarchy, intentional quote blocks without visible greater-than markers, readable tables and nested Reasoning, compact user bubbles, and a dark fenced-code surface whose horizontal overflow stays local, exposes its language, and shows immediate Copied feedback. The code action is a native keyboard/pointer button and the production Electron test verified the actual clipboard write and restored prior clipboard contents; selectable assistant text and narrow containment were also exercised. Independent verification passed all 55 repository tests, the complete adapter/native Speech/renderer/Electron main/preload build, git diff checks, and the full production Electron journey 1/1 in 37.4 seconds. That journey retained Picker, Focus, Activity, Fork, Voice, Approval, Overview, Diff, recovery, scroll, draft, streaming, failure, and restart behavior. No acceptance IDs remain unresolved.",
+  "ticket_id": "ticket-fix-chat-markdown-presentation",
+  "unresolved_acceptance_ids": []
+}
