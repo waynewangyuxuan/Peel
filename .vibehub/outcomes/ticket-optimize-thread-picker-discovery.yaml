@@ -1,0 +1,23 @@
+{
+  "accepted_acceptance_ids": [
+    "cursor-pagination",
+    "warm-cache-and-deduplication",
+    "responsive-warm-and-provisional-search",
+    "search-race-safety",
+    "picker-feedback-and-accessibility",
+    "discovery-regression-coverage"
+  ],
+  "closed_at": "2026-08-26T08:29:55Z",
+  "evidence_ids": [
+    "evidence-thread-picker-cache-latency",
+    "evidence-thread-picker-cursor-pagination",
+    "evidence-thread-picker-race-safety",
+    "evidence-thread-picker-regression-suite"
+  ],
+  "kind": "ticket_outcome",
+  "schema_version": 1,
+  "status": "successful",
+  "summary": "Independent closeout accepted all six Thread Picker discovery criteria after reading the exact Ticket, all three Context references, the successful v0.1 dependency Outcome, all four acceptance-linked Evidence records, and the complete implementation and test diff at commit 9921083829ae82c4af08750ecfdf135b8a45df40. Typed IPC and PeelService normalize term and cursor, request 30-item pages, preserve the App Server nextCursor, cache exact term-plus-cursor responses until the 15,000ms boundary, and share in-flight queries. The renderer immediately reuses the warm first page, presents matching provisional results while authoritative search continues, de-duplicates appended pages, and rejects late query or cursor responses through request generation and normalized-term guards. Cold, background, page-loading, count, more, exhaustion, empty, and recoverable-error states remain distinguishable around the persistent search field. Independent verification passed project and Ticket validation, all 42 repository tests, the full build, and the real Electron journey with a 750ms delayed 71-Thread fixture in 29.6 seconds; that journey measured the warm, provisional, and repeated-query paths below 100ms, exercised delayed out-of-order and close/reopen races, loaded 30 then 60 results, selected Catalog direction 54, and preserved the original Start Space journey. A package rebuilt from the exact commit passed double-launch verification, and a read-only local Codex smoke returned 30 Threads with a real nextCursor and 60 after Load more. The repository remained clean after verification.",
+  "ticket_id": "ticket-optimize-thread-picker-discovery",
+  "unresolved_acceptance_ids": []
+}
