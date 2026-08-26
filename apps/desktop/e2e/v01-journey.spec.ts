@@ -31,6 +31,8 @@ test.beforeAll(async () => {
   await exec("git", ["config", "user.email", "peel@example.test"], { cwd: repository });
   await exec("git", ["config", "user.name", "Peel Test"], { cwd: repository });
   await writeFile(join(repository, "README.md"), "# Peel fixture\n");
+  await writeFile(join(repository, "delay-thread-list-warm"), "1");
+  await writeFile(join(repository, "delay-thread-list-search"), "1");
   await exec("git", ["add", "README.md"], { cwd: repository });
   await exec("git", ["commit", "-m", "fixture"], { cwd: repository });
 });
@@ -58,6 +60,14 @@ async function launch(): Promise<void> {
   await page.waitForLoadState("domcontentloaded");
 }
 
+async function readRpcEvents(): Promise<Array<{ method?: string; params?: Record<string, unknown> }>> {
+  const content = await readFile(rpcLog, "utf8");
+  return content
+    .split("\n")
+    .filter(Boolean)
+    .map((line) => JSON.parse(line) as { method?: string; params?: Record<string, unknown> });
+}
+
 async function startFreshSpace(): Promise<void> {
   await page.getByRole("button", { name: /New Space/ }).click();
   await expect(page.locator(".thread-picker")).toBeVisible();
@@ -82,9 +92,100 @@ test("real Thread-first Fork loop, recovery surfaces, scale, and restart", async
   test.setTimeout(120_000);
   await launch();
   await expect(page.getByRole("button", { name: /Choose a Codex Chat/ })).toBeEnabled();
+  await expect.poll(async () => (await readFile(rpcLog, "utf8")).includes('"method":"fixture/thread-list/responded"')).toBe(true);
+  const threadListsBeforeWarmOpen = (await readFile(rpcLog, "utf8")).match(/"method":"thread\/list"/g)?.length ?? 0;
+  const warmOpenMs = await page.evaluate(async () => {
+    const choose = [...document.querySelectorAll<HTMLButtonElement>("button")].find((button) => button.textContent?.includes("Choose a Codex Chat"));
+    if (!choose) throw new Error("Choose a Codex Chat button was missing");
+    const started = performance.now();
+    choose.click();
+    while (!document.querySelector(".thread-result")) await new Promise(requestAnimationFrame);
+    return performance.now() - started;
+  });
+  expect(warmOpenMs).toBeLessThan(100);
+  await expect(page.locator(".thread-result")).toHaveCount(30);
+  await page.waitForTimeout(150);
+  const threadListsAfterWarmOpen = (await readFile(rpcLog, "utf8")).match(/"method":"thread\/list"/g)?.length ?? 0;
+  expect(threadListsAfterWarmOpen).toBe(threadListsBeforeWarmOpen);
+
+  const provisionalStarted = performance.now();
+  await page.getByLabel("Search Codex Chats").fill("Catalog direction 05");
+  await expect(page.locator(".thread-result")).toHaveCount(1);
+  await expect(page.locator(".thread-result strong")).toHaveText("Catalog direction 05");
+  const provisionalSearchMs = performance.now() - provisionalStarted;
+  expect(provisionalSearchMs).toBeLessThan(100);
+  await expect(page.getByText("Searching all Codex Chats…")).toBeVisible();
+  await expect.poll(async () => (await readFile(rpcLog, "utf8")).includes('"search":"catalog direction 05"')).toBe(true);
+  await page.waitForTimeout(50);
+  expect(await page.evaluate(() => ({
+    input: document.querySelector<HTMLInputElement>('[aria-label="Search Codex Chats"]')?.value,
+    results: [...document.querySelectorAll(".thread-result strong")].map((element) => element.textContent),
+    feedback: [...document.querySelectorAll(".picker-results-state, .picker-pagination")].map((element) => element.textContent),
+  }))).toEqual({
+    input: "Catalog direction 05",
+    results: ["Catalog direction 05"],
+    feedback: ["1 Chat loadedEnd of results"],
+  });
+  const listsAfterAuthoritativeSearch = (await readFile(rpcLog, "utf8")).match(/"method":"thread\/list"/g)?.length ?? 0;
+
+  await page.getByLabel("Search Codex Chats").fill("");
+  await expect(page.locator(".thread-result")).toHaveCount(30);
+  const repeatedStarted = performance.now();
+  await page.getByLabel("Search Codex Chats").fill("Catalog direction 05");
+  await expect(page.locator(".thread-result")).toHaveCount(1);
+  const repeatedSearchMs = performance.now() - repeatedStarted;
+  expect(repeatedSearchMs).toBeLessThan(100);
+  await page.waitForTimeout(250);
+  const listsAfterRepeatedSearch = (await readFile(rpcLog, "utf8")).match(/"method":"thread\/list"/g)?.length ?? 0;
+  expect(listsAfterRepeatedSearch).toBe(listsAfterAuthoritativeSearch);
+
+  await page.getByLabel("Search Codex Chats").fill("Catalog direction 06");
+  await expect.poll(async () => (await readRpcEvents()).some((event) =>
+    event.method === "thread/list" && event.params?.searchTerm === "Catalog direction 06"
+  ), { intervals: [10, 20, 50], timeout: 2_000 }).toBe(true);
+  await page.getByLabel("Search Codex Chats").fill("Catalog direction 07");
+  await expect.poll(async () => (await readRpcEvents()).some((event) =>
+    event.method === "thread/list" && event.params?.searchTerm === "Catalog direction 07"
+  ), { intervals: [10, 20, 50], timeout: 2_000 }).toBe(true);
+  await expect.poll(async () => {
+    const responses = (await readRpcEvents())
+      .filter((event) => event.method === "fixture/thread-list/responded")
+      .map((event) => event.params?.search);
+    return {
+      olderFinished: responses.includes("catalog direction 06"),
+      currentFinished: responses.includes("catalog direction 07"),
+    };
+  }, { intervals: [10, 20, 50], timeout: 2_000 }).toEqual({ olderFinished: true, currentFinished: false });
+  expect(await page.locator(".thread-result strong").allTextContents()).toEqual(["Catalog direction 07"]);
+  await expect(page.getByText("Searching all Codex Chats…")).toBeVisible();
+  await expect.poll(async () => (await readRpcEvents()).some((event) =>
+    event.method === "fixture/thread-list/responded" && event.params?.search === "catalog direction 07"
+  )).toBe(true);
+  await expect(page.locator(".thread-result strong")).toHaveText("Catalog direction 07");
+  await expect(page.getByText("End of results")).toBeVisible();
+
+  await page.getByLabel("Search Codex Chats").fill("Catalog direction 08");
+  await expect.poll(async () => (await readRpcEvents()).some((event) =>
+    event.method === "thread/list" && event.params?.searchTerm === "Catalog direction 08"
+  ), { intervals: [10, 20, 50], timeout: 2_000 }).toBe(true);
+  await page.locator(".picker-header .icon-button").click();
+  await expect(page.locator(".thread-picker")).toHaveCount(0);
   await page.getByRole("button", { name: /Choose a Codex Chat/ }).click();
-  await expect(page.getByText("Spatial product direction").last()).toBeVisible();
-  await page.getByText("Spatial product direction").last().click();
+  await expect(page.locator(".thread-result")).toHaveCount(30);
+  await expect.poll(async () => (await readRpcEvents()).some((event) =>
+    event.method === "fixture/thread-list/responded" && event.params?.search === "catalog direction 08"
+  )).toBe(true);
+  await expect(page.getByLabel("Search Codex Chats")).toHaveValue("");
+  await expect(page.locator(".thread-result")).toHaveCount(30);
+  await rm(join(repository, "delay-thread-list-search"));
+
+  await page.getByRole("button", { name: "Load more" }).click();
+  await expect(page.locator(".thread-result")).toHaveCount(60);
+  await page.getByText("Catalog direction 54", { exact: true }).click();
+  await expect(page.getByRole("heading", { name: "Catalog direction 54" })).toBeVisible();
+  await page.getByRole("button", { name: /New Space/ }).click();
+  await expect(page.locator(".thread-picker")).toBeVisible();
+  await page.locator(".thread-result").first().click();
   await expect(page.getByRole("heading", { name: "Spatial product direction" })).toBeVisible();
   await expect(page.getByRole("heading", { name: "Direction", exact: true })).toBeVisible();
   await expect(page.locator(".agent-message strong")).toHaveText("full-fidelity");

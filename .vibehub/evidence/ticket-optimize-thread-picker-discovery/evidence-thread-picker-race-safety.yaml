@@ -1,0 +1,18 @@
+{
+  "acceptance_ids": [
+    "search-race-safety"
+  ],
+  "evidence_id": "evidence-thread-picker-race-safety",
+  "kind": "ticket_evidence",
+  "origin": "agent",
+  "recorded_at": "2026-08-26T08:21:58Z",
+  "refs": [
+    "apps/desktop/src/renderer/App.tsx",
+    "apps/desktop/e2e/fixtures/codex",
+    "apps/desktop/e2e/v01-journey.spec.ts",
+    "command:npm run test:e2e --workspace @peel/desktop"
+  ],
+  "schema_version": 1,
+  "summary": "Every query and Load-more operation captures the current request generation and normalized term before applying results. The delayed Electron fixture records exact requests and responses; the journey waits until an older search has finished while the newer search is still pending and proves the visible result remains the newer provisional match, then accepts only that newer authoritative response. It also closes the Picker with another delayed query pending, reopens to the cached recent page, waits for the closed Picker's response, and proves the reopened empty-term results remain intact before continuing pagination.",
+  "ticket_id": "ticket-optimize-thread-picker-discovery"
+}

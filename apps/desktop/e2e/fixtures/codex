@@ -52,9 +52,22 @@ const root = {
     ] },
   ],
 };
+const catalogThreads = Array.from({ length: 70 }, (_, index) => {
+  const number = String(index + 1).padStart(2, "0");
+  return {
+    ...structuredClone(root),
+    id: `catalog-${number}`,
+    sessionId: `session-catalog-${number}`,
+    name: `Catalog direction ${number}`,
+    preview: `Searchable Codex Chat ${number}`,
+    createdAt: now - 200 - index,
+    updatedAt: now - 120 - index,
+  };
+});
 const threads = new Map([[root.id, root]]);
 let childIndex = 0;
 let requestIndex = 90;
+let threadListRequestIndex = 0;
 
 const send = (message) => process.stdout.write(`${JSON.stringify(message)}\n`);
 const notify = (method, params) => send({ method, params });
@@ -68,11 +81,34 @@ reader.on("line", (line) => {
   if (method === "initialize") return send({ id, result: { userAgent: "peel-e2e", platform: "darwin" } });
   if (method === "thread/list") {
     const search = String(params.searchTerm || "").toLowerCase();
-    const data = [...threads.values()].filter((thread) => !search || `${thread.name} ${thread.preview}`.toLowerCase().includes(search));
-    return send({ id, result: { data, nextCursor: null, backwardsCursor: null } });
+    const available = [...threads.values(), ...catalogThreads.filter((thread) => !threads.has(thread.id))]
+      .filter((thread) => !search || `${thread.name} ${thread.preview}`.toLowerCase().includes(search));
+    const offset = String(params.cursor || "").startsWith("offset:") ? Number(String(params.cursor).slice(7)) : 0;
+    const limit = Math.max(1, Number(params.limit) || 30);
+    const data = available.slice(offset, offset + limit);
+    const nextCursor = offset + data.length < available.length ? `offset:${offset + data.length}` : null;
+    const response = { id, result: { data, nextCursor, backwardsCursor: offset > 0 ? `offset:${Math.max(0, offset - limit)}` : null } };
+    threadListRequestIndex += 1;
+    const warmDelayMarker = process.env.TMPDIR ? join(process.env.TMPDIR, "delay-thread-list-warm") : null;
+    const searchDelayMarker = process.env.TMPDIR ? join(process.env.TMPDIR, "delay-thread-list-search") : null;
+    const delayedWarm = Boolean(threadListRequestIndex === 1 && warmDelayMarker && existsSync(warmDelayMarker));
+    if (delayedWarm && warmDelayMarker) unlinkSync(warmDelayMarker);
+    const delay = delayedWarm
+      ? 750
+      : search && searchDelayMarker && existsSync(searchDelayMarker) ? 750 : 0;
+    const respond = () => {
+      log({ method: "fixture/thread-list/responded", params: { search, offset, count: data.length } });
+      send(response);
+    };
+    if (delay > 0) {
+      setTimeout(respond, delay);
+      return;
+    }
+    respond();
+    return;
   }
   if (method === "thread/read" || method === "thread/resume") {
-    let thread = threads.get(params.threadId) || restoreTestChild(params.threadId) || restoreSynthetic(params.threadId);
+    let thread = threads.get(params.threadId) || restoreCatalog(params.threadId) || restoreTestChild(params.threadId) || restoreSynthetic(params.threadId);
     const nonGitMarker = process.env.TMPDIR ? join(process.env.TMPDIR, "root-non-git-once") : null;
     if (thread?.id === "thread-root" && nonGitMarker && existsSync(nonGitMarker)) {
       unlinkSync(nonGitMarker);
@@ -188,6 +224,14 @@ function restoreTestChild(threadId) {
   };
   threads.set(threadId, child);
   return child;
+}
+
+function restoreCatalog(threadId) {
+  const catalog = catalogThreads.find((thread) => thread.id === threadId);
+  if (!catalog) return null;
+  const restored = structuredClone(catalog);
+  threads.set(threadId, restored);
+  return restored;
 }
 
 function restoreSynthetic(threadId) {

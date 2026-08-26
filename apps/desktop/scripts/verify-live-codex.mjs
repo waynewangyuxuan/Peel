@@ -22,9 +22,16 @@ try {
     return button instanceof HTMLButtonElement && !button.disabled;
   }, undefined, { timeout: 20_000 });
   await choose.click();
-  await page.locator(".thread-results button").first().waitFor({ state: "visible", timeout: 20_000 });
-  const threadCount = await page.locator(".thread-results button").count();
-  process.stdout.write(`${JSON.stringify({ ok: true, connectedToLocalCodex: true, listedThreads: threadCount })}\n`);
+  await page.locator(".thread-result").first().waitFor({ state: "visible", timeout: 20_000 });
+  const firstPageThreads = await page.locator(".thread-result").count();
+  const loadMore = page.getByRole("button", { name: "Load more" });
+  const hadNextCursor = await loadMore.isVisible();
+  if (hadNextCursor) {
+    await loadMore.click();
+    await page.waitForFunction((count) => document.querySelectorAll(".thread-result").length > count, firstPageThreads, { timeout: 20_000 });
+  }
+  const listedThreads = await page.locator(".thread-result").count();
+  process.stdout.write(`${JSON.stringify({ ok: true, connectedToLocalCodex: true, firstPageThreads, hadNextCursor, listedThreads })}\n`);
 } finally {
   await application?.close();
   await rm(scratch, { recursive: true, force: true });

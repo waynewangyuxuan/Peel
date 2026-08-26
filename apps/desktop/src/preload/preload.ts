@@ -9,6 +9,7 @@ import type {
   OpenTargetInput,
   PeelApi,
   PeelState,
+  SearchThreadsInput,
   SendTurnInput,
   StartSpaceInput,
   ThreadSnapshot,
@@ -24,7 +25,7 @@ function subscription<T>(channel: string, listener: (payload: T) => void): () =>
 
 const api: PeelApi = {
   bootstrap: async () => await ipcRenderer.invoke(IPC.bootstrap) as BootstrapPayload,
-  searchThreads: async (term) => await ipcRenderer.invoke(IPC.searchThreads, term) as ThreadListResponse,
+  searchThreads: async (input: SearchThreadsInput) => await ipcRenderer.invoke(IPC.searchThreads, input) as ThreadListResponse,
   readThread: async (threadId) => await ipcRenderer.invoke(IPC.readThread, threadId) as ThreadSnapshot,
   startSpace: async (input: StartSpaceInput) => await ipcRenderer.invoke(IPC.startSpace, input) as PeelState,
   saveState: async (state) => await ipcRenderer.invoke(IPC.saveState, state) as PeelState,

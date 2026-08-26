@@ -142,9 +142,17 @@ export interface VoiceTranscription {
   isFinal: true;
 }
 
+export const THREAD_SEARCH_PAGE_SIZE = 30;
+export const THREAD_SEARCH_CACHE_TTL_MS = 15_000;
+
+export interface SearchThreadsInput {
+  term: string;
+  cursor?: string | null;
+}
+
 export interface PeelApi {
   bootstrap(): Promise<BootstrapPayload>;
-  searchThreads(term: string): Promise<ThreadListResponse>;
+  searchThreads(input: SearchThreadsInput): Promise<ThreadListResponse>;
   readThread(threadId: string): Promise<ThreadSnapshot>;
   startSpace(input: StartSpaceInput): Promise<PeelState>;
   saveState(state: PeelState): Promise<PeelState>;

@@ -5,6 +5,7 @@ Peel is a macOS desktop client for navigating real Codex Threads as a single-roo
 ## Product boundary
 
 - Start a Space by searching and selecting an existing Codex Chat. Project membership is neither required nor displayed.
+- Thread discovery warms a 30-Chat recent page after Codex connects, keeps a 15-second in-memory page cache, uses App Server cursors for explicit progressive loading, and never treats the first page as the complete Chat history.
 - Focus is the full conversation surface: streamed Items, commands, file changes, approvals, Activity, attachments, editable per-Thread drafts, Voice Dictation, and a safe fallback for unknown Items.
 - A completed Turn can create a local, cancellable Fork Draft. No Thread or Worktree exists until First Send.
 - Overview contains deterministic Fork cards and real Fork edges only. Card positions and camera state are stable and persisted.

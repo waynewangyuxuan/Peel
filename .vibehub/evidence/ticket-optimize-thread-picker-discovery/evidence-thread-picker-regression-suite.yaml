@@ -1,0 +1,25 @@
+{
+  "acceptance_ids": [
+    "discovery-regression-coverage"
+  ],
+  "evidence_id": "evidence-thread-picker-regression-suite",
+  "kind": "ticket_evidence",
+  "origin": "agent",
+  "recorded_at": "2026-08-26T08:21:58Z",
+  "refs": [
+    "apps/desktop/test/peel-service-search.test.ts",
+    "apps/desktop/test/thread-search.test.ts",
+    "apps/desktop/e2e/fixtures/codex",
+    "apps/desktop/e2e/v01-journey.spec.ts",
+    "apps/desktop/scripts/verify-package.mjs",
+    "apps/desktop/scripts/verify-live-codex.mjs",
+    "command:npm test",
+    "command:npm run build",
+    "command:npm run test:e2e --workspace @peel/desktop",
+    "command:npm run verify:package --workspace @peel/desktop",
+    "command:npm run verify:live-codex --workspace @peel/desktop"
+  ],
+  "schema_version": 1,
+  "summary": "All 17 App Server, 10 Git adapter, and 15 desktop tests pass, followed by the complete Electron v0.1 journey and rebuilt-package smoke. The 71-Thread fixture covers the 30/60 cursor boundary, a result beyond the old 50 limit, de-duplication, warm and repeated latency budgets, delayed out-of-order search, and selection of Catalog direction 54 before starting the original Spatial product direction flow. The read-only live check independently confirms a local 30-item first page, real next cursor, and 60 listed Threads.",
+  "ticket_id": "ticket-optimize-thread-picker-discovery"
+}

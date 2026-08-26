@@ -11,15 +11,18 @@ import {
 } from "@peel/codex-app-server";
 import { GitWorkspaceAdapter, GitWorkspaceError } from "@peel/git-workspace";
 
-import type {
-  ApprovalDecisionInput,
-  BootstrapPayload,
-  CommitForkInput,
-  CommitForkResult,
-  PeelState,
-  SendTurnInput,
-  StartSpaceInput,
-  ThreadSnapshot,
+import {
+  THREAD_SEARCH_CACHE_TTL_MS,
+  THREAD_SEARCH_PAGE_SIZE,
+  type ApprovalDecisionInput,
+  type BootstrapPayload,
+  type CommitForkInput,
+  type CommitForkResult,
+  type PeelState,
+  type SearchThreadsInput,
+  type SendTurnInput,
+  type StartSpaceInput,
+  type ThreadSnapshot,
 } from "../shared/contracts";
 import { automaticTitle, createSpace } from "../shared/state";
 import { StateStore } from "./state-store";
@@ -27,6 +30,11 @@ import { StateStore } from "./state-store";
 interface PendingAutomaticTitle {
   prompt: string;
   firstTurnId: string;
+}
+
+interface CachedThreadPage {
+  expiresAt: number;
+  response: ThreadListResponse;
 }
 
 export class PeelService extends EventEmitter {
@@ -37,13 +45,17 @@ export class PeelService extends EventEmitter {
   readonly #worktreesRoot: string;
   readonly #automaticTitles = new Map<string, PendingAutomaticTitle>();
   readonly #titleQueues = new Map<string, Promise<void>>();
+  readonly #threadPages = new Map<string, CachedThreadPage>();
+  readonly #threadPageRequests = new Map<string, Promise<ThreadListResponse>>();
+  readonly #now: () => number;
   #connected = false;
   #connectionError: string | null = null;
 
-  constructor(userDataPath: string, options: { codexBinary?: string; stateFailureMarker?: string } = {}) {
+  constructor(userDataPath: string, options: { codexBinary?: string; stateFailureMarker?: string; now?: () => number } = {}) {
     super();
     this.#store = new StateStore(userDataPath, options.stateFailureMarker);
     this.#worktreesRoot = join(userDataPath, "Worktrees");
+    this.#now = options.now ?? Date.now;
     this.transport = new AppServerTransport({ reconnect: true, ...(options.codexBinary ? { codexBinary: options.codexBinary } : {}) });
     this.client = new AppServerClient(this.transport);
     this.client.on("notification", (notification: AppServerNotification) => {
@@ -51,7 +63,10 @@ export class PeelService extends EventEmitter {
       void this.#handleAutomaticTitle(notification);
     });
     this.client.on("serverRequest", (request: AppServerServerRequest) => this.emit("serverRequest", request));
-    this.transport.on("ready", () => this.#setConnection(true, null));
+    this.transport.on("ready", () => {
+      this.#setConnection(true, null);
+      this.#warmRecentThreads();
+    });
     this.transport.on("disconnected", (error: Error) => this.#setConnection(false, error.message));
     this.transport.on("failed", (error: Error) => this.#setConnection(false, error.message));
   }
@@ -60,6 +75,7 @@ export class PeelService extends EventEmitter {
     try {
       await this.client.connect();
       this.#setConnection(true, null);
+      this.#warmRecentThreads();
     } catch (error) {
       this.#setConnection(false, messageOf(error));
     }
@@ -78,9 +94,32 @@ export class PeelService extends EventEmitter {
     };
   }
 
-  async searchThreads(term: string): Promise<ThreadListResponse> {
+  async searchThreads(input: SearchThreadsInput): Promise<ThreadListResponse> {
     this.#requireConnection();
-    return await this.client.searchThreads(term, { limit: 50, sortKey: "updated_at", sortDirection: "desc" });
+    const term = input.term.trim();
+    const cursor = input.cursor ?? null;
+    const key = JSON.stringify([term.toLocaleLowerCase(), cursor]);
+    const cached = this.#threadPages.get(key);
+    if (cached && cached.expiresAt > this.#now()) return cached.response;
+    const pending = this.#threadPageRequests.get(key);
+    if (pending) return await pending;
+    const request = this.client.searchThreads(term, {
+      cursor,
+      limit: THREAD_SEARCH_PAGE_SIZE,
+      sortKey: "updated_at",
+      sortDirection: "desc",
+    }).then((response) => {
+      this.#threadPages.set(key, { expiresAt: this.#now() + THREAD_SEARCH_CACHE_TTL_MS, response });
+      return response;
+    }).finally(() => {
+      this.#threadPageRequests.delete(key);
+    });
+    this.#threadPageRequests.set(key, request);
+    return await request;
+  }
+
+  #warmRecentThreads(): void {
+    void this.searchThreads({ term: "" }).catch(() => undefined);
   }
 
   async readThread(threadId: string): Promise<ThreadSnapshot> {

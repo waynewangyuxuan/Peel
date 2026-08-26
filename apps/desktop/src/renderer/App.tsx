@@ -1,14 +1,15 @@
-import type { AppServerServerRequest, CodexThread, ThreadListResponse, UserInput } from "@peel/codex-app-server";
+import type { AppServerServerRequest, ThreadListResponse, UserInput } from "@peel/codex-app-server";
 import type { WorkspaceDiffSummary } from "@peel/git-workspace";
 import { useCallback, useEffect, useMemo, useRef, useState, type ReactNode } from "react";
 import { flushSync } from "react-dom";
 
-import type { ForkDraft, PeelState, Point, SpaceNode, SpaceRecord, ThreadSnapshot } from "../shared/contracts";
+import { THREAD_SEARCH_CACHE_TTL_MS, type ForkDraft, type PeelState, type Point, type SpaceNode, type SpaceRecord, type ThreadSnapshot } from "../shared/contracts";
 import { emptyState, suggestedChildPosition } from "../shared/state";
 import { ForkComposer, Transcript } from "./Transcript";
 import { Overview } from "./Overview";
 import { Icon } from "./icons";
 import { clip, itemText, latestCompletedTurn, relativeTime } from "./lib";
+import { mergeThreadPage, threadMatches } from "./thread-search";
 
 export function App(): ReactNode {
   const [state, setState] = useState<PeelState | null>(null);
@@ -429,29 +430,90 @@ function LineageRail({ space, activeThreadId, threads, onSelect, onRename }: {
 function ThreadPicker({ connected, onClose, onStart }: { connected: boolean; onClose(): void; onStart(threadId: string): Promise<void> }): ReactNode {
   const [term, setTerm] = useState("");
   const [result, setResult] = useState<ThreadListResponse | null>(null);
-  const [loading, setLoading] = useState(false);
+  const [phase, setPhase] = useState<"initial" | "search" | "more" | null>(null);
   const [error, setError] = useState<string | null>(null);
+  const version = useRef(0);
+  const activeTerm = useRef("");
+  const recentPage = useRef<ThreadListResponse | null>(null);
+  const completedQueries = useRef(new Map<string, { expiresAt: number; response: ThreadListResponse }>());
+  const normalizedTerm = term.trim();
+  activeTerm.current = normalizedTerm;
+
   useEffect(() => {
     if (!connected) return;
+    const requestVersion = ++version.current;
+    const query = normalizedTerm;
+    const cachedQuery = completedQueries.current.get(query.toLocaleLowerCase());
+    const cached = cachedQuery && cachedQuery.expiresAt > Date.now() ? cachedQuery.response : null;
+    const provisional = query && recentPage.current
+      ? { data: recentPage.current.data.filter((thread) => threadMatches(thread, query)), nextCursor: null, backwardsCursor: null }
+      : null;
+    const immediate = cached ?? (query ? provisional : recentPage.current);
+    if (immediate) setResult(immediate);
+    setError(null);
     const timer = window.setTimeout(() => {
-      setLoading(true);
-      window.peel.searchThreads(term).then(setResult).catch((reason) => setError(messageOf(reason))).finally(() => setLoading(false));
-    }, term ? 180 : 0);
-    return () => window.clearTimeout(timer);
-  }, [connected, term]);
+      setPhase(immediate ? "search" : "initial");
+      window.peel.searchThreads({ term: query, cursor: null }).then((response) => {
+        if (version.current !== requestVersion || activeTerm.current !== query) return;
+        if (!query) recentPage.current = response;
+        completedQueries.current.set(query.toLocaleLowerCase(), {
+          expiresAt: Date.now() + THREAD_SEARCH_CACHE_TTL_MS,
+          response,
+        });
+        setResult(response);
+      }).catch((reason) => {
+        if (version.current === requestVersion) setError(messageOf(reason));
+      }).finally(() => {
+        if (version.current === requestVersion) setPhase(null);
+      });
+    }, query ? 120 : 0);
+    return () => {
+      window.clearTimeout(timer);
+      if (version.current === requestVersion) version.current += 1;
+    };
+  }, [connected, normalizedTerm]);
+
+  const loadMore = async (): Promise<void> => {
+    const cursor = result?.nextCursor;
+    if (!cursor || phase) return;
+    const requestVersion = version.current;
+    const query = normalizedTerm;
+    setPhase("more");
+    setError(null);
+    try {
+      const page = await window.peel.searchThreads({ term: query, cursor });
+      if (version.current !== requestVersion || activeTerm.current !== query) return;
+      setResult((current) => current ? mergeThreadPage(current, page) : page);
+    } catch (reason) {
+      if (version.current === requestVersion) setError(messageOf(reason));
+    } finally {
+      if (version.current === requestVersion) setPhase(null);
+    }
+  };
+
+  const loaded = result?.data.length ?? 0;
   return <div className="modal-backdrop" onPointerDown={(event) => { if (event.target === event.currentTarget) onClose(); }}>
     <section className="thread-picker">
       <div className="picker-header"><div><div className="eyebrow">New Space</div><h2>Start from a Codex Chat</h2></div><button className="icon-button" onClick={onClose}><Icon name="close"/></button></div>
-      <div className="search-box"><Icon name="search"/><input autoFocus value={term} onChange={(event) => setTerm(event.target.value)} placeholder="Search titles or messages…"/></div>
+      <div className="search-box"><Icon name="search"/><input aria-label="Search Codex Chats" autoFocus value={term} onChange={(event) => setTerm(event.target.value)} placeholder="Search titles or messages…"/></div>
       {!connected && <div className="picker-state error">Codex is not connected. {" "}<small>The App Server must be available to search real Chats.</small></div>}
-      {error && <div className="picker-state error">{error}</div>}
-      {loading && <div className="picker-state">Searching real Codex Chats…</div>}
-      <div className="thread-results">{result?.data.map((thread) => <button key={thread.id} onClick={() => void onStart(thread.id)}>
+      <div className="thread-results" aria-busy={phase !== null}>{result?.data.map((thread) => <button className="thread-result" key={thread.id} onClick={() => void onStart(thread.id)}>
         <span className={`result-status ${thread.status.type === "active" ? "active" : ""}`}/>
         <span><strong>{thread.name || clip(thread.preview, 64) || "Untitled Chat"}</strong><small>{clip(thread.preview, 120) || thread.cwd}</small><em>{relativeTime(thread.updatedAt)} · {thread.turns?.length ?? 0} turns</em></span>
         <Icon name="chevron"/>
-      </button>)}</div>
-      {result && result.data.length === 0 && !loading && <div className="picker-state">No matching Chats.</div>}
+      </button>)}
+        {phase === "initial" && loaded === 0 && <div className="picker-results-state" role="status"><span className="mini-spinner"/>Loading recent Codex Chats…</div>}
+        {phase === "search" && <div className="picker-results-state subtle" role="status"><span className="mini-spinner"/>Searching all Codex Chats…</div>}
+        {phase === "more" && <div className="picker-results-state subtle" role="status"><span className="mini-spinner"/>Loading more Chats…</div>}
+        {error && <div className="picker-results-state error" role="alert">{error}<small>Your current results are still available. Try again.</small></div>}
+        {result && loaded === 0 && phase === null && !error && <div className="picker-results-state">No matching Chats.</div>}
+        {result && loaded > 0 && <div className="picker-pagination" aria-live="polite">
+          <span>{loaded} Chat{loaded === 1 ? "" : "s"} loaded</span>
+          {result.nextCursor
+            ? <button className="load-more" disabled={phase !== null} onClick={() => void loadMore()}>{phase === "more" ? "Loading…" : "Load more"}</button>
+            : <span>{phase === "search" ? "Checking full history" : error ? "Results may be incomplete" : "End of results"}</span>}
+        </div>}
+      </div>
       <footer>Selecting a Chat creates one Space Root. Peel won’t move it into or read a Project.</footer>
     </section>
   </div>;

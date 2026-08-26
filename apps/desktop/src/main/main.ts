@@ -8,6 +8,7 @@ import type {
   CommitForkInput,
   OpenTargetInput,
   PeelState,
+  SearchThreadsInput,
   SendTurnInput,
   StartSpaceInput,
 } from "../shared/contracts";
@@ -90,7 +91,7 @@ async function flushRenderer(): Promise<void> {
 function registerIpc(peel: PeelService, voice: VoiceService): void {
   ipcMain.on(IPC.flushComplete, () => flushResolver?.());
   ipcMain.handle(IPC.bootstrap, async () => await peel.bootstrap());
-  ipcMain.handle(IPC.searchThreads, async (_event, term: string) => await peel.searchThreads(term));
+  ipcMain.handle(IPC.searchThreads, async (_event, input: SearchThreadsInput) => await peel.searchThreads(input));
   ipcMain.handle(IPC.readThread, async (_event, threadId: string) => await peel.readThread(threadId));
   ipcMain.handle(IPC.startSpace, async (_event, input: StartSpaceInput) => await peel.startSpace(input));
   ipcMain.handle(IPC.saveState, async (_event, state: PeelState) => await peel.saveState(state));

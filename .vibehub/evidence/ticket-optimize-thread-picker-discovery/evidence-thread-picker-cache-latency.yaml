@@ -1,0 +1,21 @@
+{
+  "acceptance_ids": [
+    "warm-cache-and-deduplication",
+    "responsive-warm-and-provisional-search"
+  ],
+  "evidence_id": "evidence-thread-picker-cache-latency",
+  "kind": "ticket_evidence",
+  "origin": "agent",
+  "recorded_at": "2026-08-26T08:21:58Z",
+  "refs": [
+    "apps/desktop/src/main/peel-service.ts",
+    "apps/desktop/src/renderer/App.tsx",
+    "apps/desktop/test/peel-service-search.test.ts",
+    "apps/desktop/test/thread-search.test.ts",
+    "apps/desktop/e2e/fixtures/codex",
+    "apps/desktop/e2e/v01-journey.spec.ts"
+  ],
+  "schema_version": 1,
+  "summary": "The service warms the recent first page after connection without delaying bootstrap, keys cache and in-flight work by exact normalized term plus cursor, shares concurrent identical requests, and expires completed pages at the exact 15,000ms boundary. With the fixture delaying thread/list by 750ms, the Electron journey measures a warmed Picker open under 100ms with no new request, a matching provisional result under 100ms while authoritative search continues, and an identical repeated query under 100ms without another App Server request.",
+  "ticket_id": "ticket-optimize-thread-picker-discovery"
+}
