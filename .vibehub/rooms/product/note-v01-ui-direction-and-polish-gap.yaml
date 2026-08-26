@@ -1,6 +1,6 @@
 {
   "context_id": "note-v01-ui-direction-and-polish-gap",
-  "detail": "用户 dogfood 后认为功能整体不错，但视觉方向已经跑偏，交付呈现像完成了功能而没有完成打磨。这不是单个颜色或间距缺陷，而是需要以原始 Demo、当前真实功能密度和桌面端使用感为证据，重新审查信息层级、Typography、Spacing、Material、状态表达、Motion 与各 Surface 的一致性。广泛重写样式前应先交付可比较的视觉审计与目标方向，让用户确认方向，再进入实现。",
+  "detail": "用户 dogfood 后认为功能整体不错，但视觉方向已经跑偏，交付呈现像完成了功能而没有完成打磨。这不是单个颜色或间距缺陷，而是需要把生产实现重新对齐已保存的原始 Demo：信息层级、Typography、Spacing、Material、状态表达、Motion 与各 Surface 的一致性都应以 Demo 为视觉权威。真实 Transcript、Approval、Voice、Worktree、失败恢复和 30–50 Node 规模只要求在该方向内做生产适配，不构成重新提案视觉方向的理由。",
   "evidence": [
     {
       "note": "用户对当前可运行 v0.1 的直接视觉质量判断。",

@@ -1,24 +1,32 @@
 {
   "acceptance": [
     {
-      "acceptance_id": "refine-after-direction",
-      "criterion": "After the human visual-direction and Thread Picker discovery Outcomes exist, this Ticket is rewritten as maturity firm with the selected direction's exact surface, token, state, motion and accessibility acceptance instead of proceeding from this draft."
+      "acceptance_id": "demo-visual-alignment",
+      "criterion": "At the same 1440px desktop viewport and equivalent product states, Welcome, Thread Picker, Focus, Fork Draft, Overview and Diff visibly share the preserved Demo's neutral workbench language: layout proportions, restrained palette, typography hierarchy, spacing rhythm, border/radius/shadow material, icon weight, density and 220–420ms Focus/Overview motion are implemented from the Demo rather than from a new visual direction."
+    },
+    {
+      "acceptance_id": "production-state-polish",
+      "criterion": "Real Transcript, Streaming, Approval, Command, File Change, Subagent, Voice, Worktree, recoverable-error and Thread Picker cold/warm/search/pagination states use the same Demo-derived visual system with deliberate hover, focus, pressed, loading, disabled, error and empty treatments; no delivered state looks like a raw implementation fallback."
     },
     {
       "acceptance_id": "retain-product-contracts",
-      "criterion": "The refined implementation preserves Thread-first entry, Focus fidelity, deterministic Overview, exact Fork lineage, recoverable First Send, Voice Draft safety, Worktree/Diff boundaries and persisted view state."
+      "criterion": "The visual implementation preserves Thread-first entry, screen-space Focus fidelity, deterministic Overview, exact Fork lineage, recoverable First Send, Voice Draft safety, Worktree/Diff boundaries, persisted view state and keyboard-visible accessibility while removing obsolete Project-first visual content."
+    },
+    {
+      "acceptance_id": "scale-and-layout-integrity",
+      "criterion": "Representative 30–50 Node Overview, long Transcript/code, narrow desktop window and drawer/open-overlay states retain readable hierarchy with no clipped primary action, accidental overlap or global page scroll; production adaptations remain recognizably within the Demo direction."
     },
     {
       "acceptance_id": "visual-regression-set",
-      "criterion": "The refined implementation defines and verifies representative light/dark, empty/loading/error, Focus/Fork/Overview/Diff and scale screenshots, including the final Thread Picker cold, warm, provisional-search, Load more, exhaustion and recoverable-error states, so polish does not depend on one happy-path frame."
+      "criterion": "Checked-in or test-produced reference screenshots cover equivalent Demo and production states for Welcome/Picker, Focus, Fork Draft, Overview, Diff, Voice/error and scale; automated interaction coverage and a final rendered review verify that the polish did not regress the v0.1 behavior contract."
     }
   ],
   "constraints": [
-    "Do not execute while maturity remains draft.",
     "Do not trade full-fidelity Transcript readability or deterministic Overview facts for decorative novelty.",
-    "Do not reintroduce Project-first navigation, arbitrary graph editing or semantic AI interpretation."
+    "Do not reintroduce Project-first navigation, arbitrary graph editing or semantic AI interpretation.",
+    "Do not require another visual-direction proposal or human selection before implementation; the preserved Demo is authoritative."
   ],
-  "context": "The implementation direction is intentionally deferred until the visual proposal, human selection, and final Thread Picker states are complete. Once unblocked, this same Ticket must be refined in place with direction-specific, screenshot-verifiable acceptance before execution.",
+  "context": "Human clarification removed the proposed audit-and-selection detour: the original Demo HTML already defines the v0.1 visual direction. This Ticket directly translates that runnable baseline into the complete production surface, adapting only where real Codex states, accessibility and scale require it. It follows the focused Thread Picker repair so the polish pass styles the final discovery states.",
   "context_refs": [
     {
       "purpose": "Records why a broad UI polish delivery is needed.",
@@ -29,22 +37,26 @@
       "ref": ".vibehub/rooms/product/note-demo-visual-interaction-baseline.yaml"
     },
     {
+      "purpose": "Records the human decision that the Demo is the visual authority and no direction audit is needed.",
+      "ref": ".vibehub/rooms/product/decision-demo-authoritative-v01-ui-direction.yaml"
+    },
+    {
+      "purpose": "Provides the exact runnable CSS, layout, states and motion reference.",
+      "ref": "docs/product/source/peel-demo-v0-original.html"
+    },
+    {
       "purpose": "Protects delivered behavior through the visual refactor.",
       "ref": ".vibehub/rooms/product/contract-v01-core-spatial-fork-loop.yaml"
     }
   ],
   "kind": "ticket",
-  "maturity": "draft",
-  "outcome": "Peel's production desktop surfaces feel cohesive, deliberate and product-ready in the Wayne-approved visual direction without regressing the v0.1 behavior contract.",
+  "maturity": "firm",
+  "outcome": "Peel's complete production desktop surface is visibly aligned with the preserved Demo and feels deliberately finished without regressing the real v0.1 behavior contract.",
   "provenance_refs": [
-    "conversation:2026-08-26-dogfood-ui-search-feedback"
+    "conversation:2026-08-26-dogfood-ui-search-feedback",
+    "conversation:2026-08-26-demo-is-ui-direction"
   ],
   "relations": [
-    {
-      "rationale": "The chosen target direction determines the real implementation acceptance.",
-      "target_ticket_id": "ticket-decide-v01-visual-direction",
-      "type": "depends_on"
-    },
     {
       "rationale": "The broad polish pass must style and verify the final functional Picker states rather than an obsolete one-page surface.",
       "target_ticket_id": "ticket-optimize-thread-picker-discovery",

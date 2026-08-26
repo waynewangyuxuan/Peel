@@ -1,0 +1,50 @@
+{
+  "context_id": "decision-demo-authoritative-v01-ui-direction",
+  "detail": "v0.1 的视觉方向已经由无损保存的原始 Demo HTML 确定，不再安排视觉审计、多方向提案或二次方向选择。生产 UI 必须直接对齐 Demo 的中性桌面工作台质感、信息层级、布局比例、Typography、Spacing、Material、状态表达与 Motion。实现可以为 Thread-first 入口、真实 Codex 状态、失败恢复、无障碍和 30–50 Node 规模做必要适配，但不能借此另起一套视觉语言。Demo 中已被后续决策取代的 Project-first 文案和 membership 模型仍不得恢复。",
+  "evidence": [
+    {
+      "note": "用户明确指出已有 Demo 就是方向，不需要再审计或选择视觉方向。",
+      "ref": "conversation:2026-08-26-demo-is-ui-direction"
+    },
+    {
+      "note": "无损保存的自包含 Demo HTML 是实现参照。",
+      "ref": "docs/product/source/peel-demo-v0-original.html"
+    },
+    {
+      "note": "已有 Context 提炼了 Demo 的布局、Motion、Surface 与适用边界。",
+      "ref": ".vibehub/rooms/product/note-demo-visual-interaction-baseline.yaml"
+    }
+  ],
+  "kind": "context",
+  "relations": [
+    {
+      "target_context_id": "note-v01-ui-direction-and-polish-gap",
+      "type": "relates_to"
+    },
+    {
+      "target_context_id": "note-demo-visual-interaction-baseline",
+      "type": "relates_to"
+    },
+    {
+      "target_context_id": "change-original-project-registration-superseded",
+      "type": "relates_to"
+    }
+  ],
+  "schema_version": 1,
+  "source": {
+    "captured_at": "2026-08-26T08:45:00Z",
+    "quote": "我们都有 demo 的 html，我不需要审计方向。",
+    "ref": "conversation:2026-08-26-demo-is-ui-direction"
+  },
+  "state": "active",
+  "summary": "v0.1 直接以原始 Demo HTML 为视觉权威，不再增加方向审计与选择门槛",
+  "tags": [
+    "decision",
+    "v0.1",
+    "demo",
+    "visual-authority",
+    "ui-polish",
+    "supersession"
+  ],
+  "type": "decision"
+}
