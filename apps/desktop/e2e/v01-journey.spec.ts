@@ -92,6 +92,7 @@ test("real Thread-first Fork loop, recovery surfaces, scale, and restart", async
   test.setTimeout(120_000);
   await launch();
   await expect(page.getByRole("button", { name: /Choose a Codex Chat/ })).toBeEnabled();
+  await page.screenshot({ path: join(desktopRoot, "test-results/ui-welcome.png") });
   await expect.poll(async () => (await readFile(rpcLog, "utf8")).includes('"method":"fixture/thread-list/responded"')).toBe(true);
   const threadListsBeforeWarmOpen = (await readFile(rpcLog, "utf8")).match(/"method":"thread\/list"/g)?.length ?? 0;
   const warmOpenMs = await page.evaluate(async () => {
@@ -104,6 +105,7 @@ test("real Thread-first Fork loop, recovery surfaces, scale, and restart", async
   });
   expect(warmOpenMs).toBeLessThan(100);
   await expect(page.locator(".thread-result")).toHaveCount(30);
+  await page.screenshot({ path: join(desktopRoot, "test-results/ui-thread-picker.png") });
   await page.waitForTimeout(150);
   const threadListsAfterWarmOpen = (await readFile(rpcLog, "utf8")).match(/"method":"thread\/list"/g)?.length ?? 0;
   expect(threadListsAfterWarmOpen).toBe(threadListsBeforeWarmOpen);
@@ -194,6 +196,7 @@ test("real Thread-first Fork loop, recovery surfaces, scale, and restart", async
   await expect(page.getByText("Subagent activity")).toBeVisible();
   await expect(page.getByText("A recoverable fixture error")).toBeVisible();
   await expect(page.getByText("Codex item: futureCapability")).toBeVisible();
+  await page.screenshot({ path: join(desktopRoot, "test-results/ui-focus.png") });
   const codeLayout = await page.locator(".code-block").evaluate((element) => ({
     whiteSpace: getComputedStyle(element).whiteSpace,
     overflowX: getComputedStyle(element).overflowX,
@@ -223,6 +226,7 @@ test("real Thread-first Fork loop, recovery surfaces, scale, and restart", async
   });
   expect(forkLatency).toBeLessThan(150);
   await page.locator(".fork-surface textarea").fill("Cancel this local-only direction");
+  await page.screenshot({ path: join(desktopRoot, "test-results/ui-fork-draft.png") });
   await page.keyboard.press("Escape");
   await expect(page.locator(".fork-surface")).toHaveCount(0);
   const beforeSend = await readFile(rpcLog, "utf8");
@@ -309,6 +313,7 @@ test("real Thread-first Fork loop, recovery surfaces, scale, and restart", async
   await page.getByLabel("Rename Lineage branch name").press("Enter");
   const renamedBranchCard = page.locator(".overview-card").filter({ hasText: "Overview branch name" });
   await expect(renamedBranchCard).toBeVisible();
+  await page.screenshot({ path: join(desktopRoot, "test-results/ui-overview.png") });
   await renamedBranchCard.locator(".card-snippets button").nth(1).click();
   await expect(page.locator('.turn.highlighted[data-turn-id="turn-3"]')).toBeVisible();
 
@@ -559,6 +564,7 @@ test("real Thread-first Fork loop, recovery surfaces, scale, and restart", async
   await expect(page.getByText("DIFF_TEST.md", { exact: true })).toBeVisible();
   await expect(page.locator(".diff-patch")).toContainText("diff drawer exact file and patch");
   await expect(page.getByRole("button", { name: "Open in Codex" })).toBeVisible();
+  await page.screenshot({ path: join(desktopRoot, "test-results/ui-diff.png") });
   await page.locator(".diff-drawer").getByRole("button").first().click();
   await expect(page.getByLabel("Message")).toBeVisible();
 });

@@ -40,7 +40,7 @@ async function createWindow(): Promise<void> {
     minHeight: 680,
     titleBarStyle: "hiddenInset",
     trafficLightPosition: { x: 16, y: 16 },
-    backgroundColor: nativeTheme.shouldUseDarkColors ? "#171717" : "#f4f2ed",
+    backgroundColor: "#e9e9e6",
     show: false,
     webPreferences: {
       preload: join(appRoot(), "dist/preload/preload.cjs"),

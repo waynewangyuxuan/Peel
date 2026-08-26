@@ -494,7 +494,7 @@ function ThreadPicker({ connected, onClose, onStart }: { connected: boolean; onC
   const loaded = result?.data.length ?? 0;
   return <div className="modal-backdrop" onPointerDown={(event) => { if (event.target === event.currentTarget) onClose(); }}>
     <section className="thread-picker">
-      <div className="picker-header"><div><div className="eyebrow">New Space</div><h2>Start from a Codex Chat</h2></div><button className="icon-button" onClick={onClose}><Icon name="close"/></button></div>
+      <div className="picker-header"><div><div className="eyebrow">New Space</div><h2>Start from a Codex Chat</h2></div><button className="icon-button" aria-label="Close Chat picker" onClick={onClose}><Icon name="close"/></button></div>
       <div className="search-box"><Icon name="search"/><input aria-label="Search Codex Chats" autoFocus value={term} onChange={(event) => setTerm(event.target.value)} placeholder="Search titles or messages…"/></div>
       {!connected && <div className="picker-state error">Codex is not connected. {" "}<small>The App Server must be available to search real Chats.</small></div>}
       <div className="thread-results" aria-busy={phase !== null}>{result?.data.map((thread) => <button className="thread-result" key={thread.id} onClick={() => void onStart(thread.id)}>
@@ -525,7 +525,7 @@ function DiffDrawer({ node, onClose }: { node: SpaceNode; onClose(): void }): Re
   useEffect(() => { void window.peel.getDiff(node.cwd).then(setValue).catch((reason) => setError(messageOf(reason))); }, [node.cwd]);
   return <div className="drawer-backdrop" onPointerDown={(event) => { if (event.target === event.currentTarget) onClose(); }}>
     <aside className="diff-drawer">
-      <header><div><div className="eyebrow">Workspace changes</div><h2>{node.worktreeName || "Current workspace"}</h2></div><button className="icon-button" onClick={onClose}><Icon name="close"/></button></header>
+      <header><div><div className="eyebrow">Workspace changes</div><h2>{node.worktreeName || "Current workspace"}</h2></div><button className="icon-button" aria-label="Close Diff" onClick={onClose}><Icon name="close"/></button></header>
       {error && <div className="drawer-error">{error}</div>}
       {!value && !error && <div className="drawer-loading">Reading Git changes…</div>}
       {value && <>
