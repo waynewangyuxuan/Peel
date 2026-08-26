@@ -1,0 +1,17 @@
+{
+  "acceptance_ids": [
+    "overview-visual-and-scale-regression"
+  ],
+  "evidence_id": "evidence-overview-full-verification",
+  "kind": "ticket_evidence",
+  "origin": "agent",
+  "recorded_at": "2026-08-26T10:17:30Z",
+  "refs": [
+    "commit:b3a4383",
+    "command:npm test passes all 46 repository tests",
+    "command:npm run build passes Codex adapter, Git adapter, desktop typecheck, native Speech helper, renderer, main, and preload builds"
+  ],
+  "schema_version": 1,
+  "summary": "The complete repository verification passes after the final production and accessibility semantics changes: all 46 tests across the Codex adapter, Git/worktree adapter, and desktop pass, and the full build produces the adapters, native Speech helper, renderer, Electron main process, and preload bundle. This supplements the exact-HEAD Electron journey and visual screenshots with full cross-package regression proof.",
+  "ticket_id": "ticket-rebuild-overview-demo-fidelity"
+}
