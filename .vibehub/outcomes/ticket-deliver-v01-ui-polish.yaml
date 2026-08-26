@@ -1,0 +1,21 @@
+{
+  "accepted_acceptance_ids": [
+    "demo-visual-alignment",
+    "production-state-polish",
+    "retain-product-contracts",
+    "scale-and-layout-integrity",
+    "visual-regression-set"
+  ],
+  "closed_at": "2026-08-26T08:54:51Z",
+  "evidence_ids": [
+    "evidence-demo-aligned-visual-system",
+    "evidence-ui-contract-and-scale-integrity",
+    "evidence-ui-visual-regression-and-package"
+  ],
+  "kind": "ticket_outcome",
+  "schema_version": 1,
+  "status": "successful",
+  "summary": "Independent closeout accepted all five v0.1 UI-polish criteria at exact commit f48af55c27ed8d78e2531206f451d110f804bc34 after reading the exact Ticket, all five Context references including the complete preserved Demo HTML, the successful prerequisite Outcome, all three acceptance-linked Evidence records, the implementation commits and final test-only Evidence repair. Direct comparison at a 1440px viewport found that Welcome, Thread Picker, Focus, Fork Draft, Overview and Diff preserve the Demo's neutral workbench palette, compact typography, rail and header proportions, spacing, restrained material, icon weight and 220-240ms Focus/Overview motion while correctly retaining the Thread-first product model. Source and journey review confirmed polished real Transcript, stream, approval, command, file-change, subagent, worktree, recoverable-error, Picker and Voice states, including stable recording, transcribing and forced-error frames with draft safety. The final exact-HEAD Electron journey passed 1/1 in 34.5 seconds and regenerated eleven directly inspected production reference screenshots; the corrected Focus restore is fully settled, and the new Voice frames close the previously identified visual-evidence gap. Independent regression verification against the unchanged production source passed all 42 repository tests, the full build, a 50-node deterministic Overview, narrow-window containment and package creation; final package verification also passed with restoredDraft and nativeVoiceHelper true. The rendered 50-node Overview, long code, Fork overlay, Diff drawer and 1000x720 path showed no clipped primary action, accidental overlap or global page scroll, and accessibility-visible focus and reduced-motion rules remain present. No acceptance IDs remain unresolved.",
+  "ticket_id": "ticket-deliver-v01-ui-polish",
+  "unresolved_acceptance_ids": []
+}
