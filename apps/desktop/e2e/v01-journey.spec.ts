@@ -258,6 +258,11 @@ test("real Thread-first Fork loop, recovery surfaces, scale, and restart", async
   await expect(commandActivity.locator("pre").first()).toContainText("npm test");
   await expect(commandActivity.locator("header").nth(1)).toContainText("Output");
   await expect(commandActivity.locator("pre").nth(1)).toContainText("All checks passed");
+  const failedCommand = page.locator(".activity-item.technical.failed").filter({ hasText: "Command needs attention" });
+  await expect(failedCommand).toBeVisible();
+  await failedCommand.locator("summary").click();
+  await expect(failedCommand.locator("header").nth(1)).toContainText("Error output");
+  await expect(failedCommand.locator("pre").nth(1)).toContainText("One presentation check needs attention");
   const fileActivity = page.locator(".activity-item.technical").filter({ hasText: "Updated src/focus.tsx" });
   await expect(fileActivity).toBeVisible();
   await fileActivity.locator("summary").click();

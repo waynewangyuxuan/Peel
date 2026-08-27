@@ -46,6 +46,7 @@ const root = {
       item("agentMessage", "turn-2-a", "Create a local draft first, then fork on the first send."),
       item("reasoning", "turn-2-reasoning", "**Planning collaborative reasoning framework**\n\n1. Preserve exact parent provenance.\n2. Keep technical activity secondary.\n\n> The user should understand the result before the machinery."),
       item("commandExecution", "turn-2-command", "npm test\nAll checks passed", { status: "completed", command: "npm test" }),
+      item("commandExecution", "turn-2-command-failed", "npm run lint\nOne presentation check needs attention", { status: "failed", command: "npm run lint" }),
       item("fileChange", "turn-2-files", "", { changes: [{ path: "src/focus.tsx", diff: "+ renderFocus()" }] }),
       item("subAgentActivity", "turn-2-subagent", "Inspect deterministic card fields", { status: "running" }),
       item("error", "turn-2-error", "A recoverable fixture error"),
