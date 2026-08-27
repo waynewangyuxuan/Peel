@@ -55,6 +55,10 @@ export function Transcript({
   const [voiceLevels, setVoiceLevels] = useState<number[]>(() => Array.from({ length: 17 }, () => 0));
   const [recordingMs, setRecordingMs] = useState(0);
   const recorder = useRef<RecorderSession | null>(null);
+  const dictationEngine = useRef<"codex-realtime" | "native-fallback" | null>(null);
+  const dictationThreadId = useRef<string | null>(null);
+  const audioQueue = useRef<Promise<void>>(Promise.resolve());
+  const audioError = useRef<unknown>(null);
   const textarea = useRef<HTMLTextAreaElement>(null);
   const mounted = useRef(true);
   const draftRef = useRef(draft);
@@ -67,7 +71,19 @@ export function Transcript({
     mounted.current = false;
     recorder.current?.cancel();
     recorder.current = null;
+    const activeThreadId = dictationThreadId.current;
+    if (activeThreadId) void window.peel.cancelDictation(activeThreadId);
   }, []);
+
+  useEffect(() => () => {
+    recorder.current?.cancel();
+    recorder.current = null;
+    if (dictationThreadId.current === thread.id) void window.peel.cancelDictation(thread.id);
+    dictationEngine.current = null;
+    dictationThreadId.current = null;
+    audioQueue.current = Promise.resolve();
+    audioError.current = null;
+  }, [thread.id]);
 
   useEffect(() => {
     if (voice !== "recording") {
@@ -161,37 +177,70 @@ export function Transcript({
       try {
         const wav = await recorder.current.stop();
         recorder.current = null;
-        const result = await window.peel.transcribeWav(wav);
+        let result;
+        if (dictationEngine.current === "codex-realtime") {
+          await audioQueue.current;
+          if (audioError.current) throw audioError.current;
+          result = await window.peel.finishDictation(thread.id);
+        } else {
+          result = await window.peel.transcribeWav(wav);
+        }
         if (!mounted.current) return;
         const latestDraft = draftRef.current;
         onDraft([latestDraft.trimEnd(), result.text].filter(Boolean).join(latestDraft.trim() ? " " : ""));
       } catch (error) {
+        const activeThreadId = dictationThreadId.current;
+        if (activeThreadId) await window.peel.cancelDictation(activeThreadId);
         if (!mounted.current) return;
         setVoiceFeedback(voiceFailurePresentation(error));
       } finally {
+        dictationEngine.current = null;
+        dictationThreadId.current = null;
+        audioQueue.current = Promise.resolve();
+        audioError.current = null;
         if (mounted.current) setVoice("idle");
       }
       return;
     }
     try {
+      const started = await window.peel.beginDictation(thread.id);
+      dictationEngine.current = started.engine;
+      dictationThreadId.current = thread.id;
+      audioQueue.current = Promise.resolve();
+      audioError.current = null;
       const session = await startPcmRecorder((message) => {
         if (!mounted.current) return;
         recorder.current = null;
         setVoice("idle");
         setVoiceLevels(Array.from({ length: 17 }, () => 0));
         setVoiceFeedback(voiceFailurePresentation(message));
+        const activeThreadId = dictationThreadId.current;
+        if (activeThreadId) void window.peel.cancelDictation(activeThreadId);
+        dictationEngine.current = null;
+        dictationThreadId.current = null;
       }, (level) => {
         if (!mounted.current) return;
         setVoiceLevels((current) => [...current.slice(1), level]);
+      }, (chunk) => {
+        if (dictationEngine.current !== "codex-realtime" || dictationThreadId.current !== thread.id) return;
+        audioQueue.current = audioQueue.current
+          .then(async () => await window.peel.appendDictationAudio({ threadId: thread.id, ...chunk }))
+          .catch((error) => { audioError.current ??= error; });
       });
       if (!mounted.current) {
         session.cancel();
+        await window.peel.cancelDictation(thread.id);
         return;
       }
       recorder.current = session;
       setVoiceLevels(Array.from({ length: 17 }, () => 0));
       setVoice("recording");
     } catch (error) {
+      if (dictationThreadId.current) await window.peel.cancelDictation(dictationThreadId.current);
+      dictationEngine.current = null;
+      dictationThreadId.current = null;
+      audioQueue.current = Promise.resolve();
+      audioError.current = null;
       if (!mounted.current) return;
       setVoiceFeedback(voiceFailurePresentation(error));
     }

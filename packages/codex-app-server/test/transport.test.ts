@@ -13,10 +13,14 @@ import { FakeProcess } from "./fixtures.js";
 
 test("handshake, request correlation, notifications, server requests, and stderr", async () => {
   const child = new FakeProcess();
+  let spawnedArgs: string[] = [];
   const transport = new AppServerTransport({
     codexBinary: "/bin/echo",
     reconnect: false,
-    processFactory: () => child,
+    processFactory: (_binary, args) => {
+      spawnedArgs = args;
+      return child;
+    },
   });
   const notifications: unknown[] = [];
   const serverRequests: unknown[] = [];
@@ -29,6 +33,11 @@ test("handshake, request correlation, notifications, server requests, and stderr
   assert.equal(initialized.userAgent, "codex-test");
   assert.equal(transport.state, "ready");
   assert.equal(child.writes[1]?.method, "initialized");
+  assert.deepEqual(spawnedArgs, ["app-server", "--stdio", "--enable", "realtime_conversation"]);
+  assert.deepEqual((child.writes[0]?.params as { capabilities?: unknown }).capabilities, {
+    experimentalApi: true,
+    requestAttestation: false,
+  });
 
   const pending = transport.request("thread/read", { threadId: "abc", includeTurns: true });
   const request = child.writes.find((message) => message.method === "thread/read");

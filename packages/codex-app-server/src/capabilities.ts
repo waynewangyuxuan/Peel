@@ -24,6 +24,20 @@ export const REQUIRED_STABLE_NOTIFICATIONS = [
   "item/agentMessage/delta",
 ] as const;
 
+export const REALTIME_DICTATION_METHODS = [
+  "thread/realtime/start",
+  "thread/realtime/appendAudio",
+  "thread/realtime/stop",
+] as const;
+
+export const REALTIME_DICTATION_NOTIFICATIONS = [
+  "thread/realtime/started",
+  "thread/realtime/transcript/delta",
+  "thread/realtime/transcript/done",
+  "thread/realtime/error",
+  "thread/realtime/closed",
+] as const;
+
 const EXPERIMENTAL_FEATURES = new Set([
   "project-association",
   "project-inheritance",
@@ -66,7 +80,7 @@ export class CapabilityMatrix {
   }
 
   applySchemaDetection(schema: DetectedAppServerSchema): void {
-    for (const method of REQUIRED_STABLE_METHODS) {
+    for (const method of [...REQUIRED_STABLE_METHODS, ...REALTIME_DICTATION_METHODS]) {
       const status: CapabilityStatus = schema.stableMethods.has(method)
         ? "stable"
         : this.#experimentalApi && schema.experimentalMethods.has(method)
@@ -74,6 +88,14 @@ export class CapabilityMatrix {
           : "unavailable";
       this.#methods.set(method, status);
     }
+    const realtimeMethods = REALTIME_DICTATION_METHODS.every((method) =>
+      this.#methods.get(method) === "stable" || this.#methods.get(method) === "experimental-enabled");
+    const realtimeNotifications = REALTIME_DICTATION_NOTIFICATIONS.every((method) =>
+      schema.stableNotifications.has(method) ||
+      (this.#experimentalApi && schema.experimentalNotifications.has(method)));
+    this.#features.set("realtime-voice", realtimeMethods && realtimeNotifications
+      ? (REALTIME_DICTATION_METHODS.every((method) => this.#methods.get(method) === "stable") ? "stable" : "experimental-enabled")
+      : "unavailable");
     this.#detection = "installed-schema";
     this.#detectionError = null;
   }
@@ -93,6 +115,9 @@ export class CapabilityMatrix {
 
   markMethodUnavailable(method: string): void {
     this.#methods.set(method, "unavailable");
+    if ((REALTIME_DICTATION_METHODS as readonly string[]).includes(method)) {
+      this.#features.set("realtime-voice", "unavailable");
+    }
   }
 
   markFeatureUnavailable(feature: string): void {

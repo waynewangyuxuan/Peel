@@ -108,6 +108,15 @@ Electron main process
 - Permission denial, capture interruption, service unavailability, and transcription failure are first-class recoverable results. Existing Draft text is never replaced on failure.
 - The adapter may use a native helper or another explicitly selected transcription implementation. Experimental Codex Realtime APIs are not the baseline.
 
+Post-decision implementation note (2026-08-27): Peel now owns a capability-first
+Codex Realtime adapter behind this boundary. It enables the under-development
+feature only on Peel's child process and preflights each Thread before capture.
+The installed Codex 0.149 runtime still requires API-key auth for Realtime when
+the App Server is authenticated through ChatGPT/SIWC, so the current package
+honestly selects Apple Speech before recording. No API key is inherited,
+requested, stored, or exposed; a future runtime may replace the engine after a
+real `thread/realtime/started` without changing the Dictation contract.
+
 ## Packaging, updates, and security policy
 
 - Use Electron Forge for `package`, `make`, signing, notarization, and publishing. Public macOS distribution requires signing and notarization.

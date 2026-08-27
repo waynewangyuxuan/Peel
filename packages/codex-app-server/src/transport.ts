@@ -44,6 +44,7 @@ export interface TransportOptions {
   reconnect?: boolean;
   reconnectDelayMs?: number;
   processFactory?: ProcessFactory;
+  enabledFeatures?: readonly string[];
 }
 
 interface PendingRequest {
@@ -89,7 +90,7 @@ export class AppServerRequestAbortedError extends Error {
 const DEFAULT_INITIALIZE: InitializeParams = {
   clientInfo: { name: "peel", title: "Peel", version: "0.1.0" },
   capabilities: {
-    experimentalApi: false,
+    experimentalApi: true,
     requestAttestation: false,
   },
 };
@@ -326,7 +327,12 @@ export class AppServerTransport extends EventEmitter {
     const factory = this.#options.processFactory ?? defaultProcessFactory;
     const child = factory(
       this.#binary ?? (() => { throw new Error("Codex binary was not resolved"); })(),
-      ["app-server", "--stdio"],
+      [
+        "app-server",
+        "--stdio",
+        ...(this.#options.enabledFeatures ?? ["realtime_conversation"])
+          .flatMap((feature) => ["--enable", feature]),
+      ],
       allowlistedEnvironment(this.#options.env),
     );
     this.#process = child;

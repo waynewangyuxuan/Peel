@@ -3,9 +3,16 @@ export interface RecorderSession {
   cancel(): void;
 }
 
+export interface PcmAudioChunk {
+  bytes: ArrayBuffer;
+  sampleRate: number;
+  samplesPerChannel: number;
+}
+
 export async function startPcmRecorder(
   onInterrupted?: (message: string) => void,
   onLevel?: (level: number) => void,
+  onChunk?: (chunk: PcmAudioChunk) => void,
 ): Promise<RecorderSession> {
   const stream = await navigator.mediaDevices.getUserMedia({
     audio: { channelCount: 1, echoCancellation: true, noiseSuppression: true, autoGainControl: true },
@@ -22,7 +29,17 @@ export async function startPcmRecorder(
   let lastLevelAt = 0;
   let smoothedLevel = 0;
   const levelSamples = new Float32Array(analyser.fftSize);
-  processor.onaudioprocess = (event) => samples.push(new Float32Array(event.inputBuffer.getChannelData(0)));
+  processor.onaudioprocess = (event) => {
+    const chunk = new Float32Array(event.inputBuffer.getChannelData(0));
+    samples.push(chunk);
+    if (onChunk) {
+      onChunk({
+        bytes: encodePcm16(chunk),
+        sampleRate: context.sampleRate,
+        samplesPerChannel: chunk.length,
+      });
+    }
+  };
   source.connect(analyser);
   source.connect(processor);
   processor.connect(context.destination);
@@ -76,6 +93,16 @@ export function pcmAmplitude(samples: Float32Array): number {
   const rms = Math.sqrt(energy / samples.length);
   const aboveFloor = Math.max(0, rms - .008);
   return Math.min(1, Math.pow(aboveFloor / .32, .65));
+}
+
+export function encodePcm16(samples: Float32Array): ArrayBuffer {
+  const buffer = new ArrayBuffer(samples.length * 2);
+  const view = new DataView(buffer);
+  for (let index = 0; index < samples.length; index += 1) {
+    const sample = Math.max(-1, Math.min(1, samples[index] ?? 0));
+    view.setInt16(index * 2, sample < 0 ? sample * 0x8000 : sample * 0x7fff, true);
+  }
+  return buffer;
 }
 
 export function encodeWav(chunks: Float32Array[], sampleRate: number): ArrayBuffer {

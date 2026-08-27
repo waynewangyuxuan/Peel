@@ -17,6 +17,8 @@ import type {
   ThreadListResponse,
   ThreadStartParams,
   ThreadStartResponse,
+  RealtimeAudioChunk,
+  ThreadRealtimeStartParams,
   TurnStartParams,
   CommandApprovalDecision,
 } from "./protocol.js";
@@ -138,6 +140,18 @@ export class AppServerClient extends EventEmitter {
 
   async interruptTurn(threadId: string, turnId: string): Promise<void> {
     await this.#call("turn/interrupt", { threadId, turnId });
+  }
+
+  async startRealtime(params: ThreadRealtimeStartParams): Promise<void> {
+    await this.#call("thread/realtime/start", params);
+  }
+
+  async appendRealtimeAudio(threadId: string, audio: RealtimeAudioChunk): Promise<void> {
+    await this.#call("thread/realtime/appendAudio", { threadId, audio });
+  }
+
+  async stopRealtime(threadId: string): Promise<void> {
+    await this.#call("thread/realtime/stop", { threadId });
   }
 
   subscribeStatus(listener: (params: Record<string, unknown>) => void): () => void {

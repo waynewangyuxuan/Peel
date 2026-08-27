@@ -144,6 +144,39 @@ export interface TurnStartParams {
   outputSchema?: JsonValue | null;
 }
 
+export interface RealtimeAudioChunk {
+  data: string;
+  sampleRate: number;
+  numChannels: number;
+  samplesPerChannel: number | null;
+  itemId: string | null;
+}
+
+export interface ThreadRealtimeStartParams {
+  threadId: string;
+  clientManagedHandoffs?: boolean | null;
+  flushTranscriptTailOnSessionEnd?: boolean | null;
+  codexResponsesAsItems?: boolean | null;
+  outputModality: "text" | "audio";
+  includeStartupContext?: boolean | null;
+  realtimeStartInstructions?: string | null;
+  realtimeEndInstructions?: string | null;
+  prompt?: string | null;
+  version?: "v1" | "v2" | "v3" | null;
+}
+
+export interface ThreadRealtimeTranscriptDelta {
+  threadId: string;
+  role: string;
+  delta: string;
+}
+
+export interface ThreadRealtimeTranscriptDone {
+  threadId: string;
+  role: string;
+  text: string;
+}
+
 export interface InitializeParams {
   clientInfo: { name: string; title: string | null; version: string };
   capabilities: {
@@ -182,6 +215,18 @@ export interface AppServerMethodMap {
   "turn/start": { params: TurnStartParams; result: { turn: CodexTurn } };
   "turn/interrupt": {
     params: { threadId: string; turnId: string };
+    result: Record<string, never>;
+  };
+  "thread/realtime/start": {
+    params: ThreadRealtimeStartParams;
+    result: Record<string, never>;
+  };
+  "thread/realtime/appendAudio": {
+    params: { threadId: string; audio: RealtimeAudioChunk };
+    result: Record<string, never>;
+  };
+  "thread/realtime/stop": {
+    params: { threadId: string };
     result: Record<string, never>;
   };
 }

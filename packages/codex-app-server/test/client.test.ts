@@ -170,6 +170,48 @@ test("new and forked Threads start turns without an unnecessary resume", async (
   assert.equal(transport.calls.filter((call) => call.method === "thread/resume").length, 0);
 });
 
+test("typed realtime calls preserve exact transcript-only request and PCM metadata", async () => {
+  const transport = new MockTransport();
+  transport.results.set("thread/realtime/start", {});
+  transport.results.set("thread/realtime/appendAudio", {});
+  transport.results.set("thread/realtime/stop", {});
+  const client = new AppServerClient(transport as unknown as AppServerTransport);
+  await client.startRealtime({
+    threadId: "root",
+    outputModality: "text",
+    includeStartupContext: false,
+    clientManagedHandoffs: true,
+  });
+  await client.appendRealtimeAudio("root", {
+    data: "BQYH",
+    sampleRate: 16_000,
+    numChannels: 1,
+    samplesPerChannel: 3,
+    itemId: null,
+  });
+  await client.stopRealtime("root");
+  assert.deepEqual(transport.calls.slice(-3), [
+    {
+      method: "thread/realtime/start",
+      params: {
+        threadId: "root",
+        outputModality: "text",
+        includeStartupContext: false,
+        clientManagedHandoffs: true,
+      },
+    },
+    {
+      method: "thread/realtime/appendAudio",
+      params: {
+        threadId: "root",
+        audio: { data: "BQYH", sampleRate: 16_000, numChannels: 1, samplesPerChannel: 3, itemId: null },
+      },
+    },
+    { method: "thread/realtime/stop", params: { threadId: "root" } },
+  ]);
+  assert.equal(transport.calls.some((call) => call.method === "turn/start"), false);
+});
+
 test("capability gate is bound to the transport handshake flag", () => {
   const transport = new MockTransport();
   Object.defineProperty(transport, "initializeParams", {

@@ -28,6 +28,7 @@ import {
 } from "../shared/contracts";
 import { automaticTitle, createSpace } from "../shared/state";
 import { StateStore } from "./state-store";
+import { RealtimeDictationService } from "./realtime-dictation-service";
 
 interface PendingAutomaticTitle {
   prompt: string;
@@ -42,6 +43,7 @@ interface CachedThreadPage {
 export class PeelService extends EventEmitter {
   readonly transport: AppServerTransport;
   readonly client: AppServerClient;
+  readonly dictation: RealtimeDictationService;
   readonly git = new GitWorkspaceAdapter();
   readonly #store: StateStore;
   readonly #worktreesRoot: string;
@@ -61,6 +63,7 @@ export class PeelService extends EventEmitter {
     this.#now = options.now ?? Date.now;
     this.transport = new AppServerTransport({ reconnect: true, ...(options.codexBinary ? { codexBinary: options.codexBinary } : {}) });
     this.client = new AppServerClient(this.transport);
+    this.dictation = new RealtimeDictationService(this.client);
     this.client.on("notification", (notification: AppServerNotification) => {
       this.emit("notification", notification);
       void this.#handleAutomaticTitle(notification);
@@ -85,6 +88,7 @@ export class PeelService extends EventEmitter {
   }
 
   async shutdown(): Promise<void> {
+    await this.dictation.cancelAll();
     await this.transport.shutdown();
   }
 

@@ -144,6 +144,14 @@ export interface OpenTargetInput {
 export interface VoiceTranscription {
   text: string;
   isFinal: true;
+  engine?: "codex-realtime" | "native-fallback";
+}
+
+export interface DictationAudioInput {
+  threadId: string;
+  bytes: ArrayBuffer;
+  sampleRate: number;
+  samplesPerChannel: number;
 }
 
 export const THREAD_SEARCH_PAGE_SIZE = 30;
@@ -168,6 +176,10 @@ export interface PeelApi {
   getDiff(cwd: string): Promise<{ summary: WorkspaceDiffSummary; patch: string }>;
   openTarget(input: OpenTargetInput): Promise<void>;
   copyText(text: string): Promise<void>;
+  beginDictation(threadId: string): Promise<{ engine: "codex-realtime" | "native-fallback" }>;
+  appendDictationAudio(input: DictationAudioInput): Promise<void>;
+  finishDictation(threadId: string): Promise<VoiceTranscription>;
+  cancelDictation(threadId: string): Promise<void>;
   transcribeWav(bytes: ArrayBuffer): Promise<VoiceTranscription>;
   decideApproval(input: ApprovalDecisionInput): Promise<void>;
   onCodexNotification(listener: (notification: AppServerNotification) => void): () => void;
@@ -190,6 +202,10 @@ export const IPC = {
   getDiff: "peel:workspace:diff",
   openTarget: "peel:open",
   copyText: "peel:clipboard:write",
+  beginDictation: "peel:voice:begin",
+  appendDictationAudio: "peel:voice:append-audio",
+  finishDictation: "peel:voice:finish",
+  cancelDictation: "peel:voice:cancel",
   transcribeWav: "peel:voice:transcribe",
   decideApproval: "peel:approval:decide",
   codexNotification: "peel:event:codex",

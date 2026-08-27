@@ -39,6 +39,10 @@ const api: PeelApi = {
   getDiff: async (cwd) => await ipcRenderer.invoke(IPC.getDiff, cwd),
   openTarget: async (input: OpenTargetInput) => { await ipcRenderer.invoke(IPC.openTarget, input); },
   copyText: async (text: string) => { await ipcRenderer.invoke(IPC.copyText, text); },
+  beginDictation: async (threadId: string) => await ipcRenderer.invoke(IPC.beginDictation, threadId) as { engine: "codex-realtime" | "native-fallback" },
+  appendDictationAudio: async (input) => { await ipcRenderer.invoke(IPC.appendDictationAudio, input); },
+  finishDictation: async (threadId: string) => await ipcRenderer.invoke(IPC.finishDictation, threadId) as VoiceTranscription,
+  cancelDictation: async (threadId: string) => { await ipcRenderer.invoke(IPC.cancelDictation, threadId); },
   transcribeWav: async (bytes) => await ipcRenderer.invoke(IPC.transcribeWav, bytes) as VoiceTranscription,
   decideApproval: async (input: ApprovalDecisionInput) => { await ipcRenderer.invoke(IPC.decideApproval, input); },
   onCodexNotification: (listener: (payload: AppServerNotification) => void) =>

@@ -6,6 +6,7 @@ import { fileURLToPath } from "node:url";
 import type {
   ApprovalDecisionInput,
   CommitForkInput,
+  DictationAudioInput,
   OpenTargetInput,
   PeelState,
   SearchThreadsInput,
@@ -127,6 +128,10 @@ function registerIpc(peel: PeelService, voice: VoiceService): void {
   });
   ipcMain.handle(IPC.decideApproval, (_event, input: ApprovalDecisionInput) => peel.decideApproval(input));
   ipcMain.handle(IPC.copyText, (_event, text: string) => { clipboard.writeText(text); });
+  ipcMain.handle(IPC.beginDictation, async (_event, threadId: string) => await peel.dictation.begin(threadId));
+  ipcMain.handle(IPC.appendDictationAudio, async (_event, input: DictationAudioInput) => await peel.dictation.append(input));
+  ipcMain.handle(IPC.finishDictation, async (_event, threadId: string) => await peel.dictation.finish(threadId));
+  ipcMain.handle(IPC.cancelDictation, async (_event, threadId: string) => await peel.dictation.cancel(threadId));
   ipcMain.handle(IPC.openTarget, async (_event, input: OpenTargetInput) => {
     if (input.kind === "codex") {
       if (input.threadId) clipboard.writeText(input.threadId);

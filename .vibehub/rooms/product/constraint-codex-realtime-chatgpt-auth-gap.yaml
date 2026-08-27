@@ -1,0 +1,48 @@
+{
+  "context_id": "constraint-codex-realtime-chatgpt-auth-gap",
+  "detail": "Peel may enable the under-development realtime_conversation feature only for its owned App Server process and detect thread/realtime methods and notifications. On Codex 0.149.0, a real empty Thread created through the user's authenticated App Server accepts thread/realtime/start but immediately emits thread/realtime/error with `realtime conversation requires API key auth`. Official Codex source calls the environment-key path a temporary fallback until Realtime auth supports ChatGPT/SIWC sessions. Therefore method presence and experimentalApi are not sufficient proof that Server Dictation works. Peel must preflight each session before microphone capture, select Codex only after thread/realtime/started, quietly select its replaceable native adapter on this auth error, never claim Apple Speech was replaced on the current runtime, and never require, inherit, store, or expose an independent API key merely to bridge the platform gap.",
+  "evidence": [
+    {
+      "note": "Disposable App Server Thread emitted the exact auth rejection with experimentalApi enabled and remained at zero Turns and zero Item events.",
+      "ref": "live-probe:codex-0.149.0-realtime-requires-api-key-auth"
+    },
+    {
+      "note": "Official source function realtime_api_key returns the error and includes a TODO to remove the fallback once Realtime auth supports ChatGPT/SIWC sessions.",
+      "ref": "https://github.com/openai/codex/blob/main/codex-rs/core/src/realtime_conversation.rs"
+    },
+    {
+      "note": "The installed experimental schema contains start, appendAudio, stop, started, transcript, error, and closed despite the separate runtime-auth limitation.",
+      "ref": "local-schema:codex-app-server-0.149.0-experimental"
+    }
+  ],
+  "kind": "context",
+  "relations": [
+    {
+      "target_context_id": "constraint-app-server-capability-gating",
+      "type": "depends_on"
+    },
+    {
+      "target_context_id": "contract-voice-dictation-draft",
+      "type": "relates_to"
+    }
+  ],
+  "schema_version": 1,
+  "source": {
+    "captured_at": "2026-08-27T09:19:23Z",
+    "quote": "realtime conversation requires API key auth",
+    "ref": "execution:ticket-integrate-codex-realtime-dictation"
+  },
+  "state": "active",
+  "summary": "Codex App Server Realtime is schema-visible but Codex 0.149 cannot use the existing ChatGPT/SIWC login as its Realtime credential",
+  "tags": [
+    "app-server",
+    "realtime",
+    "voice",
+    "authentication",
+    "api-key",
+    "chatgpt",
+    "capability-gating",
+    "fallback"
+  ],
+  "type": "constraint"
+}

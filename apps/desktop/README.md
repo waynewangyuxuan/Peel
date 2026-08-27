@@ -23,7 +23,7 @@ npm test
 npm run test:e2e --workspace @peel/desktop
 ```
 
-The end-to-end journey launches Electron and therefore needs permission to start a local GUI process. It uses isolated Codex and Speech fixtures, a disposable Git repository, and a dedicated Peel user-data directory. The real microphone implementation is not replaced in production: the renderer records mono PCM from `getUserMedia`, and the packaged native helper invokes Apple's Speech framework.
+The end-to-end journey launches Electron and therefore needs permission to start a local GUI process. It uses isolated Codex and Speech fixtures, a disposable Git repository, and a dedicated Peel user-data directory. The renderer records real mono PCM from `getUserMedia`. Before capture, Peel preflights its owned Codex App Server Realtime adapter; only a real `thread/realtime/started` selects it. Codex 0.149 rejects the existing ChatGPT/SIWC login for Realtime, so today's package selects the native Apple Speech helper before recording without exposing the protocol error. Peel never requires or inherits an independent API key.
 
 ## Package and verify
 
@@ -34,6 +34,6 @@ npm run verify:package --workspace @peel/desktop
 
 The package is written to `apps/desktop/out/Peel-darwin-arm64/Peel.app`. The verification launches that exact bundle twice outside Vite, checks the unpacked native Speech helper and privacy usage strings, and proves an edit made immediately before close survives a full restart. This is a local dogfood package; distribution signing and notarization are release operations outside the v0.1 Ticket.
 
-Voice Dictation requests macOS microphone and Speech Recognition permission on first use. Recognition errors and capture interruption leave the existing draft untouched. The transcript is appended to the draft and is never sent automatically.
+Voice Dictation requests the permissions required by the selected engine on first use. Recognition errors and capture interruption leave the existing draft untouched. The transcript is appended to the draft and is never sent automatically.
 
 “Copy ID & open Codex” copies the exact Thread ID to the clipboard and opens Codex as an explicit escape hatch. Peel does not fabricate an undocumented Thread deep link.

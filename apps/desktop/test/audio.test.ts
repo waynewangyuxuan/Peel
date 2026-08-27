@@ -1,6 +1,6 @@
 import { describe, expect, it } from "vitest";
 
-import { encodeWav, pcmAmplitude } from "../src/renderer/audio";
+import { encodePcm16, encodeWav, pcmAmplitude } from "../src/renderer/audio";
 
 describe("voice dictation recording", () => {
   it("encodes captured microphone PCM as a real mono WAV boundary", () => {
@@ -22,5 +22,15 @@ describe("voice dictation recording", () => {
     expect(speaking).toBeGreaterThan(.5);
     expect(loud).toBeGreaterThan(speaking);
     expect(loud).toBeLessThanOrEqual(1);
+  });
+
+  it("encodes raw little-endian PCM16 chunks for Codex Realtime", () => {
+    const pcm = encodePcm16(new Float32Array([0, .5, -1, 1]));
+    const view = new DataView(pcm);
+    expect(pcm.byteLength).toBe(8);
+    expect(view.getInt16(0, true)).toBe(0);
+    expect(view.getInt16(2, true)).toBe(16_383);
+    expect(view.getInt16(4, true)).toBe(-32_768);
+    expect(view.getInt16(6, true)).toBe(32_767);
   });
 });
