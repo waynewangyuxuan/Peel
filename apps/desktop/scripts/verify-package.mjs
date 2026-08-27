@@ -41,7 +41,7 @@ try {
 
   let application = await electron.launch({ executablePath: executable, env });
   let page = await application.firstWindow();
-  await page.getByRole("button", { name: /Choose a Codex Chat/ }).click();
+  await page.locator(".welcome").getByRole("button", { name: "Search Chats", exact: true }).click();
   await page.getByText(rootTitle).last().click();
   await page.getByLabel("Message").fill("Packaged draft survives a full restart");
   await application.close();

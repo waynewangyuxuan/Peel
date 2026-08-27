@@ -48,12 +48,13 @@ try {
   if (!browser) throw new Error("Packaged Peel did not expose its verification endpoint");
   const context = browser.contexts()[0];
   const page = context.pages()[0] ?? await context.waitForEvent("page");
-  await page.getByRole("button", { name: /Choose a Codex Chat/ }).waitFor({ state: "visible", timeout: 20_000 });
+  const searchChats = page.locator(".welcome").getByRole("button", { name: "Search Chats", exact: true });
+  await searchChats.waitFor({ state: "visible", timeout: 20_000 });
   await page.waitForFunction(() => {
-    const button = [...document.querySelectorAll("button")].find((candidate) => candidate.textContent?.includes("Choose a Codex Chat"));
+    const button = document.querySelector(".welcome .secondary-button");
     return button instanceof HTMLButtonElement && !button.disabled;
   }, undefined, { timeout: 20_000 });
-  await page.getByRole("button", { name: /Choose a Codex Chat/ }).click();
+  await searchChats.click();
   await page.locator(".thread-result").first().click();
 
   const draft = page.getByLabel("Message");
