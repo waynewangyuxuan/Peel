@@ -1,0 +1,101 @@
+{
+  "acceptance": [
+    {
+      "acceptance_id": "content-first-shell-hierarchy",
+      "criterion": "At 1440x960 and 1000x720, Focus makes the conversation the dominant surface: Spaces and Lineage remain legible and fully usable but visually recessive, the current Space/Thread identity remains discoverable without horizontal scrolling, and the top bar no longer presents every secondary action as an equally weighted boxed control."
+    },
+    {
+      "acceptance_id": "coherent-material-and-geometry",
+      "criterion": "The renderer uses one documented visual token system for canvas, navigation, selection, elevated surfaces, borders, shadows, radii, typography, and icons; resting controls are predominantly unboxed, persistent pills are limited to states that need containment, and no core surface invents a competing component geometry."
+    },
+    {
+      "acceptance_id": "chat-and-composer-proportion",
+      "criterion": "Short user messages shrink to their content within a safe maximum width, the empty Composer rests at no more than 82 CSS pixels high before transient error or Voice content, attachment/dictation/send remain clear and keyboard-complete, and recording, transcription, sending, disabled, error, and preserved-Draft states remain immediately legible without raw intermediate UI."
+    },
+    {
+      "acceptance_id": "calm-activity-and-progressive-actions",
+      "criterion": "Completed Reasoning, Command, File Change, Subagent, Turn, Diff, and navigation actions preserve all information and accessible names while using secondary integrated presentation; hover, focus, active, running, approval, result, and failure states reveal the minimum additional chrome needed for the current action."
+    },
+    {
+      "acceptance_id": "overview-material-continuity",
+      "criterion": "Overview retains deterministic cards, real edges, drag, pan, zoom, Fit, Focus return, and 30–50 Node readability while sharing the reset shell's typography, material, icon, and selection language; the canvas remains spatially distinct without reverting to a generic card dashboard."
+    },
+    {
+      "acceptance_id": "motion-accessibility-and-regression-proof",
+      "criterion": "Frequent navigation and keyboard actions respond immediately without decorative entrance animation, press feedback and occasional drawer/modal transitions remain interruptible and under 300ms, reduced-motion behavior stays legible, all repository tests and the packaged Electron journey pass, and fresh wide/narrow Focus plus 2/6/50-node Overview screenshots receive direct visual review."
+    }
+  ],
+  "constraints": [
+    "The preserved original Demo remains the information-architecture and spatial interaction authority; this reset refines material, density, hierarchy, and micro-interaction rather than introducing a new product skin.",
+    "ChatGPT/Codex conventions guide content dominance and control restraint, but Peel must retain its own Spaces, persistent Lineage, Peel gesture, and deterministic Overview identity.",
+    "Do not remove, defer, or fake any shipped New Chat, Search, Fork, Voice, Worktree, Diff, Approval, Activity, Markdown, restoration, or 30–50 Node behavior.",
+    "Do not reintroduce Project-first navigation, generic graph editing, Git management, or an execution dashboard.",
+    "Prefer CSS and small presentational structure changes; do not disturb Codex, Voice, Git, persistence, or topology ownership boundaries."
+  ],
+  "context": "The current implementation is functionally strong and its Chat content is now structurally faithful, but the whole shell still reads as a prototype component kit: two equally weighted rails consume 474px before the conversation, many resting actions are boxed, nearly every state is a pale rounded rectangle, typography is miniaturized, short user messages expand into wide pills, and the empty Composer is visually inflated. This Ticket is a coherent material and hierarchy reset rather than another local polish patch.",
+  "context_refs": [
+    {
+      "purpose": "Keeps the reset aligned with the user's chosen visual and interaction authority.",
+      "ref": ".vibehub/rooms/product/decision-demo-authoritative-v01-ui-direction.yaml"
+    },
+    {
+      "purpose": "Defines the valid Focus, Overview, rail, Composer, and motion baseline plus its scale limitations.",
+      "ref": ".vibehub/rooms/product/note-demo-visual-interaction-baseline.yaml"
+    },
+    {
+      "purpose": "Requires product-quality Chat presentation, containment, progressive Activity, and complete identity.",
+      "ref": ".vibehub/rooms/product/constraint-focus-chat-interaction-quality.yaml"
+    },
+    {
+      "purpose": "Protects the distinct Focus and Overview information contracts during the material reset.",
+      "ref": ".vibehub/rooms/product/decision-focus-overview-information-contract.yaml"
+    },
+    {
+      "purpose": "Records that functional completeness without integrated polish remains unacceptable.",
+      "ref": ".vibehub/rooms/product/note-v01-ui-direction-and-polish-gap.yaml"
+    },
+    {
+      "purpose": "Provides the exact preserved spatial and interaction reference.",
+      "ref": "docs/product/source/peel-demo-v0-original.html"
+    },
+    {
+      "purpose": "Preserves the latest verified Chat typography, Markdown, code, Activity, and responsive reading behavior.",
+      "ref": ".vibehub/outcomes/ticket-rebuild-chat-reading-surface.yaml"
+    },
+    {
+      "purpose": "Preserves deterministic Overview topology, 2/6/50-node layout, and interaction fidelity.",
+      "ref": ".vibehub/outcomes/ticket-rebuild-overview-demo-fidelity.yaml"
+    },
+    {
+      "purpose": "Preserves the real new-Chat entry, Composer keyboard semantics, and live PCM-driven Voice feedback.",
+      "ref": ".vibehub/outcomes/ticket-rework-new-chat-composer-and-voice-feedback.yaml"
+    }
+  ],
+  "kind": "ticket",
+  "maturity": "firm",
+  "outcome": "Peel's Focus, shared chrome, and Overview feel like one calm native Codex workspace rather than a stack of rounded SaaS components, while preserving the Demo's spatial information architecture and every shipped workflow.",
+  "provenance_refs": [
+    "conversation:2026-08-27-shell-plasticity-diagnosis-and-reset",
+    "apps/desktop/test-results/ui-focus-activity.png",
+    "/private/tmp/peel-demo-authority-1440.png"
+  ],
+  "relations": [
+    {
+      "rationale": "The reset must preserve the completed Chat content and Activity system.",
+      "target_ticket_id": "ticket-rebuild-chat-reading-surface",
+      "type": "depends_on"
+    },
+    {
+      "rationale": "The reset must preserve the completed deterministic Overview implementation.",
+      "target_ticket_id": "ticket-rebuild-overview-demo-fidelity",
+      "type": "depends_on"
+    },
+    {
+      "rationale": "The reset changes the delivered Composer surface and must retain its real entry and Voice lifecycle.",
+      "target_ticket_id": "ticket-rework-new-chat-composer-and-voice-feedback",
+      "type": "depends_on"
+    }
+  ],
+  "schema_version": 1,
+  "ticket_id": "ticket-reset-shell-material-hierarchy"
+}
