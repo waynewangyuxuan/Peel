@@ -1,0 +1,21 @@
+{
+  "acceptance_ids": [
+    "chatgpt-like-conversation-rhythm",
+    "stable-streaming-and-interaction"
+  ],
+  "evidence_id": "evidence-chat-rhythm-and-streaming",
+  "kind": "ticket_evidence",
+  "origin": "agent",
+  "recorded_at": "2026-08-27T09:42:08Z",
+  "refs": [
+    "commit:a6029fc",
+    "apps/desktop/src/renderer/styles.css",
+    "apps/desktop/src/renderer/Markdown.tsx",
+    "apps/desktop/test-results/ui-focus-markdown.png generated and directly inspected at 1440x960",
+    "apps/desktop/test-results/ui-focus-markdown-narrow.png generated and directly inspected at 1000x720",
+    "apps/desktop/test-results/ui-focus.png generated and directly inspected with expanded Reasoning"
+  ],
+  "schema_version": 1,
+  "summary": "Direct inspection confirms the preserved Demo shell now contains one calm continuous Chat surface: heavy per-Turn dividers are removed, the reading measure remains bounded, bilingual body type and headings have deliberate hierarchy, quotes use a quiet semantic rule with no source marker or debug box, tables use restrained row structure, user prompts remain compact, and Activity stays subordinate. Parameterized render-only projection keeps incomplete emphasis, inline/fenced code, links, quote/list forms, and table headers readable without mutating authoritative text. The stream caret is static instead of decorative animation, frequent Activity/keyboard states use targeted short transitions only, and global reduced-motion handling remains in force. Wide and compact Electron screenshots show stable containment and local code overflow without forced document widening."
+  ,"ticket_id": "ticket-rebuild-chat-reading-surface"
+}

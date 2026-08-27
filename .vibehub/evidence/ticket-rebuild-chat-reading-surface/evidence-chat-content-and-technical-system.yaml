@@ -1,0 +1,22 @@
+{
+  "acceptance_ids": [
+    "coherent-chat-content-system",
+    "finished-code-and-technical-activity"
+  ],
+  "evidence_id": "evidence-chat-content-and-technical-system",
+  "kind": "ticket_evidence",
+  "origin": "agent",
+  "recorded_at": "2026-08-27T09:42:08Z",
+  "refs": [
+    "commit:a6029fc",
+    "commit:d1b2596",
+    "apps/desktop/src/renderer/Markdown.tsx",
+    "apps/desktop/src/renderer/Transcript.tsx",
+    "apps/desktop/src/renderer/styles.css",
+    "apps/desktop/test/markdown.test.tsx",
+    "apps/desktop/test-results/ui-focus-activity.png generated and directly inspected"
+  ],
+  "schema_version": 1,
+  "summary": "A shared safe CommonMark/GFM system now presents assistant, user, Reasoning, Subagent, and error prose while command, output, file change, diff, and unknown facts use a coherent expandable technical surface. Quotes, headings, paragraphs, emphasis, nested lists, tasks, links, bounded images, rules, inline code, fenced code, and tables have one intentional type and spacing system with raw HTML and unsafe URLs disabled. Fenced source and diff code receive deterministic injection-free syntax hierarchy, retain exact text, selectability and horizontal scrolling, show language, and retain pointer/keyboard Copy feedback. Completed command and file facts collapse to calm summaries; exact command/output/patch content appears in labeled sections on demand, including a separately verified failed-command state rather than a raw pre block."
+  ,"ticket_id": "ticket-rebuild-chat-reading-surface"
+}

@@ -1,0 +1,22 @@
+{
+  "acceptance_ids": [
+    "supported-server-draft-lifecycle",
+    "switch-cancel-and-fallback-safety"
+  ],
+  "evidence_id": "evidence-realtime-draft-and-cancellation-safety",
+  "kind": "ticket_evidence",
+  "origin": "agent",
+  "recorded_at": "2026-08-27T09:42:08Z",
+  "refs": [
+    "commit:2f5c4ec",
+    "apps/desktop/src/main/realtime-dictation-service.ts",
+    "apps/desktop/src/renderer/Transcript.tsx",
+    "apps/desktop/src/renderer/audio.ts",
+    "apps/desktop/test/realtime-dictation-service.test.ts",
+    "apps/desktop/test/audio.test.ts",
+    "apps/desktop/e2e/v01-journey.spec.ts"
+  ],
+  "schema_version": 1,
+  "summary": "The supported Server lifecycle sends measured PCM16 chunks with sample metadata, accepts only user-role transcript deltas/completions, and merges the finished transcript into the latest editable Draft without auto-send or thread/turn/start. Ordered audio append and concurrent Draft typing are preserved. Thread switch, unmount, recorder interruption, append failure, permission denial, Server failure, and explicit cancel close the matching session and cannot write into another Thread. The same Composer retains live level feedback and uses concise no-speech/failure presentation on the native path. Tests cover fragmented transcript assembly, role filtering, exact thread isolation, cancellation, Draft merge, fallback, and native regression."
+  ,"ticket_id": "ticket-integrate-codex-realtime-dictation"
+}

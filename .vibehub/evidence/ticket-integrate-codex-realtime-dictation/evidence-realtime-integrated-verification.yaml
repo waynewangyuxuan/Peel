@@ -1,0 +1,21 @@
+{
+  "acceptance_ids": [
+    "realtime-dictation-verification"
+  ],
+  "evidence_id": "evidence-realtime-integrated-verification",
+  "kind": "ticket_evidence",
+  "origin": "agent",
+  "recorded_at": "2026-08-27T09:42:08Z",
+  "refs": [
+    "commit:2f5c4ec",
+    "commit:2684998",
+    "command:npm test passes all 75 repository tests",
+    "command:npm run build passes both adapters, desktop typecheck, native Speech helper, renderer, main, and preload",
+    "command:npm run test:e2e --workspace @peel/desktop passes the 39.7 second Electron journey",
+    "command:npm run verify:package --workspace @peel/desktop returns ok with restoredDraft and nativeVoiceHelper",
+    "command:npm run test:realtime --workspace @peel/codex-app-server returns passed with native-fallback, ChatGPT-auth rejection, and zero Turn events"
+  ],
+  "schema_version": 1,
+  "summary": "The exact implementation is covered at transport, schema capability, typed client, main/preload contract, PCM recorder, renderer lifecycle, native fallback, and adapter-service levels. All 75 repository tests, the complete build, the full Electron journey, and the production package smoke pass. The installed schema probe reports 10 stable methods, 8 stable notifications, 3 Realtime methods, and 5 Realtime notifications; the disposable live runtime probe proves the present no-key fallback decision without creating or mutating a conversation. The production package contains an executable native Speech helper and restores a saved Draft across restart."
+  ,"ticket_id": "ticket-integrate-codex-realtime-dictation"
+}

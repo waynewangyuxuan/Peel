@@ -1,0 +1,26 @@
+{
+  "acceptance_ids": [
+    "realistic-visual-regression-proof"
+  ],
+  "evidence_id": "evidence-chat-reading-surface-regression",
+  "kind": "ticket_evidence",
+  "origin": "agent",
+  "recorded_at": "2026-08-27T09:42:08Z",
+  "refs": [
+    "commit:2684998",
+    "apps/desktop/e2e/fixtures/codex",
+    "apps/desktop/e2e/v01-journey.spec.ts",
+    "apps/desktop/test-results/ui-focus-markdown.png",
+    "apps/desktop/test-results/ui-focus-markdown-code.png",
+    "apps/desktop/test-results/ui-focus-activity.png",
+    "apps/desktop/test-results/ui-focus-markdown-narrow.png",
+    "command:npm test passes all 75 repository tests",
+    "command:npm run build passes the complete repository",
+    "command:npm run test:e2e --workspace @peel/desktop passes 1/1 in 39.7 seconds",
+    "command:npm run verify:package --workspace @peel/desktop returns ok",
+    "command:npm run verify:live-codex --workspace @peel/desktop lists 30 first-page and 60 paginated real Chats"
+  ],
+  "schema_version": 1,
+  "summary": "The realistic bilingual fixture covers semantic quotes, nested and task lists, GFM tables, long highlighted TypeScript, command success and failure, exact output, a highlighted file diff, Reasoning, Subagent prose, error prose, unsafe content, unknown future items, and incomplete streaming. The full Electron journey asserts semantic DOM, sanitization, selection, local code overflow, clipboard feedback, expanded Reasoning and technical detail, long-title discovery, and wide/compact screenshots while retaining Picker pagination/races, Focus navigation, Fork and recovery, Worktree, Voice, Approval, Overview at scale, Diff, Draft, scroll, persistence, and restart behavior. All repository tests/build, production packaging, installed Codex Chat pagination, and direct screenshot inspection pass at the recorded HEAD."
+  ,"ticket_id": "ticket-rebuild-chat-reading-surface"
+}
