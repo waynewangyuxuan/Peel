@@ -1,0 +1,22 @@
+{
+  "accepted_acceptance_ids": [
+    "resume-before-turn",
+    "session-recovery-regression",
+    "send-failure-draft-safety",
+    "independent-voice-launch",
+    "voice-failure-clarity",
+    "integrated-verification"
+  ],
+  "closed_at": "2026-08-27T07:57:14Z",
+  "evidence_ids": [
+    "evidence-session-resume-and-draft-safety",
+    "evidence-real-apple-speech-and-errors",
+    "evidence-session-voice-integrated-verification"
+  ],
+  "kind": "ticket_outcome",
+  "schema_version": 1,
+  "status": "successful",
+  "summary": "Independent closeout accepted all six criteria against the baseline-to-HEAD implementation diff, source assertions, and acceptance-linked Evidence. Fresh verification passed all 59 repository tests, the complete build, packaged Draft/native-helper verification, the full production Electron journey, and a real LaunchServices Apple Speech run that preserved existing Draft text, emitted zero Turns, and attributed TCC responsibility to com.peel.desktop rather than ChatGPT. Stored Threads resume before sending, loaded state invalidates safely, concurrent resume is coalesced, and unrecoverable send or Voice failures remain actionable and Draft-safe.",
+  "ticket_id": "ticket-fix-session-resume-and-voice-launch",
+  "unresolved_acceptance_ids": []
+}
