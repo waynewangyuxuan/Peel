@@ -15,13 +15,13 @@ try {
     env: { ...process.env, PEEL_USER_DATA_PATH: join(scratch, "user-data"), ELECTRON_DISABLE_SECURITY_WARNINGS: "true" },
   });
   const page = await application.firstWindow();
-  const choose = page.getByRole("button", { name: /Choose a Codex Chat/ });
-  await choose.waitFor({ state: "visible", timeout: 20_000 });
+  const search = page.locator(".welcome").getByRole("button", { name: "Search Chats", exact: true });
+  await search.waitFor({ state: "visible", timeout: 20_000 });
   await page.waitForFunction(() => {
-    const button = [...document.querySelectorAll("button")].find((candidate) => candidate.textContent?.includes("Choose a Codex Chat"));
+    const button = [...document.querySelectorAll(".welcome button")].find((candidate) => candidate.textContent?.includes("Search Chats"));
     return button instanceof HTMLButtonElement && !button.disabled;
   }, undefined, { timeout: 20_000 });
-  await choose.click();
+  await search.click();
   await page.locator(".thread-result").first().waitFor({ state: "visible", timeout: 20_000 });
   const firstPageThreads = await page.locator(".thread-result").count();
   const loadMore = page.getByRole("button", { name: "Load more" });
