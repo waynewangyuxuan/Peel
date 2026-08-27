@@ -476,6 +476,18 @@ test("real Thread-first Fork loop, recovery surfaces, scale, and restart", async
   await installMediaCapture();
   await page.getByTitle("Dictate into draft").click();
   await expect(page.getByTitle("Stop dictation")).toBeVisible();
+  await page.locator(".lineage-tree button").first().click();
+  await expect(page.getByTitle("Dictate into draft")).toBeVisible();
+  await expect(page.getByTitle("Stop dictation")).toHaveCount(0);
+  await expect(page.locator(".voice-live")).toHaveCount(0);
+  await page.getByLabel("Message").fill("The switched Composer is immediately retryable");
+  await expect(page.getByTitle("Send message")).toBeEnabled();
+  await page.locator(".lineage-tree button").nth(1).click();
+  await expect(page.getByLabel("Message")).toHaveValue("This draft must survive restart");
+  expect((await readFile(rpcLog, "utf8")).match(/"method":"turn\/start"/g)?.length ?? 0).toBe(turnsBeforeVoice);
+  await installMediaCapture();
+  await page.getByTitle("Dictate into draft").click();
+  await expect(page.getByTitle("Stop dictation")).toBeVisible();
   await expect(page.locator(".voice-waveform i")).toHaveCount(17);
   await expect.poll(async () => await page.locator(".voice-waveform i").evaluateAll((bars) => Math.max(...bars.map((bar) => {
     const match = (bar as HTMLElement).style.transform.match(/scaleY\(([^)]+)\)/);

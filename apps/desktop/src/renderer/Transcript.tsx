@@ -83,6 +83,12 @@ export function Transcript({
     dictationThreadId.current = null;
     audioQueue.current = Promise.resolve();
     audioError.current = null;
+    if (mounted.current) {
+      setVoice("idle");
+      setVoiceLevels(Array.from({ length: 17 }, () => 0));
+      setRecordingMs(0);
+      setVoiceFeedback(null);
+    }
   }, [thread.id]);
 
   useEffect(() => {
@@ -225,7 +231,18 @@ export function Transcript({
         if (dictationEngine.current !== "codex-realtime" || dictationThreadId.current !== thread.id) return;
         audioQueue.current = audioQueue.current
           .then(async () => await window.peel.appendDictationAudio({ threadId: thread.id, ...chunk }))
-          .catch((error) => { audioError.current ??= error; });
+          .catch((error) => {
+            audioError.current ??= error;
+            if (!mounted.current || dictationThreadId.current !== thread.id) return;
+            recorder.current?.cancel();
+            recorder.current = null;
+            void window.peel.cancelDictation(thread.id);
+            dictationEngine.current = null;
+            dictationThreadId.current = null;
+            setVoiceLevels(Array.from({ length: 17 }, () => 0));
+            setVoiceFeedback(voiceFailurePresentation(error));
+            setVoice("idle");
+          });
       });
       if (!mounted.current) {
         session.cancel();

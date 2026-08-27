@@ -8,6 +8,7 @@ interface DictationSession {
   liveText: string;
   error: string | null;
   started: boolean;
+  stopRequested: boolean;
   revision: number;
   listeners: Set<() => void>;
 }
@@ -51,6 +52,7 @@ export class RealtimeDictationService {
       liveText: "",
       error: null,
       started: false,
+      stopRequested: false,
       revision: 0,
       listeners: new Set(),
     };
@@ -67,12 +69,12 @@ export class RealtimeDictationService {
       });
       const started = session.started || await waitForStart(session);
       if (started && !session.error) return { engine: "codex-realtime" };
-      this.#sessions.delete(threadId);
-      await this.#client.stopRealtime(threadId).catch(() => undefined);
+      this.#remove(session);
+      await this.#requestStop(session);
       return { engine: "native-fallback" };
     } catch {
-      this.#sessions.delete(threadId);
-      session.listeners.forEach((listener) => listener());
+      this.#remove(session);
+      await this.#requestStop(session);
       return { engine: "native-fallback" };
     }
   }
@@ -80,20 +82,27 @@ export class RealtimeDictationService {
   async append(input: DictationAudioInput): Promise<void> {
     const session = this.#sessions.get(input.threadId);
     if (!session) throw new Error("Dictation is no longer active");
-    await this.#client.appendRealtimeAudio(input.threadId, {
-      data: Buffer.from(input.bytes).toString("base64"),
-      sampleRate: input.sampleRate,
-      numChannels: 1,
-      samplesPerChannel: input.samplesPerChannel,
-      itemId: null,
-    });
+    try {
+      await this.#client.appendRealtimeAudio(input.threadId, {
+        data: Buffer.from(input.bytes).toString("base64"),
+        sampleRate: input.sampleRate,
+        numChannels: 1,
+        samplesPerChannel: input.samplesPerChannel,
+        itemId: null,
+      });
+    } catch (error) {
+      session.error = "Codex voice transcription stopped";
+      this.#remove(session);
+      await this.#requestStop(session);
+      throw error;
+    }
   }
 
   async finish(threadId: string): Promise<{ text: string; isFinal: true; engine: "codex-realtime" }> {
     const session = this.#sessions.get(threadId);
     if (!session) throw new Error("Dictation is no longer active");
     try {
-      await this.#client.stopRealtime(threadId);
+      await this.#requestStop(session, false);
       await waitUntilQuiet(session);
       if (session.error) throw new Error(session.error);
       const text = [...session.finalParts, session.liveText]
@@ -104,16 +113,15 @@ export class RealtimeDictationService {
       if (!text) throw new Error("No speech was recognized. Your existing draft was left unchanged.");
       return { text, isFinal: true, engine: "codex-realtime" };
     } finally {
-      this.#sessions.delete(threadId);
+      this.#remove(session);
     }
   }
 
   async cancel(threadId: string): Promise<void> {
     const session = this.#sessions.get(threadId);
     if (!session) return;
-    this.#sessions.delete(threadId);
-    session.listeners.forEach((listener) => listener());
-    await this.#client.stopRealtime(threadId).catch(() => undefined);
+    this.#remove(session);
+    await this.#requestStop(session);
   }
 
   async cancelAll(): Promise<void> {
@@ -138,11 +146,27 @@ export class RealtimeDictationService {
       session.liveText = "";
     } else if (notification.method === "thread/realtime/error") {
       session.error = typeof params.message === "string" ? params.message : "Codex voice transcription stopped";
-    } else if (notification.method === "thread/realtime/closed" && !session.started) {
-      session.error = "Codex voice transcription did not start";
+      this.#remove(session);
+      void this.#requestStop(session);
+    } else if (notification.method === "thread/realtime/closed" && !session.stopRequested) {
+      session.error = session.started ? "Codex voice transcription stopped" : "Codex voice transcription did not start";
+      this.#remove(session);
+      void this.#requestStop(session);
     }
     session.revision += 1;
     session.listeners.forEach((listener) => listener());
+  }
+
+  #remove(session: DictationSession): void {
+    if (this.#sessions.get(session.threadId) === session) this.#sessions.delete(session.threadId);
+    session.listeners.forEach((listener) => listener());
+  }
+
+  async #requestStop(session: DictationSession, swallowFailure = true): Promise<void> {
+    if (session.stopRequested) return;
+    session.stopRequested = true;
+    if (swallowFailure) await this.#client.stopRealtime(session.threadId).catch(() => undefined);
+    else await this.#client.stopRealtime(session.threadId);
   }
 }
 

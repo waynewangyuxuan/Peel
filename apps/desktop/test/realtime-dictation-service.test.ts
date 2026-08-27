@@ -9,9 +9,12 @@ class FakeClient extends EventEmitter {
   calls: Array<{ method: string; params: unknown }> = [];
   capabilities = { featureStatus: () => this.feature };
   startFailure: string | null = null;
+  rejectStart = false;
+  rejectAppend = false;
 
   async startRealtime(params: unknown): Promise<void> {
     this.calls.push({ method: "thread/realtime/start", params });
+    if (this.rejectStart) throw new Error("start transport failed");
     const threadId = (params as { threadId: string }).threadId;
     queueMicrotask(() => this.emit("notification", this.startFailure
       ? { method: "thread/realtime/error", params: { threadId, message: this.startFailure } }
@@ -20,6 +23,7 @@ class FakeClient extends EventEmitter {
 
   async appendRealtimeAudio(threadId: string, audio: unknown): Promise<void> {
     this.calls.push({ method: "thread/realtime/appendAudio", params: { threadId, audio } });
+    if (this.rejectAppend) throw new Error("append transport failed");
   }
 
   async stopRealtime(threadId: string): Promise<void> {
@@ -109,5 +113,56 @@ describe("Codex App Server realtime dictation", () => {
       "thread/realtime/stop",
     ]);
     expect(client.calls.some((call) => call.method === "thread/realtime/appendAudio")).toBe(false);
+  });
+
+  it("best-effort stops an ambiguously started session when start throws", async () => {
+    const client = new FakeClient();
+    client.rejectStart = true;
+    const service = new RealtimeDictationService(client as unknown as AppServerClient);
+    await expect(service.begin("thread-a")).resolves.toEqual({ engine: "native-fallback" });
+    expect(client.calls.map((call) => call.method)).toEqual([
+      "thread/realtime/start",
+      "thread/realtime/stop",
+    ]);
+  });
+
+  it("closes the matching session immediately when append fails", async () => {
+    const client = new FakeClient();
+    const service = new RealtimeDictationService(client as unknown as AppServerClient);
+    await service.begin("thread-a");
+    client.rejectAppend = true;
+    await expect(service.append({
+      threadId: "thread-a",
+      bytes: new Uint8Array([1, 2]).buffer,
+      sampleRate: 16_000,
+      samplesPerChannel: 2,
+    })).rejects.toThrow("append transport failed");
+    expect(client.calls.map((call) => call.method)).toEqual([
+      "thread/realtime/start",
+      "thread/realtime/appendAudio",
+      "thread/realtime/stop",
+    ]);
+    await expect(service.finish("thread-a")).rejects.toThrow("Dictation is no longer active");
+  });
+
+  it("closes an active session when the Server reports an error", async () => {
+    const client = new FakeClient();
+    const service = new RealtimeDictationService(client as unknown as AppServerClient);
+    await service.begin("thread-a");
+    client.emit("notification", {
+      method: "thread/realtime/error",
+      params: { threadId: "thread-a", message: "realtime transport stopped" },
+    });
+    await new Promise((resolve) => setTimeout(resolve, 0));
+    expect(client.calls.map((call) => call.method)).toEqual([
+      "thread/realtime/start",
+      "thread/realtime/stop",
+    ]);
+    await expect(service.append({
+      threadId: "thread-a",
+      bytes: new Uint8Array([1]).buffer,
+      sampleRate: 16_000,
+      samplesPerChannel: 1,
+    })).rejects.toThrow("Dictation is no longer active");
   });
 });
