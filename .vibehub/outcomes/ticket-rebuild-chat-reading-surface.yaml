@@ -1,0 +1,21 @@
+{
+  "accepted_acceptance_ids": [
+    "coherent-chat-content-system",
+    "chatgpt-like-conversation-rhythm",
+    "finished-code-and-technical-activity",
+    "stable-streaming-and-interaction",
+    "realistic-visual-regression-proof"
+  ],
+  "closed_at": "2026-08-27T09:50:32Z",
+  "evidence_ids": [
+    "evidence-chat-content-and-technical-system",
+    "evidence-chat-rhythm-and-streaming",
+    "evidence-chat-reading-surface-regression"
+  ],
+  "kind": "ticket_outcome",
+  "schema_version": 1,
+  "status": "successful",
+  "summary": "Independent closeout accepted all five criteria at exact implementation-and-Evidence HEAD 058eb5fbd02b95adb6c44f314d1c446a1cadceb3. I read the complete Ticket, all direct Context references, the successful dependency Outcome, all acceptance-linked Evidence, the full 672-line preserved Demo HTML, the complete implementation diff across commits a6029fc, d1b2596, and 2684998, and the changed renderer, fixture, unit, and Electron journey source. Source inspection confirms one safe CommonMark/GFM renderer for user, assistant, Reasoning, Subagent, and error prose; raw HTML is skipped, unsafe URLs are removed, remote images are non-interactive outbound links, and local data/blob images stay bounded. Command, output, failed command, file-change diff, and unknown machine facts remain exact and selectable inside labeled expandable technical surfaces rather than prose or undifferentiated raw blocks. The deterministic token highlighter preserves source text exactly while providing language identity, source/diff hierarchy, local horizontal overflow, and a native keyboard/pointer Copy button with immediate copied state. Streaming repair remains render-only, covers incomplete emphasis, inline/fenced code, links, quotes, lists, and table headers, leaves authoritative item text untouched, uses a static caret, and combines selection-aware bottom follow with saved per-Thread scroll; CSS contains no transition-all, interaction transitions are targeted and below 300ms, and the global reduced-motion rule is present. Fresh direct inspection of the regenerated 1440x960 and 1000x720 Electron screenshots confirms the Demo shell, continuous divider-free assistant reading surface, compact user bubbles, restrained bilingual type, semantic quote rules and tables, subordinate Reasoning/activity, readable highlighted code, and contained technical disclosures at both widths. Independent verification passed all 75 repository tests, the complete build, the full Electron journey 1/1 in 38.7 seconds, packaged-app verification with restored Draft and native voice helper, live installed-Codex verification with 30 first-page and 60 paginated Chats, git diff checks, and a clean worktree. Initial sandboxed Electron launch attempts were rejected by macOS GUI isolation before application startup; the identical authorized GUI commands then passed, so no product assertion failed. The journey retains Picker caching/pagination/race safety, Focus navigation and title containment, Fork and Worktree recovery, Voice, Approval, Overview scale, Diff, Draft, selection, auto-follow opt-out, persistence, and restart behavior. No acceptance IDs remain unresolved.",
+  "ticket_id": "ticket-rebuild-chat-reading-surface",
+  "unresolved_acceptance_ids": []
+}

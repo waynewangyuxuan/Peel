@@ -1,0 +1,22 @@
+{
+  "accepted_acceptance_ids": [
+    "runtime-preflight-before-capture",
+    "experimental-realtime-capability",
+    "no-api-key-or-secret-boundary",
+    "supported-server-draft-lifecycle",
+    "switch-cancel-and-fallback-safety",
+    "realtime-dictation-verification"
+  ],
+  "closed_at": "2026-08-27T10:02:23Z",
+  "evidence_ids": [
+    "evidence-realtime-capability-and-auth-boundary",
+    "evidence-realtime-draft-and-cancellation-safety",
+    "evidence-realtime-integrated-verification"
+  ],
+  "kind": "ticket_outcome",
+  "schema_version": 1,
+  "status": "successful",
+  "summary": "All six acceptance criteria are accepted at committed HEAD 28f6cf7. Independent inspection and focused tests verify complete installed-schema gating, feature-scoped realtime_conversation launch, best-effort stop after thrown or ambiguous starts, immediate matching-session closure after append failure or active Server error, strict no-key environment handling, measured PCM and user-only transcript assembly into the latest editable per-Thread Draft, zero Turn creation, and cancellation isolation. The Electron journey proves active-recording Thread switch closes the old microphone track, exposes an immediately retryable Composer, preserves the original Draft on return, and creates no Turn. Independent reruns passed all 78 repository tests, the full build, the installed Codex schema and disposable live Realtime probe with truthful ChatGPT-auth native fallback and zero Turn events, the 40.3 second Electron journey, a rebuilt package, and packaged restart smoke with Draft restoration and native voice helper integrity.",
+  "ticket_id": "ticket-integrate-codex-realtime-dictation",
+  "unresolved_acceptance_ids": []
+}
