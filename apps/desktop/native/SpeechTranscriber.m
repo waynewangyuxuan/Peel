@@ -12,17 +12,28 @@ static void finish(BOOL ok, NSString *text, NSString *error, NSString *code, int
   exit(status);
 }
 
+static BOOL runUntil(BOOL *completed, NSTimeInterval timeout) {
+  NSDate *deadline = [NSDate dateWithTimeIntervalSinceNow:timeout];
+  while (!*completed && deadline.timeIntervalSinceNow > 0) {
+    @autoreleasepool {
+      [[NSRunLoop currentRunLoop] runMode:NSDefaultRunLoopMode
+                                beforeDate:[NSDate dateWithTimeIntervalSinceNow:0.05]];
+    }
+  }
+  return *completed;
+}
+
 int main(int argc, const char * argv[]) {
   @autoreleasepool {
     if (argc != 2) finish(NO, nil, @"Expected one WAV file path", @"invalid-arguments", 2);
 
-    dispatch_semaphore_t permissionSemaphore = dispatch_semaphore_create(0);
     __block SFSpeechRecognizerAuthorizationStatus permission = SFSpeechRecognizerAuthorizationStatusNotDetermined;
+    __block BOOL permissionResolved = NO;
     [SFSpeechRecognizer requestAuthorization:^(SFSpeechRecognizerAuthorizationStatus status) {
       permission = status;
-      dispatch_semaphore_signal(permissionSemaphore);
+      permissionResolved = YES;
     }];
-    dispatch_semaphore_wait(permissionSemaphore, dispatch_time(DISPATCH_TIME_NOW, 20 * NSEC_PER_SEC));
+    runUntil(&permissionResolved, 20);
     if (permission != SFSpeechRecognizerAuthorizationStatusAuthorized) {
       NSString *code = @"permission-unknown";
       if (permission == SFSpeechRecognizerAuthorizationStatusDenied) code = @"permission-denied";
@@ -40,7 +51,6 @@ int main(int argc, const char * argv[]) {
     request.shouldReportPartialResults = NO;
     if (@available(macOS 13.0, *)) request.addsPunctuation = YES;
 
-    dispatch_semaphore_t resultSemaphore = dispatch_semaphore_create(0);
     __block NSString *recognized = nil;
     __block NSError *recognitionError = nil;
     __block BOOL signaled = NO;
@@ -50,11 +60,9 @@ int main(int argc, const char * argv[]) {
         signaled = YES;
         recognitionError = error;
         recognized = result.bestTranscription.formattedString;
-        dispatch_semaphore_signal(resultSemaphore);
       }
     }];
-    long timeout = dispatch_semaphore_wait(resultSemaphore, dispatch_time(DISPATCH_TIME_NOW, 40 * NSEC_PER_SEC));
-    if (timeout != 0) {
+    if (!runUntil(&signaled, 40)) {
       [task cancel];
       finish(NO, nil, @"Speech recognition timed out", @"timeout", 5);
     }

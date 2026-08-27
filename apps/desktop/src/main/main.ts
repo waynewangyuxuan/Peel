@@ -22,6 +22,7 @@ const configuredCodexBinary = process.env.PEEL_CODEX_BINARY || argumentValue("--
 const configuredVoiceHelper = process.env.PEEL_VOICE_HELPER || argumentValue("--peel-voice-helper");
 const configuredStateFailureMarker = process.env.PEEL_TEST_STATE_FAILURE_MARKER || argumentValue("--peel-test-state-failure-marker");
 const configuredTmpdir = argumentValue("--peel-test-tmpdir");
+const quitAfterVoiceVerification = process.argv.includes("--peel-test-quit-after-voice");
 if (configuredUserDataPath) app.setPath("userData", configuredUserDataPath);
 if (configuredTmpdir) process.env.TMPDIR = configuredTmpdir;
 let window: BrowserWindow | null = null;
@@ -117,8 +118,11 @@ function registerIpc(peel: PeelService, voice: VoiceService): void {
     summary: await peel.git.getDiffSummary(cwd),
     patch: await peel.git.getDiff(cwd),
   }));
-  ipcMain.handle(IPC.transcribeWav, async (_event, bytes: ArrayBuffer) =>
-    await voice.transcribe(new Uint8Array(bytes)));
+  ipcMain.handle(IPC.transcribeWav, async (_event, bytes: ArrayBuffer) => {
+    const result = await voice.transcribe(new Uint8Array(bytes));
+    if (quitAfterVoiceVerification) setTimeout(() => app.quit(), 1_500);
+    return result;
+  });
   ipcMain.handle(IPC.decideApproval, (_event, input: ApprovalDecisionInput) => peel.decideApproval(input));
   ipcMain.handle(IPC.copyText, (_event, text: string) => { clipboard.writeText(text); });
   ipcMain.handle(IPC.openTarget, async (_event, input: OpenTargetInput) => {
