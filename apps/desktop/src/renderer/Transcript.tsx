@@ -6,7 +6,7 @@ import type { ApprovalDecisionInput, ForkDraft, SpaceNode } from "../shared/cont
 import { Icon } from "./icons";
 import { itemText } from "./lib";
 import { startPcmRecorder, type RecorderSession } from "./audio";
-import { MarkdownContent } from "./Markdown";
+import { HighlightedCode, MarkdownContent } from "./Markdown";
 import { voiceFailurePresentation, type VoiceFailurePresentation } from "./voice-error";
 
 interface TranscriptProps {
@@ -334,7 +334,7 @@ function TurnView({ turn, reduced, highlighted, onBranch, onOpenCodex }: {
   return <section className={`turn ${highlighted ? "highlighted" : ""}`} data-turn-id={turn.id}>
     {items.map(({ item, streamedText, completed }) => <ItemView key={item.id} item={item} streamedText={streamedText} streaming={!completed} onOpenCodex={onOpenCodex}/>) }
     <div className="turn-actions">
-      <span>{turn.status === "inProgress" ? "Running" : turn.status}</span>
+      <span>{turn.status === "inProgress" ? "Working" : turn.status === "failed" ? "Needs attention" : turn.status === "interrupted" ? "Stopped" : ""}</span>
       {turn.status === "completed" && <button onClick={onBranch}><Icon name="branch" size={14}/> Branch from here</button>}
     </div>
     {turn.status === "completed" && <PeelHandle onPeel={onBranch}/>} 
@@ -383,40 +383,49 @@ export function ItemView({ item, streamedText, streaming, onOpenCodex }: { item:
   const text = itemText(item) + streamedText;
   if (item.type === "userMessage") return <article className="message user-message"><MarkdownContent text={text || "User message"} className="user-markdown"/></article>;
   if (item.type === "agentMessage") return <article className="message agent-message"><MarkdownContent text={text} streaming={streaming}/></article>;
-  if (item.type === "reasoning") return <ActivityDisclosure icon="reasoning" label="Reasoning" state={activityState(item, streaming)} defaultOpen={streaming}>
+  if (item.type === "reasoning") return <ActivityDisclosure icon="reasoning" label={streaming ? "Thinking" : "Reasoning"} state={activityState(item, streaming)} defaultOpen={streaming} kind="reasoning">
     <MarkdownContent text={text || "Reasoning activity"} streaming={streaming}/>
   </ActivityDisclosure>;
   if (item.type === "commandExecution") {
     const state = activityState(item, streaming);
-    return <ActivityDisclosure icon="terminal" label={commandLabel(item, state)} state={state} defaultOpen={state === "active"}>
-      <pre className="activity-output">{text || String(item.command ?? "Command output")}</pre>
+    const command = commandText(item);
+    const output = commandOutput(text, command);
+    return <ActivityDisclosure icon="terminal" label={commandLabel(state)} state={state} defaultOpen={state === "active"} kind="technical">
+      <TechnicalOutput sections={[
+        { label: "Command", value: command, language: "shell" },
+        ...(output ? [{ label: state === "failed" ? "Error output" : "Output", value: output }] : []),
+      ]}/>
     </ActivityDisclosure>;
   }
   if (item.type === "fileChange") {
-    const count = Array.isArray(item.changes) ? item.changes.length : 1;
-    return <ActivityDisclosure icon="file" label={`Changed ${count} file${count === 1 ? "" : "s"}`} state={activityState(item, streaming)}>
-      <pre className="activity-output">{text || JSON.stringify(item.changes ?? {}, null, 2)}</pre>
+    const sections = fileChangeSections(item, text);
+    return <ActivityDisclosure icon="file" label={fileChangeLabel(sections)} state={activityState(item, streaming)} kind="technical">
+      <TechnicalOutput sections={sections}/>
     </ActivityDisclosure>;
   }
-  if (item.type === "collabAgentToolCall" || item.type === "subAgentActivity") return <ActivityDisclosure icon="agent" label="Subagent activity" state={activityState(item, streaming)} defaultOpen={streaming}>
+  if (item.type === "collabAgentToolCall" || item.type === "subAgentActivity") return <ActivityDisclosure icon="agent" label={streaming ? "A subagent is working" : "Worked with a subagent"} state={activityState(item, streaming)} defaultOpen={streaming}>
     <MarkdownContent text={text || safeJson(item)} streaming={streaming}/>
   </ActivityDisclosure>;
-  if (item.type === "error") return <ActivityDisclosure icon="warning" label="Codex hit an issue" state="failed">
+  if (item.type === "error") return <ActivityDisclosure icon="warning" label="Something needs attention" state="failed">
     <MarkdownContent text={text || String(item.message ?? "Codex reported an error")}/>
   </ActivityDisclosure>;
-  return <div className="unknown-item"><span>Codex item: {item.type}</span><button onClick={onOpenCodex}>Copy ID & open Codex <Icon name="external" size={12}/></button></div>;
+  return <ActivityDisclosure icon="more" label="Additional Codex activity" state={activityState(item, streaming)} kind="technical">
+    <TechnicalOutput sections={[{ label: item.type, value: text || safeJson(item) }]}/>
+    <button className="open-codex-item" onClick={onOpenCodex}>Open in Codex <Icon name="external" size={12}/></button>
+  </ActivityDisclosure>;
 }
 
 type ActivityState = "completed" | "active" | "failed";
 
-function ActivityDisclosure({ icon, label, state, defaultOpen = false, children }: {
+function ActivityDisclosure({ icon, label, state, defaultOpen = false, kind = "standard", children }: {
   icon: string;
   label: string;
   state: ActivityState;
   defaultOpen?: boolean;
+  kind?: "standard" | "reasoning" | "technical";
   children: ReactNode;
 }): ReactNode {
-  return <details className={`activity-item ${state}`} open={defaultOpen}>
+  return <details className={`activity-item ${state} ${kind}`} open={defaultOpen}>
     <summary>
       <span className="activity-icon"><Icon name={icon} size={13}/></span>
       <span className="activity-label">{label}</span>
@@ -434,13 +443,51 @@ function activityState(item: ThreadItem, streaming: boolean): ActivityState {
   return "completed";
 }
 
-function commandLabel(item: ThreadItem, state: ActivityState): string {
-  const raw = Array.isArray(item.command) ? item.command.join(" ") : String(item.command ?? "command");
-  const command = raw.replace(/\s+/g, " ").trim();
-  const concise = command.length > 76 ? `${command.slice(0, 75)}…` : command;
-  if (state === "active") return `Running ${concise}`;
-  if (state === "failed") return `${concise} failed`;
-  return `Ran ${concise}`;
+function commandLabel(state: ActivityState): string {
+  if (state === "active") return "Running a command";
+  if (state === "failed") return "Command needs attention";
+  return "Ran a command";
+}
+
+function commandText(item: ThreadItem): string {
+  return Array.isArray(item.command) ? item.command.map(String).join(" ") : String(item.command ?? "Command");
+}
+
+function commandOutput(text: string, command: string): string {
+  const trimmed = text.trim();
+  if (!trimmed || trimmed === command.trim()) return "";
+  if (trimmed.startsWith(`${command.trim()}\n`)) return trimmed.slice(command.trim().length + 1);
+  return trimmed;
+}
+
+interface TechnicalSection { label: string; value: string; language?: string }
+
+function TechnicalOutput({ sections }: { sections: TechnicalSection[] }): ReactNode {
+  const visible = sections.filter((section) => section.value.trim());
+  return <div className="technical-output">{visible.map((section, index) => <section key={`${section.label}-${index}`}>
+    <header><span>{section.label}</span><span>{lineCount(section.value)} line{lineCount(section.value) === 1 ? "" : "s"}</span></header>
+    <pre><code className={section.language ? `language-${section.language}` : undefined}><HighlightedCode code={section.value} language={section.language ?? "plain text"}/></code></pre>
+  </section>)}</div>;
+}
+
+function lineCount(value: string): number {
+  return value ? value.split("\n").length : 0;
+}
+
+function fileChangeSections(item: ThreadItem, fallback: string): TechnicalSection[] {
+  if (!Array.isArray(item.changes)) return [{ label: "Changes", value: fallback || safeJson(item.changes ?? {}) }];
+  return item.changes.map((change, index) => {
+    if (!change || typeof change !== "object") return { label: `Change ${index + 1}`, value: String(change) };
+    const record = change as Record<string, unknown>;
+    const label = typeof record.path === "string" ? record.path : `Change ${index + 1}`;
+    const value = [record.diff, record.patch, record.content].find((candidate) => typeof candidate === "string");
+    return { label, value: typeof value === "string" ? value : safeJson(record), language: "diff" };
+  });
+}
+
+function fileChangeLabel(sections: TechnicalSection[]): string {
+  if (sections.length === 1 && sections[0]?.label && sections[0].label !== "Changes") return `Updated ${sections[0].label}`;
+  return `Updated ${sections.length} file${sections.length === 1 ? "" : "s"}`;
 }
 
 function ApprovalCard({ request, onDecide }: {

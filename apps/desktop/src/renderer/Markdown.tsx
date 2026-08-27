@@ -1,4 +1,4 @@
-import { Children, isValidElement, useEffect, useRef, useState, type ReactNode } from "react";
+import { Children, Fragment, isValidElement, useEffect, useRef, useState, type ReactNode } from "react";
 import ReactMarkdown, { defaultUrlTransform, type Components, type UrlTransform } from "react-markdown";
 import remarkBreaks from "remark-breaks";
 import remarkGfm from "remark-gfm";
@@ -71,7 +71,7 @@ export function projectStreamingMarkdown(text: string): string {
   return projected;
 }
 
-function CodeBlock({ code, language, children }: { code: string; language: string; children: ReactNode }): ReactNode {
+function CodeBlock({ code, language }: { code: string; language: string; children?: ReactNode }): ReactNode {
   const [copied, setCopied] = useState(false);
   const resetTimer = useRef<number | null>(null);
   useEffect(() => () => { if (resetTimer.current !== null) window.clearTimeout(resetTimer.current); }, []);
@@ -83,8 +83,71 @@ function CodeBlock({ code, language, children }: { code: string; language: strin
   };
   return <div className="markdown-code">
     <div className="markdown-code-header"><span>{language}</span><button className="copy-code" onClick={() => void copy()}><Icon name={copied ? "check" : "copy"} size={12}/>{copied ? "Copied" : "Copy code"}</button></div>
-    <pre className="code-block">{children}</pre>
+    <pre className="code-block"><code><HighlightedCode code={code} language={language}/></code></pre>
   </div>;
+}
+
+export function HighlightedCode({ code, language }: { code: string; language: string }): ReactNode {
+  return highlightCode(code, language).map((token, index) => token.kind === "plain"
+    ? <Fragment key={index}>{token.value}</Fragment>
+    : <span className={`syntax-${token.kind}`} key={index}>{token.value}</span>);
+}
+
+export type SyntaxTokenKind = "plain" | "comment" | "keyword" | "literal" | "number" | "string" | "function" | "operator" | "punctuation" | "addition" | "deletion" | "meta";
+export interface SyntaxToken { kind: SyntaxTokenKind; value: string }
+
+const KEYWORDS = new Set([
+  "as", "async", "await", "break", "case", "catch", "class", "const", "continue", "def", "delete", "do", "else", "enum", "export", "extends", "finally", "for", "from", "function", "if", "implements", "import", "in", "instanceof", "interface", "let", "new", "of", "package", "private", "protected", "public", "raise", "return", "static", "switch", "throw", "try", "type", "typeof", "var", "while", "with", "yield",
+]);
+const LITERALS = new Set(["false", "None", "null", "true", "undefined"]);
+const SOURCE_LANGUAGES = /^(?:[cm]?[jt]sx?|javascript|typescript|jsonc?|python|py|bash|sh|shell|zsh|css|scss|sql|go|rust|java|swift|kotlin|c|cpp|csharp)$/i;
+
+/** A compact, deterministic highlighter: enough hierarchy for reading without HTML injection or a large runtime grammar. */
+export function highlightCode(code: string, language: string): SyntaxToken[] {
+  const normalized = language.toLowerCase();
+  if (normalized === "diff" || normalized === "patch") return tokenizeDiff(code);
+  if (!SOURCE_LANGUAGES.test(normalized)) return [{ kind: "plain", value: code }];
+
+  const tokens: SyntaxToken[] = [];
+  const pattern = /(\/\*[\s\S]*?\*\/|\/\/[^\n]*|#[^\n]*|`(?:\\.|[^`\\])*`|"(?:\\.|[^"\\])*"|'(?:\\.|[^'\\])*'|\b(?:0x[\da-f]+|\d+(?:\.\d+)?)\b|\b[A-Za-z_$][\w$]*\b|===|!==|=>|==|!=|<=|>=|&&|\|\||\+\+|--|\?\?|\?\.|[+\-*\/%=&|!<>?:~^]+|[{}[\](),.;])/gim;
+  let cursor = 0;
+  for (const match of code.matchAll(pattern)) {
+    const index = match.index ?? 0;
+    if (index > cursor) pushToken(tokens, "plain", code.slice(cursor, index));
+    const value = match[0];
+    pushToken(tokens, classifyToken(value, code, index), value);
+    cursor = index + value.length;
+  }
+  if (cursor < code.length) pushToken(tokens, "plain", code.slice(cursor));
+  return tokens;
+}
+
+function classifyToken(value: string, source: string, index: number): SyntaxTokenKind {
+  if (value.startsWith("//") || value.startsWith("/*") || value.startsWith("#")) return "comment";
+  if (/^[`"']/.test(value)) return "string";
+  if (/^(?:0x[\da-f]+|\d)/i.test(value)) return "number";
+  if (KEYWORDS.has(value)) return "keyword";
+  if (LITERALS.has(value)) return "literal";
+  if (/^[A-Za-z_$]/.test(value)) return /^\s*\(/.test(source.slice(index + value.length)) ? "function" : "plain";
+  if (/^[{}[\](),.;]$/.test(value)) return "punctuation";
+  return "operator";
+}
+
+function tokenizeDiff(code: string): SyntaxToken[] {
+  const lines = code.match(/.*(?:\n|$)/g)?.filter(Boolean) ?? [];
+  return lines.map((value) => ({
+    kind: value.startsWith("+++") || value.startsWith("---") || value.startsWith("@@") ? "meta"
+      : value.startsWith("+") ? "addition"
+        : value.startsWith("-") ? "deletion"
+          : "plain",
+    value,
+  }));
+}
+
+function pushToken(tokens: SyntaxToken[], kind: SyntaxTokenKind, value: string): void {
+  const previous = tokens.at(-1);
+  if (previous?.kind === kind) previous.value += value;
+  else tokens.push({ kind, value });
 }
 
 function reactText(node: ReactNode): string {

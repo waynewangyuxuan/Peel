@@ -2,7 +2,7 @@ import { renderToStaticMarkup } from "react-dom/server";
 import { describe, expect, it } from "vitest";
 import type { ThreadItem } from "@peel/codex-app-server";
 
-import { MarkdownContent } from "../src/renderer/Markdown";
+import { highlightCode, MarkdownContent } from "../src/renderer/Markdown";
 import { ItemView } from "../src/renderer/Transcript";
 
 const LIVE_REDACTED_EXCERPT = `我们先把命题压实。
@@ -53,6 +53,8 @@ const safe = true;
     expect(html).toContain("Copy code");
     expect(html).toContain(">ts</span>");
     expect(html).toContain("class=\"code-block\"");
+    expect(html).toContain("class=\"syntax-keyword\">const</span>");
+    expect(html).toContain("class=\"syntax-literal\">true</span>");
     expect(html).toContain("target=\"_blank\"");
     expect(html).not.toContain("<script");
     expect(html).not.toContain("javascript:");
@@ -120,8 +122,22 @@ const safe = true;
 
     const command = { type: "commandExecution", command: "printf '**raw**'", aggregatedOutput: "**raw**", status: "completed" } as unknown as ThreadItem;
     const commandHtml = renderToStaticMarkup(<ItemView item={command} streamedText="" streaming={false} onOpenCodex={() => undefined}/>);
-    expect(commandHtml).toContain("class=\"activity-output\"");
+    expect(commandHtml).toContain("class=\"technical-output\"");
+    expect(commandHtml).toContain("Ran a command");
+    expect(commandHtml).toContain("class=\"syntax-string\"");
     expect(commandHtml).toContain("**raw**");
     expect(commandHtml).not.toContain("<strong>raw</strong>");
+  });
+
+  it("adds safe visual hierarchy to source and diff code without changing its text", () => {
+    const source = "const ready = true; // shipped\n";
+    const sourceTokens = highlightCode(source, "ts");
+    expect(sourceTokens.map((token) => token.value).join("")).toBe(source);
+    expect(sourceTokens.map((token) => token.kind)).toEqual(expect.arrayContaining(["keyword", "literal", "comment"]));
+
+    const patch = "@@ -1 +1 @@\n-old\n+new\n";
+    const patchTokens = highlightCode(patch, "diff");
+    expect(patchTokens.map((token) => token.value).join("")).toBe(patch);
+    expect(patchTokens.map((token) => token.kind)).toEqual(["meta", "deletion", "addition"]);
   });
 });

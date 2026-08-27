@@ -233,13 +233,14 @@ test("real Thread-first Fork loop, recovery surfaces, scale, and restart", async
     const style = getComputedStyle(element);
     return { borderLeftWidth: style.borderLeftWidth, backgroundColor: style.backgroundColor, paddingLeft: style.paddingLeft };
   });
-  expect(quoteCraft).toMatchObject({ borderLeftWidth: "3px", paddingLeft: "13px" });
-  expect(quoteCraft.backgroundColor).not.toBe("rgba(0, 0, 0, 0)");
+  expect(quoteCraft).toMatchObject({ borderLeftWidth: "2px", paddingLeft: "15px", backgroundColor: "rgba(0, 0, 0, 0)" });
   await page.locator(".agent-message table").scrollIntoViewIfNeeded();
   await page.waitForTimeout(100);
   await page.screenshot({ path: join(desktopRoot, "test-results/ui-focus-markdown.png") });
   const code = page.locator(".markdown-code").first();
   await expect(code.locator(".markdown-code-header > span")).toHaveText("ts");
+  await expect(code.locator(".syntax-keyword")).toContainText("const");
+  await expect(code.locator(".syntax-string")).toContainText("a-very-long-code-line");
   const clipboardBeforeCopy = await app!.evaluate(({ clipboard }) => clipboard.readText());
   await code.getByRole("button", { name: "Copy code" }).click();
   await expect(code.getByRole("button", { name: "Copied" })).toBeVisible();
@@ -250,14 +251,14 @@ test("real Thread-first Fork loop, recovery surfaces, scale, and restart", async
   await reasoning.locator("summary").click();
   await expect(reasoning.locator("strong")).toHaveText("Planning collaborative reasoning framework");
   await expect(reasoning.locator("blockquote")).toContainText("understand the result");
-  await expect(page.getByText("Ran npm test")).toBeVisible();
-  await expect(page.getByText("Changed 1 file")).toBeVisible();
-  await expect(page.getByText("Subagent activity")).toBeVisible();
-  const issue = page.locator(".activity-item.failed").filter({ hasText: "Codex hit an issue" });
+  await expect(page.getByText("Ran a command")).toBeVisible();
+  await expect(page.getByText("Updated src/focus.tsx")).toBeVisible();
+  await expect(page.getByText("Worked with a subagent")).toBeVisible();
+  const issue = page.locator(".activity-item.failed").filter({ hasText: "Something needs attention" });
   await expect(issue).toBeVisible();
   await issue.locator("summary").click();
   await expect(issue).toContainText("A recoverable fixture error");
-  await expect(page.getByText("Codex item: futureCapability")).toBeVisible();
+  await expect(page.getByText("Additional Codex activity")).toBeVisible();
   await expect(page.locator(".thread-name")).toHaveAttribute("title", rootTitle);
   await expect(page.locator(".thread-name")).toHaveAttribute("aria-label", `Current Thread: ${rootTitle}. Double-click to rename.`);
   const assertContainedNavigation = async (): Promise<void> => {
