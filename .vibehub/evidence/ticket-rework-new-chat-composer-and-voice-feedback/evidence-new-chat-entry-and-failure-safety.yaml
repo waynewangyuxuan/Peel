@@ -1,0 +1,22 @@
+{
+  "acceptance_ids": [
+    "immediate-real-new-chat",
+    "distinct-entry-semantics",
+    "new-chat-failure-safety"
+  ],
+  "evidence_id": "evidence-new-chat-entry-and-failure-safety",
+  "kind": "ticket_evidence",
+  "origin": "agent",
+  "recorded_at": "2026-08-27T08:23:38Z",
+  "refs": [
+    "commit:98a98ee0e21e338e6fd6af51a0d02b0e70b4ffe6",
+    "commit:c1e0472fccb49f9c850546ed55c983bbf289f131",
+    "test:apps/desktop/test/peel-service-new-chat.test.ts covers direct start and persistence cleanup",
+    "test:apps/desktop/e2e/v01-journey.spec.ts covers sub-250ms new Chat usability during delayed discovery, exactly one plus and one search action, and thread/start failure safety",
+    "command:npm test passed all 62 repository tests",
+    "command:npm run test:e2e --workspace @peel/desktop passed the production Electron journey"
+  ],
+  "schema_version": 1,
+  "summary": "The committed desktop implementation starts a real Codex Thread directly, persists it as a one-root Space, reuses the active cwd when present, and cleans up the remote Thread if persistence fails. The UI now has one New Chat plus and one Search Chats icon, with separate empty-state and keyboard semantics. Service and production Electron tests prove immediate usability without thread/list, retryable human-readable failure, and no phantom Space.",
+  "ticket_id": "ticket-rework-new-chat-composer-and-voice-feedback"
+}

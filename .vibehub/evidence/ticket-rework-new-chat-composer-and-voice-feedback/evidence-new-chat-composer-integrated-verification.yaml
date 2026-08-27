@@ -1,0 +1,25 @@
+{
+  "acceptance_ids": [
+    "integrated-ui-verification"
+  ],
+  "evidence_id": "evidence-new-chat-composer-integrated-verification",
+  "kind": "ticket_evidence",
+  "origin": "agent",
+  "recorded_at": "2026-08-27T08:23:38Z",
+  "refs": [
+    "commit:e9c6767dc67baecceeeb5caf94c770542c42fda0",
+    "command:npm test passed App Server 19, Git adapter 12, and desktop 31 tests",
+    "command:npm run build passed App Server, Git adapter, desktop typecheck, native Speech helper, renderer, Electron main, and preload",
+    "command:npm run test:e2e --workspace @peel/desktop passed in 39.5 seconds",
+    "command:npm run verify:package --workspace @peel/desktop returned ok=true, restoredDraft=true, nativeVoiceHelper=true",
+    "command:npm run verify:real-voice --workspace @peel/desktop returned ok=true",
+    "runtime:one packaged Peel process remains active after stale verification processes and the prior app instance were stopped",
+    "screenshot:apps/desktop/test-results/ui-welcome.png",
+    "screenshot:apps/desktop/test-results/ui-new-chat-empty.png",
+    "screenshot:apps/desktop/test-results/ui-voice-recording.png",
+    "screenshot:apps/desktop/test-results/ui-voice-transcribing.png"
+  ],
+  "schema_version": 1,
+  "summary": "At the committed state, all repository tests, production builds, the full Electron journey, the packaged lifecycle check, and real Apple Speech verification pass. Welcome, empty New Chat, recording, and transcribing screenshots were visually reviewed against the preserved Demo, and the freshly packaged app was relaunched as the only active Peel instance.",
+  "ticket_id": "ticket-rework-new-chat-composer-and-voice-feedback"
+}

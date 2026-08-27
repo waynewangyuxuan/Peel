@@ -1,0 +1,23 @@
+{
+  "acceptance_ids": [
+    "chat-like-composer",
+    "live-voice-level-feedback"
+  ],
+  "evidence_id": "evidence-chat-composer-and-live-voice-feedback",
+  "kind": "ticket_evidence",
+  "origin": "agent",
+  "recorded_at": "2026-08-27T08:23:38Z",
+  "refs": [
+    "commit:98a98ee0e21e338e6fd6af51a0d02b0e70b4ffe6",
+    "commit:e9c6767dc67baecceeeb5caf94c770542c42fda0",
+    "test:apps/desktop/test/audio.test.ts proves quiet, speaking, and loud PCM produce ordered level feedback",
+    "test:apps/desktop/e2e/v01-journey.spec.ts proves Shift+Enter, Enter send, live waveform response, transcription state, and Draft safety",
+    "command:npm run verify:real-voice --workspace @peel/desktop returned ok=true, preserved Existing draft remains., appended Peel voice check is working, reported zero turn/start, zero errors, Peel TCC subject and responsibility, and no ChatGPT responsibility",
+    "screenshot:apps/desktop/test-results/ui-new-chat-empty.png",
+    "screenshot:apps/desktop/test-results/ui-voice-recording.png",
+    "screenshot:apps/desktop/test-results/ui-voice-transcribing.png"
+  ],
+  "schema_version": 1,
+  "summary": "The Focus Composer now auto-grows, sends with Enter, preserves Shift+Enter newlines, uses an explicit circular up-arrow stateful Send action, and retains per-Thread Drafts. Dictation measures real analyser PCM, maps perceptual loudness into a continuously updated compact waveform and elapsed state, then appends Apple Speech text without auto-send or Draft loss.",
+  "ticket_id": "ticket-rework-new-chat-composer-and-voice-feedback"
+}
