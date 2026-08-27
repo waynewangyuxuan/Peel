@@ -1,0 +1,18 @@
+{
+  "accepted_acceptance_ids": [
+    "friendly-no-speech-retry",
+    "sanitized-voice-failure-safety",
+    "voice-error-regression-proof"
+  ],
+  "closed_at": "2026-08-27T08:41:19Z",
+  "evidence_ids": [
+    "evidence-voice-no-speech-retry-and-safety",
+    "evidence-voice-no-speech-regression-verification"
+  ],
+  "kind": "ticket_outcome",
+  "schema_version": 1,
+  "status": "successful",
+  "summary": "All three acceptance criteria are accepted. The committed renderer repeatedly removes Electron IPC and Error wrappers, classifies native no-speech, empty-transcript, and unusable-audio variants as one quiet retry notice, keeps real capture and recognizer failures distinct and actionable, clears feedback on the next recording, and preserves the exact per-Thread Draft without automatic sending. Checked-in unit and production Electron journey Evidence exercises the reported wrapped peel:voice:transcribe failure, quiet/error styling, retry clearing, Draft safety, and zero turn creation; repository tests, the desktop build, packaged lifecycle, and real Apple Speech verification all pass without changing the native recognizer contract.",
+  "ticket_id": "ticket-fix-voice-no-speech-recovery",
+  "unresolved_acceptance_ids": []
+}
