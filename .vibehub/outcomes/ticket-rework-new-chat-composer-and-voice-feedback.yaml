@@ -1,0 +1,22 @@
+{
+  "accepted_acceptance_ids": [
+    "immediate-real-new-chat",
+    "distinct-entry-semantics",
+    "new-chat-failure-safety",
+    "chat-like-composer",
+    "live-voice-level-feedback",
+    "integrated-ui-verification"
+  ],
+  "closed_at": "2026-08-27T08:27:15Z",
+  "evidence_ids": [
+    "evidence-new-chat-entry-and-failure-safety",
+    "evidence-chat-composer-and-live-voice-feedback",
+    "evidence-new-chat-composer-integrated-verification"
+  ],
+  "kind": "ticket_outcome",
+  "schema_version": 1,
+  "status": "successful",
+  "summary": "All six acceptance criteria are accepted. The committed implementation creates a real Codex Thread directly as a one-root Space without discovery gating, gives New Chat and existing-Chat search distinct permanent and keyboard entry semantics, and recovers safely from start or persistence failure. The Demo-aligned Composer provides Enter/Shift+Enter behavior, stateful circular send, attachments, editable per-Thread Drafts, and real PCM-driven live dictation levels with elapsed and transcription states. Checked-in service/audio/Electron/package/real-voice Evidence, independently inspected screenshots and implementation diffs, a valid Ticket graph, and an independent 62-test repository run establish the integrated result without unresolved criteria.",
+  "ticket_id": "ticket-rework-new-chat-composer-and-voice-feedback",
+  "unresolved_acceptance_ids": []
+}
