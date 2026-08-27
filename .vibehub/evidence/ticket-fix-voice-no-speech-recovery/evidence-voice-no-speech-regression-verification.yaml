@@ -1,0 +1,20 @@
+{
+  "acceptance_ids": [
+    "voice-error-regression-proof"
+  ],
+  "evidence_id": "evidence-voice-no-speech-regression-verification",
+  "kind": "ticket_evidence",
+  "origin": "agent",
+  "recorded_at": "2026-08-27T08:38:34Z",
+  "refs": [
+    "commit:e10330fd07e77916d0b89b375fea3a821635e6ae",
+    "command:npm test passed App Server 19, Git adapter 12, and desktop 37 tests",
+    "command:npm run build --workspace @peel/desktop passed typecheck, native Speech helper, renderer, Electron main, and preload",
+    "command:npm run test:e2e --workspace @peel/desktop passed the full Electron journey in 40.9 seconds",
+    "command:npm run verify:package --workspace @peel/desktop returned ok=true, restoredDraft=true, nativeVoiceHelper=true",
+    "command:npm run verify:real-voice --workspace @peel/desktop returned ok=true with recognized Peel voice check text, zero errors, zero turn/start, and TCC responsibility owned by Peel"
+  ],
+  "schema_version": 1,
+  "summary": "The exact no-speech rejection passes through the production Electron renderer/main/helper boundary in the full journey, all 68 repository tests pass, the desktop production build and packaged lifecycle pass, and real Apple Speech still appends recognized text to the existing Draft with zero automatic Turns or errors.",
+  "ticket_id": "ticket-fix-voice-no-speech-recovery"
+}

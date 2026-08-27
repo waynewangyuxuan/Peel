@@ -1,0 +1,18 @@
+{
+  "acceptance_ids": [
+    "friendly-no-speech-retry",
+    "sanitized-voice-failure-safety"
+  ],
+  "evidence_id": "evidence-voice-no-speech-retry-and-safety",
+  "kind": "ticket_evidence",
+  "origin": "agent",
+  "recorded_at": "2026-08-27T08:38:34Z",
+  "refs": [
+    "commit:e10330fd07e77916d0b89b375fea3a821635e6ae",
+    "test:apps/desktop/test/voice-error.test.ts covers the exact Error invoking remote method peel:voice:transcribe wrapper, repeated wrappers, no-speech variants, permission denial, and interrupted recognition",
+    "test:apps/desktop/e2e/v01-journey.spec.ts proves quiet notice styling, absence of raw IPC/channel/helper copy, exact Draft preservation, zero auto-send, retry clearing, and continued successful Dictation"
+  ],
+  "schema_version": 1,
+  "summary": "The committed renderer classifies native/helper no-speech and unusable-audio variants as one quiet retry notice, repeatedly strips Electron IPC and Error wrappers, preserves distinct actionable copy for actual permission/interruption/failure cases, clears feedback when a new recording starts, and never mutates the existing Draft on rejection.",
+  "ticket_id": "ticket-fix-voice-no-speech-recovery"
+}
