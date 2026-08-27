@@ -1,0 +1,69 @@
+{
+  "acceptance": [
+    {
+      "acceptance_id": "coherent-chat-content-system",
+      "criterion": "Assistant, user, Reasoning, Subagent, error, command, file-change, diff, and unknown supported item routes use an intentional shared content system: prose routes render safe CommonMark/GFM; genuinely verbatim facts retain semantic technical surfaces. Headings, paragraphs, emphasis, nested lists, blockquotes, task lists, links, images, horizontal rules, inline/fenced code, and tables have coherent typography, spacing, selection, overflow, and compact-width behavior with no visible source markers or unprocessed JSON."
+    },
+    {
+      "acceptance_id": "chatgpt-like-conversation-rhythm",
+      "criterion": "At 1440x960 and 1000x720, the assistant response reads as one calm continuous surface with a deliberate readable measure, balanced bilingual typography, and no heavy per-Turn separators or nested-card clutter. User messages remain compact and distinct; Activity is subordinate but legible; completed low-value technical activity collapses quietly. The result preserves the Demo shell while matching familiar ChatGPT hierarchy rather than introducing a document-editor theme."
+    },
+    {
+      "acceptance_id": "finished-code-and-technical-activity",
+      "criterion": "Fenced code has syntax highlighting, language identity, safe horizontal scrolling, selection, and immediate keyboard/pointer Copy feedback; inline code remains readable in prose. Commands, output, file changes, failures, and diffs present concise summaries and expandable detail with readable wrapping/scrolling instead of an undifferentiated raw pre block, while preserving exact technical text on demand."
+    },
+    {
+      "acceptance_id": "stable-streaming-and-interaction",
+      "criterion": "Representative incomplete emphasis, links, lists, blockquotes, fenced code, tables, and mixed Chinese/English content stream without exposed control syntax, layout jumps, lost selection, or forced scroll changes, then resolve to the final semantic structure without mutating authoritative message text. Frequent keyboard, streaming, and Activity interactions do not wait on decorative animation; motion is interruptible, targeted, under 300ms where used, and respects reduced motion."
+    },
+    {
+      "acceptance_id": "realistic-visual-regression-proof",
+      "criterion": "A realistic long bilingual and technical Codex fixture covers quotes, nested lists, GFM tables, long code, command success/failure, file change, Reasoning, Subagent prose, streaming fragments, unsafe content, and unknown items. Automated semantic/accessibility tests, complete repository tests/build/package, and directly inspected Electron screenshots at normal and compact widths prove the complete Focus journey and preserve Picker, Overview, Fork, Voice, Approval, Diff, Draft, scroll, recovery, and restart behavior."
+    }
+  ],
+  "constraints": [
+    "The preserved original Demo remains the shell and material authority; ChatGPT conventions guide conversation hierarchy and Markdown craft rather than creating a competing skin.",
+    "The authoritative Codex message string is never rewritten or persisted differently; incomplete-state repair stays render-only.",
+    "Raw HTML, unsafe URLs, scripts, and remote interactive content remain disabled; text and code remain selectable.",
+    "Do not disguise commands, patches, diffs, or unknown machine facts as prose Markdown; make exact detail available through a semantic technical surface.",
+    "Do not add decorative entrance motion to streaming content or frequent keyboard interactions, do not use transition-all, and respect reduced-motion preferences."
+  ],
+  "context": "The current renderer has a sound CommonMark/GFM baseline, safe links, render-only streaming repair, code copy, and semantic blockquotes/tables. Dogfooding still feels unfinished because the visual system is fragmented: assistant Turns are chopped by repeated separators, typography and spacing read like a compact debug transcript, Reasoning is cramped, command and file activity falls back to raw preformatted blocks, code lacks real syntax highlighting, and several Markdown structures feel generic rather than ChatGPT-like. The work therefore needs a coherent content component system and realistic visual regression coverage, not another parser-only patch or a new product skin. The preserved Demo remains authoritative for shell proportions while ChatGPT's conversation hierarchy guides content presentation.",
+  "context_refs": [
+    {
+      "purpose": "Requires Chat to feel intentionally processed and prevents raw intermediate presentation.",
+      "ref": ".vibehub/rooms/product/constraint-focus-chat-interaction-quality.yaml"
+    },
+    {
+      "purpose": "Defines supported transcript items, Markdown/code fidelity, streaming, selection, scroll, and Activity behavior.",
+      "ref": ".vibehub/rooms/product/contract-focus-chat-fidelity.yaml"
+    },
+    {
+      "purpose": "Keeps visual iteration inside the accepted v0.1 direction.",
+      "ref": ".vibehub/rooms/product/decision-demo-authoritative-v01-ui-direction.yaml"
+    },
+    {
+      "purpose": "Provides the exact preserved shell, spacing, materials, and Focus interaction reference.",
+      "ref": "docs/product/source/peel-demo-v0-original.html"
+    },
+    {
+      "purpose": "Preserves the existing parser safety, supported syntax, streaming projection, and regression baseline while raising presentation quality.",
+      "ref": ".vibehub/outcomes/ticket-fix-chat-markdown-presentation.yaml"
+    }
+  ],
+  "kind": "ticket",
+  "maturity": "firm",
+  "outcome": "Focus Chat becomes a polished ChatGPT-like reading surface in which Markdown, code, reasoning, command activity, and streaming content always appear intentionally rendered rather than raw or mechanically boxed.",
+  "provenance_refs": [
+    "conversation:2026-08-27-chatgpt-like-markdown-and-content-presentation"
+  ],
+  "relations": [
+    {
+      "rationale": "The visual/content-system rebuild extends the verified safe Markdown routing and streaming baseline.",
+      "target_ticket_id": "ticket-fix-chat-markdown-presentation",
+      "type": "depends_on"
+    }
+  ],
+  "schema_version": 1,
+  "ticket_id": "ticket-rebuild-chat-reading-surface"
+}

@@ -1,0 +1,70 @@
+{
+  "acceptance": [
+    {
+      "acceptance_id": "experimental-realtime-capability",
+      "criterion": "The App Server adapter detects the installed experimental realtime request and notification surface from the exact resolved Codex executable, initializes with experimentalApi only through one typed capability boundary, and reports codex-realtime, native-fallback, or unavailable accurately without weakening stable Thread operations. Tests cover supported, schema-absent, and runtime-method-unavailable variants."
+    },
+    {
+      "acceptance_id": "existing-session-no-api-key",
+      "criterion": "The primary dictation engine communicates only through the already-owned local Codex App Server process and its existing Codex/ChatGPT account state. No OPENAI_API_KEY, Realtime API credential, renderer secret, or separate user authentication is required or introduced; engine status remains inspectable for troubleshooting."
+    },
+    {
+      "acceptance_id": "draft-only-realtime-lifecycle",
+      "criterion": "Starting dictation opens one client-managed Codex realtime session configured for transcript-only behavior, measured microphone PCM is appended with correct sample metadata, user-role transcript delta/done events are accumulated, and Stop inserts the resulting text into the exact current editable Draft. The complete lifecycle performs zero thread/turn/start, handoff, assistant-response, or auto-send operations and preserves concurrent user typing."
+    },
+    {
+      "acceptance_id": "switch-cancel-and-fallback-safety",
+      "criterion": "Cancel, Thread switch, Space switch, unmount, permission denial, server error, or app shutdown closes the realtime session and cannot write transcript into another Thread. If Codex realtime is unavailable or cannot start before audio is committed, Peel may use the existing native recognizer; all paths preserve the prior Draft, return to a retryable Composer, and show concise non-technical feedback with no raw protocol or IPC wrapper text."
+    },
+    {
+      "acceptance_id": "realtime-dictation-verification",
+      "criterion": "Automated transport, reducer, main/preload, audio, and renderer tests prove experimental handshake, exact start-append-stop ordering, fragmented transcript assembly, user-role filtering, Draft merge semantics, zero Turn creation, cancellation isolation, and native fallback. An installed-schema probe plus a packaged Electron smoke verify the real capability boundary without mutating unrelated Codex Threads."
+    }
+  ],
+  "constraints": [
+    "Voice Dictation remains Record to Transcribe to editable Draft to explicit Send and never auto-sends.",
+    "Codex App Server Realtime is experimental and must remain behind an adapter capability boundary with explicit fallback; renderer components do not consume raw JSON-RPC.",
+    "Do not require an independent OpenAI API key, duplicate Codex authentication, or expose credentials to the renderer.",
+    "Do not treat audio as a normal Turn input or permit a transcript-only dictation gesture to start agent work.",
+    "Preserve the existing ChatGPT-like live microphone level and no-speech recovery interaction."
+  ],
+  "context": "The shipped dictation path uses an unpacked Apple Speech.framework helper because the stable App Server schema previously exposed no voice request. The locally installed Codex 0.149.0 experimental schema now exposes thread/realtime/start, appendAudio, stop, listVoices, and transcript delta/done notifications. That server path can reuse the App Server process and Codex account already owned by Peel, so an independent OpenAI API key is not the correct primary product contract. The integration must preserve the existing Record to Transcribe to editable Draft to explicit Send boundary: realtime transcript events update only the current Draft and never create a Codex Turn or trigger a model response. Apple Speech remains an explicit capability fallback for installations where the experimental realtime contract is absent or cannot start.",
+  "context_refs": [
+    {
+      "purpose": "Requires stable, experimental, and unavailable App Server behavior to degrade explicitly.",
+      "ref": ".vibehub/rooms/product/constraint-app-server-capability-gating.yaml"
+    },
+    {
+      "purpose": "Defines editable Draft insertion, explicit Send, and failure safety for Voice.",
+      "ref": ".vibehub/rooms/product/contract-voice-dictation-draft.yaml"
+    },
+    {
+      "purpose": "Keeps process, transport, typed client, capability, and renderer responsibilities separated.",
+      "ref": ".vibehub/rooms/product/decision-app-server-adapter-architecture.yaml"
+    },
+    {
+      "purpose": "Prevents dictation from creating shadow Turns or assistant state outside Codex.",
+      "ref": ".vibehub/rooms/product/contract-source-of-truth-ownership.yaml"
+    },
+    {
+      "purpose": "Records why transcription was an adapter and allows the replaceable native baseline to evolve.",
+      "ref": "docs/architecture/ADR-0001-electron-desktop-shell.md"
+    }
+  ],
+  "kind": "ticket",
+  "maturity": "firm",
+  "outcome": "Peel Voice Dictation uses Codex App Server Realtime through the user's existing Codex session to produce an editable Draft, with no API key requirement and a capability-gated native fallback.",
+  "provenance_refs": [
+    "conversation:2026-08-27-codex-server-voice-engine",
+    "/private/tmp/peel-codex-schema-experimental.KGx5QB"
+  ],
+  "relations": [
+    {
+      "rationale": "The server-backed engine must preserve the latest verified Composer recovery and Draft-safety behavior.",
+      "target_ticket_id": "ticket-fix-voice-no-speech-recovery",
+      "type": "depends_on"
+    }
+  ],
+  "schema_version": 1,
+  "ticket_id": "ticket-integrate-codex-realtime-dictation"
+}
