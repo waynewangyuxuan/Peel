@@ -728,4 +728,27 @@ test("real Thread-first Fork loop, recovery surfaces, scale, and restart", async
   await page.screenshot({ path: join(desktopRoot, "test-results/ui-diff.png") });
   await page.locator(".diff-drawer").getByRole("button").first().click();
   await expect(page.getByLabel("Message")).toBeVisible();
+
+  await page.getByRole("button", { name: /New Space/ }).click();
+  await page.getByLabel("Search Codex Chats").fill("Catalog direction 69");
+  await page.locator(".thread-result").filter({ hasText: "Catalog direction 69" }).click();
+  const directDraft = page.getByLabel("Message");
+  await directDraft.fill("A direct send survives a failed session resume");
+  await page.locator('.composer input[type="file"]').setInputFiles(attachmentPath);
+  const directEventsBefore = await readRpcEvents();
+  await writeFile(join(repository, "fail-resume"), "1");
+  await directDraft.press(process.platform === "darwin" ? "Meta+Enter" : "Control+Enter");
+  await expect(page.getByRole("alert")).toContainText("could not be resumed");
+  await expect(directDraft).toHaveValue("A direct send survives a failed session resume");
+  await expect(page.locator(".attachment")).toContainText("Image");
+  await directDraft.press(process.platform === "darwin" ? "Meta+Enter" : "Control+Enter");
+  await expect(page.getByText("Command approval")).toBeVisible();
+  await expect(directDraft).toHaveValue("");
+  await expect(page.locator(".attachment")).toHaveCount(0);
+  const directEvents = (await readRpcEvents()).slice(directEventsBefore.length);
+  const directResumeIndex = directEvents.findIndex((event) => event.method === "thread/resume" && event.params?.threadId === "catalog-69");
+  const directTurnIndex = directEvents.findIndex((event) => event.method === "turn/start" && event.params?.threadId === "catalog-69");
+  expect(directResumeIndex).toBeGreaterThanOrEqual(0);
+  expect(directTurnIndex).toBeGreaterThan(directResumeIndex);
+  expect(directEvents.filter((event) => event.method === "turn/start" && event.params?.threadId === "catalog-69")).toHaveLength(1);
 });

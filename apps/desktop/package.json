@@ -14,6 +14,7 @@
     "test": "vitest run test",
     "test:e2e": "playwright test",
     "package": "electron-packager . Peel --out out --overwrite --platform darwin --arch arm64 --app-bundle-id com.peel.desktop --extend-info build/Info.plist --asar.unpackDir=native/bin --ignore='(^|/)(src|test|e2e|node_modules/.cache)(/|$)'",
+    "launch": "node scripts/launch-packaged.mjs",
     "verify:package": "node scripts/verify-package.mjs",
     "verify:live-codex": "node scripts/verify-live-codex.mjs"
   },

@@ -17,6 +17,13 @@ import { PeelService } from "./peel-service";
 import { VoiceService } from "./voice-service";
 
 const currentDirectory = dirname(fileURLToPath(import.meta.url));
+const configuredUserDataPath = process.env.PEEL_USER_DATA_PATH || argumentValue("--peel-user-data-path");
+const configuredCodexBinary = process.env.PEEL_CODEX_BINARY || argumentValue("--peel-codex-binary");
+const configuredVoiceHelper = process.env.PEEL_VOICE_HELPER || argumentValue("--peel-voice-helper");
+const configuredStateFailureMarker = process.env.PEEL_TEST_STATE_FAILURE_MARKER || argumentValue("--peel-test-state-failure-marker");
+const configuredTmpdir = argumentValue("--peel-test-tmpdir");
+if (configuredUserDataPath) app.setPath("userData", configuredUserDataPath);
+if (configuredTmpdir) process.env.TMPDIR = configuredTmpdir;
 let window: BrowserWindow | null = null;
 let service: PeelService | null = null;
 let quitting = false;
@@ -25,6 +32,12 @@ let flushResolver: (() => void) | null = null;
 
 function appRoot(): string {
   return app.isPackaged ? app.getAppPath() : join(currentDirectory, "../..");
+}
+
+function argumentValue(name: string): string | undefined {
+  const index = process.argv.indexOf(name);
+  const value = index >= 0 ? process.argv[index + 1] : undefined;
+  return value && !value.startsWith("--") ? value : undefined;
 }
 
 function rendererUrl(): string {
@@ -129,11 +142,11 @@ app.whenReady().then(async () => {
   session.defaultSession.setPermissionRequestHandler((_webContents, permission, callback) => {
     callback(permission === "media");
   });
-  service = new PeelService(process.env.PEEL_USER_DATA_PATH || app.getPath("userData"), {
-    ...(process.env.PEEL_CODEX_BINARY ? { codexBinary: process.env.PEEL_CODEX_BINARY } : {}),
-    ...(process.env.PEEL_TEST_STATE_FAILURE_MARKER ? { stateFailureMarker: process.env.PEEL_TEST_STATE_FAILURE_MARKER } : {}),
+  service = new PeelService(configuredUserDataPath || app.getPath("userData"), {
+    ...(configuredCodexBinary ? { codexBinary: configuredCodexBinary } : {}),
+    ...(configuredStateFailureMarker ? { stateFailureMarker: configuredStateFailureMarker } : {}),
   });
-  const voiceHelperPath = process.env.PEEL_VOICE_HELPER || (app.isPackaged
+  const voiceHelperPath = configuredVoiceHelper || (app.isPackaged
     ? join(process.resourcesPath, "app.asar.unpacked/native/bin/peel-speech")
     : join(appRoot(), "native/bin/peel-speech"));
   const voice = new VoiceService(voiceHelperPath);

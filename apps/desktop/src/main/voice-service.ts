@@ -36,24 +36,37 @@ async function runHelper(helperPath: string, audioPath: string): Promise<VoiceHe
     const child = spawn(helperPath, [audioPath], { stdio: ["ignore", "pipe", "pipe"], windowsHide: true });
     let stdout = "";
     let stderr = "";
+    let settled = false;
+    const fail = (error: Error): void => {
+      if (settled) return;
+      settled = true;
+      clearTimeout(timer);
+      reject(error);
+    };
     const timer = setTimeout(() => {
       child.kill("SIGTERM");
-      reject(new Error("Dictation timed out after 45 seconds"));
+      fail(new Error("Dictation timed out after 45 seconds. Your existing draft was left unchanged."));
     }, 45_000);
     child.stdout.setEncoding("utf8");
     child.stderr.setEncoding("utf8");
     child.stdout.on("data", (chunk: string) => (stdout += chunk));
     child.stderr.on("data", (chunk: string) => (stderr += chunk));
     child.once("error", (error) => {
-      clearTimeout(timer);
-      reject(error);
+      fail(error);
     });
-    child.once("exit", (code) => {
+    child.once("exit", (code, signal) => {
+      if (settled) return;
+      settled = true;
       clearTimeout(timer);
       try {
         const parsed = JSON.parse(stdout || "{}") as VoiceHelperResponse;
-        if (code !== 0 && parsed.ok !== false) {
-          reject(new Error(stderr.trim() || `Speech helper exited with code ${code ?? "unknown"}`));
+        if ((code !== 0 || signal) && parsed.ok !== false) {
+          if (signal === "SIGABRT") {
+            reject(new Error("macOS blocked Speech Recognition for this launch. Open the packaged Peel app directly and try again; your existing draft was left unchanged."));
+            return;
+          }
+          const termination = signal ? `signal ${signal}` : `code ${code ?? "unknown"}`;
+          reject(new Error(stderr.trim() || `Speech recognition stopped unexpectedly (${termination}). Your existing draft was left unchanged.`));
           return;
         }
         resolve(parsed);

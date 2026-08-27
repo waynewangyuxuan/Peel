@@ -34,6 +34,8 @@ export class AppServerClient extends EventEmitter {
   readonly reducer: AppServerReducer;
   readonly capabilities: CapabilityMatrix;
   readonly #tracked = new Set<string>();
+  readonly #loaded = new Set<string>();
+  readonly #resumeRequests = new Map<string, Promise<void>>();
   readonly #schemaDetector: typeof detectInstalledAppServerSchema;
 
   constructor(transport: AppServerTransport, options: AppServerClientOptions = {}) {
@@ -45,12 +47,20 @@ export class AppServerClient extends EventEmitter {
       experimentalApi: transport.initializeParams.capabilities?.experimentalApi ?? false,
     });
     transport.on("notification", (notification: AppServerNotification) => {
+      if (notification.method === "thread/closed" && typeof notification.params.threadId === "string") {
+        this.#loaded.delete(notification.params.threadId);
+      }
       this.reducer.apply(notification);
       this.emit("notification", notification);
       if (notification.method === "thread/status/changed") this.emit("status", notification.params);
     });
     transport.on("serverRequest", (request: AppServerServerRequest) => this.emit("serverRequest", request));
-    transport.on("ready", () => void this.#reconcileTracked());
+    transport.on("disconnected", () => this.#loaded.clear());
+    transport.on("failed", () => this.#loaded.clear());
+    transport.on("ready", () => {
+      this.#loaded.clear();
+      void this.#reconcileTracked();
+    });
   }
 
   async connect(): Promise<InitializeResponse> {
@@ -77,7 +87,6 @@ export class AppServerClient extends EventEmitter {
 
   async readThread(threadId: string, includeTurns = true): Promise<CodexThread> {
     const response = await this.#call("thread/read", { threadId, includeTurns });
-    this.#tracked.add(threadId);
     this.reducer.rebuild(response.thread);
     return response.thread;
   }
@@ -85,6 +94,7 @@ export class AppServerClient extends EventEmitter {
   async startThread(params: ThreadStartParams): Promise<ThreadStartResponse> {
     const response = await this.#call("thread/start", params);
     this.#tracked.add(response.thread.id);
+    this.#loaded.add(response.thread.id);
     this.reducer.rebuild(response.thread);
     return response;
   }
@@ -92,6 +102,7 @@ export class AppServerClient extends EventEmitter {
   async resumeThread(threadId: string): Promise<ThreadStartResponse> {
     const response = await this.#call("thread/resume", { threadId });
     this.#tracked.add(threadId);
+    this.#loaded.add(threadId);
     this.reducer.rebuild(response.thread);
     return response;
   }
@@ -103,6 +114,7 @@ export class AppServerClient extends EventEmitter {
     }
     const response = await this.#call("thread/fork", params);
     this.#tracked.add(response.thread.id);
+    this.#loaded.add(response.thread.id);
     this.reducer.rebuild(response.thread);
     return response;
   }
@@ -114,10 +126,12 @@ export class AppServerClient extends EventEmitter {
   async deleteThread(threadId: string): Promise<void> {
     await this.#call("thread/delete", { threadId });
     this.#tracked.delete(threadId);
+    this.#loaded.delete(threadId);
     this.reducer.remove(threadId);
   }
 
   async startTurn(params: TurnStartParams): Promise<string> {
+    await this.#ensureLoaded(params.threadId);
     const response = await this.#call("turn/start", params);
     return response.turn.id;
   }
@@ -192,10 +206,23 @@ export class AppServerClient extends EventEmitter {
   async #reconcileTracked(): Promise<void> {
     for (const threadId of this.#tracked) {
       try {
-        await this.resumeThread(threadId);
+        await this.#ensureLoaded(threadId);
       } catch (error) {
         this.emit("reconcileError", threadId, error);
       }
+    }
+  }
+
+  async #ensureLoaded(threadId: string): Promise<void> {
+    if (this.#loaded.has(threadId)) return;
+    const existing = this.#resumeRequests.get(threadId);
+    if (existing) return await existing;
+    const request = this.resumeThread(threadId).then(() => undefined);
+    this.#resumeRequests.set(threadId, request);
+    try {
+      await request;
+    } finally {
+      if (this.#resumeRequests.get(threadId) === request) this.#resumeRequests.delete(threadId);
     }
   }
 }

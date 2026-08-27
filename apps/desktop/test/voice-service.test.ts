@@ -17,6 +17,15 @@ async function helper(response: object): Promise<string> {
   return path;
 }
 
+async function rawHelper(source: string): Promise<string> {
+  const directory = await mkdtemp(join(tmpdir(), "peel-voice-helper-"));
+  directories.push(directory);
+  const path = join(directory, "helper");
+  await writeFile(path, `#!/usr/bin/env node\n${source}\n`);
+  await chmod(path, 0o755);
+  return path;
+}
+
 describe("VoiceService native boundary", () => {
   it("returns a final transcript without owning or sending the editable draft", async () => {
     const service = new VoiceService(await helper({ ok: true, text: "editable transcript" }));
@@ -31,5 +40,15 @@ describe("VoiceService native boundary", () => {
   it("rejects an unusable capture before invoking native recognition", async () => {
     const service = new VoiceService("/does/not/exist");
     await expect(service.transcribe(new Uint8Array(43))).rejects.toThrow("did not contain usable audio");
+  });
+
+  it("turns a macOS privacy abort into an actionable independent-launch error", async () => {
+    const service = new VoiceService(await rawHelper('process.kill(process.pid, "SIGABRT");'));
+    await expect(service.transcribe(new Uint8Array(48))).rejects.toThrow("Open the packaged Peel app directly");
+  });
+
+  it("reports non-privacy termination signals without hiding the signal", async () => {
+    const service = new VoiceService(await rawHelper('process.kill(process.pid, "SIGTERM");'));
+    await expect(service.transcribe(new Uint8Array(48))).rejects.toThrow("signal SIGTERM");
   });
 });

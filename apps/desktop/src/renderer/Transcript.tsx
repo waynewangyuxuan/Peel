@@ -48,6 +48,7 @@ export function Transcript({
   const scroller = useRef<HTMLDivElement>(null);
   const [attachments, setAttachments] = useState<UserInput[]>([]);
   const [sending, setSending] = useState(false);
+  const [sendError, setSendError] = useState<string | null>(null);
   const [voice, setVoice] = useState<"idle" | "recording" | "transcribing">("idle");
   const [voiceError, setVoiceError] = useState<string | null>(null);
   const recorder = useRef<RecorderSession | null>(null);
@@ -100,12 +101,15 @@ export function Transcript({
     const text = draft.trim();
     if ((!text && attachments.length === 0) || sending) return;
     setSending(true);
+    setSendError(null);
     try {
       await onSend([
         ...(text ? [{ type: "text" as const, text, text_elements: [] }] : []),
         ...attachments,
       ]);
       setAttachments([]);
+    } catch (error) {
+      setSendError(userFacingIpcError(error));
     } finally {
       setSending(false);
     }
@@ -198,6 +202,7 @@ export function Transcript({
     <div className="composer-wrap">
       {attachments.length > 0 && <div className="attachment-row">{attachments.map((item, index) =>
         <span className="attachment" key={`${item.type}-${index}`}>{item.type === "audio" ? "Audio" : "Image"}<button onClick={() => setAttachments((all) => all.filter((_, itemIndex) => itemIndex !== index))}><Icon name="close" size={12}/></button></span>)}</div>}
+      {sendError && <div className="composer-error" role="alert">{sendError}</div>}
       {voiceError && <div className="composer-error">{voiceError}</div>}
       <div className={`composer ${voice === "recording" ? "is-recording" : ""}`}>
         <textarea
@@ -222,6 +227,14 @@ export function Transcript({
       </div>
     </div>
   </div>;
+}
+
+function userFacingIpcError(error: unknown): string {
+  const message = error instanceof Error ? error.message : String(error);
+  return message
+    .replace(/^Error invoking remote method '[^']+':\s*/i, "")
+    .replace(/^Error:\s*/i, "")
+    .trim() || "The message could not be sent. Your draft is unchanged; try again.";
 }
 
 function TurnView({ turn, reduced, highlighted, onBranch, onOpenCodex }: {

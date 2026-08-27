@@ -37,6 +37,7 @@ test("typed list/search/read/turn/name calls preserve Codex-owned thread identit
   const snapshot = thread("root", [turn("turn-1")]);
   transport.results.set("thread/list", { data: [snapshot], nextCursor: null, backwardsCursor: null });
   transport.results.set("thread/read", { thread: snapshot });
+  transport.results.set("thread/resume", { thread: snapshot, model: "m", modelProvider: "p" });
   transport.results.set("turn/start", { turn: turn("turn-2", "inProgress") });
   transport.results.set("thread/name/set", {});
   const client = new AppServerClient(transport as unknown as AppServerTransport);
@@ -50,7 +51,7 @@ test("typed list/search/read/turn/name calls preserve Codex-owned thread identit
   await client.setThreadName("root", "Named root");
   assert.deepEqual(
     transport.calls.map((call) => call.method),
-    ["thread/list", "thread/read", "turn/start", "thread/name/set"],
+    ["thread/list", "thread/read", "thread/resume", "turn/start", "thread/name/set"],
   );
   assert.deepEqual(transport.calls[0]?.params, { searchTerm: "root" });
   assert.equal(client.reducer.getThread("root")?.thread.id, "root");
@@ -109,19 +110,64 @@ test("stream/status events reduce state and approvals use method-specific respon
   ]);
 });
 
-test("ready after interruption resumes tracked threads before rebuilding instead of keeping a shadow transcript", async () => {
+test("ready after interruption resumes loaded threads before rebuilding instead of keeping a shadow transcript", async () => {
   const transport = new MockTransport();
   let snapshot = thread("root", [turn("before")]);
   transport.results.set("thread/read", () => ({ thread: snapshot }));
   transport.results.set("thread/resume", () => ({ thread: snapshot }));
   const client = new AppServerClient(transport as unknown as AppServerTransport);
-  await client.readThread("root");
+  await client.resumeThread("root");
   snapshot = thread("root", [turn("before"), turn("after")]);
+  transport.emit("disconnected", new Error("fixture disconnect"));
   transport.emit("ready", {});
   await new Promise((resolve) => setImmediate(resolve));
   assert.equal(client.reducer.getThread("root")?.turns.length, 2);
-  assert.equal(transport.calls.filter((call) => call.method === "thread/read").length, 1);
+  assert.equal(transport.calls.filter((call) => call.method === "thread/read").length, 0);
+  assert.equal(transport.calls.filter((call) => call.method === "thread/resume").length, 2);
+});
+
+test("stored Threads resume once before turn/start and resume again after thread/closed", async () => {
+  const transport = new MockTransport();
+  const snapshot = thread("stored", [turn("before")]);
+  let releaseResume!: () => void;
+  const resumeGate = new Promise<void>((resolve) => { releaseResume = resolve; });
+  transport.results.set("thread/read", { thread: snapshot });
+  transport.results.set("thread/resume", async () => {
+    await resumeGate;
+    return { thread: snapshot };
+  });
+  let nextTurn = 1;
+  transport.results.set("turn/start", () => ({ turn: turn(`continued-${nextTurn++}`, "inProgress") }));
+  const client = new AppServerClient(transport as unknown as AppServerTransport);
+  await client.readThread("stored");
+
+  const first = client.startTurn({ threadId: "stored", input: [{ type: "text", text: "one", text_elements: [] }] });
+  const second = client.startTurn({ threadId: "stored", input: [{ type: "text", text: "two", text_elements: [] }] });
   assert.equal(transport.calls.filter((call) => call.method === "thread/resume").length, 1);
+  assert.equal(transport.calls.filter((call) => call.method === "turn/start").length, 0);
+  releaseResume();
+  assert.deepEqual(await Promise.all([first, second]), ["continued-1", "continued-2"]);
+  assert.equal(transport.calls.filter((call) => call.method === "thread/resume").length, 1);
+  assert.equal(transport.calls.filter((call) => call.method === "turn/start").length, 2);
+
+  transport.emit("notification", { method: "thread/closed", params: { threadId: "stored" } });
+  await client.startTurn({ threadId: "stored", input: [{ type: "text", text: "three", text_elements: [] }] });
+  assert.equal(transport.calls.filter((call) => call.method === "thread/resume").length, 2);
+  assert.equal(transport.calls.filter((call) => call.method === "turn/start").length, 3);
+});
+
+test("new and forked Threads start turns without an unnecessary resume", async () => {
+  const transport = new MockTransport();
+  transport.results.set("thread/start", { thread: thread("new"), model: "m", modelProvider: "p" });
+  transport.results.set("thread/fork", { thread: thread("child"), model: "m", modelProvider: "p" });
+  transport.results.set("turn/start", { turn: turn("active", "inProgress") });
+  const client = new AppServerClient(transport as unknown as AppServerTransport);
+
+  await client.startThread({});
+  await client.startTurn({ threadId: "new", input: [{ type: "text", text: "new", text_elements: [] }] });
+  await client.forkThread({ threadId: "new" });
+  await client.startTurn({ threadId: "child", input: [{ type: "text", text: "child", text_elements: [] }] });
+  assert.equal(transport.calls.filter((call) => call.method === "thread/resume").length, 0);
 });
 
 test("capability gate is bound to the transport handshake flag", () => {

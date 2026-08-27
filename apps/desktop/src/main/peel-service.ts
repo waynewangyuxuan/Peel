@@ -4,6 +4,7 @@ import { EventEmitter } from "node:events";
 
 import {
   AppServerClient,
+  AppServerRpcError,
   AppServerTransport,
   type AppServerNotification,
   type AppServerServerRequest,
@@ -147,11 +148,19 @@ export class PeelService extends EventEmitter {
 
   async sendTurn(input: SendTurnInput): Promise<{ turnId: string }> {
     this.#requireConnection();
-    const turnId = await this.client.startTurn({
-      threadId: input.threadId,
-      input: input.input,
-      ...(input.cwd ? { cwd: input.cwd } : {}),
-    });
+    let turnId: string;
+    try {
+      turnId = await this.client.startTurn({
+        threadId: input.threadId,
+        input: input.input,
+        ...(input.cwd ? { cwd: input.cwd } : {}),
+      });
+    } catch (error) {
+      if (isUnavailableThread(error)) {
+        throw new Error("This Codex Chat could not be resumed. Your message is still in the draft—retry, or open the Chat in Codex from the header.");
+      }
+      throw error;
+    }
     const state = await this.#store.load();
     const node = Object.values(state.spaces).flatMap((space) => Object.values(space.nodes)).find((candidate) => candidate.threadId === input.threadId);
     const prompt = input.input.find((candidate) => candidate.type === "text")?.text;
@@ -396,4 +405,10 @@ function failure(
 
 function messageOf(error: unknown): string {
   return error instanceof Error ? error.message : String(error);
+}
+
+function isUnavailableThread(error: unknown): boolean {
+  return error instanceof AppServerRpcError
+    && (error.code === -32600 || error.code === -32004)
+    && /thread.*(?:not found|unknown)|unknown.*thread/i.test(error.message);
 }

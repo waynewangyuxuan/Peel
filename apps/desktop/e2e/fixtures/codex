@@ -66,6 +66,7 @@ const catalogThreads = Array.from({ length: 70 }, (_, index) => {
   };
 });
 const threads = new Map([[root.id, root]]);
+const loadedThreads = new Set();
 let childIndex = 0;
 let requestIndex = 90;
 let threadListRequestIndex = 0;
@@ -110,11 +111,17 @@ reader.on("line", (line) => {
   }
   if (method === "thread/read" || method === "thread/resume") {
     let thread = threads.get(params.threadId) || restoreCatalog(params.threadId) || restoreTestChild(params.threadId) || restoreSynthetic(params.threadId);
+    const failResumeMarker = process.env.TMPDIR ? join(process.env.TMPDIR, "fail-resume") : null;
+    if (method === "thread/resume" && failResumeMarker && existsSync(failResumeMarker)) {
+      unlinkSync(failResumeMarker);
+      return send({ id, error: { code: -32600, message: `thread not found: ${params.threadId}` } });
+    }
     const nonGitMarker = process.env.TMPDIR ? join(process.env.TMPDIR, "root-non-git-once") : null;
     if (thread?.id === "thread-root" && nonGitMarker && existsSync(nonGitMarker)) {
       unlinkSync(nonGitMarker);
       thread = { ...structuredClone(thread), cwd: dirname(cwd) };
     }
+    if (thread && method === "thread/resume") loadedThreads.add(thread.id);
     const response = thread ? { id, result: method === "thread/read" ? { thread } : startResponse(thread) } : { id, error: { code: -32004, message: "Unknown test Thread" } };
     const delayMarker = process.env.TMPDIR ? join(process.env.TMPDIR, `delay-read-${params.threadId}`) : null;
     if (delayMarker && existsSync(delayMarker)) {
@@ -137,6 +144,7 @@ reader.on("line", (line) => {
     const childId = `thread-child-${++childIndex}`;
     const child = { ...structuredClone(parent), id: childId, sessionId: `session-${childId}`, name: null, preview: "", cwd: params.cwd || parent.cwd, forkedFromId: parent.id, parentThreadId: parent.id, createdAt: now, updatedAt: now, turns: structuredClone(parent.turns.slice(0, lastIndex + 1)) };
     threads.set(childId, child);
+    loadedThreads.add(childId);
     const delayForkMarker = process.env.TMPDIR ? join(process.env.TMPDIR, "delay-fork") : null;
     if (delayForkMarker && existsSync(delayForkMarker)) {
       unlinkSync(delayForkMarker);
@@ -167,6 +175,7 @@ reader.on("line", (line) => {
     }
     const thread = threads.get(params.threadId);
     if (!thread) return send({ id, error: { code: -32004, message: "Unknown Thread" } });
+    if (!loadedThreads.has(thread.id)) return send({ id, error: { code: -32600, message: `thread not found: ${thread.id}` } });
     const textInput = params.input.find((candidate) => candidate.type === "text");
     const armFinalizeMarker = process.env.TMPDIR ? join(process.env.TMPDIR, "arm-finalize-persist") : null;
     if (armFinalizeMarker && existsSync(armFinalizeMarker)) {
