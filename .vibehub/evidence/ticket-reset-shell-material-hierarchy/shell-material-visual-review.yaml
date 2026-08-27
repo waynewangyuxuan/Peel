@@ -1,0 +1,23 @@
+{
+  "acceptance_ids": [
+    "content-first-shell-hierarchy",
+    "coherent-material-and-geometry",
+    "calm-activity-and-progressive-actions"
+  ],
+  "evidence_id": "shell-material-visual-review",
+  "kind": "ticket_evidence",
+  "origin": "agent",
+  "recorded_at": "2026-08-27T11:17:04Z",
+  "refs": [
+    "git:c73e51c-reset-desktop-shell-material-hierarchy",
+    "apps/desktop/src/renderer/styles.css",
+    "apps/desktop/src/renderer/App.tsx",
+    "apps/desktop/src/renderer/Transcript.tsx",
+    "apps/desktop/test-results/ui-focus-activity.png",
+    "apps/desktop/test-results/ui-focus-markdown-narrow.png",
+    "apps/desktop/e2e/v01-journey.spec.ts:contained-navigation-and-activity-assertions"
+  ],
+  "schema_version": 1,
+  "summary": "Direct visual review of the fresh 1440x960 Focus Activity screenshot and 1000x720 narrow Focus screenshot confirms the conversation remains dominant, Spaces and Lineage are legible but recessive, current identity remains available through clipped labels plus full title/accessible name, secondary top-bar actions rest unboxed, and Reasoning, Command, File Change, Subagent, failure, and additional activity use integrated progressive disclosure rather than nested cards. The renderer now derives navigation, selection, elevated surface, border, shadow, radius, typography, rail-width, and motion decisions from one shared token block.",
+  "ticket_id": "ticket-reset-shell-material-hierarchy"
+}
