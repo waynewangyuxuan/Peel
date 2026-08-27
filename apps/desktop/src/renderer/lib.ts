@@ -47,3 +47,17 @@ export function clip(value: string, max = 132): string {
   const normalized = value.replace(/\s+/g, " ").trim();
   return normalized.length > max ? `${normalized.slice(0, max - 1)}…` : normalized;
 }
+
+export function plainTextPreview(value: string): string {
+  return value
+    .replace(/```[^\n]*\n?([\s\S]*?)```/g, "$1")
+    .replace(/!\[([^\]]*)\]\([^)]*\)/g, "$1")
+    .replace(/\[([^\]]+)\]\([^)]*\)/g, "$1")
+    .replace(/^\s{0,3}(?:#{1,6}\s+|>\s?|[-+*]\s+|\d+[.)]\s+)/gm, "")
+    .replace(/(\*\*|__)(.*?)\1/g, "$2")
+    .replace(/(~~)(.*?)\1/g, "$2")
+    .replace(/`([^`]+)`/g, "$1")
+    .replace(/\\([\\`*_[\]{}()#+\-.!>])/g, "$1")
+    .replace(/\s+/g, " ")
+    .trim();
+}

@@ -3,7 +3,7 @@ import { useLayoutEffect, useMemo, useRef, useState, type PointerEvent, type Rea
 import type { WorkspaceDiffSummary } from "@peel/git-workspace";
 
 import type { CameraState, Point, SpaceNode, SpaceRecord } from "../shared/contracts";
-import { clip, itemText, latestCompletedTurn, relativeTime } from "./lib";
+import { clip, itemText, latestCompletedTurn, plainTextPreview, relativeTime } from "./lib";
 
 const CARD_WIDTH = 294;
 const CARD_HEIGHT = 205;
@@ -186,11 +186,11 @@ function OverviewCard({ node, parent, thread, parentThread, diff, active, draggi
   const subagentCount = subagents.length;
   const subagentRunning = subagents.some((item) => ["running", "inProgress", "active"].includes(String(item.status ?? "")));
   const forkTurn = parentThread?.turns.find((turn) => turn.id === node.forkedAtTurnId);
-  const forkSnippet = forkTurn?.items.map(itemText).filter(Boolean).at(-1) ?? "";
+  const forkSnippet = plainTextPreview(forkTurn?.items.map(itemText).filter(Boolean).at(-1) ?? "");
   const latestUserTurn = thread ? [...thread.turns].reverse().find((turn) => turn.items.some((item) => item.type === "userMessage")) : undefined;
   const latestResultTurn = thread ? [...thread.turns].reverse().find((turn) => turn.status === "completed" && turn.items.some((item) => item.type === "agentMessage")) : undefined;
-  const latestUser = latestUserTurn?.items.filter((item) => item.type === "userMessage").map(itemText).filter(Boolean).at(-1) ?? "";
-  const latestResult = latestResultTurn?.items.filter((item) => item.type === "agentMessage").map(itemText).filter(Boolean).at(-1) ?? "";
+  const latestUser = plainTextPreview(latestUserTurn?.items.filter((item) => item.type === "userMessage").map(itemText).filter(Boolean).at(-1) ?? "");
+  const latestResult = plainTextPreview(latestResultTurn?.items.filter((item) => item.type === "agentMessage").map(itemText).filter(Boolean).at(-1) ?? "");
   const statuses = failed ? [{ label: "Failed", tone: "failed" }]
     : needsApproval ? [{ label: "Needs approval", tone: "approval" }, ...(newResult ? [{ label: "New result", tone: "result" }] : [])]
       : isRunning ? [{ label: "Running", tone: "running" }, ...(newResult ? [{ label: "New result", tone: "result" }] : [])]

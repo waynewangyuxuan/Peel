@@ -4,6 +4,7 @@ import type { ThreadItem } from "@peel/codex-app-server";
 
 import { highlightCode, MarkdownContent } from "../src/renderer/Markdown";
 import { ItemView } from "../src/renderer/Transcript";
+import { plainTextPreview } from "../src/renderer/lib";
 
 const LIVE_REDACTED_EXCERPT = `我们先把命题压实。
 
@@ -17,6 +18,15 @@ const LIVE_REDACTED_EXCERPT = `我们先把命题压实。
 | Tests | 连续性、时间线、人物动机 |`;
 
 describe("MarkdownContent", () => {
+  it("turns Markdown into calm plain-text previews for spatial cards", () => {
+    expect(plainTextPreview(`## Direction
+
+> **A streamed result** for [this direction](https://example.com).
+
+- Preserve \`Focus\`
+- ~~Remove chrome~~`)).toBe("Direction A streamed result for this direction. Preserve Focus Remove chrome");
+  });
+
   it("renders CommonMark and GFM structures without executing raw HTML", () => {
     const html = renderToStaticMarkup(<MarkdownContent text={`# Plan
 

@@ -59,6 +59,9 @@ async function launch(): Promise<void> {
   });
   page = await app.firstWindow();
   await page.waitForLoadState("domcontentloaded");
+  await page.evaluate(() => {
+    (window as unknown as { peelNativeAudioContext?: typeof AudioContext }).peelNativeAudioContext = AudioContext;
+  });
 }
 
 async function readRpcEvents(): Promise<Array<{ method?: string; params?: Record<string, unknown> }>> {
@@ -77,14 +80,38 @@ async function startFreshSpace(): Promise<void> {
 }
 
 async function installMediaCapture(): Promise<void> {
-  await page.evaluate(() => {
-    const context = new AudioContext();
+  await page.evaluate(async () => {
+    const testWindow = window as unknown as {
+      peelCaptureAudio?: AudioContext;
+      peelCaptureTrack?: MediaStreamTrack;
+      peelNativeAudioContext?: typeof AudioContext;
+    };
+    const NativeAudioContext = testWindow.peelNativeAudioContext;
+    if (!NativeAudioContext) throw new Error("Native AudioContext was not preserved");
+    await testWindow.peelCaptureAudio?.close();
+    const context = new NativeAudioContext();
     const destination = context.createMediaStreamDestination();
     const oscillator = context.createOscillator();
-    oscillator.frequency.value = 220;
     oscillator.connect(destination);
     oscillator.start();
-    (window as unknown as { peelCaptureTrack?: MediaStreamTrack }).peelCaptureTrack = destination.stream.getAudioTracks()[0];
+    await context.resume();
+    testWindow.peelCaptureAudio = context;
+    testWindow.peelCaptureTrack = destination.stream.getAudioTracks()[0];
+    Object.defineProperty(window, "AudioContext", {
+      configurable: true,
+      value: class extends NativeAudioContext {
+        override createAnalyser(): AnalyserNode {
+          const analyser = super.createAnalyser();
+          Object.defineProperty(analyser, "getFloatTimeDomainData", {
+            configurable: true,
+            value: (samples: Float32Array<ArrayBuffer>) => {
+              for (let index = 0; index < samples.length; index += 1) samples[index] = Math.sin(index * .35) * .42;
+            },
+          });
+          return analyser;
+        }
+      },
+    });
     Object.defineProperty(navigator.mediaDevices, "getUserMedia", { configurable: true, value: async () => destination.stream });
   });
 }
@@ -114,6 +141,8 @@ test("real Thread-first Fork loop, recovery surfaces, scale, and restart", async
   await newChatDraft.type("Second line");
   await expect(newChatDraft).toHaveValue("First line\nSecond line");
   await newChatDraft.fill("");
+  const emptyComposerHeight = await page.locator(".composer").evaluate((element) => element.getBoundingClientRect().height);
+  expect(emptyComposerHeight).toBeLessThanOrEqual(82);
   await page.screenshot({ path: join(desktopRoot, "test-results/ui-new-chat-empty.png") });
 
   const spacesBeforeStartFailure = await page.evaluate(() => window.peel.bootstrap().then((payload) => Object.keys(payload.state.spaces).length));
@@ -227,6 +256,11 @@ test("real Thread-first Fork loop, recovery surfaces, scale, and restart", async
   await expect(page.locator(".agent-message blockquote").first()).toContainText("Keep the Chat readable");
   await expect(page.locator(".agent-message blockquote").nth(1)).toContainText("我们的护城河不是 AI 会写");
   await expect(page.locator(".agent-message del")).toHaveText("Raw pipe text");
+  const userBubbleProportion = await page.locator(".user-message").first().evaluate((bubble) => {
+    const transcript = bubble.closest(".transcript")!;
+    return bubble.getBoundingClientRect().width / transcript.getBoundingClientRect().width;
+  });
+  expect(userBubbleProportion).toBeLessThan(.5);
   expect(await page.evaluate(() => Boolean((window as unknown as { __peelUnsafe?: boolean }).__peelUnsafe))).toBe(false);
   expect(await page.locator(".agent-message").first().evaluate((element) => element.innerText.split("\n").filter((line) => line.trimStart().startsWith(">")))).toEqual([]);
   const quoteCraft = await page.locator(".agent-message blockquote").first().evaluate((element) => {
@@ -448,6 +482,7 @@ test("real Thread-first Fork loop, recovery surfaces, scale, and restart", async
   await expect(renamedBranchCard.locator("h3")).toHaveAttribute("title", "Overview branch name");
   await expect(renamedBranchCard.getByText("Latest user", { exact: true })).toBeVisible();
   await expect(renamedBranchCard.getByText("Latest result", { exact: true })).toBeVisible();
+  expect(await renamedBranchCard.innerText()).not.toContain("**");
   await page.waitForTimeout(500);
   const initialOverviewLayout = await page.locator(".overview-viewport").evaluate((viewport) => {
     const frame = viewport.getBoundingClientRect();

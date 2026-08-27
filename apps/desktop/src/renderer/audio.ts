@@ -18,6 +18,7 @@ export async function startPcmRecorder(
     audio: { channelCount: 1, echoCancellation: true, noiseSuppression: true, autoGainControl: true },
   });
   const context = new AudioContext({ sampleRate: 16_000 });
+  if (context.state === "suspended") await context.resume();
   const source = context.createMediaStreamSource(stream);
   const analyser = context.createAnalyser();
   analyser.fftSize = 256;
