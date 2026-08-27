@@ -293,6 +293,7 @@ export function App(): ReactNode {
   return <div className={`app ${state.viewMode} ${forkDraft ? "forking" : ""}`}>
     <SpaceSidebar
       state={state}
+      connected={connected}
       onSelect={(space) => {
         mutate((draft) => { draft.activeSpaceId = space.id; draft.activeThreadId = space.rootThreadId; draft.viewMode = "focus"; }, 0);
         setForkDraft(null);
@@ -372,8 +373,9 @@ export function App(): ReactNode {
   </div>;
 }
 
-function SpaceSidebar({ state, newChatBusy, onSelect, onNewChat, onSearch }: {
+function SpaceSidebar({ state, connected, newChatBusy, onSelect, onNewChat, onSearch }: {
   state: PeelState;
+  connected: boolean;
   newChatBusy: boolean;
   onSelect(space: SpaceRecord): void;
   onNewChat(): void;
@@ -384,8 +386,8 @@ function SpaceSidebar({ state, newChatBusy, onSelect, onNewChat, onSearch }: {
     <div className="drag-region"/>
     <div className="brand"><span className="peel-mark small">P</span><strong>Peel</strong></div>
     <div className="sidebar-heading"><span>Spaces</span><div className="sidebar-entry-actions">
-      <button onClick={onSearch} title="Search existing Codex Chats (⌘K)" aria-label="Search Chats"><Icon name="search"/></button>
-      <button className="new-chat-trigger" onClick={onNewChat} disabled={newChatBusy} title="New Chat (⌘N)" aria-label="New Chat"><Icon name={newChatBusy ? "spinner" : "plus"}/></button>
+      <button onClick={onSearch} disabled={!connected} title="Search existing Codex Chats (⌘K)" aria-label="Search Chats"><Icon name="search"/></button>
+      <button className="new-chat-trigger" onClick={onNewChat} disabled={!connected || newChatBusy} title="New Chat (⌘N)" aria-label="New Chat"><Icon name={newChatBusy ? "spinner" : "plus"}/></button>
     </div></div>
     <nav>{spaces.map((space) => {
       const directionCount = Object.keys(space.nodes).length;

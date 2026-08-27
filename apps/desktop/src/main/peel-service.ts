@@ -50,6 +50,7 @@ export class PeelService extends EventEmitter {
   readonly #threadPages = new Map<string, CachedThreadPage>();
   readonly #threadPageRequests = new Map<string, Promise<ThreadListResponse>>();
   readonly #now: () => number;
+  #threadCacheVersion = 0;
   #connected = false;
   #connectionError: string | null = null;
 
@@ -105,16 +106,19 @@ export class PeelService extends EventEmitter {
     if (cached && cached.expiresAt > this.#now()) return cached.response;
     const pending = this.#threadPageRequests.get(key);
     if (pending) return await pending;
+    const cacheVersion = this.#threadCacheVersion;
     const request = this.client.searchThreads(term, {
       cursor,
       limit: THREAD_SEARCH_PAGE_SIZE,
       sortKey: "updated_at",
       sortDirection: "desc",
     }).then((response) => {
-      this.#threadPages.set(key, { expiresAt: this.#now() + THREAD_SEARCH_CACHE_TTL_MS, response });
+      if (cacheVersion === this.#threadCacheVersion) {
+        this.#threadPages.set(key, { expiresAt: this.#now() + THREAD_SEARCH_CACHE_TTL_MS, response });
+      }
       return response;
     }).finally(() => {
-      this.#threadPageRequests.delete(key);
+      if (this.#threadPageRequests.get(key) === request) this.#threadPageRequests.delete(key);
     });
     this.#threadPageRequests.set(key, request);
     return await request;
@@ -133,6 +137,7 @@ export class PeelService extends EventEmitter {
   async startNewChat(input: StartNewChatInput): Promise<PeelState> {
     this.#requireConnection();
     const response = await this.client.startThread(input.cwd ? { cwd: input.cwd } : {});
+    this.#invalidateThreadCache();
     const space = createSpace(response.thread);
     try {
       return await this.#store.mutate((state) => {
@@ -148,6 +153,12 @@ export class PeelService extends EventEmitter {
         ? "The new Chat could not be saved, so nothing was added. Try again."
         : "The Chat was created in Codex but could not be added to Peel. Find it with Search Chats, then try again.");
     }
+  }
+
+  #invalidateThreadCache(): void {
+    this.#threadCacheVersion += 1;
+    this.#threadPages.clear();
+    this.#threadPageRequests.clear();
   }
 
   async startSpace(input: StartSpaceInput): Promise<PeelState> {

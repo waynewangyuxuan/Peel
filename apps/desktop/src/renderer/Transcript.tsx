@@ -248,7 +248,7 @@ export function Transcript({
           {voice === "recording" && <div className="voice-live" aria-label="Live microphone level"><VoiceWaveform levels={voiceLevels}/><span>{formatRecordingTime(recordingMs)}</span></div>}
           {voice === "transcribing" && <span className="voice-transcribing"><span className="mini-spinner"/>Transcribing…</span>}
           <span className="composer-spacer" />
-          <button className={`send-button ${sending ? "sending" : ""}`} onClick={() => void submit()} disabled={sending || voice !== "idle" || (!draft.trim() && attachments.length === 0)} aria-label={sending ? "Sending message" : "Send message"} title="Send message"><Icon name={sending ? "spinner" : "arrowUp"}/></button>
+          <button className={`send-button ${sending ? "sending" : ""}`} onClick={() => void submit()} disabled={sending || voice !== "idle" || (!draft.trim() && attachments.length === 0)} aria-label={sending ? "Sending" : "Send"} title="Send message"><Icon name={sending ? "spinner" : "arrowUp"}/></button>
         </div>
       </div>
     </div>

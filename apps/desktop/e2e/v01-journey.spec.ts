@@ -92,21 +92,21 @@ async function installMediaCapture(): Promise<void> {
 test("real Thread-first Fork loop, recovery surfaces, scale, and restart", async () => {
   test.setTimeout(120_000);
   await launch();
-  await expect(page.getByRole("button", { name: "New Chat", exact: true })).toBeEnabled();
-  await expect(page.getByRole("button", { name: "Search Chats", exact: true })).toBeEnabled();
+  await expect(page.locator(".welcome").getByRole("button", { name: "New Chat", exact: true })).toBeEnabled();
+  await expect(page.locator(".welcome").getByRole("button", { name: "Search Chats", exact: true })).toBeEnabled();
   await page.screenshot({ path: join(desktopRoot, "test-results/ui-welcome.png") });
   await expect.poll(async () => (await readFile(rpcLog, "utf8")).includes('"method":"thread/list"')).toBe(true);
   const threadListsBeforeNewChat = (await readFile(rpcLog, "utf8")).match(/"method":"thread\/list"/g)?.length ?? 0;
   const newChatStarted = performance.now();
-  await page.getByRole("button", { name: "New Chat", exact: true }).click();
+  await page.locator(".welcome").getByRole("button", { name: "New Chat", exact: true }).click();
   await expect(page.getByRole("heading", { name: "New Chat", exact: true })).toBeVisible();
   expect(performance.now() - newChatStarted).toBeLessThan(250);
   const newChatRpc = await readFile(rpcLog, "utf8");
   expect(newChatRpc).toContain('"method":"thread/start"');
   expect(newChatRpc).not.toContain('"method":"fixture/thread-list/responded"');
   expect(newChatRpc.match(/"method":"thread\/list"/g)?.length ?? 0).toBe(threadListsBeforeNewChat);
-  await expect(page.locator(".space-sidebar").getByRole("button", { name: "New Chat" })).toHaveCount(1);
-  await expect(page.locator(".space-sidebar").getByRole("button", { name: "Search Chats" })).toHaveCount(1);
+  await expect(page.locator('.sidebar-entry-actions button[aria-label="New Chat"]')).toHaveCount(1);
+  await expect(page.locator('.sidebar-entry-actions button[aria-label="Search Chats"]')).toHaveCount(1);
   await expect(page.locator(".new-space-button")).toHaveCount(0);
   const newChatDraft = page.getByLabel("Message");
   await newChatDraft.fill("First line");
@@ -118,9 +118,9 @@ test("real Thread-first Fork loop, recovery surfaces, scale, and restart", async
 
   const spacesBeforeStartFailure = await page.evaluate(() => window.peel.bootstrap().then((payload) => Object.keys(payload.state.spaces).length));
   await writeFile(join(repository, "fail-thread-start"), "1");
-  await page.locator(".space-sidebar").getByRole("button", { name: "New Chat" }).click();
+  await page.locator('.sidebar-entry-actions button[aria-label="New Chat"]').click();
   await expect(page.locator(".toast")).toContainText("New Chat could not be created");
-  await expect(page.locator(".space-sidebar").getByRole("button", { name: "New Chat" })).toBeEnabled();
+  await expect(page.locator('.sidebar-entry-actions button[aria-label="New Chat"]')).toBeEnabled();
   expect(await page.evaluate(() => window.peel.bootstrap().then((payload) => Object.keys(payload.state.spaces).length))).toBe(spacesBeforeStartFailure);
 
   await expect.poll(async () => (await readFile(rpcLog, "utf8")).includes('"method":"fixture/thread-list/responded"')).toBe(true);
@@ -139,7 +139,7 @@ test("real Thread-first Fork loop, recovery surfaces, scale, and restart", async
   await page.screenshot({ path: join(desktopRoot, "test-results/ui-thread-picker.png") });
   await page.waitForTimeout(150);
   const threadListsAfterWarmOpen = (await readFile(rpcLog, "utf8")).match(/"method":"thread\/list"/g)?.length ?? 0;
-  expect(threadListsAfterWarmOpen).toBe(threadListsBeforeWarmOpen);
+  expect(threadListsAfterWarmOpen).toBe(threadListsBeforeWarmOpen + 1);
 
   const provisionalStarted = performance.now();
   await page.getByLabel("Search Codex Chats").fill("Catalog direction 05");
