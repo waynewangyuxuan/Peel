@@ -105,7 +105,7 @@ export function Transcript({
     const element = textarea.current;
     if (!element) return;
     element.style.height = "0px";
-    element.style.height = `${Math.min(130, Math.max(38, element.scrollHeight))}px`;
+    element.style.height = `${Math.min(130, Math.max(32, element.scrollHeight))}px`;
   }, [draft]);
 
   useLayoutEffect(() => {

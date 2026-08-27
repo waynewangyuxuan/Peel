@@ -432,7 +432,7 @@ function TopBar({ space, node, mode, connected, onMode, onRenameSpace, onArchive
     <div className="segmented"><button className={mode === "focus" ? "active" : ""} onClick={() => onMode("focus")}><Icon name="chat"/> Focus <kbd>⌘1</kbd></button><button className={mode === "overview" ? "active" : ""} onClick={() => onMode("overview")}><Icon name="map"/> Overview <kbd>⌘2</kbd></button></div>
     <div className="topbar-actions">
       <button onClick={onDiff}><Icon name="diff"/> Diff</button>
-      <button onClick={onOpenCodex} title="Copy this Thread ID, then open Codex"><Icon name="external"/> Copy ID & open Codex</button>
+      <button onClick={onOpenCodex} title="Copy this Thread ID, then open Codex"><Icon name="external"/> Open in Codex</button>
       <button className="icon-button" onClick={() => setMenu(!menu)}><Icon name="more"/></button>
       {menu && <div className="topbar-menu"><button onClick={() => { setEditingThread(true); setMenu(false); }}>Rename Thread</button><button onClick={() => { setEditingSpace(true); setMenu(false); }}>Rename Space</button><button className="danger" onClick={onArchive}>Archive Space</button></div>}
     </div>
