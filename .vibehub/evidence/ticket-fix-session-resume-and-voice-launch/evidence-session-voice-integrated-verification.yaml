@@ -1,0 +1,20 @@
+{
+  "acceptance_ids": [
+    "integrated-verification"
+  ],
+  "evidence_id": "evidence-session-voice-integrated-verification",
+  "kind": "ticket_evidence",
+  "origin": "agent",
+  "recorded_at": "2026-08-27T07:51:03Z",
+  "refs": [
+    "commit:d067e6a7b34fa1fd562e0858c4223111f2aeee16",
+    "command:npm test passed all 59 repository tests",
+    "command:npm run build passed App Server, Git adapter, desktop typecheck, native Speech helper, renderer, Electron main, and preload",
+    "command:npm run verify:package --workspace @peel/desktop returned ok=true, restoredDraft=true, nativeVoiceHelper=true",
+    "command:npm run verify:real-voice --workspace @peel/desktop returned ok=true with real Apple Speech and zero turn/start",
+    "command:npm run test:e2e --workspace @peel/desktop produced test-results/.last-run.json status=passed"
+  ],
+  "schema_version": 1,
+  "summary": "At exact final commit d067e6a, all 59 repository tests pass, the complete adapters/native Speech/renderer/main/preload build succeeds, the production package verifies executable assets plus full-restart Draft restoration, the real LaunchServices Apple Speech verification succeeds, and the full Electron journey passes with retained Picker, Focus, Markdown, streaming, Activity, Fork and recovery, Voice editing/no-auto-send, Approval, Overview, Diff, scale, Draft/Scroll persistence, and restart behavior.",
+  "ticket_id": "ticket-fix-session-resume-and-voice-launch"
+}

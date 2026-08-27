@@ -1,0 +1,23 @@
+{
+  "acceptance_ids": [
+    "resume-before-turn",
+    "session-recovery-regression",
+    "send-failure-draft-safety"
+  ],
+  "evidence_id": "evidence-session-resume-and-draft-safety",
+  "kind": "ticket_evidence",
+  "origin": "agent",
+  "recorded_at": "2026-08-27T07:51:03Z",
+  "refs": [
+    "commit:9ef64c689fe9bf75f8d6e9e0720ea36c891d54b3",
+    "packages/codex-app-server/src/client.ts",
+    "packages/codex-app-server/test/client.test.ts",
+    "apps/desktop/e2e/fixtures/codex",
+    "apps/desktop/e2e/v01-journey.spec.ts",
+    "command:npm test passed 59 tests including 19 App Server lifecycle tests",
+    "command:npm run test:e2e --workspace @peel/desktop passed the complete production Electron journey with forced resume failure and retry"
+  ],
+  "schema_version": 1,
+  "summary": "The App Server client now keeps read-only snapshots separate from loaded sessions, coalesces concurrent resume work, loads stored Threads before their first turn/start, preserves the already-loaded state of new and forked Threads, and invalidates it on disconnect, failure, or thread/closed. Unit tests exercise each transition. The production fixture now rejects turn/start for an unloaded Thread, and the Electron journey proves a forced resume failure presents an actionable Composer error, retains exact text plus attachment, then retries through one successful resume and one remote Turn without duplicate sends.",
+  "ticket_id": "ticket-fix-session-resume-and-voice-launch"
+}

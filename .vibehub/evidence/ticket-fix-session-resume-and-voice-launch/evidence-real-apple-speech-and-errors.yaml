@@ -1,0 +1,23 @@
+{
+  "acceptance_ids": [
+    "independent-voice-launch",
+    "voice-failure-clarity"
+  ],
+  "evidence_id": "evidence-real-apple-speech-and-errors",
+  "kind": "ticket_evidence",
+  "origin": "agent",
+  "recorded_at": "2026-08-27T07:51:03Z",
+  "refs": [
+    "commit:9ef64c689fe9bf75f8d6e9e0720ea36c891d54b3",
+    "commit:d067e6a7b34fa1fd562e0858c4223111f2aeee16",
+    "apps/desktop/scripts/launch-packaged.mjs",
+    "apps/desktop/scripts/verify-real-voice.mjs",
+    "apps/desktop/native/SpeechTranscriber.m",
+    "apps/desktop/src/main/voice-service.ts",
+    "command:KEEP_PEEL_VOICE_SCRATCH=1 npm run verify:real-voice --workspace @peel/desktop returned ok=true, real phrase in preserved Draft, errors=[], turnsBefore=0, turnsAfter=0, tccSubjectIsPeel=true, responsibleIsPeel=true, responsibleIsChatGpt=false",
+    "diagnostic:/var/folders/w8/f7m3z7t96_b6n0vssj72qkjh0000gn/T/peel-real-voice-LJV9DN/tcc.log"
+  ],
+  "schema_version": 1,
+  "summary": "The supported launcher hands the packaged com.peel.desktop bundle to macOS LaunchServices. The native helper now drives the main RunLoop while awaiting Speech.framework authorization and final recognition callbacks instead of deadlocking them behind a main-thread semaphore. A repeatable packaged verification used real Apple Speech on a system-spoken known phrase: the draft changed from `Existing draft remains.` to `Existing draft remains. Peel voice check is working`, no Composer error appeared, and turn/start remained 0 before and after. Captured TCC facts report subject com.peel.desktop and Peel.app as the responsible path, with no ChatGPT responsible path. The Voice boundary now distinguishes SIGABRT privacy termination, other signals, timeout, permission, capture, and recognition failures while retaining the existing Draft.",
+  "ticket_id": "ticket-fix-session-resume-and-voice-launch"
+}
