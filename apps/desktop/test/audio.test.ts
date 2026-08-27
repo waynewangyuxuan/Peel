@@ -1,6 +1,6 @@
 import { describe, expect, it } from "vitest";
 
-import { encodeWav } from "../src/renderer/audio";
+import { encodeWav, pcmAmplitude } from "../src/renderer/audio";
 
 describe("voice dictation recording", () => {
   it("encodes captured microphone PCM as a real mono WAV boundary", () => {
@@ -12,5 +12,15 @@ describe("voice dictation recording", () => {
     expect(view.getUint16(22, true)).toBe(1);
     expect(view.getUint32(24, true)).toBe(16_000);
     expect(view.getUint32(40, true)).toBe(8);
+  });
+
+  it("maps real PCM energy into stronger live levels for louder input", () => {
+    const quiet = pcmAmplitude(new Float32Array([.005, -.005, .004, -.004]));
+    const speaking = pcmAmplitude(new Float32Array([.22, -.24, .19, -.21]));
+    const loud = pcmAmplitude(new Float32Array([.75, -.8, .7, -.72]));
+    expect(quiet).toBe(0);
+    expect(speaking).toBeGreaterThan(.5);
+    expect(loud).toBeGreaterThan(speaking);
+    expect(loud).toBeLessThanOrEqual(1);
   });
 });

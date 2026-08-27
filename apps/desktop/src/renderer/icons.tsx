@@ -8,6 +8,7 @@ export function Icon({ name, size = 16 }: { name: string; size?: number }): Reac
     chat: <><path d="M4 5h16v12H8l-4 4Z"/></>,
     mic: <><rect x="9" y="3" width="6" height="12" rx="3"/><path d="M5 11a7 7 0 0 0 14 0M12 18v3"/></>,
     send: <><path d="m4 4 17 8-17 8 4-8Z"/><path d="M8 12h13"/></>,
+    arrowUp: <><path d="M12 19V5"/><path d="m6.5 10.5 5.5-5.5 5.5 5.5"/></>,
     diff: <><path d="M7 3v18M17 3v18M4 7h6M14 17h6"/></>,
     external: <><path d="M14 4h6v6M20 4l-9 9"/><path d="M18 13v7H4V6h7"/></>,
     close: <><path d="m6 6 12 12M18 6 6 18"/></>,
@@ -26,6 +27,7 @@ export function Icon({ name, size = 16 }: { name: string; size?: number }): Reac
     reasoning: <><path d="M9 18h6M10 21h4"/><path d="M8.5 15.5A7 7 0 1 1 15.5 15.5C14.4 16.3 14 17 14 18h-4c0-1-.4-1.7-1.5-2.5Z"/></>,
     agent: <><circle cx="12" cy="8" r="3"/><path d="M5 20c.7-4 3-6 7-6s6.3 2 7 6"/></>,
     warning: <><path d="M12 4 3 20h18Z"/><path d="M12 9v5M12 17h.01"/></>,
+    spinner: <><circle cx="12" cy="12" r="8" opacity=".28"/><path d="M12 4a8 8 0 0 1 8 8"/></>,
   };
-  return <svg aria-hidden="true" width={size} height={size} viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.75" strokeLinecap="round" strokeLinejoin="round">{paths[name]}</svg>;
+  return <svg className={name === "spinner" ? "icon-spinner" : undefined} aria-hidden="true" width={size} height={size} viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.75" strokeLinecap="round" strokeLinejoin="round">{paths[name]}</svg>;
 }

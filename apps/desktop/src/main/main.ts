@@ -10,6 +10,7 @@ import type {
   PeelState,
   SearchThreadsInput,
   SendTurnInput,
+  StartNewChatInput,
   StartSpaceInput,
 } from "../shared/contracts";
 import { IPC } from "../shared/contracts";
@@ -107,6 +108,7 @@ function registerIpc(peel: PeelService, voice: VoiceService): void {
   ipcMain.handle(IPC.bootstrap, async () => await peel.bootstrap());
   ipcMain.handle(IPC.searchThreads, async (_event, input: SearchThreadsInput) => await peel.searchThreads(input));
   ipcMain.handle(IPC.readThread, async (_event, threadId: string) => await peel.readThread(threadId));
+  ipcMain.handle(IPC.startNewChat, async (_event, input: StartNewChatInput) => await peel.startNewChat(input));
   ipcMain.handle(IPC.startSpace, async (_event, input: StartSpaceInput) => await peel.startSpace(input));
   ipcMain.handle(IPC.saveState, async (_event, state: PeelState) => await peel.saveState(state));
   ipcMain.handle(IPC.sendTurn, async (_event, input: SendTurnInput) => await peel.sendTurn(input));

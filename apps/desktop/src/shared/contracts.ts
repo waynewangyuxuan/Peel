@@ -88,6 +88,10 @@ export interface StartSpaceInput {
   name?: string;
 }
 
+export interface StartNewChatInput {
+  cwd?: string;
+}
+
 export interface CommitForkInput {
   spaceId: string;
   draft: ForkDraft;
@@ -154,6 +158,7 @@ export interface PeelApi {
   bootstrap(): Promise<BootstrapPayload>;
   searchThreads(input: SearchThreadsInput): Promise<ThreadListResponse>;
   readThread(threadId: string): Promise<ThreadSnapshot>;
+  startNewChat(input: StartNewChatInput): Promise<PeelState>;
   startSpace(input: StartSpaceInput): Promise<PeelState>;
   saveState(state: PeelState): Promise<PeelState>;
   sendTurn(input: SendTurnInput): Promise<{ turnId: string }>;
@@ -175,6 +180,7 @@ export const IPC = {
   bootstrap: "peel:bootstrap",
   searchThreads: "peel:threads:search",
   readThread: "peel:thread:read",
+  startNewChat: "peel:chat:start",
   startSpace: "peel:space:start",
   saveState: "peel:state:save",
   sendTurn: "peel:turn:send",

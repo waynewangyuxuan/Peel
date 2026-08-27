@@ -3,23 +3,52 @@ export interface RecorderSession {
   cancel(): void;
 }
 
-export async function startPcmRecorder(onInterrupted?: (message: string) => void): Promise<RecorderSession> {
+export async function startPcmRecorder(
+  onInterrupted?: (message: string) => void,
+  onLevel?: (level: number) => void,
+): Promise<RecorderSession> {
   const stream = await navigator.mediaDevices.getUserMedia({
     audio: { channelCount: 1, echoCancellation: true, noiseSuppression: true, autoGainControl: true },
   });
   const context = new AudioContext({ sampleRate: 16_000 });
   const source = context.createMediaStreamSource(stream);
+  const analyser = context.createAnalyser();
+  analyser.fftSize = 256;
+  analyser.smoothingTimeConstant = .35;
   const processor = context.createScriptProcessor(4096, 1, 1);
   const samples: Float32Array[] = [];
   let active = true;
+  let levelFrame = 0;
+  let lastLevelAt = 0;
+  let smoothedLevel = 0;
+  const levelSamples = new Float32Array(analyser.fftSize);
   processor.onaudioprocess = (event) => samples.push(new Float32Array(event.inputBuffer.getChannelData(0)));
+  source.connect(analyser);
   source.connect(processor);
   processor.connect(context.destination);
+
+  const readLevel = (at: number): void => {
+    if (!active) return;
+    if (onLevel && at - lastLevelAt >= 40) {
+      analyser.getFloatTimeDomainData(levelSamples);
+      const measured = pcmAmplitude(levelSamples);
+      smoothedLevel = measured > smoothedLevel
+        ? smoothedLevel * .42 + measured * .58
+        : smoothedLevel * .72 + measured * .28;
+      onLevel(smoothedLevel);
+      lastLevelAt = at;
+    }
+    levelFrame = requestAnimationFrame(readLevel);
+  };
+  if (onLevel) levelFrame = requestAnimationFrame(readLevel);
 
   const cleanup = (): void => {
     if (!active) return;
     active = false;
+    if (levelFrame) cancelAnimationFrame(levelFrame);
+    onLevel?.(0);
     processor.disconnect();
+    analyser.disconnect();
     source.disconnect();
     stream.getTracks().forEach((track) => track.stop());
     void context.close();
@@ -38,6 +67,15 @@ export async function startPcmRecorder(onInterrupted?: (message: string) => void
     },
     cancel: cleanup,
   };
+}
+
+export function pcmAmplitude(samples: Float32Array): number {
+  if (samples.length === 0) return 0;
+  let energy = 0;
+  for (const sample of samples) energy += sample * sample;
+  const rms = Math.sqrt(energy / samples.length);
+  const aboveFloor = Math.max(0, rms - .008);
+  return Math.min(1, Math.pow(aboveFloor / .32, .65));
 }
 
 export function encodeWav(chunks: Float32Array[], sampleRate: number): ArrayBuffer {

@@ -22,6 +22,7 @@ import {
   type PeelState,
   type SearchThreadsInput,
   type SendTurnInput,
+  type StartNewChatInput,
   type StartSpaceInput,
   type ThreadSnapshot,
 } from "../shared/contracts";
@@ -127,6 +128,26 @@ export class PeelService extends EventEmitter {
     this.#requireConnection();
     const thread = await this.client.readThread(threadId, true);
     return { thread, reduced: this.client.getThreadState(threadId) };
+  }
+
+  async startNewChat(input: StartNewChatInput): Promise<PeelState> {
+    this.#requireConnection();
+    const response = await this.client.startThread(input.cwd ? { cwd: input.cwd } : {});
+    const space = createSpace(response.thread);
+    try {
+      return await this.#store.mutate((state) => {
+        state.spaces[space.id] = space;
+        state.activeSpaceId = space.id;
+        state.activeThreadId = response.thread.id;
+        state.viewMode = "focus";
+        return state;
+      });
+    } catch (error) {
+      const cleanedUp = await this.client.deleteThread(response.thread.id).then(() => true, () => false);
+      throw new Error(cleanedUp
+        ? "The new Chat could not be saved, so nothing was added. Try again."
+        : "The Chat was created in Codex but could not be added to Peel. Find it with Search Chats, then try again.");
+    }
   }
 
   async startSpace(input: StartSpaceInput): Promise<PeelState> {

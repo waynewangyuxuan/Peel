@@ -70,7 +70,7 @@ async function readRpcEvents(): Promise<Array<{ method?: string; params?: Record
 }
 
 async function startFreshSpace(): Promise<void> {
-  await page.getByRole("button", { name: /New Space/ }).click();
+  await page.locator(".space-sidebar").getByRole("button", { name: "Search Chats" }).click();
   await expect(page.locator(".thread-picker")).toBeVisible();
   await page.locator(".thread-results button").first().click();
   await expect(page.getByRole("heading", { name: rootTitle })).toBeVisible({ timeout: 15_000 });
@@ -92,13 +92,42 @@ async function installMediaCapture(): Promise<void> {
 test("real Thread-first Fork loop, recovery surfaces, scale, and restart", async () => {
   test.setTimeout(120_000);
   await launch();
-  await expect(page.getByRole("button", { name: /Choose a Codex Chat/ })).toBeEnabled();
+  await expect(page.getByRole("button", { name: "New Chat", exact: true })).toBeEnabled();
+  await expect(page.getByRole("button", { name: "Search Chats", exact: true })).toBeEnabled();
   await page.screenshot({ path: join(desktopRoot, "test-results/ui-welcome.png") });
+  await expect.poll(async () => (await readFile(rpcLog, "utf8")).includes('"method":"thread/list"')).toBe(true);
+  const threadListsBeforeNewChat = (await readFile(rpcLog, "utf8")).match(/"method":"thread\/list"/g)?.length ?? 0;
+  const newChatStarted = performance.now();
+  await page.getByRole("button", { name: "New Chat", exact: true }).click();
+  await expect(page.getByRole("heading", { name: "New Chat", exact: true })).toBeVisible();
+  expect(performance.now() - newChatStarted).toBeLessThan(250);
+  const newChatRpc = await readFile(rpcLog, "utf8");
+  expect(newChatRpc).toContain('"method":"thread/start"');
+  expect(newChatRpc).not.toContain('"method":"fixture/thread-list/responded"');
+  expect(newChatRpc.match(/"method":"thread\/list"/g)?.length ?? 0).toBe(threadListsBeforeNewChat);
+  await expect(page.locator(".space-sidebar").getByRole("button", { name: "New Chat" })).toHaveCount(1);
+  await expect(page.locator(".space-sidebar").getByRole("button", { name: "Search Chats" })).toHaveCount(1);
+  await expect(page.locator(".new-space-button")).toHaveCount(0);
+  const newChatDraft = page.getByLabel("Message");
+  await newChatDraft.fill("First line");
+  await newChatDraft.press("Shift+Enter");
+  await newChatDraft.type("Second line");
+  await expect(newChatDraft).toHaveValue("First line\nSecond line");
+  await newChatDraft.fill("");
+  await page.screenshot({ path: join(desktopRoot, "test-results/ui-new-chat-empty.png") });
+
+  const spacesBeforeStartFailure = await page.evaluate(() => window.peel.bootstrap().then((payload) => Object.keys(payload.state.spaces).length));
+  await writeFile(join(repository, "fail-thread-start"), "1");
+  await page.locator(".space-sidebar").getByRole("button", { name: "New Chat" }).click();
+  await expect(page.locator(".toast")).toContainText("New Chat could not be created");
+  await expect(page.locator(".space-sidebar").getByRole("button", { name: "New Chat" })).toBeEnabled();
+  expect(await page.evaluate(() => window.peel.bootstrap().then((payload) => Object.keys(payload.state.spaces).length))).toBe(spacesBeforeStartFailure);
+
   await expect.poll(async () => (await readFile(rpcLog, "utf8")).includes('"method":"fixture/thread-list/responded"')).toBe(true);
   const threadListsBeforeWarmOpen = (await readFile(rpcLog, "utf8")).match(/"method":"thread\/list"/g)?.length ?? 0;
   const warmOpenMs = await page.evaluate(async () => {
-    const choose = [...document.querySelectorAll<HTMLButtonElement>("button")].find((button) => button.textContent?.includes("Choose a Codex Chat"));
-    if (!choose) throw new Error("Choose a Codex Chat button was missing");
+    const choose = document.querySelector<HTMLButtonElement>('.space-sidebar button[aria-label="Search Chats"]');
+    if (!choose) throw new Error("Search Chats button was missing");
     const started = performance.now();
     choose.click();
     while (!document.querySelector(".thread-result")) await new Promise(requestAnimationFrame);
@@ -174,7 +203,7 @@ test("real Thread-first Fork loop, recovery surfaces, scale, and restart", async
   ), { intervals: [10, 20, 50], timeout: 2_000 }).toBe(true);
   await page.locator(".picker-header .icon-button").click();
   await expect(page.locator(".thread-picker")).toHaveCount(0);
-  await page.getByRole("button", { name: /Choose a Codex Chat/ }).click();
+  await page.locator(".space-sidebar").getByRole("button", { name: "Search Chats" }).click();
   await expect(page.locator(".thread-result")).toHaveCount(30);
   await expect.poll(async () => (await readRpcEvents()).some((event) =>
     event.method === "fixture/thread-list/responded" && event.params?.search === "catalog direction 08"
@@ -187,7 +216,7 @@ test("real Thread-first Fork loop, recovery surfaces, scale, and restart", async
   await expect(page.locator(".thread-result")).toHaveCount(60);
   await page.getByText("Catalog direction 54", { exact: true }).click();
   await expect(page.getByRole("heading", { name: "Catalog direction 54" })).toBeVisible();
-  await page.getByRole("button", { name: /New Space/ }).click();
+  await page.locator(".space-sidebar").getByRole("button", { name: "Search Chats" }).click();
   await expect(page.locator(".thread-picker")).toBeVisible();
   await page.locator(".thread-result").first().click();
   await expect(page.getByRole("heading", { name: rootTitle })).toBeVisible();
@@ -431,7 +460,12 @@ test("real Thread-first Fork loop, recovery surfaces, scale, and restart", async
   await installMediaCapture();
   await page.getByTitle("Dictate into draft").click();
   await expect(page.getByTitle("Stop dictation")).toBeVisible();
-  await page.waitForTimeout(150);
+  await expect(page.locator(".voice-waveform i")).toHaveCount(17);
+  await expect.poll(async () => await page.locator(".voice-waveform i").evaluateAll((bars) => Math.max(...bars.map((bar) => {
+    const match = (bar as HTMLElement).style.transform.match(/scaleY\(([^)]+)\)/);
+    return Number(match?.[1] ?? 0);
+  })))).toBeGreaterThan(.5);
+  await expect(page.locator(".voice-live")).toContainText("0:");
   await page.screenshot({ path: join(desktopRoot, "test-results/ui-voice-recording.png") });
   await page.evaluate(() => (window as unknown as { peelCaptureTrack?: MediaStreamTrack }).peelCaptureTrack?.dispatchEvent(new Event("ended")));
   await expect(page.getByText(/Microphone capture stopped/)).toBeVisible();
@@ -518,7 +552,7 @@ test("real Thread-first Fork loop, recovery surfaces, scale, and restart", async
   await page.locator(".fork-surface textarea").fill("First Turn failure keeps this prompt");
   await page.getByRole("button", { name: "Create & send" }).click();
   await expect(page.getByLabel("Message")).toHaveValue("First Turn failure keeps this prompt");
-  await page.getByLabel("Message").press(process.platform === "darwin" ? "Meta+Enter" : "Control+Enter");
+  await page.getByLabel("Message").press("Enter");
   await expect(page.getByText("Command approval")).toBeVisible();
   await page.getByRole("button", { name: "Decline" }).click();
   const recoveredChildId = await page.evaluate(() => window.peel.bootstrap().then((payload) => payload.state.activeThreadId!));
@@ -729,7 +763,7 @@ test("real Thread-first Fork loop, recovery surfaces, scale, and restart", async
   await page.locator(".diff-drawer").getByRole("button").first().click();
   await expect(page.getByLabel("Message")).toBeVisible();
 
-  await page.getByRole("button", { name: /New Space/ }).click();
+  await page.locator(".space-sidebar").getByRole("button", { name: "Search Chats" }).click();
   await page.getByLabel("Search Codex Chats").fill("Catalog direction 69");
   await page.locator(".thread-result").filter({ hasText: "Catalog direction 69" }).click();
   const directDraft = page.getByLabel("Message");
@@ -737,11 +771,11 @@ test("real Thread-first Fork loop, recovery surfaces, scale, and restart", async
   await page.locator('.composer input[type="file"]').setInputFiles(attachmentPath);
   const directEventsBefore = await readRpcEvents();
   await writeFile(join(repository, "fail-resume"), "1");
-  await directDraft.press(process.platform === "darwin" ? "Meta+Enter" : "Control+Enter");
+  await directDraft.press("Enter");
   await expect(page.getByRole("alert")).toContainText("could not be resumed");
   await expect(directDraft).toHaveValue("A direct send survives a failed session resume");
   await expect(page.locator(".attachment")).toContainText("Image");
-  await directDraft.press(process.platform === "darwin" ? "Meta+Enter" : "Control+Enter");
+  await directDraft.press("Enter");
   await expect(page.getByText("Command approval")).toBeVisible();
   await expect(directDraft).toHaveValue("");
   await expect(page.locator(".attachment")).toHaveCount(0);

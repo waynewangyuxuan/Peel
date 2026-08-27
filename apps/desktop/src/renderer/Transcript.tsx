@@ -51,7 +51,10 @@ export function Transcript({
   const [sendError, setSendError] = useState<string | null>(null);
   const [voice, setVoice] = useState<"idle" | "recording" | "transcribing">("idle");
   const [voiceError, setVoiceError] = useState<string | null>(null);
+  const [voiceLevels, setVoiceLevels] = useState<number[]>(() => Array.from({ length: 17 }, () => 0));
+  const [recordingMs, setRecordingMs] = useState(0);
   const recorder = useRef<RecorderSession | null>(null);
+  const textarea = useRef<HTMLTextAreaElement>(null);
   const mounted = useRef(true);
   const draftRef = useRef(draft);
   const followBottom = useRef(true);
@@ -64,6 +67,23 @@ export function Transcript({
     recorder.current?.cancel();
     recorder.current = null;
   }, []);
+
+  useEffect(() => {
+    if (voice !== "recording") {
+      setRecordingMs(0);
+      return;
+    }
+    const startedAt = performance.now();
+    const timer = window.setInterval(() => setRecordingMs(performance.now() - startedAt), 100);
+    return () => window.clearInterval(timer);
+  }, [voice]);
+
+  useLayoutEffect(() => {
+    const element = textarea.current;
+    if (!element) return;
+    element.style.height = "0px";
+    element.style.height = `${Math.min(130, Math.max(38, element.scrollHeight))}px`;
+  }, [draft]);
 
   useLayoutEffect(() => {
     const element = scroller.current;
@@ -116,7 +136,7 @@ export function Transcript({
   };
 
   const onKeyDown = (event: KeyboardEvent<HTMLTextAreaElement>): void => {
-    if (event.key === "Enter" && (event.metaKey || event.ctrlKey)) {
+    if (event.key === "Enter" && !event.shiftKey && !event.nativeEvent.isComposing) {
       event.preventDefault();
       void submit();
     }
@@ -136,6 +156,7 @@ export function Transcript({
     setVoiceError(null);
     if (voice === "recording" && recorder.current) {
       setVoice("transcribing");
+      setVoiceLevels(Array.from({ length: 17 }, () => 0));
       try {
         const wav = await recorder.current.stop();
         recorder.current = null;
@@ -156,13 +177,18 @@ export function Transcript({
         if (!mounted.current) return;
         recorder.current = null;
         setVoice("idle");
+        setVoiceLevels(Array.from({ length: 17 }, () => 0));
         setVoiceError(message);
+      }, (level) => {
+        if (!mounted.current) return;
+        setVoiceLevels((current) => [...current.slice(1), level]);
       });
       if (!mounted.current) {
         session.cancel();
         return;
       }
       recorder.current = session;
+      setVoiceLevels(Array.from({ length: 17 }, () => 0));
       setVoice("recording");
     } catch (error) {
       if (!mounted.current) return;
@@ -206,27 +232,37 @@ export function Transcript({
       {voiceError && <div className="composer-error">{voiceError}</div>}
       <div className={`composer ${voice === "recording" ? "is-recording" : ""}`}>
         <textarea
+          ref={textarea}
           aria-label="Message"
           value={draft}
           onChange={(event) => onDraft(event.target.value)}
           onKeyDown={onKeyDown}
-          placeholder="Continue this direction…"
-          rows={2}
+          placeholder="Message Codex"
+          rows={1}
         />
         <div className="composer-actions">
           <label className="icon-button" title="Attach image or audio"><Icon name="paperclip"/><input type="file" accept="image/*,audio/*" multiple onChange={(event) => void attach(event)}/></label>
-          <button className={`icon-button ${voice !== "idle" ? "active" : ""}`} onClick={() => void dictate()} disabled={voice === "transcribing"} title={voice === "recording" ? "Stop dictation" : "Dictate into draft"}>
+          <button className={`icon-button voice-button ${voice === "recording" ? "recording" : voice === "transcribing" ? "active" : ""}`} onClick={() => void dictate()} disabled={voice === "transcribing"} aria-label={voice === "recording" ? "Stop dictation" : "Dictate into draft"} title={voice === "recording" ? "Stop dictation" : "Dictate into draft"}>
             <Icon name={voice === "recording" ? "stop" : "mic"}/>
           </button>
-          {voice === "recording" && <span className="recording-label">Listening…</span>}
-          {voice === "transcribing" && <span className="recording-label">Transcribing…</span>}
+          {voice === "recording" && <div className="voice-live" aria-label="Live microphone level"><VoiceWaveform levels={voiceLevels}/><span>{formatRecordingTime(recordingMs)}</span></div>}
+          {voice === "transcribing" && <span className="voice-transcribing"><span className="mini-spinner"/>Transcribing…</span>}
           <span className="composer-spacer" />
-          <span className="key-hint">⌘↵</span>
-          <button className="send-button" onClick={() => void submit()} disabled={sending || (!draft.trim() && attachments.length === 0)} title="Send"><Icon name="send"/></button>
+          <button className={`send-button ${sending ? "sending" : ""}`} onClick={() => void submit()} disabled={sending || voice !== "idle" || (!draft.trim() && attachments.length === 0)} aria-label={sending ? "Sending message" : "Send message"} title="Send message"><Icon name={sending ? "spinner" : "arrowUp"}/></button>
         </div>
       </div>
     </div>
   </div>;
+}
+
+function VoiceWaveform({ levels }: { levels: number[] }): ReactNode {
+  return <span className="voice-waveform" role="img" aria-label="Microphone audio level">{levels.map((level, index) =>
+    <i key={index} style={{ transform: `scaleY(${Math.max(.16, level)})` }}/>)}</span>;
+}
+
+function formatRecordingTime(value: number): string {
+  const totalSeconds = Math.floor(value / 1000);
+  return `${Math.floor(totalSeconds / 60)}:${String(totalSeconds % 60).padStart(2, "0")}`;
 }
 
 function userFacingIpcError(error: unknown): string {

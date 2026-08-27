@@ -68,6 +68,7 @@ const catalogThreads = Array.from({ length: 70 }, (_, index) => {
 const threads = new Map([[root.id, root]]);
 const loadedThreads = new Set();
 let childIndex = 0;
+let newThreadIndex = 0;
 let requestIndex = 90;
 let threadListRequestIndex = 0;
 
@@ -108,6 +109,29 @@ reader.on("line", (line) => {
     }
     respond();
     return;
+  }
+  if (method === "thread/start") {
+    const failStartMarker = process.env.TMPDIR ? join(process.env.TMPDIR, "fail-thread-start") : null;
+    if (failStartMarker && existsSync(failStartMarker)) {
+      unlinkSync(failStartMarker);
+      return send({ id, error: { code: -32062, message: "New Chat could not be created. Try again." } });
+    }
+    const threadId = `thread-new-${++newThreadIndex}`;
+    const thread = {
+      ...structuredClone(root),
+      id: threadId,
+      sessionId: `session-${threadId}`,
+      name: null,
+      preview: "",
+      projectId: null,
+      cwd: params.cwd || cwd,
+      createdAt: now,
+      updatedAt: now,
+      turns: [],
+    };
+    threads.set(threadId, thread);
+    loadedThreads.add(threadId);
+    return send({ id, result: startResponse(thread) });
   }
   if (method === "thread/read" || method === "thread/resume") {
     let thread = threads.get(params.threadId) || restoreCatalog(params.threadId) || restoreTestChild(params.threadId) || restoreSynthetic(params.threadId);

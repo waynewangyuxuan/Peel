@@ -40,7 +40,7 @@ export function createSpace(thread: {
   cwd: string;
   createdAt: number;
 }): SpaceRecord {
-  const title = thread.name?.trim() || temporaryTitle(thread.preview, "Root thread");
+  const title = thread.name?.trim() || temporaryTitle(thread.preview, "New Chat");
   const root: SpaceNode = {
     threadId: thread.id,
     parentThreadId: null,

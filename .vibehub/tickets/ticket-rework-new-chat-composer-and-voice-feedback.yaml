@@ -1,0 +1,73 @@
+{
+  "acceptance": [
+    {
+      "acceptance_id": "immediate-real-new-chat",
+      "criterion": "From the sidebar and empty-state primary action, New Chat invokes Codex thread/start directly, creates and persists one new Peel Space whose only Root is that real empty Codex Thread, opens its editable Focus Composer, and does not issue thread/list or search before the new Chat is usable. The active Thread cwd is reused when available and App Server defaults are used when no active cwd exists."
+    },
+    {
+      "acceptance_id": "distinct-entry-semantics",
+      "criterion": "The permanent navigation exposes exactly one plus control for New Chat and one separately labeled search-icon control for finding existing Codex Chats; the duplicate New Space plus/button is removed. Keyboard and empty-state entry points preserve the same distinction, and the existing picker is only entered through the search action."
+    },
+    {
+      "acceptance_id": "new-chat-failure-safety",
+      "criterion": "If thread/start or Peel persistence fails, no phantom Space is shown, existing Spaces and Drafts remain unchanged, the creation control becomes usable again, and a concise human-readable recovery message is visible without raw IPC/server wrapper text."
+    },
+    {
+      "acceptance_id": "chat-like-composer",
+      "criterion": "Focus uses one visually coherent Demo-aligned Composer with a ChatGPT-familiar circular up-arrow Send action, clear disabled/sending feedback, Enter-to-send and Shift+Enter-for-newline behavior, attachment and dictation affordances, preserved editable Drafts, and no raw intermediate UI state. Frequent keyboard actions do not wait on decorative animation."
+    },
+    {
+      "acceptance_id": "live-voice-level-feedback",
+      "criterion": "During real microphone capture the Composer displays a continuous compact waveform and elapsed recording state driven by measured microphone PCM amplitude rather than a fake looping animation; louder input produces visibly stronger bars, Stop transitions to transcription, and interruption/failure leaves the existing editable Draft intact. Reduced-motion mode preserves legible level feedback without decorative movement."
+    },
+    {
+      "acceptance_id": "integrated-ui-verification",
+      "criterion": "Automated adapter/service, renderer audio, and production Electron journey tests prove direct thread/start without discovery, entry-action uniqueness, keyboard sending, microphone-level response, Draft safety, and existing-Chat search regression coverage. A clean build/package passes and current-state screenshots at welcome, new empty Chat, recording, and Composer states are reviewed against the preserved Demo."
+    }
+  ],
+  "constraints": [
+    "The preserved original Demo remains the visual authority; ChatGPT conventions guide affordance hierarchy and Composer behavior, not a new product skin.",
+    "A newly created Chat is a real Codex Thread and a new single-Root Space; it is not a local placeholder and does not join an existing Space without a real Fork.",
+    "Existing-Chat discovery remains available but cannot gate or delay New Chat.",
+    "Voice Dictation inserts editable text into the current Thread Draft and never auto-sends.",
+    "Do not reintroduce Project-first navigation, Add to Space, generic graph editing, or fake audio activity."
+  ],
+  "context": "The current product makes every Space entry go through existing-Chat discovery, duplicates the same action behind two plus controls, and represents Voice as a label rather than a continuously legible audio interaction. The user wants the primary action to create a genuinely new Codex Chat without waiting for history search; existing Chat discovery should be a search-icon secondary action. Composer send and dictation should follow familiar ChatGPT interaction expectations while staying inside the preserved Demo's neutral desktop visual language.",
+  "context_refs": [
+    {
+      "purpose": "Defines real Codex Thread roots and the single-Root Space boundary; this Ticket extends entry to new as well as existing Threads.",
+      "ref": ".vibehub/rooms/product/decision-thread-first-space-entry.yaml"
+    },
+    {
+      "purpose": "Requires editable, no-auto-send Voice Dictation with per-Thread Draft safety.",
+      "ref": ".vibehub/rooms/product/contract-voice-dictation-draft.yaml"
+    },
+    {
+      "purpose": "Requires Chat-like interaction quality and no unfinished presentation.",
+      "ref": ".vibehub/rooms/product/constraint-focus-chat-interaction-quality.yaml"
+    },
+    {
+      "purpose": "Keeps the implementation inside the accepted Demo visual language.",
+      "ref": ".vibehub/rooms/product/decision-demo-authoritative-v01-ui-direction.yaml"
+    },
+    {
+      "purpose": "Provides the preserved Composer material, proportions, and interaction baseline.",
+      "ref": "docs/product/source/peel-demo-v0-original.html"
+    }
+  ],
+  "kind": "ticket",
+  "maturity": "firm",
+  "outcome": "Peel lets the user begin a real new Codex Chat immediately, gives existing-Chat discovery a distinct search-only entry, and presents a ChatGPT-familiar Composer with live microphone-level feedback.",
+  "provenance_refs": [
+    "conversation:2026-08-27-new-chat-composer-and-live-voice-feedback"
+  ],
+  "relations": [
+    {
+      "rationale": "The direct new-Thread flow and richer dictation UI build on the verified App Server session and native Voice lifecycle.",
+      "target_ticket_id": "ticket-fix-session-resume-and-voice-launch",
+      "type": "depends_on"
+    }
+  ],
+  "schema_version": 1,
+  "ticket_id": "ticket-rework-new-chat-composer-and-voice-feedback"
+}

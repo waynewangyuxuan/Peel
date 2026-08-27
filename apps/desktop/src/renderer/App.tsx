@@ -25,6 +25,7 @@ export function App(): ReactNode {
   const [forkBusy, setForkBusy] = useState(false);
   const [highlightTarget, setHighlightTarget] = useState<{ threadId: string; turnId: string } | null>(null);
   const [showThreadPicker, setShowThreadPicker] = useState(false);
+  const [newChatBusy, setNewChatBusy] = useState(false);
   const [diffThreadId, setDiffThreadId] = useState<string | null>(null);
   const [toast, setToast] = useState<string | null>(null);
   const refreshTimers = useRef(new Map<string, number>());
@@ -124,6 +125,21 @@ export function App(): ReactNode {
   const activeNode = activeSpace && state?.activeThreadId ? activeSpace.nodes[state.activeThreadId] ?? null : null;
   const activeSnapshot = activeNode ? threads[activeNode.threadId] ?? null : null;
 
+  const startNewChat = useCallback(async (): Promise<void> => {
+    if (!connected || newChatBusy) return;
+    setNewChatBusy(true);
+    setShowThreadPicker(false);
+    try {
+      installState(await window.peel.startNewChat(activeNode?.cwd ? { cwd: activeNode.cwd } : {}));
+      setThreads({});
+      setForkDraft(null);
+    } catch (error) {
+      setToast(userFacingError(error, "The new Chat could not be created. Try again."));
+    } finally {
+      setNewChatBusy(false);
+    }
+  }, [activeNode?.cwd, connected, installState, newChatBusy]);
+
   useEffect(() => {
     if (!connected || !activeNode) return;
     const threadId = activeNode.threadId;
@@ -163,11 +179,12 @@ export function App(): ReactNode {
       if (event.key === "Escape" && forkDraft && !forkBusy) setForkDraft(null);
       if ((event.metaKey || event.ctrlKey) && event.key === "1") { event.preventDefault(); mutate((draft) => { draft.viewMode = "focus"; }, 0); }
       if ((event.metaKey || event.ctrlKey) && event.key === "2") { event.preventDefault(); mutate((draft) => { draft.viewMode = "overview"; }, 0); }
+      if ((event.metaKey || event.ctrlKey) && event.key.toLowerCase() === "n") { event.preventDefault(); void startNewChat(); }
       if ((event.metaKey || event.ctrlKey) && event.key.toLowerCase() === "k") { event.preventDefault(); setShowThreadPicker(true); }
     };
     window.addEventListener("keydown", onKey);
     return () => window.removeEventListener("keydown", onKey);
-  }, [forkBusy, forkDraft, mutate]);
+  }, [forkBusy, forkDraft, mutate, startNewChat]);
 
   if (!state) return <div className="launch-screen"><div className="peel-mark">P</div><span>Opening Peel…</span></div>;
 
@@ -280,10 +297,12 @@ export function App(): ReactNode {
         mutate((draft) => { draft.activeSpaceId = space.id; draft.activeThreadId = space.rootThreadId; draft.viewMode = "focus"; }, 0);
         setForkDraft(null);
       }}
-      onNew={() => setShowThreadPicker(true)}
+      newChatBusy={newChatBusy}
+      onNewChat={() => void startNewChat()}
+      onSearch={() => setShowThreadPicker(true)}
     />
     <main className="workspace">
-      {!activeSpace || !activeNode ? <Welcome connected={connected} error={connectionError} onStart={() => setShowThreadPicker(true)} /> : <>
+      {!activeSpace || !activeNode ? <Welcome connected={connected} error={connectionError} newChatBusy={newChatBusy} onNewChat={() => void startNewChat()} onSearch={() => setShowThreadPicker(true)} /> : <>
         <TopBar
           key={activeNode.threadId}
           space={activeSpace}
@@ -353,12 +372,21 @@ export function App(): ReactNode {
   </div>;
 }
 
-function SpaceSidebar({ state, onSelect, onNew }: { state: PeelState; onSelect(space: SpaceRecord): void; onNew(): void }): ReactNode {
+function SpaceSidebar({ state, newChatBusy, onSelect, onNewChat, onSearch }: {
+  state: PeelState;
+  newChatBusy: boolean;
+  onSelect(space: SpaceRecord): void;
+  onNewChat(): void;
+  onSearch(): void;
+}): ReactNode {
   const spaces = Object.values(state.spaces).filter((space) => !space.archived).sort((a, b) => b.updatedAt - a.updatedAt);
   return <aside className="space-sidebar">
     <div className="drag-region"/>
     <div className="brand"><span className="peel-mark small">P</span><strong>Peel</strong></div>
-    <div className="sidebar-heading"><span>Spaces</span><button onClick={onNew} title="Start from a Codex Chat"><Icon name="plus"/></button></div>
+    <div className="sidebar-heading"><span>Spaces</span><div className="sidebar-entry-actions">
+      <button onClick={onSearch} title="Search existing Codex Chats (⌘K)" aria-label="Search Chats"><Icon name="search"/></button>
+      <button className="new-chat-trigger" onClick={onNewChat} disabled={newChatBusy} title="New Chat (⌘N)" aria-label="New Chat"><Icon name={newChatBusy ? "spinner" : "plus"}/></button>
+    </div></div>
     <nav>{spaces.map((space) => {
       const directionCount = Object.keys(space.nodes).length;
       return <button
@@ -372,7 +400,6 @@ function SpaceSidebar({ state, onSelect, onNew }: { state: PeelState; onSelect(s
         <span className="space-copy"><strong>{space.name}</strong><small>{directionCount} direction{directionCount === 1 ? "" : "s"}</small></span>
       </button>;
     })}</nav>
-    <button className="new-space-button" onClick={onNew}><Icon name="plus"/> New Space <kbd>⌘K</kbd></button>
   </aside>;
 }
 
@@ -507,7 +534,7 @@ function ThreadPicker({ connected, onClose, onStart }: { connected: boolean; onC
   const loaded = result?.data.length ?? 0;
   return <div className="modal-backdrop" onPointerDown={(event) => { if (event.target === event.currentTarget) onClose(); }}>
     <section className="thread-picker">
-      <div className="picker-header"><div><div className="eyebrow">New Space</div><h2>Start from a Codex Chat</h2></div><button className="icon-button" aria-label="Close Chat picker" onClick={onClose}><Icon name="close"/></button></div>
+      <div className="picker-header"><div><div className="eyebrow">Existing Codex Chat</div><h2>Search Chats</h2></div><button className="icon-button" aria-label="Close Chat picker" onClick={onClose}><Icon name="close"/></button></div>
       <div className="search-box"><Icon name="search"/><input aria-label="Search Codex Chats" autoFocus value={term} onChange={(event) => setTerm(event.target.value)} placeholder="Search titles or messages…"/></div>
       {!connected && <div className="picker-state error">Codex is not connected. {" "}<small>The App Server must be available to search real Chats.</small></div>}
       <div className="thread-results" aria-busy={phase !== null}>{result?.data.map((thread) => <button className="thread-result" key={thread.id} onClick={() => void onStart(thread.id)}>
@@ -527,7 +554,7 @@ function ThreadPicker({ connected, onClose, onStart }: { connected: boolean; onC
             : <span>{phase === "search" ? "Checking full history" : error ? "Results may be incomplete" : "End of results"}</span>}
         </div>}
       </div>
-      <footer>Selecting a Chat creates one Space Root. Peel won’t move it into or read a Project.</footer>
+      <footer>Opening a Chat creates its own one-root Space. Peel won’t move it into or read a Project.</footer>
     </section>
   </div>;
 }
@@ -551,8 +578,14 @@ function DiffDrawer({ node, onClose }: { node: SpaceNode; onClose(): void }): Re
   </div>;
 }
 
-function Welcome({ connected, error, onStart }: { connected: boolean; error: string | null; onStart(): void }): ReactNode {
-  return <div className="welcome"><div className="welcome-art"><span/><span/><span/><i/><i/></div><div className="eyebrow">Spatial work for Codex</div><h1>Keep every good direction<br/>within reach.</h1><p>Start with any existing Codex Chat. Peel turns its real Forks into a space you can understand, return to, and continue.</p><button className="primary-button large" onClick={onStart} disabled={!connected}><Icon name="search"/> Choose a Codex Chat</button>{!connected && <div className="connection-error">Codex is unavailable{error ? ` — ${error}` : ""}</div>}<small>No Project setup. No graph vocabulary required.</small></div>;
+function Welcome({ connected, error, newChatBusy, onNewChat, onSearch }: {
+  connected: boolean;
+  error: string | null;
+  newChatBusy: boolean;
+  onNewChat(): void;
+  onSearch(): void;
+}): ReactNode {
+  return <div className="welcome"><div className="welcome-art"><span/><span/><span/><i/><i/></div><div className="eyebrow">Spatial work for Codex</div><h1>Keep every good direction<br/>within reach.</h1><p>Begin with a fresh Codex Chat now, or find one you already started. Every real Fork stays visible and easy to return to.</p><div className="welcome-actions"><button className="primary-button large" onClick={onNewChat} disabled={!connected || newChatBusy}><Icon name={newChatBusy ? "spinner" : "plus"}/> {newChatBusy ? "Creating…" : "New Chat"}</button><button className="secondary-button large" onClick={onSearch} disabled={!connected}><Icon name="search"/> Search Chats</button></div>{!connected && <div className="connection-error">Codex is unavailable{error ? ` — ${error}` : ""}</div>}<small>⌘N creates immediately · ⌘K searches existing Chats</small></div>;
 }
 
 function ThreadLoading(): ReactNode {
@@ -572,3 +605,10 @@ function treeOrder(space: SpaceRecord): Array<{ node: SpaceNode; depth: number }
 }
 
 function messageOf(error: unknown): string { return error instanceof Error ? error.message : String(error); }
+
+function userFacingError(error: unknown, fallback: string): string {
+  return messageOf(error)
+    .replace(/^Error invoking remote method '[^']+':\s*/i, "")
+    .replace(/^Error:\s*/i, "")
+    .trim() || fallback;
+}
