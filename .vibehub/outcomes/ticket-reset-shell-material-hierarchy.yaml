@@ -1,0 +1,22 @@
+{
+  "accepted_acceptance_ids": [
+    "content-first-shell-hierarchy",
+    "coherent-material-and-geometry",
+    "chat-and-composer-proportion",
+    "calm-activity-and-progressive-actions",
+    "overview-material-continuity",
+    "motion-accessibility-and-regression-proof"
+  ],
+  "closed_at": "2026-08-27T11:27:54Z",
+  "evidence_ids": [
+    "shell-material-visual-review",
+    "chat-composer-regression-verification",
+    "overview-material-and-scale-review"
+  ],
+  "kind": "ticket_outcome",
+  "schema_version": 1,
+  "status": "successful",
+  "summary": "Independent closeout accepted all six criteria for the shell material hierarchy reset at exact implementation HEAD 8fc875ee24cb22f417039fb53326aea271a09c81 after reading the complete Ticket, every direct Context item, the full preserved Demo HTML, all three successful dependency Outcomes, all current acceptance-linked Evidence, the full 24f660f..8fc875e commit range, and the relevant renderer, audio, Markdown, Overview, tests, and Electron journey. The shared CSS token block now defines the canvas, navigation, selection, elevated surfaces, borders, shadows, radii, rail widths, color, type, and motion language; 212/218px wide rails and 188/198px narrow rails stay legible and recessive while the 720px conversation measure remains dominant. Fresh 1440x960 and 1000x720 visual review confirmed contained navigation with no horizontal overflow, clipped current Space/Thread identity backed by full title and accessible names, and unboxed secondary top-bar actions. Resting Reasoning, Command, File Change, Subagent, failure, turn, Diff, and navigation actions are integrated progressive disclosures with all labels, raw technical output, statuses, and accessible actions preserved; error and active states alone add the necessary emphasis. Short user messages size to content with a safe maximum, the empty Composer is 70–82 CSS pixels, attachment/dictation/send remain labeled and keyboard complete, and recording, live PCM waveform, transcription, sending, disabled, no-speech, permission, transport failure, and preserved-Draft states remain legible without raw IPC errors. Overview retains its deterministic 294x205 spatial cards, real edges, persisted topology, pan, pointer-centered zoom, Fit, drag, rename, provenance, exact-turn navigation, Focus return, Diff/worktree and subagent facts, while plain-text card previews remove Markdown source tokens. Fresh direct inspection of the regenerated 2-, 6-, and 50-node screenshots confirmed the shared material continuity, distinct spatial canvas, and usable scale overview. Motion inspection found no Focus entrance animation or transition-all usage; frequent navigation is immediate, press feedback is 80–160ms, fork/modal/drawer entrances are 220–260ms, and the global reduced-motion rule collapses all transitions and animations while retaining legible states. Independent verification passed all 79 repository tests, the full repository build, current-HEAD Electron packaging, the complete Electron journey 1/1 in 36.0 seconds, and packaged-app verification with restored draft and native voice helper. No acceptance IDs remain unresolved.",
+  "ticket_id": "ticket-reset-shell-material-hierarchy",
+  "unresolved_acceptance_ids": []
+}
