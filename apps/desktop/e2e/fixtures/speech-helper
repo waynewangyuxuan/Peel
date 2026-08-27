@@ -5,6 +5,12 @@ import { join } from "node:path";
 const marker = (name) => process.env.TMPDIR ? join(process.env.TMPDIR, name) : null;
 const fail = marker("fail-speech");
 const delay = marker("delay-speech");
+const noSpeech = marker("no-speech");
+if (noSpeech && existsSync(noSpeech)) {
+  unlinkSync(noSpeech);
+  process.stdout.write(`${JSON.stringify({ ok: false, error: "No speech detected" })}\n`);
+  process.exit(1);
+}
 if (fail && existsSync(fail)) {
   unlinkSync(fail);
   process.stdout.write(`${JSON.stringify({ ok: false, error: "Forced transcription failure" })}\n`);

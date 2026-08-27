@@ -1,0 +1,52 @@
+{
+  "acceptance": [
+    {
+      "acceptance_id": "friendly-no-speech-retry",
+      "criterion": "Native/helper variants including `No speech detected`, an empty recognized transcript, and a too-short or unusable recording resolve in Focus as one concise non-technical no-speech notice that asks the user to try again and speak a little longer. The notice contains no `Error invoking remote method`, IPC channel, stack/error prefix, or recognizer implementation language, and it clears when the next recording starts."
+    },
+    {
+      "acceptance_id": "sanitized-voice-failure-safety",
+      "criterion": "Every Voice capture or transcription rejection removes repeated Electron IPC and `Error:` wrappers before presentation, leaves the exact existing per-Thread Draft unchanged, returns Dictation to an immediately retryable idle control, and reserves error styling for actual failures rather than the ordinary no-speech retry state."
+    },
+    {
+      "acceptance_id": "voice-error-regression-proof",
+      "criterion": "Automated unit and production Electron journey tests exercise the exact wrapped `peel:voice:transcribe` no-speech rejection, friendly notice and retry clearing, sanitized real failure, Draft preservation, and zero auto-send; repository tests and the desktop production build pass."
+    }
+  ],
+  "constraints": [
+    "Voice Dictation must remain Record → Transcribe → editable Draft → explicit Send and must never auto-send.",
+    "Do not hide permission, capture, recognizer, or packaging failures; translate them into concise actionable copy while preserving their real distinction.",
+    "The preserved Demo remains the visual authority; no-speech feedback belongs inside the existing quiet Composer hierarchy rather than a modal, toast, or technical diagnostic card.",
+    "Do not change the native Speech recognizer or fabricate a successful transcript when no speech was recognized."
+  ],
+  "context": "Dogfooding the packaged app produced `Error invoking remote method 'peel:voice:transcribe': Error: No speech detected`. The native recognizer can legitimately return no speech for short, silent, clipped, or unavailable microphone input, but the renderer currently displays the rejected IPC Error verbatim because Voice does not use the message-send path's error sanitizer. No-speech is an expected recoverable state, while other capture and transcription failures still need concise product copy and Draft preservation.",
+  "context_refs": [
+    {
+      "purpose": "Requires recoverable editable Dictation that never auto-sends or loses the current Thread Draft.",
+      "ref": ".vibehub/rooms/product/contract-voice-dictation-draft.yaml"
+    },
+    {
+      "purpose": "Requires human product presentation with no raw intermediate or protocol syntax in Focus.",
+      "ref": ".vibehub/rooms/product/constraint-focus-chat-interaction-quality.yaml"
+    },
+    {
+      "purpose": "Provides the accepted quiet inline Composer feedback hierarchy.",
+      "ref": "docs/product/source/peel-demo-v0-original.html"
+    }
+  ],
+  "kind": "ticket",
+  "maturity": "firm",
+  "outcome": "Voice Dictation treats an empty recognition result as a normal retryable listening miss and never exposes Electron IPC wrappers or raw speech-helper errors in the Composer.",
+  "provenance_refs": [
+    "conversation:2026-08-27-voice-no-speech-raw-ipc-error"
+  ],
+  "relations": [
+    {
+      "rationale": "This repair corrects the delivered Composer and real Voice feedback/error boundary.",
+      "target_ticket_id": "ticket-rework-new-chat-composer-and-voice-feedback",
+      "type": "depends_on"
+    }
+  ],
+  "schema_version": 1,
+  "ticket_id": "ticket-fix-voice-no-speech-recovery"
+}

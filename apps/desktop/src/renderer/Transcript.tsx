@@ -7,6 +7,7 @@ import { Icon } from "./icons";
 import { itemText } from "./lib";
 import { startPcmRecorder, type RecorderSession } from "./audio";
 import { MarkdownContent } from "./Markdown";
+import { voiceFailurePresentation, type VoiceFailurePresentation } from "./voice-error";
 
 interface TranscriptProps {
   thread: CodexThread;
@@ -50,7 +51,7 @@ export function Transcript({
   const [sending, setSending] = useState(false);
   const [sendError, setSendError] = useState<string | null>(null);
   const [voice, setVoice] = useState<"idle" | "recording" | "transcribing">("idle");
-  const [voiceError, setVoiceError] = useState<string | null>(null);
+  const [voiceFeedback, setVoiceFeedback] = useState<VoiceFailurePresentation | null>(null);
   const [voiceLevels, setVoiceLevels] = useState<number[]>(() => Array.from({ length: 17 }, () => 0));
   const [recordingMs, setRecordingMs] = useState(0);
   const recorder = useRef<RecorderSession | null>(null);
@@ -153,7 +154,7 @@ export function Transcript({
   };
 
   const dictate = async (): Promise<void> => {
-    setVoiceError(null);
+    setVoiceFeedback(null);
     if (voice === "recording" && recorder.current) {
       setVoice("transcribing");
       setVoiceLevels(Array.from({ length: 17 }, () => 0));
@@ -166,7 +167,7 @@ export function Transcript({
         onDraft([latestDraft.trimEnd(), result.text].filter(Boolean).join(latestDraft.trim() ? " " : ""));
       } catch (error) {
         if (!mounted.current) return;
-        setVoiceError(error instanceof Error ? error.message : String(error));
+        setVoiceFeedback(voiceFailurePresentation(error));
       } finally {
         if (mounted.current) setVoice("idle");
       }
@@ -178,7 +179,7 @@ export function Transcript({
         recorder.current = null;
         setVoice("idle");
         setVoiceLevels(Array.from({ length: 17 }, () => 0));
-        setVoiceError(message);
+        setVoiceFeedback(voiceFailurePresentation(message));
       }, (level) => {
         if (!mounted.current) return;
         setVoiceLevels((current) => [...current.slice(1), level]);
@@ -192,7 +193,7 @@ export function Transcript({
       setVoice("recording");
     } catch (error) {
       if (!mounted.current) return;
-      setVoiceError(error instanceof Error ? error.message : String(error));
+      setVoiceFeedback(voiceFailurePresentation(error));
     }
   };
 
@@ -229,7 +230,7 @@ export function Transcript({
       {attachments.length > 0 && <div className="attachment-row">{attachments.map((item, index) =>
         <span className="attachment" key={`${item.type}-${index}`}>{item.type === "audio" ? "Audio" : "Image"}<button onClick={() => setAttachments((all) => all.filter((_, itemIndex) => itemIndex !== index))}><Icon name="close" size={12}/></button></span>)}</div>}
       {sendError && <div className="composer-error" role="alert">{sendError}</div>}
-      {voiceError && <div className="composer-error">{voiceError}</div>}
+      {voiceFeedback && <div className={voiceFeedback.tone === "notice" ? "composer-notice" : "composer-error"} role={voiceFeedback.tone === "notice" ? "status" : "alert"}>{voiceFeedback.message}</div>}
       <div className={`composer ${voice === "recording" ? "is-recording" : ""}`}>
         <textarea
           ref={textarea}
