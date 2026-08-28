@@ -1,0 +1,93 @@
+{
+  "acceptance": [
+    {
+      "acceptance_id": "clear-product-entry",
+      "criterion": "The opening section names Peel, states the product thesis and primary user problem in plain language, and explains Space, Focus, Overview, and real Codex Forks without requiring graph, Git, VibeHub, or internal architecture vocabulary."
+    },
+    {
+      "acceptance_id": "durable-current-visuals",
+      "criterion": "The README includes tracked, repository-relative current screenshots for both the Focus conversation surface and the spatial Overview; the images render from a GitHub checkout and are not references to ignored test output or local absolute paths."
+    },
+    {
+      "acceptance_id": "honest-capabilities-and-boundaries",
+      "criterion": "The README accurately distinguishes shipped v0.1 capabilities, explicit non-goals, and v0.2 direction; it preserves the Thread-first single-root real-Fork model, Codex/Peel source-of-truth boundary, main-based Diff semantics, editable no-auto-send Voice behavior, current Codex Realtime authentication fallback, and local unsigned dogfood status without implying unsupported Project, graph-editing, Git-management, or distribution features."
+    },
+    {
+      "acceptance_id": "reproducible-local-start",
+      "criterion": "A new contributor can identify macOS, Node 22+, Codex CLI/App Server, Git, and Apple Command Line Tools requirements and follow repository-accurate install, development, test, package, launch, and package-verification commands, including the exact output app path."
+    },
+    {
+      "acceptance_id": "maintainable-repository-guide",
+      "criterion": "The README provides a compact repository map and links to the preserved PRD, runnable Demo source, desktop and adapter documentation, while avoiding duplicated low-level package documentation; every referenced repository path exists and Markdown/image links pass an automated local check."
+    }
+  ],
+  "constraints": [
+    "Write a project entry point, not a replacement PRD or generated feature inventory.",
+    "Do not claim public release readiness, signing, notarization, Codex Project support, arbitrary graph editing, Git management, or server-backed Realtime voice on the current runtime.",
+    "Use the current shipped UI as the visual source and store only reasonably sized durable screenshot assets.",
+    "Keep commands synchronized with root and desktop package scripts; do not invent setup steps or external services.",
+    "README copy may be polished, but factual product claims remain governed by checked-in Product Room Context and successful Outcomes."
+  ],
+  "context": "The repository has accurate package-level engineering notes and extensive product Context, but no root README. A visitor currently cannot quickly learn what Peel is, why spatial Forks matter, what is actually shipped, how Codex and Peel divide ownership, how to build and launch the desktop app, or which capabilities remain experimental or future work. The README should be a concise product and contributor entry point rather than a duplicate PRD.",
+  "context_refs": [
+    {
+      "purpose": "Defines the product thesis and Codex relationship.",
+      "ref": ".vibehub/rooms/product/intent-spatial-thread-workspace.yaml"
+    },
+    {
+      "purpose": "Defines the primary user and problem the opening should communicate.",
+      "ref": ".vibehub/rooms/product/intent-primary-user-and-job.yaml"
+    },
+    {
+      "purpose": "Protects the real-Fork single-root Space model.",
+      "ref": ".vibehub/rooms/product/decision-single-root-fork-tree.yaml"
+    },
+    {
+      "purpose": "Defines the distinct Focus and Overview roles.",
+      "ref": ".vibehub/rooms/product/decision-focus-overview-information-contract.yaml"
+    },
+    {
+      "purpose": "Defines what Codex owns and what Peel persists.",
+      "ref": ".vibehub/rooms/product/contract-source-of-truth-ownership.yaml"
+    },
+    {
+      "purpose": "Provides the shipped v0.1 feature and reliability boundary.",
+      "ref": ".vibehub/rooms/product/contract-v01-core-spatial-fork-loop.yaml"
+    },
+    {
+      "purpose": "Provides an honest, scoped roadmap summary.",
+      "ref": ".vibehub/rooms/product/contract-v02-scale-continuity-context.yaml"
+    },
+    {
+      "purpose": "Prevents README copy from reshaping Peel into a generic graph or execution product.",
+      "ref": ".vibehub/rooms/product/decision-non-goals-and-convergence-gate.yaml"
+    },
+    {
+      "purpose": "Requires an accurate current Voice/Reatime disclosure.",
+      "ref": ".vibehub/rooms/product/constraint-codex-realtime-chatgpt-auth-gap.yaml"
+    },
+    {
+      "purpose": "Provides the latest independently verified UI and package baseline.",
+      "ref": ".vibehub/outcomes/ticket-reset-shell-material-hierarchy.yaml"
+    },
+    {
+      "purpose": "Provides the authoritative current local development and packaging commands.",
+      "ref": "apps/desktop/README.md"
+    }
+  ],
+  "kind": "ticket",
+  "maturity": "firm",
+  "outcome": "The Peel repository has a polished root README that lets a new user understand the product, see the current interface, run the macOS dogfood build, and distinguish shipped v0.1 behavior from boundaries and future work without reading internal specifications.",
+  "provenance_refs": [
+    "conversation:2026-08-28-create-root-readme"
+  ],
+  "relations": [
+    {
+      "rationale": "The README's current screenshots and delivered UI claims depend on the completed shell hierarchy baseline.",
+      "target_ticket_id": "ticket-reset-shell-material-hierarchy",
+      "type": "depends_on"
+    }
+  ],
+  "schema_version": 1,
+  "ticket_id": "ticket-publish-project-readme"
+}
