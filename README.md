@@ -120,4 +120,3 @@ The original PRD and Demo are preserved as source material. Active checked-in Pr
 ## Roadmap
 
 v0.2 begins only after the core spatial-return loop is proven in dogfood. Its current direction is scale and continuity: keyboard-first Overview navigation, Space search, pinning, reversible subtree collapse/parking, recent filtering, explicit Tidy, and honest discovery of externally created Codex Forks. Codex Project association remains an optional capability-gated experiment, not a dependency of the Space model or the v0.2 release.
-
