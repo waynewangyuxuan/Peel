@@ -1,0 +1,21 @@
+{
+  "accepted_acceptance_ids": [
+    "clear-product-entry",
+    "durable-current-visuals",
+    "honest-capabilities-and-boundaries",
+    "reproducible-local-start",
+    "maintainable-repository-guide"
+  ],
+  "closed_at": "2026-08-28T23:01:03Z",
+  "evidence_ids": [
+    "readme-product-content-review",
+    "readme-durable-visuals-review",
+    "readme-setup-and-link-verification"
+  ],
+  "kind": "ticket_outcome",
+  "schema_version": 1,
+  "status": "successful",
+  "summary": "Independent closeout accepted all five project-README criteria at exact HEAD 0717f987f8047a6081916c48c6979a54389e32a6 after reading the complete Ticket, every direct Product Context reference, the successful shell-hierarchy dependency Outcome and all of its Evidence, the complete 597e292..0717f98 commit range, the full root and desktop READMEs, root and desktop package scripts, adapter/source documentation, both tracked screenshot assets, and all three current acceptance-linked Evidence records. The opening names Peel, states the spatial-Fork thesis and flat-chat problem in plain language, and explains the one-root Space, full-conversation Focus, spatial Overview, and exact completed-Turn Codex Fork loop before introducing internal vocabulary. Direct content comparison confirmed that the shipped-v0.1 list, ownership table, non-goals, local unsigned Apple-silicon dogfood status, main-based Diff, editable no-auto-send Voice behavior, Codex 0.149 Realtime ChatGPT/SIWC authentication fallback, and v0.2 scale/continuity roadmap match active Context without claiming Project-first topology, arbitrary graph editing, Git management, public distribution, or server-backed Realtime support. The Focus and six-direction Overview PNGs are valid 1600x1054 RGB assets tracked at repository-relative docs/assets paths, total 495,593 bytes, and remain legible under original-detail inspection; no product source changed after the accepted shell baseline, and comparison with freshly regenerated journey screenshots measured SSIM 0.9970 and 0.9923 respectively. An automated Markdown scan resolved all 13 of 13 repository-relative image and documentation targets, including the preserved PRD, runnable Demo, desktop, Codex adapter, Git adapter, architecture, source archive, and VibeHub paths; neither image points to ignored test output or a local absolute path. Requirements and commands match package.json and apps/desktop/package.json: Darwin arm64, Node >=22, authenticated Codex CLI/App Server, Git, Apple Command Line Tools, npm install, build, repository tests, Electron journey, package, production launch chain, package verification, and the exact apps/desktop/out/Peel-darwin-arm64/Peel.app output. Independent current-HEAD verification passed all 79 tests, full native/renderer/main/preload build and packaging, Electron journey 1/1 in 35.4 seconds, and packaged-app verification with the native Voice helper and restored Draft. Both git diff --check 597e292 and git diff --check now pass at the final implementation state. No acceptance IDs remain unresolved.",
+  "ticket_id": "ticket-publish-project-readme",
+  "unresolved_acceptance_ids": []
+}
