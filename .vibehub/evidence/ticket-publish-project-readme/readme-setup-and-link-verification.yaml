@@ -1,0 +1,24 @@
+{
+  "acceptance_ids": [
+    "reproducible-local-start",
+    "maintainable-repository-guide"
+  ],
+  "evidence_id": "readme-setup-and-link-verification",
+  "kind": "ticket_evidence",
+  "origin": "agent",
+  "recorded_at": "2026-08-28T22:53:49Z",
+  "refs": [
+    "README.md:run-it-locally-repository-map-product-sources",
+    "package.json:scripts-and-node-engine",
+    "apps/desktop/package.json:build-package-launch-and-verify-scripts",
+    "verification:npm-test-79-passed-2026-08-28",
+    "verification:npm-run-build-passed-2026-08-28",
+    "verification:npm-run-package-desktop-passed-2026-08-28",
+    "verification:package-ok-restored-draft-native-voice-helper-2026-08-28",
+    "verification:readme-local-link-scan-13-of-13-passed-2026-08-28",
+    "verification:git-diff-check-passed-2026-08-28"
+  ],
+  "schema_version": 1,
+  "summary": "The root README requirements and commands match the root and desktop package scripts: Apple-silicon macOS, Node 22+, authenticated Codex CLI/App Server, Git, Apple Command Line Tools, npm install, start:desktop, build, 79-test repository suite, Electron journey, package:desktop, and verify:package. Independent execution passed all 79 tests, full build, production package, and packaged verification with restored Draft and native Voice helper. An automated local Markdown target scan resolved all 13 repository-relative image and documentation references; the repository map links to the desktop, Codex adapter, Git adapter, architecture, VibeHub, preserved PRD, and runnable Demo source without duplicating their low-level documentation.",
+  "ticket_id": "ticket-publish-project-readme"
+}

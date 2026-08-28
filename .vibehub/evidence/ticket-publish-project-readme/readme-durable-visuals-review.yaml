@@ -1,0 +1,20 @@
+{
+  "acceptance_ids": [
+    "durable-current-visuals"
+  ],
+  "evidence_id": "readme-durable-visuals-review",
+  "kind": "ticket_evidence",
+  "origin": "agent",
+  "recorded_at": "2026-08-28T22:53:49Z",
+  "refs": [
+    "README.md:focus-and-overview-images",
+    "docs/assets/peel-focus.png:1600x1054-163kb",
+    "docs/assets/peel-overview.png:1600x1054-321kb",
+    "source:apps/desktop/test-results/ui-focus-activity.png",
+    "source:apps/desktop/test-results/ui-overview-6.png",
+    "verification:direct-original-detail-image-review-2026-08-28"
+  ],
+  "schema_version": 1,
+  "summary": "The README renders repository-relative Focus and six-node Overview screenshots copied from the latest independently verified Electron journey. Both files are tracked under docs/assets rather than ignored test output, were resized to a GitHub-appropriate 1600x1054, remain directly legible under original-detail inspection, and total under 500 KiB.",
+  "ticket_id": "ticket-publish-project-readme"
+}

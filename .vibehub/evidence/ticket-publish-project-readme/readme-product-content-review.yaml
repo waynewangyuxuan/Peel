@@ -1,0 +1,21 @@
+{
+  "acceptance_ids": [
+    "clear-product-entry",
+    "honest-capabilities-and-boundaries"
+  ],
+  "evidence_id": "readme-product-content-review",
+  "kind": "ticket_evidence",
+  "origin": "agent",
+  "recorded_at": "2026-08-28T22:53:49Z",
+  "refs": [
+    "git:1960f96f6db081d97ae18a182c37ea16fc3891d1",
+    "README.md:opening-core-loop-capabilities-boundary-voice-roadmap",
+    ".vibehub/rooms/product/intent-spatial-thread-workspace.yaml",
+    ".vibehub/rooms/product/contract-v01-core-spatial-fork-loop.yaml",
+    ".vibehub/rooms/product/contract-v02-scale-continuity-context.yaml",
+    ".vibehub/rooms/product/constraint-codex-realtime-chatgpt-auth-gap.yaml"
+  ],
+  "schema_version": 1,
+  "summary": "Direct comparison of the root README with all Product Room context referenced by the Ticket confirms that the opening explains Peel, the flat-chat problem, Space, Focus, Overview, and real Codex Forks in plain language. The shipped v0.1 list, Codex/Peel ownership table, non-goals, local dogfood status, main-based Diff, editable no-auto-send Voice contract, exact Codex 0.149 Realtime auth fallback, unsigned package status, and v0.2 scale/continuity roadmap preserve the active Thread-first single-root model without claiming Project, graph-editing, Git-management, public distribution, or server-backed Realtime support.",
+  "ticket_id": "ticket-publish-project-readme"
+}
