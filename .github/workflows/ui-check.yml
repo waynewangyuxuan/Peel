@@ -16,6 +16,8 @@ jobs:
           node-version: 24
           cache: npm
       - run: npm ci --legacy-peer-deps
+      - run: npm run build --workspace @peel/codex-app-server
+      - run: npm run build --workspace @peel/git-workspace
       - run: npm run typecheck --workspace @peel/desktop
       - run: npm run test --workspace @peel/desktop
       - run: npm run build:renderer --workspace @peel/desktop
