@@ -338,8 +338,8 @@ export function Overview({ space, activeThreadId, threads, diffs, onCamera, onNo
     ref={shell}
     data-zoom-mode={zoomMode.current}
     style={{
-      "--camera-scale": space.camera.scale,
-      "--semantic-scale": semanticContentScale(space.camera.scale, zoomMode.current),
+      "--camera-scale": camera.current.scale,
+      "--semantic-scale": semanticContentScale(camera.current.scale, zoomMode.current),
     } as CSSProperties}
   >
     <div className="overview-toolbar">
@@ -349,7 +349,7 @@ export function Overview({ space, activeThreadId, threads, diffs, onCamera, onNo
       </div>
       <div className="zoom-controls">
         <button aria-label="Zoom out" title="Zoom out" onClick={() => zoomAtCenter(camera.current.scale - .12)}>−</button>
-        <span ref={zoomValue} aria-label={`Zoom ${Math.round(space.camera.scale * 100)} percent`}>{Math.round(space.camera.scale * 100)}%</span>
+        <span ref={zoomValue} aria-label={`Zoom ${Math.round(camera.current.scale * 100)} percent`}>{Math.round(camera.current.scale * 100)}%</span>
         <button aria-label="Zoom in" title="Zoom in" onClick={() => zoomAtCenter(camera.current.scale + .12)}>+</button>
         <button className="fit-button" aria-label="Fit" title="Fit Overview" onClick={() => animateCamera(fitCamera(nodes, viewport.current))}>Fit</button>
       </div>
@@ -363,10 +363,12 @@ export function Overview({ space, activeThreadId, threads, diffs, onCamera, onNo
       onPointerCancel={end}
       onWheel={wheel}
     >
-      <div className="overview-world" ref={world} style={{ transform: cameraTransform(space.camera) }}>
+      <div className="overview-world" ref={world} style={{ transform: cameraTransform(camera.current) }}>
         <svg className="overview-edges" style={{ left: bounds.minX, top: bounds.minY }} width={bounds.width} height={bounds.height} viewBox={`${bounds.minX} ${bounds.minY} ${bounds.width} ${bounds.height}`}>
           {nodes.filter((node) => node.parentThreadId && space.nodes[node.parentThreadId]).map((node) => {
             const parent = space.nodes[node.parentThreadId!]!;
+            const parentPosition = positions.current.get(parent.threadId) ?? parent.position;
+            const nodePosition = positions.current.get(node.threadId) ?? node.position;
             return <path
               ref={(element: SVGPathElement | null) => {
                 if (element) edges.current.set(node.threadId, element);
@@ -374,7 +376,7 @@ export function Overview({ space, activeThreadId, threads, diffs, onCamera, onNo
               }}
               className={emphasizedPath.has(node.threadId) ? "active" : ""}
               key={node.threadId}
-              d={edgeCurve(parent.position, node.position)}
+              d={edgeCurve(parentPosition, nodePosition)}
             />;
           })}
         </svg>
@@ -385,6 +387,7 @@ export function Overview({ space, activeThreadId, threads, diffs, onCamera, onNo
             else cards.current.delete(node.threadId);
           }}
           node={node}
+          position={positions.current.get(node.threadId) ?? node.position}
           parent={node.parentThreadId ? space.nodes[node.parentThreadId] ?? null : null}
           thread={threads[node.threadId] ?? null}
           parentThread={node.parentThreadId ? threads[node.parentThreadId] ?? null : null}
@@ -404,9 +407,10 @@ export function Overview({ space, activeThreadId, threads, diffs, onCamera, onNo
   </div>;
 }
 
-function OverviewCard({ cardRef, node, parent, thread, parentThread, diff, active, dragging, onPointerDown, onOpen, onFocusTurn, onFocusParent, onRename, onDiff, onHover }: {
+function OverviewCard({ cardRef, node, position, parent, thread, parentThread, diff, active, dragging, onPointerDown, onOpen, onFocusTurn, onFocusParent, onRename, onDiff, onHover }: {
   cardRef(element: HTMLElement | null): void;
   node: SpaceNode;
+  position: Point;
   parent: SpaceNode | null;
   thread: CodexThread | null;
   parentThread: CodexThread | null;
@@ -448,7 +452,7 @@ function OverviewCard({ cardRef, node, parent, thread, parentThread, diff, activ
   return <article
     ref={cardRef}
     className={`overview-card ${active ? "active" : ""} ${dragging ? "dragging" : ""}`}
-    style={{ transform: nodeTransform(node.position) }}
+    style={{ transform: nodeTransform(position) }}
     onPointerDown={onPointerDown}
     onPointerEnter={() => onHover(true)}
     onPointerLeave={() => onHover(false)}

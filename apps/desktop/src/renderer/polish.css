@@ -536,6 +536,7 @@ body {
 .overview-shell[data-zoom-mode="compact"] .card-compact {
   opacity: 1;
   filter: blur(0);
+  pointer-events: auto;
 }
 .overview-shell[data-zoom-mode="compact"] .card-map { opacity: 0; }
 .overview-shell[data-zoom-mode="map"] .card-compact {
@@ -545,6 +546,7 @@ body {
 .overview-shell[data-zoom-mode="map"] .card-map {
   opacity: 1;
   filter: blur(0);
+  pointer-events: auto;
 }
 .overview-shell[data-zoom-mode="compact"] .overview-card.active .card-compact,
 .overview-shell[data-zoom-mode="map"] .overview-card.active .card-map {
