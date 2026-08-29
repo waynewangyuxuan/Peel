@@ -1,0 +1,82 @@
+name: Finalize semantic zoom interaction
+
+on:
+  push:
+    branches:
+      - ui/peel-shell-semantic-zoom
+    paths:
+      - .github/workflows/interaction-fix.yml
+
+permissions:
+  contents: write
+
+jobs:
+  apply-and-verify:
+    runs-on: ubuntu-latest
+    timeout-minutes: 15
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 24
+          cache: npm
+      - name: Preserve transient interaction state and full semantic hit areas
+        run: |
+          python <<'PY'
+          from pathlib import Path
+
+          overview = Path("apps/desktop/src/renderer/Overview.tsx")
+          source = overview.read_text()
+
+          replacements = [
+              ('"--camera-scale": space.camera.scale,', '"--camera-scale": camera.current.scale,'),
+              ('"--semantic-scale": semanticContentScale(space.camera.scale, zoomMode.current),', '"--semantic-scale": semanticContentScale(camera.current.scale, zoomMode.current),'),
+              ('<span ref={zoomValue} aria-label={`Zoom ${Math.round(space.camera.scale * 100)} percent`}>{Math.round(space.camera.scale * 100)}%</span>', '<span ref={zoomValue} aria-label={`Zoom ${Math.round(camera.current.scale * 100)} percent`}>{Math.round(camera.current.scale * 100)}%</span>'),
+              ('<div className="overview-world" ref={world} style={{ transform: cameraTransform(space.camera) }}>', '<div className="overview-world" ref={world} style={{ transform: cameraTransform(camera.current) }}>'),
+              ('const parent = space.nodes[node.parentThreadId!]!;\n            return <path', 'const parent = space.nodes[node.parentThreadId!]!;\n            const parentPosition = positions.current.get(parent.threadId) ?? parent.position;\n            const nodePosition = positions.current.get(node.threadId) ?? node.position;\n            return <path'),
+              ('d={edgeCurve(parent.position, node.position)}', 'd={edgeCurve(parentPosition, nodePosition)}'),
+              ('node={node}\n          parent={node.parentThreadId ? space.nodes[node.parentThreadId] ?? null : null}', 'node={node}\n          position={positions.current.get(node.threadId) ?? node.position}\n          parent={node.parentThreadId ? space.nodes[node.parentThreadId] ?? null : null}'),
+              ('function OverviewCard({ cardRef, node, parent, thread, parentThread, diff, active, dragging, onPointerDown, onOpen, onFocusTurn, onFocusParent, onRename, onDiff, onHover }: {\n  cardRef(element: HTMLElement | null): void;\n  node: SpaceNode;', 'function OverviewCard({ cardRef, node, position, parent, thread, parentThread, diff, active, dragging, onPointerDown, onOpen, onFocusTurn, onFocusParent, onRename, onDiff, onHover }: {\n  cardRef(element: HTMLElement | null): void;\n  node: SpaceNode;\n  position: Point;'),
+              ('style={{ transform: nodeTransform(node.position) }}', 'style={{ transform: nodeTransform(position) }}'),
+          ]
+
+          for old, new in replacements:
+              count = source.count(old)
+              if count != 1:
+                  raise SystemExit(f"Expected one Overview match, found {count}: {old[:80]}")
+              source = source.replace(old, new)
+
+          overview.write_text(source)
+
+          polish = Path("apps/desktop/src/renderer/polish.css")
+          css = polish.read_text()
+          replacements = [
+              ('.overview-shell[data-zoom-mode="compact"] .card-compact {\n  opacity: 1;\n  filter: blur(0);\n}', '.overview-shell[data-zoom-mode="compact"] .card-compact {\n  opacity: 1;\n  filter: blur(0);\n  pointer-events: auto;\n}'),
+              ('.overview-shell[data-zoom-mode="map"] .card-map {\n  opacity: 1;\n  filter: blur(0);\n}', '.overview-shell[data-zoom-mode="map"] .card-map {\n  opacity: 1;\n  filter: blur(0);\n  pointer-events: auto;\n}'),
+          ]
+
+          for old, new in replacements:
+              count = css.count(old)
+              if count != 1:
+                  raise SystemExit(f"Expected one CSS match, found {count}: {old[:80]}")
+              css = css.replace(old, new)
+
+          polish.write_text(css)
+          PY
+      - run: npm ci --legacy-peer-deps
+      - run: npm run build --workspace @peel/codex-app-server
+      - run: npm run build --workspace @peel/git-workspace
+      - run: npm run typecheck --workspace @peel/desktop
+      - run: npm run test --workspace @peel/desktop
+      - run: npm run build:renderer --workspace @peel/desktop
+      - name: Commit verified fixes and remove this temporary workflow
+        run: |
+          rm .github/workflows/interaction-fix.yml
+          git diff --check
+          git config user.name "Wayne"
+          git config user.email "101220495+waynewangyuxuan@users.noreply.github.com"
+          git add apps/desktop/src/renderer/Overview.tsx apps/desktop/src/renderer/polish.css .github/workflows/interaction-fix.yml
+          git commit -m "fix(ui): stabilize semantic zoom interactions"
+          git push origin HEAD:ui/peel-shell-semantic-zoom
