@@ -7,6 +7,7 @@ import { THREAD_SEARCH_CACHE_TTL_MS, type ForkDraft, type PeelState, type Point,
 import { emptyState, suggestedChildPosition } from "../shared/state";
 import { ForkComposer, Transcript } from "./Transcript";
 import { Overview } from "./Overview";
+import { BrandMark, PeelBrand } from "./Brand";
 import { Icon } from "./icons";
 import { clip, itemText, latestCompletedTurn, relativeTime } from "./lib";
 import { mergeThreadPage, threadMatches } from "./thread-search";
@@ -186,7 +187,7 @@ export function App(): ReactNode {
     return () => window.removeEventListener("keydown", onKey);
   }, [forkBusy, forkDraft, mutate, startNewChat]);
 
-  if (!state) return <div className="launch-screen"><div className="peel-mark">P</div><span>Opening Peel…</span></div>;
+  if (!state) return <div className="launch-screen"><BrandMark className="peel-mark" title="Peel"/><span>Opening Peel…</span></div>;
 
   const selectThread = (threadId: string, focusTurnId?: string): void => {
     if (highlightTimer.current !== null) {
@@ -384,16 +385,17 @@ function SpaceSidebar({ state, connected, newChatBusy, onSelect, onNewChat, onSe
   const spaces = Object.values(state.spaces).filter((space) => !space.archived).sort((a, b) => b.updatedAt - a.updatedAt);
   return <aside className="space-sidebar">
     <div className="drag-region"/>
-    <div className="brand"><span className="peel-mark small">P</span><strong>Peel</strong></div>
+    <PeelBrand className="brand"/>
     <div className="sidebar-heading"><span>Spaces</span><div className="sidebar-entry-actions">
       <button onClick={onSearch} disabled={!connected} title="Search existing Codex Chats (⌘K)" aria-label="Search Chats"><Icon name="search"/></button>
       <button className="new-chat-trigger" onClick={onNewChat} disabled={!connected || newChatBusy} title="New Chat (⌘N)" aria-label="New Chat"><Icon name={newChatBusy ? "spinner" : "plus"}/></button>
     </div></div>
-    <nav>{spaces.map((space) => {
+    <nav aria-label="Spaces">{spaces.map((space) => {
       const directionCount = Object.keys(space.nodes).length;
       return <button
         key={space.id}
         className={space.id === state.activeSpaceId ? "selected" : ""}
+        aria-current={space.id === state.activeSpaceId ? "page" : undefined}
         onClick={() => onSelect(space)}
         title={space.name}
         aria-label={`${space.name}, ${directionCount} direction${directionCount === 1 ? "" : "s"}`}

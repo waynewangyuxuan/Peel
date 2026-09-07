@@ -30,55 +30,93 @@ body {
   color: var(--ink);
 }
 
-/* The previous circular P read as an account avatar. The product name is enough in-app. */
-.peel-mark { display: none; }
+/* The Phase cut stays crisp at sidebar size; the name carries its accessible label. */
+.peel-mark,
+.peel-mark.small {
+  display: block;
+  flex: 0 0 auto;
+  width: 32px;
+  height: 32px;
+  border-radius: 0;
+  color: var(--ink);
+  background: transparent;
+}
 .brand {
-  min-height: 38px;
-  gap: 0;
-  padding: 1px 10px 17px;
+  flex: 0 0 auto;
+  gap: 7px;
+  margin: 0 9px 14px;
+  padding: 4px 0 18px;
+  border-bottom: 1px solid rgba(0,0,0,.065);
 }
 .brand strong {
-  font-size: 15px;
-  font-weight: 680;
-  letter-spacing: -.035em;
+  font-size: 19px;
+  line-height: 1;
+  font-weight: 650;
+  letter-spacing: -.045em;
 }
-.launch-screen { gap: 0; }
+.launch-screen { gap: 13px; }
+.launch-screen .peel-mark { width: 40px; height: 40px; }
 
 .app { background: var(--paper); }
 .space-sidebar,
-.lineage-rail {
-  background: var(--panel);
-}
+.lineage-rail { background: var(--panel); }
 .space-sidebar {
-  border-right-color: rgba(0,0,0,.055);
+  min-height: 0;
+  background: linear-gradient(160deg, #f8f8f6 0%, var(--panel) 46%, #f0f0ed 100%);
+  border-right-color: rgba(0,0,0,.075);
+  box-shadow: inset -1px 0 rgba(255,255,255,.65);
   padding-inline: 8px;
 }
-.sidebar-heading {
-  padding: 0 9px 8px;
+.space-sidebar .sidebar-heading {
+  flex: 0 0 auto;
+  padding: 0 9px 10px;
   color: var(--muted);
   font-size: 11.5px;
   font-weight: 560;
+  letter-spacing: .01em;
 }
-.space-sidebar nav { gap: 2px; }
+.space-sidebar nav {
+  gap: 4px;
+  padding: 1px;
+  scroll-padding-block: 2px;
+}
 .space-sidebar nav button {
-  min-height: 46px;
-  padding: 7px 9px;
-  border-radius: 8px;
+  flex: 0 0 auto;
+  min-height: 52px;
+  padding: 9px 8px;
+  border-radius: 9px;
 }
+.space-sidebar nav button.selected {
+  background: var(--paper);
+  box-shadow: inset 0 0 0 1px rgba(0,0,0,.075), 0 1px 2px rgba(0,0,0,.045);
+}
+.space-sidebar nav button:focus-visible { outline-offset: -2px; }
 .space-sidebar nav strong {
-  font-size: 13.5px;
-  font-weight: 610;
+  font-size: 13px;
+  line-height: 17px;
+  font-weight: 560;
   letter-spacing: -.01em;
 }
+.space-sidebar nav button.selected strong { font-weight: 650; }
 .space-sidebar nav small {
   margin-top: 3px;
   font-size: 11.5px;
+  line-height: 15px;
 }
-.space-glyph { color: var(--muted); }
-.sidebar-heading .new-chat-trigger,
-.sidebar-heading .new-chat-trigger:hover:not(:disabled) {
+.space-sidebar .space-glyph { color: var(--muted); }
+.space-sidebar .sidebar-heading .new-chat-trigger {
   color: var(--paper);
   background: var(--ink);
+  box-shadow: inset 0 1px rgba(255,255,255,.12), 0 1px 2px rgba(0,0,0,.12);
+}
+.space-sidebar .sidebar-heading .new-chat-trigger:hover:not(:disabled) { background: #343431; }
+@media (prefers-contrast: more) {
+  .space-sidebar { border-right-color: var(--muted); }
+  .brand { border-bottom-color: var(--muted); }
+  .space-sidebar nav button.selected { box-shadow: inset 0 0 0 1px var(--ink); }
+}
+@media (prefers-reduced-motion: reduce) {
+  .space-sidebar .sidebar-heading button:active { transform: none; }
 }
 
 .workspace { grid-template-rows: 58px minmax(0, 1fr); }

@@ -1,0 +1,55 @@
+{
+  "acceptance": [
+    {
+      "acceptance_id": "phase-brand",
+      "criterion": "The sidebar visibly renders the existing original Phase vector mark beside readable Peel text; the loading brand uses the same mark. Reusable SVG instances have unique clip IDs and decorative/named accessibility semantics. No circular text P placeholder or runtime asset/font request is introduced."
+    },
+    {
+      "acceptance_id": "sidebar-craft",
+      "criterion": "Brand, Spaces heading, entry actions and navigation rows have deliberate alignment, restrained neutral surface depth and a distinguishable selected state. At1440x960 and1000x720, existing sidebar widths/drag strip are retained, long names truncate with full names available, Search/New Chat remain unobstructed, and a long list scrolls without clipping the header or page overflow. Keyboard focus is visible and selected navigation is exposed semantically."
+    },
+    {
+      "acceptance_id": "verified-preview",
+      "criterion": "Desktop typecheck/build and existing tests pass; real Electron visual inspection at normal/narrow sizes verifies logo legibility, list/brand geometry, scrolling and navigation entry controls. Record reproducible synthetic screenshots and update the running PR preview for inspection."
+    }
+  ],
+  "constraints": [
+    "Keep the current restrained monochrome desktop visual language; do not add unrelated navigation, status dashboards, decorative motion, or a new brand direction.",
+    "Reuse the selected Phase geometry exactly; preserve main worktree uncommitted logo/package changes.",
+    "Do not alter saved state schemas, navigation semantics, sidebar widths or Overview geometry.",
+    "Respect reduced motion and increased contrast; existing keyboard shortcuts must remain immediately usable."
+  ],
+  "context": "Wayne asked on2026-09-07 to improve overall product quality, specifically the leftmost panel and upper-left logo/brand area. The current ui/peel-shell-semantic-zoom branch hides the old circular P and shows only small Peel text. A prior user-selected original C Expressive Phase mark exists in the main worktree but is uncommitted; reuse that exact mark/component rather than inventing a new brand or copying unrelated packaging changes. Canonical mark uses viewBox0 0 120 120 and path M28 105V48C28 28 42 16 63 16H70C91 16 104 29 104 49C104 70 90 82 69 82H50V105H28ZM50 38V62H69C78 62 83 58 83 50C83 42 78 38 69 38H50Z; lower clip M0 86 120 56V120H0Z; upper clip M0 0H120V49L0 79Z, translated7 units right. Add a coherent mark/name lockup, breathing room, subtle neutral sidebar surface and separators, clear selected/hover/focus treatments, and legible list metadata. Preserve the196px normal and178px narrow sidebar widths and43px window drag strip. Confine visual changes to the sidebar and consistent loading brand; leave Overview, transcript, lineage, and application packaging untouched.",
+  "context_refs": [
+    {
+      "purpose": "Retains the accepted neutral desktop design direction.",
+      "ref": ".vibehub/rooms/product/decision-demo-authoritative-v01-ui-direction.yaml"
+    },
+    {
+      "purpose": "Establishes polish as a product requirement.",
+      "ref": ".vibehub/rooms/product/note-v01-ui-direction-and-polish-gap.yaml"
+    },
+    {
+      "purpose": "Contains current sidebar, entry controls and loading brand.",
+      "ref": "apps/desktop/src/renderer/App.tsx"
+    },
+    {
+      "purpose": "Contains PR sidebar visual overrides.",
+      "ref": "apps/desktop/src/renderer/polish.css"
+    },
+    {
+      "purpose": "Defines inherited sizing and drag/focus behavior.",
+      "ref": "apps/desktop/src/renderer/styles.css"
+    }
+  ],
+  "kind": "ticket",
+  "maturity": "firm",
+  "outcome": "The left Space sidebar presents the existing Peel Phase identity and a refined, restrained material hierarchy while keeping navigation and entry actions familiar and usable.",
+  "provenance_refs": [
+    "conversation:2026-09-07-left-sidebar-brand-and-material-polish",
+    "conversation:2026-08-28-select-c-expressive-phase-logo-and-request-app-update"
+  ],
+  "relations": [],
+  "schema_version": 1,
+  "ticket_id": "ticket-polish-space-sidebar"
+}

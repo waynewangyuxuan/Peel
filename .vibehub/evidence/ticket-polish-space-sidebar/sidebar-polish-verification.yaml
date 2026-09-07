@@ -1,0 +1,23 @@
+{
+  "acceptance_ids": [
+    "phase-brand",
+    "sidebar-craft",
+    "verified-preview"
+  ],
+  "evidence_id": "sidebar-polish-verification",
+  "kind": "ticket_evidence",
+  "recorded_at": "2026-09-07T10:26:51.621691+00:00",
+  "refs": [
+    "apps/desktop/src/renderer/Brand.tsx",
+    "apps/desktop/src/renderer/App.tsx",
+    "apps/desktop/src/renderer/polish.css",
+    "apps/desktop/e2e/sidebar-polish.spec.ts",
+    "docs/review/sidebar-polish/README.md",
+    "docs/review/sidebar-polish/sidebar-normal.png",
+    "docs/review/sidebar-polish/sidebar-narrow.png",
+    "conversation:2026-09-07-updated-peel-sidebar-live-preview"
+  ],
+  "schema_version": 1,
+  "summary": "Exact main-worktree Brand.tsx reused (cmp identical): canonical Phase geometry, useId clip references, named loading mark and decorative sidebar mark. Desktop full build/typecheck passed; 51 unit tests in 11 files passed. Real Electron sidebar test passed with 30 synthetic Spaces at normal/narrow requested sizes: sidebar widths 196/178px, drag strip 43px, visible brand, ellipsis/full title, no horizontal/page overflow, bounded scrolling with fixed header, Tab focus and Enter selection/aria-current, Search and New Chat entry, increased contrast. Geometry regression also passed. The full v01 journey initially failed its existing failed-resume draft assertion; unchanged isolated rerun passed in39.7s. No draft logic changed. Normal/narrow screenshots were visually inspected and retained. Live preview process was restarted with existing isolated data and PEEL_RENDERER_URL=http://127.0.0.1:5173; native screenshot confirms Phase mark/selected sidebar and previously repaired32% Overview. Packaging source and main-worktree changes untouched.",
+  "ticket_id": "ticket-polish-space-sidebar"
+}
