@@ -18,12 +18,8 @@ import type { WorkspaceDiffSummary } from "@peel/git-workspace";
 
 import type { CameraState, Point, SpaceNode, SpaceRecord } from "../shared/contracts";
 import { clip, itemText, latestCompletedTurn, plainTextPreview, relativeTime } from "./lib";
-import { resolveSemanticZoomMode, semanticContentScale, type SemanticZoomMode } from "./overview-zoom";
+import { CARD_WIDTH, CARD_HEIGHT, MIN_SCALE, MAX_SCALE, edgeCurve, fitSemanticCamera, resolveSemanticZoomMode, semanticGeometry, type SemanticZoomMode } from "./overview-zoom";
 
-const CARD_WIDTH = 294;
-const CARD_HEIGHT = 205;
-const MIN_SCALE = .08;
-const MAX_SCALE = 1.45;
 const WHEEL_COMMIT_DELAY_MS = 150;
 const CAMERA_ANIMATION_MS = 260;
 
@@ -94,6 +90,16 @@ export function Overview({ space, activeThreadId, threads, diffs, onCamera, onNo
     onNodePositionRef.current = onNodePosition;
   }, [onNodePosition]);
 
+  const syncEdges = useCallback((): void => {
+    for (const node of nodes) {
+      if (!node.parentThreadId) continue;
+      const edge = edges.current.get(node.threadId);
+      const parentPosition = positions.current.get(node.parentThreadId);
+      const nodePosition = positions.current.get(node.threadId);
+      if (edge && parentPosition && nodePosition) edge.setAttribute("d", edgeCurve(parentPosition, nodePosition, camera.current.scale, zoomMode.current));
+    }
+  }, [nodes]);
+
   const applyCamera = useCallback((next: CameraState): void => {
     camera.current = next;
     if (world.current) world.current.style.transform = cameraTransform(next);
@@ -108,19 +114,12 @@ export function Overview({ space, activeThreadId, threads, diffs, onCamera, onNo
     if (shell.current) {
       shell.current.dataset.zoomMode = nextMode;
       shell.current.style.setProperty("--camera-scale", next.scale.toFixed(4));
-      shell.current.style.setProperty("--semantic-scale", semanticContentScale(next.scale, nextMode).toFixed(4));
+      for (const [name, value] of Object.entries(semanticStyles(next.scale))) {
+        shell.current.style.setProperty(name, String(value));
+      }
     }
-  }, []);
-
-  const syncEdges = useCallback((): void => {
-    for (const node of nodes) {
-      if (!node.parentThreadId) continue;
-      const edge = edges.current.get(node.threadId);
-      const parentPosition = positions.current.get(node.parentThreadId);
-      const nodePosition = positions.current.get(node.threadId);
-      if (edge && parentPosition && nodePosition) edge.setAttribute("d", edgeCurve(parentPosition, nodePosition));
-    }
-  }, [nodes]);
+    syncEdges();
+  }, [syncEdges]);
 
   const applyNodePosition = useCallback((threadId: string, position: Point): void => {
     positions.current.set(threadId, position);
@@ -216,7 +215,7 @@ export function Overview({ space, activeThreadId, threads, diffs, onCamera, onNo
     if (untouchedInitialCamera && initializedSpace.current !== space.id) {
       initializedSpace.current = space.id;
       const frame = requestAnimationFrame(() => {
-        const fitted = fitCamera(nodes, viewport.current);
+        const fitted = fitCamera(nodes, viewport.current, zoomMode.current);
         applyCamera(fitted);
         onCameraRef.current(fitted);
       });
@@ -339,7 +338,7 @@ export function Overview({ space, activeThreadId, threads, diffs, onCamera, onNo
     data-zoom-mode={zoomMode.current}
     style={{
       "--camera-scale": camera.current.scale,
-      "--semantic-scale": semanticContentScale(camera.current.scale, zoomMode.current),
+      ...semanticStyles(camera.current.scale),
     } as CSSProperties}
   >
     <div className="overview-toolbar">
@@ -351,7 +350,7 @@ export function Overview({ space, activeThreadId, threads, diffs, onCamera, onNo
         <button aria-label="Zoom out" title="Zoom out" onClick={() => zoomAtCenter(camera.current.scale - .12)}>−</button>
         <span ref={zoomValue} aria-label={`Zoom ${Math.round(camera.current.scale * 100)} percent`}>{Math.round(camera.current.scale * 100)}%</span>
         <button aria-label="Zoom in" title="Zoom in" onClick={() => zoomAtCenter(camera.current.scale + .12)}>+</button>
-        <button className="fit-button" aria-label="Fit" title="Fit Overview" onClick={() => animateCamera(fitCamera(nodes, viewport.current))}>Fit</button>
+        <button className="fit-button" aria-label="Fit" title="Fit Overview" onClick={() => animateCamera(fitCamera(nodes, viewport.current, zoomMode.current))}>Fit</button>
       </div>
     </div>
     <div
@@ -376,7 +375,7 @@ export function Overview({ space, activeThreadId, threads, diffs, onCamera, onNo
               }}
               className={emphasizedPath.has(node.threadId) ? "active" : ""}
               key={node.threadId}
-              d={edgeCurve(parentPosition, nodePosition)}
+              d={edgeCurve(parentPosition, nodePosition, camera.current.scale, zoomMode.current)}
             />;
           })}
         </svg>
@@ -517,7 +516,7 @@ function OverviewCard({ cardRef, node, position, parent, thread, parentThread, d
       </div>
 
       <div className="card-compact" aria-hidden="true">
-        <div className="compact-heading"><i className={`status-dot ${primaryStatus.tone}`}/><strong>{node.title}</strong><span>{primaryStatus.label}</span></div>
+        <div className="compact-heading"><i className={`status-dot ${primaryStatus.tone}`}/><strong title={node.title}>{node.title}</strong><span>{primaryStatus.label}</span></div>
         {parent && <small>From {parent.title}</small>}
         <p>{clip(compactSummary, 110)}</p>
         <footer><span>{thread?.turns.length ?? 0} turns</span><i>·</i><span>{relativeTime(thread?.updatedAt ?? node.createdAt)}</span>{diff && <><i>·</i><span>{diff.changedFileCount} files</span></>}</footer>
@@ -525,32 +524,19 @@ function OverviewCard({ cardRef, node, position, parent, thread, parentThread, d
 
       <div className="card-map" aria-hidden="true">
         <i className={`status-dot ${primaryStatus.tone}`}/>
-        <strong>{node.title}</strong>
+        <strong title={node.title}>{node.title}</strong>
         {primaryStatus.tone !== "idle" && <span>{primaryStatus.label}</span>}
       </div>
     </div>
   </article>;
 }
 
-function fitCamera(nodes: SpaceNode[], viewport: HTMLDivElement | null): CameraState {
-  if (!viewport || nodes.length === 0) return { x: 120, y: 120, scale: 1 };
-  const xs = nodes.map((node) => node.position.x);
-  const ys = nodes.map((node) => node.position.y);
-  const minX = Math.min(...xs);
-  const minY = Math.min(...ys);
-  const maxX = Math.max(...xs) + CARD_WIDTH;
-  const maxY = Math.max(...ys) + CARD_HEIGHT;
-  const paddingX = Math.min(110, viewport.clientWidth * .1);
-  const paddingY = Math.min(105, viewport.clientHeight * .12);
-  const scale = Math.max(MIN_SCALE, Math.min(1, Math.min(
-    (viewport.clientWidth - paddingX * 2) / (maxX - minX),
-    (viewport.clientHeight - paddingY * 2) / (maxY - minY),
-  )));
-  return {
-    scale,
-    x: (viewport.clientWidth - (maxX - minX) * scale) / 2 - minX * scale,
-    y: (viewport.clientHeight - (maxY - minY) * scale) / 2 - minY * scale,
-  };
+function fitCamera(nodes: SpaceNode[], viewport: HTMLDivElement | null, previousMode: SemanticZoomMode): CameraState {
+  if (!viewport) return { x: 120, y: 120, scale: 1 };
+  return fitSemanticCamera(nodes.map((node) => node.position), {
+    width: viewport.clientWidth,
+    height: viewport.clientHeight,
+  }, previousMode);
 }
 
 function cameraAroundViewportCenter(current: CameraState, nextScale: number, viewport: HTMLDivElement | null): CameraState {
@@ -585,15 +571,6 @@ function graphBounds(nodes: SpaceNode[]): { minX: number; minY: number; width: n
   return { minX, minY, width: Math.max(1, maxX - minX), height: Math.max(1, maxY - minY) };
 }
 
-function edgeCurve(parent: Point, child: Point): string {
-  const x1 = parent.x + CARD_WIDTH;
-  const y1 = parent.y + CARD_HEIGHT / 2;
-  const x2 = child.x;
-  const y2 = child.y + CARD_HEIGHT / 2;
-  const bend = Math.max(50, (x2 - x1) / 2);
-  return `M ${x1} ${y1} C ${x1 + bend} ${y1}, ${x2 - bend} ${y2}, ${x2} ${y2}`;
-}
-
 function cameraTransform(camera: CameraState): string {
   return `translate3d(${camera.x}px, ${camera.y}px, 0) scale(${camera.scale})`;
 }
@@ -604,4 +581,15 @@ function nodeTransform(position: Point): string {
 
 function clamp(value: number, minimum: number, maximum: number): number {
   return Math.max(minimum, Math.min(maximum, value));
+}
+
+function semanticStyles(scale: number): CSSProperties {
+  const compact = semanticGeometry(scale, "compact");
+  const map = semanticGeometry(scale, "map");
+  return {
+    "--compact-scale": compact.contentScale,
+    "--compact-width": `${compact.width / compact.contentScale}px`,
+    "--map-scale": map.contentScale,
+    "--map-width": `${map.width / map.contentScale}px`,
+  } as CSSProperties;
 }

@@ -260,7 +260,8 @@ body {
 /* Overview shell */
 .overview-shell {
   --camera-scale: 1;
-  --semantic-scale: 1;
+  --compact-scale: 1;
+  --map-scale: 1;
   background: var(--canvas);
 }
 .overview-toolbar {
@@ -432,11 +433,12 @@ body {
   pointer-events: none;
   transform-origin: left center;
   will-change: opacity, transform, filter;
-  transition: opacity 170ms ease, filter 210ms ease, transform 250ms var(--ease-out), box-shadow 180ms ease;
+  transition: opacity 170ms ease, filter 210ms ease, box-shadow 180ms ease;
 }
 .card-compact {
-  width: 252px;
-  min-height: 108px;
+  width: var(--compact-width);
+  height: 148px;
+  overflow: hidden;
   display: flex;
   flex-direction: column;
   padding: 14px 15px 12px;
@@ -445,7 +447,7 @@ body {
   background: rgba(255,255,255,.985);
   box-shadow: 0 8px 28px rgba(0,0,0,.07), 0 1px 3px rgba(0,0,0,.03);
   filter: blur(2px);
-  transform: translateY(-50%) scale(var(--semantic-scale));
+  transform: translateY(-50%) scale(var(--compact-scale));
 }
 .compact-heading {
   min-width: 0;
@@ -492,8 +494,9 @@ body {
 .card-compact footer i { font-style: normal; }
 
 .card-map {
-  width: 220px;
+  width: var(--map-width);
   height: 38px;
+  overflow: hidden;
   display: flex;
   align-items: center;
   gap: 9px;
@@ -503,7 +506,7 @@ body {
   background: rgba(255,255,255,.98);
   box-shadow: 0 5px 18px rgba(0,0,0,.075), 0 1px 2px rgba(0,0,0,.03);
   filter: blur(2px);
-  transform: translateY(-50%) scale(var(--semantic-scale));
+  transform: translateY(-50%) scale(var(--map-scale));
 }
 .card-map strong {
   min-width: 0;
@@ -523,6 +526,7 @@ body {
 .overview-shell[data-zoom-mode="compact"] .overview-card-surface,
 .overview-shell[data-zoom-mode="map"] .overview-card-surface {
   border-color: transparent;
+  border-width: 0;
   background: transparent;
   box-shadow: none;
 }
@@ -589,3 +593,11 @@ body {
     --lineage-rail-width: 204px;
   }
 }
+
+/* Only the visible semantic surface participates in pointer hit testing. */
+.overview-shell[data-zoom-mode="compact"] .overview-card,
+.overview-shell[data-zoom-mode="map"] .overview-card { pointer-events: none; }
+.card-map .status-dot { flex: 0 0 7px; }
+.card-map strong { flex: 1 1 auto; }
+/* Status remains encoded by its dot; reserve narrow labels for their title. */
+.overview-shell[data-zoom-mode="map"] .card-map span { display: none; }

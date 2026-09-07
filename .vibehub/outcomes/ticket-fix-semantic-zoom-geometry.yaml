@@ -1,0 +1,18 @@
+{
+  "accepted_acceptance_ids": [
+    "bounded-surfaces",
+    "consistent-geometry",
+    "regression-proof"
+  ],
+  "closed_at": "2026-09-07T10:14:28.209959+00:00",
+  "evidence_ids": [
+    "semantic-geometry-regression",
+    "semantic-geometry-independent-closeout"
+  ],
+  "kind": "ticket_outcome",
+  "schema_version": 1,
+  "status": "successful",
+  "summary": "All three criteria accepted. Compact and map surfaces remain within stable card footprints, including crossfades; shared visible geometry drives edges and Fit without repositioning nodes. Independent review and final test/typecheck/build reruns passed; rendered regression artifacts and actual four-node saved-layout checks corroborate separated labels. No protected human acceptance criteria or direct dependents.",
+  "ticket_id": "ticket-fix-semantic-zoom-geometry",
+  "unresolved_acceptance_ids": []
+}
