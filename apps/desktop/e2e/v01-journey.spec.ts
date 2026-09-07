@@ -486,7 +486,9 @@ test("real Thread-first Fork loop, recovery surfaces, scale, and restart", async
   await page.waitForTimeout(500);
   const initialOverviewLayout = await page.locator(".overview-viewport").evaluate((viewport) => {
     const frame = viewport.getBoundingClientRect();
-    const cards = [...document.querySelectorAll<HTMLElement>(".overview-card")].map((card) => card.getBoundingClientRect());
+    const mode = document.querySelector<HTMLElement>(".overview-shell")!.dataset.zoomMode;
+    const surface = mode === "detail" ? ".overview-card-surface" : mode === "compact" ? ".card-compact" : ".card-map";
+    const cards = [...document.querySelectorAll<HTMLElement>(surface)].map((card) => card.getBoundingClientRect());
     const toolbar = document.querySelector<HTMLElement>(".overview-toolbar")!;
     const shell = document.querySelector<HTMLElement>(".overview-shell")!.getBoundingClientRect();
     return {
@@ -768,9 +770,13 @@ test("real Thread-first Fork loop, recovery surfaces, scale, and restart", async
   await app!.evaluate(({ BrowserWindow }) => BrowserWindow.getAllWindows()[0]?.setSize(1000, 720));
   await expect.poll(() => page.evaluate(() => window.innerWidth)).toBe(1000);
   await page.getByRole("button", { name: "Fit", exact: true }).click();
+  // Fit animates the camera for 260ms before its settled geometry is measurable.
+  await page.waitForTimeout(300);
   const narrowOverviewFit = await page.locator(".overview-viewport").evaluate((viewport) => {
     const frame = viewport.getBoundingClientRect();
-    const cards = [...document.querySelectorAll<HTMLElement>(".overview-card")].map((card) => card.getBoundingClientRect());
+    const mode = document.querySelector<HTMLElement>(".overview-shell")!.dataset.zoomMode;
+    const surface = mode === "detail" ? ".overview-card-surface" : mode === "compact" ? ".card-compact" : ".card-map";
+    const cards = [...document.querySelectorAll<HTMLElement>(surface)].map((card) => card.getBoundingClientRect());
     const controls = document.querySelector<HTMLElement>(".zoom-controls")!.getBoundingClientRect();
     return {
       pageFits: document.documentElement.scrollWidth === window.innerWidth,
@@ -803,14 +809,16 @@ test("real Thread-first Fork loop, recovery surfaces, scale, and restart", async
   app = null;
   await launch();
   await expect(page.locator(".overview-card")).toHaveCount(50);
-  await expect(page.getByText("Scale direction 45")).toBeAttached();
-  await expect(page.locator(".status-dot.failed")).toBeAttached();
+  await expect(page.locator(".overview-card h3").filter({ hasText: /^Scale direction 45$/ })).toBeAttached();
+  await expect(page.locator(".card-detail .status-dot.failed").first()).toBeAttached();
   await expect(page.locator(".overview-edges path")).toHaveCount(49);
   await page.getByRole("button", { name: "Fit", exact: true }).click();
-  await page.waitForTimeout(100);
+  await page.waitForTimeout(300);
   const fitResult = await page.locator(".overview-viewport").evaluate((viewport) => {
     const frame = viewport.getBoundingClientRect();
-    const cards = [...document.querySelectorAll<HTMLElement>(".overview-card")].map((card) => card.getBoundingClientRect());
+    const mode = document.querySelector<HTMLElement>(".overview-shell")!.dataset.zoomMode;
+    const surface = mode === "detail" ? ".overview-card-surface" : mode === "compact" ? ".card-compact" : ".card-map";
+    const cards = [...document.querySelectorAll<HTMLElement>(surface)].map((card) => card.getBoundingClientRect());
     const svg = document.querySelector<SVGSVGElement>(".overview-edges")!;
     const viewBox = svg.viewBox.baseVal;
     const pathsFit = [...svg.querySelectorAll("path")].every((path) => {

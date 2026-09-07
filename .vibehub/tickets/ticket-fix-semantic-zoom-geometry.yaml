@@ -1,0 +1,50 @@
+{
+  "acceptance": [
+    {
+      "acceptance_id": "bounded-surfaces",
+      "criterion": "At scales 0.08 through 1.45 and both hysteresis directions, compact/map surfaces fit inside their original 294x205 world-space footprint, so previously disjoint card rectangles stay disjoint. Long titles truncate inside their label with full title available on hover/focus entry, and compact content stays contained."
+    },
+    {
+      "acceptance_id": "consistent-geometry",
+      "criterion": "Fork edge endpoints use current visible card bounds during zoom and drag, Fit contains and centers visible surfaces, and zoom/Fit never emit node position updates."
+    },
+    {
+      "acceptance_id": "regression-proof",
+      "criterion": "Regression tests cover bounding and edge/Fit geometry at detail, compact, map and minimum zoom; desktop tests/typecheck/build pass and the live Electron preview visibly shows separated labels for the reported existing layout."
+    }
+  ],
+  "constraints": [
+    "Preserve persisted node positions and world-coordinate drag behavior; no automatic tidy or layout displacement.",
+    "Limit changes to Overview semantic geometry/styles and regression coverage on ui/peel-shell-semantic-zoom.",
+    "Preserve existing detailed card content, semantic mode hysteresis, real fork relations, and access to Focus."
+  ],
+  "context": "On PR #1 ui/peel-shell-semantic-zoom, Wayne reported overlapping map labels in a screenshot on 2026-09-07. semanticContentScale inversely scales 220px map and 252px compact surfaces while world positions shrink, allowing visible surfaces to exceed the original 294x205 world-space footprint. Edges still assume full detail width. Bound semantic surfaces to the original footprint, retain readable typography with ellipsis/title access, and use consistent visible geometry for edges and Fit. Do not automatically rearrange saved positions.",
+  "context_refs": [
+    {
+      "purpose": "Requires stable persisted positions and real fork edges.",
+      "ref": ".vibehub/rooms/product/contract-stable-spatial-layout.yaml"
+    },
+    {
+      "purpose": "Owns camera, position, edge, and Fit calculations.",
+      "ref": "apps/desktop/src/renderer/Overview.tsx"
+    },
+    {
+      "purpose": "Defines semantic thresholds and inverse scale.",
+      "ref": "apps/desktop/src/renderer/overview-zoom.ts"
+    },
+    {
+      "purpose": "Defines visible semantic layers and dimensions.",
+      "ref": "apps/desktop/src/renderer/polish.css"
+    }
+  ],
+  "kind": "ticket",
+  "maturity": "firm",
+  "outcome": "Overview semantic zoom stays within each original card footprint, keeps fork edges attached to the visible surfaces, and preserves saved node positions.",
+  "provenance_refs": [
+    "conversation:2026-09-07-overlapping-semantic-map-labels",
+    "https://github.com/waynewangyuxuan/Peel/pull/1"
+  ],
+  "relations": [],
+  "schema_version": 1,
+  "ticket_id": "ticket-fix-semantic-zoom-geometry"
+}

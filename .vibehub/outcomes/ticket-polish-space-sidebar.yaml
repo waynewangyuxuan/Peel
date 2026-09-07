@@ -1,0 +1,18 @@
+{
+  "accepted_acceptance_ids": [
+    "phase-brand",
+    "sidebar-craft",
+    "verified-preview"
+  ],
+  "closed_at": "2026-09-07T10:28:28.956742+00:00",
+  "evidence_ids": [
+    "sidebar-polish-verification",
+    "sidebar-polish-independent-closeout"
+  ],
+  "kind": "ticket_outcome",
+  "schema_version": 1,
+  "status": "successful",
+  "summary": "All three criteria accepted after independent code, test, original-brand equality and normal/narrow screenshot review. Sidebar and loading surfaces reuse the selected Phase identity; restrained hierarchy, selection semantics, visible focus, full-name access and bounded scrolling preserve navigation and dimensions. Recorded checks passed, including the unchanged isolated full-journey retry, and the live PR renderer preview is updated. The macOS-constrained normal screenshot height is documented and supported by stricter narrow-height coverage. No protected human criteria or unresolved implementation gaps.",
+  "ticket_id": "ticket-polish-space-sidebar",
+  "unresolved_acceptance_ids": []
+}

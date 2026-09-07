@@ -1,0 +1,24 @@
+{
+  "acceptance_ids": [
+    "bounded-surfaces",
+    "consistent-geometry",
+    "regression-proof"
+  ],
+  "evidence_id": "semantic-geometry-independent-closeout",
+  "kind": "ticket_evidence",
+  "origin": "agent",
+  "recorded_at": "2026-09-07T10:14:28.209959+00:00",
+  "refs": [
+    "apps/desktop/src/renderer/overview-zoom.ts",
+    "apps/desktop/src/renderer/Overview.tsx",
+    "apps/desktop/src/renderer/polish.css",
+    "apps/desktop/test/overview-zoom.test.ts",
+    "apps/desktop/e2e/semantic-geometry.spec.ts",
+    "docs/review/semantic-zoom/geometry-fix/map-separated.png",
+    "docs/review/semantic-zoom/geometry-fix/fit-separated.png",
+    "conversation:2026-09-07-independent-geometry-closeout-verification"
+  ],
+  "schema_version": 1,
+  "summary": "Independent closeout inspected the exact Ticket, implementation diff, semantic geometry unit and Electron tests, and existing journey adjustments. Identified transient outgoing compact-layer expansion; re-reviewed its correction to independent bounded per-layer CSS scale/width and animation-frame audit. Independently reran all 51 desktop tests in 11 files, typecheck, and complete native/renderer/main/preload build successfully after final changes. Retained Electron last-run status is passed with no failed tests. Inspected tracked map and Fit screenshots: synthetic labels are disjoint and fork endpoints attached. Independently compared the existing preview source state and final inspection copy: all saved node coordinates match, active layout has four nodes at camera scale 0.32, and every actual-layout map rectangle is disjoint (294 by 109.25 world units). Original-layout screenshot was inspected by executor and is referenced in its Evidence; closeout independently corroborated that observation through source-state geometry and retained rendered regression artifacts. No unresolved acceptance gaps found.",
+  "ticket_id": "ticket-fix-semantic-zoom-geometry"
+}

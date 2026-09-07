@@ -1,0 +1,25 @@
+{
+  "acceptance_ids": [
+    "phase-brand",
+    "sidebar-craft",
+    "verified-preview"
+  ],
+  "evidence_id": "sidebar-polish-independent-closeout",
+  "kind": "ticket_evidence",
+  "origin": "agent",
+  "recorded_at": "2026-09-07T10:28:28.956742+00:00",
+  "refs": [
+    "apps/desktop/src/renderer/Brand.tsx",
+    "apps/desktop/src/renderer/App.tsx",
+    "apps/desktop/src/renderer/polish.css",
+    "apps/desktop/src/renderer/styles.css",
+    "apps/desktop/e2e/sidebar-polish.spec.ts",
+    "docs/review/sidebar-polish/README.md",
+    "docs/review/sidebar-polish/sidebar-normal.png",
+    "docs/review/sidebar-polish/sidebar-narrow.png",
+    "conversation:2026-09-07-sidebar-independent-closeout"
+  ],
+  "schema_version": 1,
+  "summary": "Independent closeout read the exact Ticket and all Evidence, App/polish diff, complete Brand component, inherited sizing/focus/reduced-motion rules, and sidebar Electron test. Byte comparison confirms Brand.tsx exactly matches the previously accepted main-worktree component. Canonical paths, unique useId clip references, named/decorative semantics and inline-only branding are correct. Independently inspected retained normal/narrow screenshots: Phase logo is legible, selected row and neutral material hierarchy are clear, long labels truncate, and entry controls remain unobstructed. The 30-Space test directly measures 196/178px rails, 43px drag strip, bounded list scroll and stationary brand, ellipsis/title, Tab focus, Enter selection/aria-current, Search/New Chat and increased contrast. Larger requested 1440x960 capture is constrained by macOS to1440x949 as documented; the stricter1000x720 viewport and flex sizing corroborate the intended vertical behavior. Retained Electron last-run record reports passed with no failed tests. Executor build/unit/geometry checks and unchanged isolated successful full-journey retry are recorded in primary Evidence; inspected changes do not touch draft recovery, state schemas, Overview, packaging or shortcut handlers. No broad suite was rerun without a new concern. No material findings or unresolved criteria.",
+  "ticket_id": "ticket-polish-space-sidebar"
+}

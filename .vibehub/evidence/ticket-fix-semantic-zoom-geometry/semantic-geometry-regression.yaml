@@ -1,0 +1,24 @@
+{
+  "acceptance_ids": [
+    "bounded-surfaces",
+    "consistent-geometry",
+    "regression-proof"
+  ],
+  "evidence_id": "semantic-geometry-regression",
+  "kind": "ticket_evidence",
+  "recorded_at": "2026-09-07T10:12:17.586933+00:00",
+  "refs": [
+    "apps/desktop/src/renderer/overview-zoom.ts",
+    "apps/desktop/src/renderer/Overview.tsx",
+    "apps/desktop/src/renderer/polish.css",
+    "apps/desktop/test/overview-zoom.test.ts",
+    "apps/desktop/e2e/semantic-geometry.spec.ts",
+    "apps/desktop/e2e/v01-journey.spec.ts",
+    "docs/review/semantic-zoom/geometry-fix/map-separated.png",
+    "docs/review/semantic-zoom/geometry-fix/fit-separated.png",
+    "conversation:2026-09-07-live-peel-geometry-preview-32-percent-screenshot"
+  ],
+  "schema_version": 1,
+  "summary": "Verified the corrected worktree based on PR head 79fba77. Desktop unit suite passed 51 tests in 11 files, including disjoint footprint invariants across scales0.08–1.45 in both hysteresis directions, edge endpoints and centered Fit. Desktop typecheck/native/renderer/main/preload build passed after final per-layer geometry change. The semantic-geometry Electron journey passed in6.4s after that final change: actual rendered bounds and SVG screen endpoints checked through map/compact/detail, minimum8%, wheel zoom, Fit, drag (screen delta/current scale), saved-position invariance for other nodes, and keyboard Focus entry. A requestAnimationFrame audit found zero positive-opacity layer escapes during button and wheel transitions; separate compact/map CSS variables fix the independently discovered outgoing-layer expansion. The existing full v01 journey passed in38.9s (before the final isolated per-layer-variable correction) including50 nodes, recovery and restart; its Fit assertions now wait300ms for the260ms camera animation and inspect visible semantic surfaces, and title/status selectors identify the detailed layer. Non-private regression screenshots are retained. Final live visual inspection of a packaged app from this worktree using a fresh copy of the existing preview layout at32% showed all four existing labels separately with attached fork edges. Only camera/view mode were adjusted in that inspection copy; node coordinates were retained. The live screenshot is in this conversation, while tracked images are synthetic test fixtures. No source changes were made in main.",
+  "ticket_id": "ticket-fix-semantic-zoom-geometry"
+}
