@@ -1,0 +1,25 @@
+{
+  "acceptance_ids": [
+    "new-chat-default-title-transition",
+    "manual-space-name-precedence",
+    "title-origin-persistence",
+    "legacy-new-chat-repair"
+  ],
+  "evidence_id": "evidence-space-name-provenance-and-lifecycle",
+  "kind": "ticket_evidence",
+  "origin": "agent",
+  "recorded_at": "2026-09-17T21:15:22Z",
+  "refs": [
+    "apps/desktop/src/shared/contracts.ts",
+    "apps/desktop/src/shared/state.ts",
+    "apps/desktop/src/main/state-store.ts",
+    "apps/desktop/src/main/peel-service.ts",
+    "apps/desktop/src/renderer/App.tsx",
+    "apps/desktop/test/state.test.ts",
+    "apps/desktop/test/state-store.test.ts",
+    "apps/desktop/test/peel-service-new-chat.test.ts"
+  ],
+  "schema_version": 1,
+  "summary": "SpaceRecord now persists an explicit default/manual name origin. Directly created and imported Spaces begin default-owned; the first text prompt immediately gives the Root and default-owned Space the same deterministic temporary title, and completed automatic or later manual Root naming continues that synchronization. An explicit Space rename switches provenance to manual, after which automatic, manual, and notification-driven Root changes cannot overwrite it. StateStore merge derives every default-owned name from the winning merged Root title so stale renderer saves cannot roll it back, while a prior manual Space beats stale default state. Legacy normalization treats only an exact New Chat label as the former generated default, repairs it from a useful Root title, and preserves every other legacy label as manual.",
+  "ticket_id": "ticket-fix-new-chat-space-title-lifecycle"
+}

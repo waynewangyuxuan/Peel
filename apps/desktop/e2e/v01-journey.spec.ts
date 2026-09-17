@@ -383,7 +383,7 @@ test("real Thread-first Fork loop, recovery surfaces, scale, and restart", async
     return performance.now() - start;
   });
   expect(forkLatency).toBeLessThan(150);
-  await expect(page.getByRole("button", { name: "Branch from here" })).toHaveCount(2);
+  await expect(page.getByRole("button", { name: "Branch from here" })).toHaveCount(3);
   await expect(page.locator(".peel-handle, .peel-drag-preview")).toHaveCount(0);
   await page.locator(".fork-surface textarea").fill("Cancel this local-only direction");
   await page.waitForTimeout(250);
@@ -537,7 +537,7 @@ test("real Thread-first Fork loop, recovery surfaces, scale, and restart", async
   await expect(page.locator(".toast")).toHaveCount(0, { timeout: 5_000 });
   await page.screenshot({ path: join(desktopRoot, "test-results/ui-overview-2.png") });
   await renamedBranchCard.locator(".card-facts button").nth(1).click();
-  await expect(page.locator('.turn.highlighted[data-turn-id="turn-3"]')).toBeVisible();
+  await expect(page.locator('.turn.highlighted[data-turn-id="turn-4"]')).toBeVisible();
 
   const draft = page.getByLabel("Message");
   await draft.fill("This draft must survive restart");
@@ -743,15 +743,15 @@ test("real Thread-first Fork loop, recovery surfaces, scale, and restart", async
     element.dispatchEvent(new Event("scroll"));
   });
   await page.waitForTimeout(700);
-  await page.locator('.turn[data-turn-id="turn-3"] .turn-actions button').click();
+  await page.locator('.turn[data-turn-id="turn-4"] .turn-actions button').click();
   await page.locator(".fork-surface textarea").fill("Grandchild verifies exact long-turn return");
   await page.getByRole("button", { name: "Create & send" }).click();
   await expect(page.locator(".lineage-tree button")).toHaveCount(3);
   await page.locator(".branched-from").click();
-  const exactLongParentTurn = page.locator('.turn.highlighted[data-turn-id="turn-3"]');
+  const exactLongParentTurn = page.locator('.turn.highlighted[data-turn-id="turn-4"]');
   await expect(exactLongParentTurn).toBeVisible();
   await page.waitForTimeout(500);
-  const longParentTurn = page.locator('.turn[data-turn-id="turn-3"]');
+  const longParentTurn = page.locator('.turn[data-turn-id="turn-4"]');
   const exactReturn = await longParentTurn.evaluate((element) => {
     const bounds = element.getBoundingClientRect();
     const viewport = element.closest(".transcript")!.getBoundingClientRect();
@@ -784,7 +784,7 @@ test("real Thread-first Fork loop, recovery surfaces, scale, and restart", async
     [root.threadId]: { ...root, position: { x: 70, y: 270 } },
     [child.threadId]: { ...child, position: { x: 390, y: 115 } },
     [grandchild.threadId]: { ...grandchild, position: { x: 735, y: 40 }, title: "UI visual system", titleOrigin: "automatic", lastViewedTurnId: null },
-    "synthetic-demo-navigation": { ...root, threadId: "synthetic-demo-navigation", parentThreadId: child.threadId, forkedAtTurnId: "turn-3", createdAt: Date.now() + 2, position: { x: 735, y: 286 }, title: "Navigation and command palette", titleOrigin: "automatic", lastViewedTurnId: null },
+    "synthetic-demo-navigation": { ...root, threadId: "synthetic-demo-navigation", parentThreadId: child.threadId, forkedAtTurnId: "turn-4", createdAt: Date.now() + 2, position: { x: 735, y: 286 }, title: "Navigation and command palette", titleOrigin: "automatic", lastViewedTurnId: null },
     "synthetic-demo-backend": { ...root, threadId: "synthetic-demo-backend", parentThreadId: root.threadId, forkedAtTurnId: "turn-2", createdAt: Date.now() + 3, position: { x: 390, y: 505 }, title: "Codex backend integration", titleOrigin: "automatic", lastViewedTurnId: null },
     "synthetic-demo-worktree": { ...root, threadId: "synthetic-demo-worktree", parentThreadId: "synthetic-demo-backend", forkedAtTurnId: "turn-2", createdAt: Date.now() + 4, position: { x: 735, y: 535 }, title: "Isolated worktree direction", titleOrigin: "automatic", lastViewedTurnId: null },
   };

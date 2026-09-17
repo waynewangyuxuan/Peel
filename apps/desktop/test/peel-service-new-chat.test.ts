@@ -5,6 +5,7 @@ import { join } from "node:path";
 import { afterEach, describe, expect, it, vi } from "vitest";
 
 import { PeelService } from "../src/main/peel-service";
+import { automaticTitle, temporaryTitle } from "../src/shared/state";
 
 const directories: string[] = [];
 
@@ -84,5 +85,69 @@ describe("PeelService new Chat entry", () => {
     const state = await service.bootstrap();
     expect(state.state.activeSpaceId).toBeNull();
     expect(state.state.spaces).toEqual({});
+  });
+
+  it("moves a default Space through temporary, automatic, and manual Root titles", async () => {
+    const directory = await mkdtemp(join(tmpdir(), "peel-new-chat-title-test-"));
+    directories.push(directory);
+    const service = new PeelService(directory);
+    const thread = emptyThread("fresh-title-thread", "/repo/current");
+    vi.spyOn(service.client, "searchThreads").mockResolvedValue(noThreads());
+    vi.spyOn(service.client, "startThread").mockResolvedValue({ thread } as never);
+    vi.spyOn(service.client, "startTurn").mockResolvedValue("turn-first");
+    const setThreadName = vi.spyOn(service.client, "setThreadName").mockResolvedValue(undefined);
+    service.transport.emit("ready", {});
+    const created = await service.startNewChat({ cwd: thread.cwd });
+    const spaceId = created.activeSpaceId!;
+    const prompt = "Plan resilient sidebar titles carefully. Then verify restart.";
+
+    await service.sendTurn({ threadId: thread.id, cwd: thread.cwd, input: [{ type: "text", text: prompt, text_elements: [] }] });
+    let stored = (await service.bootstrap()).state.spaces[spaceId]!;
+    expect(stored.nodes[thread.id]).toMatchObject({ title: temporaryTitle(prompt, "New Chat"), titleOrigin: "temporary" });
+    expect(stored).toMatchObject({ name: temporaryTitle(prompt, "New Chat"), nameOrigin: "default" });
+
+    service.client.emit("notification", { method: "turn/completed", params: { threadId: thread.id, turn: { id: "turn-first" } } } as never);
+    await vi.waitFor(async () => {
+      stored = (await service.bootstrap()).state.spaces[spaceId]!;
+      expect(stored.nodes[thread.id]).toMatchObject({ title: automaticTitle(prompt), titleOrigin: "automatic" });
+      expect(stored.name).toBe(automaticTitle(prompt));
+    });
+    expect(setThreadName).toHaveBeenCalledWith(thread.id, automaticTitle(prompt));
+
+    await service.setThreadName(thread.id, "Manual Root title", spaceId);
+    stored = (await service.bootstrap()).state.spaces[spaceId]!;
+    expect(stored.nodes[thread.id]).toMatchObject({ title: "Manual Root title", titleOrigin: "manual" });
+    expect(stored).toMatchObject({ name: "Manual Root title", nameOrigin: "default" });
+  });
+
+  it("never lets later Root naming overwrite a manually renamed Space", async () => {
+    const directory = await mkdtemp(join(tmpdir(), "peel-manual-space-title-test-"));
+    directories.push(directory);
+    const service = new PeelService(directory);
+    const thread = emptyThread("protected-title-thread", "/repo/current");
+    vi.spyOn(service.client, "searchThreads").mockResolvedValue(noThreads());
+    vi.spyOn(service.client, "startThread").mockResolvedValue({ thread } as never);
+    vi.spyOn(service.client, "startTurn").mockResolvedValue("turn-protected");
+    vi.spyOn(service.client, "setThreadName").mockResolvedValue(undefined);
+    service.transport.emit("ready", {});
+    const created = await service.startNewChat({ cwd: thread.cwd });
+    const spaceId = created.activeSpaceId!;
+    const protectedState = structuredClone(created);
+    protectedState.spaces[spaceId]!.name = "My protected Space";
+    protectedState.spaces[spaceId]!.nameOrigin = "manual";
+    await service.saveState(protectedState);
+    const prompt = "Generate an automatic Root title. Keep the Space name.";
+
+    await service.sendTurn({ threadId: thread.id, cwd: thread.cwd, input: [{ type: "text", text: prompt, text_elements: [] }] });
+    expect((await service.bootstrap()).state.spaces[spaceId]).toMatchObject({ name: "My protected Space", nameOrigin: "manual" });
+    service.client.emit("notification", { method: "turn/completed", params: { threadId: thread.id, turn: { id: "turn-protected" } } } as never);
+    await vi.waitFor(async () => {
+      const stored = (await service.bootstrap()).state.spaces[spaceId]!;
+      expect(stored.nodes[thread.id]?.titleOrigin).toBe("automatic");
+      expect(stored.name).toBe("My protected Space");
+    });
+
+    await service.setThreadName(thread.id, "Later manual Root title", spaceId);
+    expect((await service.bootstrap()).state.spaces[spaceId]).toMatchObject({ name: "My protected Space", nameOrigin: "manual" });
   });
 });

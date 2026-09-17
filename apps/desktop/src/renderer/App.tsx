@@ -4,7 +4,7 @@ import { useCallback, useEffect, useMemo, useRef, useState, type ReactNode } fro
 import { flushSync } from "react-dom";
 
 import { THREAD_SEARCH_CACHE_TTL_MS, type ForkDraft, type PeelState, type Point, type SpaceNode, type SpaceRecord, type ThreadSnapshot } from "../shared/contracts";
-import { emptyState, suggestedChildPosition } from "../shared/state";
+import { emptyState, suggestedChildPosition, temporaryTitle } from "../shared/state";
 import { ForkComposer, Transcript } from "./Transcript";
 import { Overview } from "./Overview";
 import { BrandMark, PeelBrand } from "./Brand";
@@ -83,6 +83,7 @@ export function App(): ReactNode {
             if (!node || node.titleOrigin === "manual") continue;
             node.title = params.name as string;
             node.titleOrigin = "automatic";
+            if (space.rootThreadId === threadId && space.nameOrigin === "default") space.name = node.title;
           }
         }, 0);
       }
@@ -267,7 +268,16 @@ export function App(): ReactNode {
   const send = async (inputs: UserInput[]): Promise<void> => {
     if (!activeNode) return;
     await window.peel.sendTurn({ threadId: activeNode.threadId, input: inputs, cwd: activeNode.cwd });
-    mutate((draft) => { draft.threadViews[activeNode.threadId] = { draft: "", scrollTop: draft.threadViews[activeNode.threadId]?.scrollTop ?? 0 }; }, 0);
+    const prompt = inputs.find((input) => input.type === "text")?.text;
+    mutate((draft) => {
+      draft.threadViews[activeNode.threadId] = { draft: "", scrollTop: draft.threadViews[activeNode.threadId]?.scrollTop ?? 0 };
+      const space = draft.activeSpaceId ? draft.spaces[draft.activeSpaceId] : null;
+      const node = space?.nodes[activeNode.threadId];
+      if (!space || !node || node.titleOrigin !== "temporary" || !prompt?.trim()) return;
+      node.title = temporaryTitle(prompt, "New Chat");
+      if (space.rootThreadId === node.threadId && space.nameOrigin === "default") space.name = node.title;
+      space.updatedAt = Date.now();
+    }, 0);
   };
 
   const currentDraft = activeNode ? state.threadViews[activeNode.threadId]?.draft ?? "" : "";
@@ -280,6 +290,8 @@ export function App(): ReactNode {
       if (!node) return;
       node.title = name;
       node.titleOrigin = "manual";
+      const space = draft.spaces[spaceId]!;
+      if (space.rootThreadId === threadId && space.nameOrigin === "default") space.name = name;
     }, 0);
   };
   const openCodex = async (node: Pick<SpaceNode, "cwd" | "threadId">): Promise<void> => {
@@ -307,7 +319,7 @@ export function App(): ReactNode {
           mode={state.viewMode}
           connected={connected}
           onMode={(mode) => mutate((draft) => { draft.viewMode = mode; }, 0)}
-          onRenameSpace={(name) => mutate((draft) => { const target = draft.spaces[activeSpace.id]; if (target) { target.name = name; target.updatedAt = Date.now(); } }, 0)}
+          onRenameSpace={(name) => mutate((draft) => { const target = draft.spaces[activeSpace.id]; if (target) { target.name = name; target.nameOrigin = "manual"; target.updatedAt = Date.now(); } }, 0)}
           onArchive={() => mutate((draft) => {
             draft.spaces[activeSpace.id]!.archived = true;
             const next = Object.values(draft.spaces).find((space) => !space.archived && space.id !== activeSpace.id);

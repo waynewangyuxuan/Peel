@@ -10,6 +10,7 @@ import type { WorkspaceContext, WorkspaceDiffSummary } from "@peel/git-workspace
 
 export type ViewMode = "focus" | "overview";
 export type TitleOrigin = "temporary" | "automatic" | "manual";
+export type SpaceNameOrigin = "default" | "manual";
 export type NodeStatus = "idle" | "active" | "waiting" | "error";
 
 export interface Point {
@@ -37,6 +38,7 @@ export interface SpaceNode {
 export interface SpaceRecord {
   id: string;
   name: string;
+  nameOrigin: SpaceNameOrigin;
   rootThreadId: string;
   archived: boolean;
   createdAt: number;

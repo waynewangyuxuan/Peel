@@ -26,7 +26,7 @@ import {
   type StartSpaceInput,
   type ThreadSnapshot,
 } from "../shared/contracts";
-import { automaticTitle, createSpace } from "../shared/state";
+import { automaticTitle, createSpace, temporaryTitle } from "../shared/state";
 import { StateStore } from "./state-store";
 import { RealtimeDictationService } from "./realtime-dictation-service";
 
@@ -173,7 +173,10 @@ export class PeelService extends EventEmitter {
   async startSpace(input: StartSpaceInput): Promise<PeelState> {
     const thread = await this.client.readThread(input.threadId, true);
     const space = createSpace(thread);
-    if (input.name?.trim()) space.name = input.name.trim();
+    if (input.name?.trim()) {
+      space.name = input.name.trim();
+      space.nameOrigin = "manual";
+    }
     return await this.#store.mutate((state) => {
       state.spaces[space.id] = space;
       state.activeSpaceId = space.id;
@@ -203,10 +206,25 @@ export class PeelService extends EventEmitter {
       throw error;
     }
     const state = await this.#store.load();
-    const node = Object.values(state.spaces).flatMap((space) => Object.values(space.nodes)).find((candidate) => candidate.threadId === input.threadId);
+    const space = Object.values(state.spaces).find((candidate) => candidate.nodes[input.threadId]);
+    const node = space?.nodes[input.threadId];
     const prompt = input.input.find((candidate) => candidate.type === "text")?.text;
     if (node?.titleOrigin === "temporary" && prompt?.trim()) {
       this.#automaticTitles.set(input.threadId, { prompt, firstTurnId: turnId });
+      const title = temporaryTitle(prompt, "New Chat");
+      try {
+        await this.#store.mutate((latest) => {
+          const target = space ? latest.spaces[space.id] : null;
+          const current = target?.nodes[input.threadId];
+          if (!target || !current || current.titleOrigin !== "temporary") return latest;
+          current.title = title;
+          if (target.rootThreadId === input.threadId && target.nameOrigin === "default") target.name = title;
+          target.updatedAt = Date.now();
+          return latest;
+        });
+      } catch (error) {
+        this.emit("titleError", { threadId: input.threadId, error: messageOf(error) });
+      }
     }
     return { turnId };
   }
@@ -359,7 +377,9 @@ export class PeelService extends EventEmitter {
         if (!node) throw new Error("Thread is not in the selected Space");
         node.title = normalized;
         node.titleOrigin = "manual";
-        state.spaces[spaceId]!.updatedAt = Date.now();
+        const space = state.spaces[spaceId]!;
+        if (space.rootThreadId === threadId && space.nameOrigin === "default") space.name = normalized;
+        space.updatedAt = Date.now();
         return state;
       });
     });
@@ -394,6 +414,9 @@ export class PeelService extends EventEmitter {
           if (current?.titleOrigin === "temporary") {
             current.title = title;
             current.titleOrigin = "automatic";
+            const target = latest.spaces[space.id]!;
+            if (target.rootThreadId === threadId && target.nameOrigin === "default") target.name = title;
+            target.updatedAt = Date.now();
           }
           return latest;
         });

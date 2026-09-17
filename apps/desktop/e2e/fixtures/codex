@@ -280,7 +280,7 @@ function restoreTestChild(threadId) {
     parentThreadId: root.id,
     createdAt: now,
     updatedAt: now,
-    turns: [...structuredClone(root.turns), turn("turn-3", "Try a compact navigation direction", "A streamed result for this direction.")],
+    turns: [...structuredClone(root.turns), turn("turn-4", "Try a compact navigation direction", "A streamed result for this direction.")],
   };
   threads.set(threadId, child);
   return child;

@@ -70,4 +70,35 @@ describe("StateStore", () => {
     expect(restored.spaces[space.id]!.nodes.root).toMatchObject({ title: "Manual root", titleOrigin: "manual" });
     expect(restored.threadViews.root).toEqual({ draft: "new local draft", scrollTop: 40 });
   });
+
+  it("keeps default Space names on the merged Root title and protects manual Space names from stale saves", async () => {
+    const directory = await mkdtemp(join(tmpdir(), "peel-space-name-merge-test-"));
+    directories.push(directory);
+    const store = new StateStore(directory);
+    const initial = emptyState();
+    const space = createSpace({ id: "root", name: null, preview: "", cwd: "/repo", createdAt: 1 });
+    initial.spaces[space.id] = space;
+    initial.activeSpaceId = space.id;
+    initial.activeThreadId = space.rootThreadId;
+    await store.save(initial);
+    const staleDefault = structuredClone(initial);
+
+    await store.mutate((state) => {
+      const current = state.spaces[space.id]!;
+      current.nodes.root!.title = "Automatic Root title";
+      current.nodes.root!.titleOrigin = "automatic";
+      current.name = "Automatic Root title";
+    });
+    await store.save(staleDefault);
+    expect((await store.load()).spaces[space.id]).toMatchObject({ name: "Automatic Root title", nameOrigin: "default" });
+
+    const staleFollowing = structuredClone(await store.load());
+    await store.mutate((state) => {
+      const current = state.spaces[space.id]!;
+      current.name = "My protected Space";
+      current.nameOrigin = "manual";
+    });
+    await store.save(staleFollowing);
+    expect((await store.load()).spaces[space.id]).toMatchObject({ name: "My protected Space", nameOrigin: "manual" });
+  });
 });
