@@ -1,0 +1,52 @@
+{
+  "acceptance": [
+    {
+      "acceptance_id": "unclipped-display-glyphs",
+      "criterion": "The exact reported Q_h=XW_h^Q, K_h=XW_h^K, V_h=XW_h^V display expression renders every base, subscript, superscript, comma, and italic overhang fully inside its scroll container at normal and narrow supported Focus widths, with horizontal containment but no vertical clipping."
+    },
+    {
+      "acceptance_id": "cjk-script-layout",
+      "criterion": "The exact reported 苹果/外卖 and 外卖/公司 display expressions render CJK subscripts visibly below their q/k bases, superscripts visibly above, with no glyph collision or false same-baseline reading; CJK fallback type remains legible and proportionate to Latin math scripts."
+    },
+    {
+      "acceptance_id": "math-layout-regression-evidence",
+      "criterion": "Automated DOM-geometry and screenshot evidence renders the exact formulas through Peel's production Markdown and CSS path, proves formula glyph bounds are contained and CJK base/subscript/superscript boxes are separated at normal and narrow widths, and retains existing safe parsing, MathML accessibility, streaming, copy, code isolation, and page-width regression tests."
+    }
+  ],
+  "constraints": [
+    "Keep raw HTML disabled, KaTeX trust false, and the existing accessible HTML plus MathML output.",
+    "Do not replace semantic TeX scripts with screenshot-like hard-coded markup or formula-specific string rewrites.",
+    "Preserve local horizontal scrolling for genuinely wide display math without allowing page-level overflow."
+  ],
+  "context": "Live dogfood after safe KaTeX support found two exact layout regressions. The display expression Q_h=XW_h^Q, K_h=XW_h^K, V_h=XW_h^V visibly clips a superscript glyph because Peel's horizontally scrollable display container also hides vertical overflow with only two pixels of top padding. The display expressions q_{\\text{苹果}}^{(1)}·k_{\\text{外卖}}^{(1)} and q_{\\text{外卖}}^{(2)}·k_{\\text{公司}}^{(2)} use KaTeX's unstyled cjk_fallback spans; browser fallback font metrics make the CJK subscripts collide with the base symbols and read at the wrong visual scale. The exact source was recovered from the local Codex session records corresponding to the reported screenshots.",
+  "context_refs": [
+    {
+      "purpose": "Defines the safe Focus math fidelity and raw-HTML boundary this layout correction must preserve.",
+      "ref": ".vibehub/rooms/product/constraint-focus-math-typesetting.yaml"
+    },
+    {
+      "purpose": "Provides the accepted KaTeX baseline and safety/streaming behaviors this follow-up must not regress.",
+      "ref": ".vibehub/outcomes/ticket-fix-focus-math-and-branch-affordance.yaml"
+    },
+    {
+      "purpose": "Owns the production remark-math and rehype-katex rendering path.",
+      "ref": "apps/desktop/src/renderer/Markdown.tsx"
+    },
+    {
+      "purpose": "Owns the current display overflow and KaTeX presentation rules causing the reported layout failures.",
+      "ref": "apps/desktop/src/renderer/styles.css"
+    }
+  ],
+  "deliveries": [],
+  "kind": "ticket",
+  "maturity": "firm",
+  "outcome": "Focus math preserves complete Latin glyphs and produces collision-free, legible CJK subscripts and superscripts for real Codex formulas at supported desktop widths.",
+  "provenance_refs": [
+    "conversation:2026-09-17-live-dogfood-math-glyph-clipping#image-1",
+    "conversation:2026-09-17-live-dogfood-math-cjk-script-layout#image-2",
+    "local-session:01a0adcc-b7ba-79f1-b30e-a396f29afcb1"
+  ],
+  "relations": [],
+  "schema_version": 2,
+  "ticket_id": "ticket-fix-display-math-clipping-and-cjk-scripts"
+}

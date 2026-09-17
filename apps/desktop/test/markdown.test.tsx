@@ -108,6 +108,20 @@ const safe = true;
     expect(html).toContain("Attention");
   });
 
+  it("keeps the exact reported Latin and CJK script formulas semantic", () => {
+    const html = renderToStaticMarkup(<MarkdownContent text={String.raw`\[
+Q_h=XW_h^Q,\qquad K_h=XW_h^K,\qquad V_h=XW_h^V
+\]
+
+\[
+q_{\text{苹果}}^{(1)}\cdot k_{\text{外卖}}^{(1)}
+\]`}/>);
+    expect(html.match(/class="katex-display"/g)).toHaveLength(2);
+    expect(html).toContain("class=\"mord cjk_fallback mtight\"");
+    expect(html).toContain("<mtext>苹果</mtext>");
+    expect(html).toContain("<annotation encoding=\"application/x-tex\">Q_h=XW_h^Q");
+  });
+
   it("keeps incomplete streamed math readable and never parses code or trusted HTML commands as math markup", () => {
     const incomplete = String.raw`Before \[ \frac{QK^\top}{\sqrt{d_k}}`;
     expect(normalizeMathDelimiters(incomplete)).toBe(incomplete);
