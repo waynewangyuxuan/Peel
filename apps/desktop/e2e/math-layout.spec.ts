@@ -33,7 +33,7 @@ test("real display math keeps Latin glyphs and CJK scripts separated", async ({}
     await expect(formulas).toHaveCount(4);
 
     for (const size of [
-      { name: "normal", width: 1440, height: 960 },
+      { name: "normal", width: 1400, height: 900 },
       { name: "narrow", width: 1000, height: 720 },
     ]) {
       await setContentSize(app, size.width, size.height);

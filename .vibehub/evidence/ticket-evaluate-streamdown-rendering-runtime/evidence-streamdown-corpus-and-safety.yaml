@@ -1,0 +1,24 @@
+{
+  "acceptance_ids": [
+    "production-shaped-renderer-corpus",
+    "safe-streamdown-prototype",
+    "peel-semantics-compatibility"
+  ],
+  "evidence_id": "evidence-streamdown-corpus-and-safety",
+  "kind": "ticket_evidence",
+  "origin": "agent",
+  "recorded_at": "2026-09-17T23:20:04Z",
+  "refs": [
+    "apps/desktop/src/renderer/rendering-benchmark-corpus.ts",
+    "apps/desktop/src/renderer/StreamdownPrototype.tsx",
+    "apps/desktop/src/renderer/RenderingBenchmark.tsx",
+    "apps/desktop/e2e/rendering-performance.spec.ts",
+    "apps/desktop/e2e/math-layout.spec.ts",
+    "docs/review/rendering-performance/README.md",
+    "command:npm run benchmark:rendering --workspace @peel/desktop passed 1/1 production Electron comparison",
+    "command:npx playwright test e2e/math-layout.spec.ts --config playwright.config.ts passed 1/1"
+  ],
+  "schema_version": 1,
+  "summary": "A checked-in eight-section corpus and synthetic 10/100/500-Turn generator exercise complete and partial Markdown, both reported CJK/math formulas, prose structures, hardened links, citation-shaped content, short/diff/160-line code, unsafe HTML, remote and embedded images, bidi/CJK, malformed input, large technical output, and a response over 200,000 characters. The isolated Streamdown 2.5.0 adapter normalizes Codex math, enables math/CJK plugins, keeps raw HTML disabled, converts remote Markdown images to click-only links, restores only strict base64 image data, hardens links, provides local code overflow and exact copy, bounds over-200k content with readable selectable text, and catches message-local renderer failures. Production Electron assertions passed: 8 corpus cases, 3 unclipped semantic KaTeX blocks, exact visible/copied code, zero remote image fetches, no script or handler execution, no page overflow, readable partial input, safe link attributes, embedded image preservation, size fallback, and error fallback. The prototype remains behind a benchmark-only dynamic route and never enters Transcript, so Codex Thread/Turn/ThreadItem, approvals, requests, Activity, attachments, unknown items, Branch anchors, Draft, Scroll, Space, and lineage remain Peel-owned and authoritative. The existing normal-Focus math geometry test also passed at screen-safe normal and narrow viewports.",
+  "ticket_id": "ticket-evaluate-streamdown-rendering-runtime"
+}

@@ -26,6 +26,7 @@ const configuredVoiceHelper = process.env.PEEL_VOICE_HELPER || argumentValue("--
 const configuredStateFailureMarker = process.env.PEEL_TEST_STATE_FAILURE_MARKER || argumentValue("--peel-test-state-failure-marker");
 const configuredTmpdir = argumentValue("--peel-test-tmpdir");
 const quitAfterVoiceVerification = process.argv.includes("--peel-test-quit-after-voice");
+if (process.env.PEEL_RENDERING_BENCHMARK === "1") app.commandLine.appendSwitch("enable-precise-memory-info");
 if (configuredUserDataPath) app.setPath("userData", configuredUserDataPath);
 if (configuredTmpdir) process.env.TMPDIR = configuredTmpdir;
 let window: BrowserWindow | null = null;
@@ -46,7 +47,9 @@ function argumentValue(name: string): string | undefined {
 
 function rendererUrl(): string {
   const development = process.env.PEEL_RENDERER_URL;
-  return development || `file://${join(appRoot(), "dist/renderer/index.html")}`;
+  const url = new URL(development || `file://${join(appRoot(), "dist/renderer/index.html")}`);
+  if (process.env.PEEL_RENDERING_BENCHMARK === "1") url.searchParams.set("rendering-benchmark", "1");
+  return url.toString();
 }
 
 async function createWindow(): Promise<void> {
