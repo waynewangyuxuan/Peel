@@ -1,0 +1,62 @@
+{
+  "acceptance": [
+    {
+      "acceptance_id": "safe-math-typesetting",
+      "criterion": "Completed assistant, user, Reasoning, Subagent, and error prose renders common inline and display math delimiters used by Codex, including the reported Attention expression with \\mathrm, \\frac, superscripts, and \\sqrt, as semantic accessible math instead of visible LaTeX control syntax; raw HTML and unsafe URL/content execution remain disabled."
+    },
+    {
+      "acceptance_id": "streaming-and-copy-fidelity",
+      "criterion": "Incomplete streamed math remains readable without breaking surrounding Markdown or causing page-width overflow, and completed math preserves selectable/copyable source meaning while headings, tables, blockquotes, links, fenced code, and existing streaming projection behavior remain intact."
+    },
+    {
+      "acceptance_id": "single-persistent-branch-action",
+      "criterion": "A completed Turn renders exactly one branch affordance: a keyboard-accessible button labeled Branch from here at the Turn footer. The circular PeelHandle and its drag preview are absent from the DOM and stylesheet, and the footer action is visible without hover or focus at supported desktop widths."
+    },
+    {
+      "acceptance_id": "branch-behavior-preserved",
+      "criterion": "Activating Branch from here still opens the same cancellable local Fork Draft anchored to the exact completed Turn, preserves the no-durable-state-before-First-Send contract, and behaves correctly for long responses, multiple Turns, keyboard activation, and narrow supported windows."
+    },
+    {
+      "acceptance_id": "focus-regression-evidence",
+      "criterion": "Automated unit and production Electron evidence covers the reported formula, safe-content rejection, incomplete streaming math, persistent branch visibility, absence of the duplicate circular handle, exact-Turn Fork Draft creation, and retention of the existing Focus Markdown, Activity, scroll, draft, Voice, Approval, and Overview journeys."
+    }
+  ],
+  "constraints": [
+    "Use a maintained math AST/typesetting path compatible with the existing safe ReactMarkdown renderer; do not enable raw HTML, arbitrary script execution, or remote interactive embeds.",
+    "Do not reinterpret Command output, patches, diffs, or unknown machine facts as prose math.",
+    "Keep Branch from here visually clear but subordinate to conversation content; do not introduce another gesture-only or duplicate branch control.",
+    "Preserve the exact completed-Turn anchor and existing Fork lifecycle semantics."
+  ],
+  "context": "Live dogfood exposed two Focus fidelity defects in the same completed-response surface: LaTeX display math leaks as literal control syntax, and the branch action is split between a hidden text action and an unlabeled circular handle positioned halfway through long Turns. The user selected the final interaction: remove the circle and make Branch from here persistent and more visible.",
+  "context_refs": [
+    {
+      "purpose": "Captures the reported raw-LaTeX failure and the required safe math boundary.",
+      "ref": ".vibehub/rooms/product/constraint-focus-math-typesetting.yaml"
+    },
+    {
+      "purpose": "Records the user's final decision to remove the circle and keep one visible Turn-footer action.",
+      "ref": ".vibehub/rooms/product/decision-turn-branch-action-placement.yaml"
+    },
+    {
+      "purpose": "Preserves the complete Focus reading, streaming, selection, and fallback contract.",
+      "ref": ".vibehub/rooms/product/contract-focus-chat-fidelity.yaml"
+    },
+    {
+      "purpose": "Provides the completed safe Markdown and streaming baseline that this correction must retain.",
+      "ref": ".vibehub/outcomes/ticket-rebuild-chat-reading-surface.yaml"
+    }
+  ],
+  "deliveries": [],
+  "kind": "ticket",
+  "maturity": "firm",
+  "outcome": "Focus Chat safely typesets common Codex math and exposes one clear, persistent Branch from here action at the completed Turn boundary.",
+  "provenance_refs": [
+    "conversation:2026-09-16-live-dogfood-chat-performance-and-focus-affordances#image-1-math",
+    "apps/desktop/src/renderer/Markdown.tsx",
+    "apps/desktop/src/renderer/Transcript.tsx",
+    "apps/desktop/src/renderer/styles.css"
+  ],
+  "relations": [],
+  "schema_version": 2,
+  "ticket_id": "ticket-fix-focus-math-and-branch-affordance"
+}

@@ -41,6 +41,7 @@
   "kind": "ticket",
   "maturity": "firm",
   "outcome": "Peel treats local main as the immutable default Git baseline for lightweight Diff and New Worktree creation, independently of the active Ticket branch.",
+  "deliveries": [],
   "provenance_refs": [
     "conversation:2026-08-26-main-diff-baseline-correction"
   ],
@@ -56,6 +57,6 @@
       "type": "depends_on"
     }
   ],
-  "schema_version": 1,
+  "schema_version": 2,
   "ticket_id": "ticket-fix-main-git-baseline"
 }

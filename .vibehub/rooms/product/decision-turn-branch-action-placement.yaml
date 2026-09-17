@@ -1,0 +1,42 @@
+{
+  "context_id": "decision-turn-branch-action-placement",
+  "detail": "完成 Turn 不再同时提供中部圆形拖拽 handle 与底部文字按钮。圆形 handle 容易被误认为无语义装饰，并因相对整个 Turn 使用 top:50% 而落在长回复正文中间。唯一主入口应是 Turn 底部的 Branch from here；它始终可见、键盘可达，并通过清晰但克制的视觉层级让用户发现分支能力。",
+  "evidence": [
+    {
+      "note": "每个 completed Turn 当前同时渲染 turn-actions 中的 Branch from here 与 PeelHandle。",
+      "ref": "apps/desktop/src/renderer/Transcript.tsx"
+    },
+    {
+      "note": "PeelHandle 使用 absolute top:50%，而 turn-actions 默认 opacity:0，仅在 hover/focus-within 时显示。",
+      "ref": "apps/desktop/src/renderer/styles.css"
+    }
+  ],
+  "kind": "context",
+  "relations": [
+    {
+      "target_context_id": "contract-focus-chat-fidelity",
+      "type": "relates_to"
+    },
+    {
+      "target_context_id": "contract-fork-creation-lifecycle",
+      "type": "relates_to"
+    }
+  ],
+  "schema_version": 1,
+  "source": {
+    "captured_at": "2026-09-17T05:44:26Z",
+    "quote": "圆可以移除，但是让branch from here 更加明显，并且常驻。",
+    "ref": "conversation:2026-09-16-live-dogfood-chat-performance-and-focus-affordances"
+  },
+  "state": "active",
+  "summary": "移除 Turn 中部圆形 Peel handle，Branch from here 在 Turn 底部常驻且更醒目",
+  "tags": [
+    "dogfood",
+    "focus",
+    "fork",
+    "branch",
+    "affordance",
+    "interaction"
+  ],
+  "type": "decision"
+}

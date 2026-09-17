@@ -1,0 +1,22 @@
+{
+  "accepted_acceptance_ids": [
+    "authoritative-content-inventory",
+    "renderer-route-matrix",
+    "prose-format-and-media-matrix",
+    "security-accessibility-performance-review",
+    "evidence-backed-gap-prioritization",
+    "smallest-follow-up-ticket-plan"
+  ],
+  "closed_at": "2026-09-17T07:13:47Z",
+  "evidence_ids": [
+    "evidence-rendering-contract-and-route-audit",
+    "evidence-rendering-contract-completeness-replan",
+    "evidence-rendering-risk-and-follow-up-plan"
+  ],
+  "kind": "ticket_outcome",
+  "schema_version": 1,
+  "status": "successful",
+  "summary": "Independent re-closeout accepted all six current criteria after reading the replanned Ticket, every Context reference, all three Evidence records, the complete audit and sanitized local-shape artifact, cited source, official App Server contract, and freshly generated Codex 0.154.0 stable and experimental types. The audit now inventories every installed ThreadItem variant, the item delta contract including reasoning summary boundaries, all 10 stable ServerRequest methods, and all 83 stable ServerNotification methods exactly once by current routing class. It distinguishes generated wire authority from content-free persisted observations, whose representative structures remove payload scalar values and dynamic keys. The route matrix traces transport, reducer, semantic and generic rendering, streaming and completion authority, request visibility, pending-card cleanup, errors, warnings, attachments, coverage, and unknown fallback. The corrected executive summary accurately distinguishes thread-scoped requests incorrectly funneled into approval UI from host and legacy requests without params.threadId that remain invisible and unresolved. The prose/media, security/privacy/accessibility/performance, evidence-backed priority, and smallest follow-up analyses remain complete; raw HTML stays disabled and no production renderer behavior changed. Fresh verification passed the installed-schema check, all 21 App Server tests, all 51 Desktop tests, and VibeHub project validation. No acceptance IDs remain unresolved.",
+  "ticket_id": "ticket-audit-codex-rendering-surface",
+  "unresolved_acceptance_ids": []
+}

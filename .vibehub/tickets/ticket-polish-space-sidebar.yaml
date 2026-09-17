@@ -45,11 +45,20 @@
   "kind": "ticket",
   "maturity": "firm",
   "outcome": "The left Space sidebar presents the existing Peel Phase identity and a refined, restrained material hierarchy while keeping navigation and entry actions familiar and usable.",
+  "deliveries": [
+    {
+      "kind": "pull_request",
+      "ref": "https://github.com/waynewangyuxuan/Peel/pull/1",
+      "state": "delivered",
+      "delivered_at": "2026-09-07T21:02:01Z",
+      "delivered_commit": "16edd76dffe422024ea63a56e4a6f5cc84611046"
+    }
+  ],
   "provenance_refs": [
     "conversation:2026-09-07-left-sidebar-brand-and-material-polish",
     "conversation:2026-08-28-select-c-expressive-phase-logo-and-request-app-update"
   ],
   "relations": [],
-  "schema_version": 1,
+  "schema_version": 2,
   "ticket_id": "ticket-polish-space-sidebar"
 }

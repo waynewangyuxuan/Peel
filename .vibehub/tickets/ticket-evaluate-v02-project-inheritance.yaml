@@ -48,6 +48,7 @@
   "kind": "ticket",
   "maturity": "firm",
   "outcome": "A capability- and dogfood-backed recommendation determines whether optional Codex Project context inheritance should enter Peel after v0.1, without implementing Project-first topology.",
+  "deliveries": [],
   "provenance_refs": [
     "conversation:2026-08-25-peel-v01-v02-scope",
     "local-schema:codex-app-server-0.149.0"
@@ -59,6 +60,6 @@
       "type": "depends_on"
     }
   ],
-  "schema_version": 1,
+  "schema_version": 2,
   "ticket_id": "ticket-evaluate-v02-project-inheritance"
 }

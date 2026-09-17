@@ -59,6 +59,7 @@
   "kind": "ticket",
   "maturity": "firm",
   "outcome": "Peel has a no-key capability-first Dictation adapter that uses Codex App Server Realtime only when the installed Thread runtime accepts the existing session, otherwise selecting the native fallback before microphone capture without exposing technical failure.",
+  "deliveries": [],
   "provenance_refs": [
     "conversation:2026-08-27-codex-server-voice-engine",
     "live-probe:codex-0.149.0-realtime-requires-api-key-auth",
@@ -71,6 +72,6 @@
       "type": "depends_on"
     }
   ],
-  "schema_version": 1,
+  "schema_version": 2,
   "ticket_id": "ticket-integrate-codex-realtime-dictation"
 }

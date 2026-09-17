@@ -1,0 +1,55 @@
+{
+  "schema_version": 1,
+  "source": {
+    "kind": "content-free-local-observation",
+    "window": "lexicographically latest 200 files under ~/.codex/sessions on 2026-09-16",
+    "selection": "event_msg payload.type=item_completed; one representative key/type shape per observed payload.item.type",
+    "redaction": "all scalar values and all dynamic object keys were removed; only field names, container kinds, and item type names remain"
+  },
+  "items": {
+    "AgentMessage": {
+      "fields": ["type:string", "id:string", "content:array<object>", "phase:string"],
+      "content_element_fields": ["type:string", "text:string"]
+    },
+    "CollabAgentToolCall": {
+      "fields": ["type:string", "id:string", "tool:string", "status:string", "sender_thread_id:string", "receiver_thread_ids:array", "receiver_agents:array", "agents_states:dynamic-map"]
+    },
+    "CommandExecution": {
+      "fields": ["type:string", "id:string", "process_id:string", "command:array<string>", "cwd:string", "parsed_cmd:array<object>", "source:string", "status:string", "stdout:string", "stderr:string", "aggregated_output:string", "exit_code:number", "duration:object", "formatted_output:string"],
+      "parsed_command_element_fields": ["type:string", "cmd:string", "name:string", "path:string"],
+      "duration_fields": ["secs:number", "nanos:number"]
+    },
+    "ContextCompaction": {
+      "fields": ["type:string", "id:string"]
+    },
+    "DynamicToolCall": {
+      "fields": ["type:string", "id:string", "namespace:string", "tool:string", "arguments:object", "status:string", "content_items:array<object>", "success:boolean", "duration:object"],
+      "observed_content_element_fields": ["type:string", "text:string"]
+    },
+    "Extension": {
+      "fields": ["type:string", "kind:string", "id:string", "query:string", "action:object", "results:array<object>"],
+      "note": "Observed persisted shape is not a member of the generated v2 ThreadItem union and therefore exercises the unknown/future-item boundary."
+    },
+    "FileChange": {
+      "fields": ["type:string", "id:string", "changes:dynamic-map<object>", "status:string", "stdout:string", "stderr:string"],
+      "change_value_fields": ["type:string", "content:string"]
+    },
+    "ImageView": {
+      "fields": ["type:string", "id:string", "path:string"]
+    },
+    "McpToolCall": {
+      "fields": ["type:string", "id:string", "server:string", "tool:string", "arguments:object", "pluginId:string", "readOnlyHint:boolean", "status:string", "result:object", "duration:object"],
+      "result_fields": ["content:array<object>", "isError:boolean", "_meta:object"]
+    },
+    "Reasoning": {
+      "fields": ["type:string", "id:string", "summary_text:array<string>", "raw_content:array"]
+    },
+    "SubAgentActivity": {
+      "fields": ["type:string", "id:string", "kind:string", "agent_thread_id:string", "agent_path:string"]
+    },
+    "UserMessage": {
+      "fields": ["type:string", "id:string", "content:array<object>"],
+      "observed_content_element_fields": ["type:string", "text:string", "text_elements:array"]
+    }
+  }
+}

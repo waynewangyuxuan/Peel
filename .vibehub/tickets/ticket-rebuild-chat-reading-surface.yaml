@@ -54,6 +54,7 @@
   "kind": "ticket",
   "maturity": "firm",
   "outcome": "Focus Chat becomes a polished ChatGPT-like reading surface in which Markdown, code, reasoning, command activity, and streaming content always appear intentionally rendered rather than raw or mechanically boxed.",
+  "deliveries": [],
   "provenance_refs": [
     "conversation:2026-08-27-chatgpt-like-markdown-and-content-presentation"
   ],
@@ -64,6 +65,6 @@
       "type": "depends_on"
     }
   ],
-  "schema_version": 1,
+  "schema_version": 2,
   "ticket_id": "ticket-rebuild-chat-reading-surface"
 }

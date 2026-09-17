@@ -1,0 +1,24 @@
+{
+  "acceptance_ids": [
+    "authoritative-content-inventory",
+    "renderer-route-matrix",
+    "prose-format-and-media-matrix"
+  ],
+  "evidence_id": "evidence-rendering-contract-and-route-audit",
+  "kind": "ticket_evidence",
+  "origin": "agent",
+  "recorded_at": "2026-09-17T06:58:57Z",
+  "refs": [
+    "docs/review/rendering-audit/README.md",
+    "https://developers.openai.com/codex/app-server",
+    "apps/desktop/src/renderer/Markdown.tsx",
+    "apps/desktop/src/renderer/Transcript.tsx",
+    "packages/codex-app-server/src/reducer.ts",
+    "packages/codex-app-server/src/protocol.ts",
+    "command:/opt/homebrew/bin/codex app-server generate-ts --out <temporary>#2026-09-16",
+    "command:/opt/homebrew/bin/codex app-server generate-ts --experimental --out <temporary>#2026-09-16"
+  ],
+  "schema_version": 1,
+  "summary": "The checked-in audit compares the official App Server item and delta contract with stable and experimental types generated from codex-cli 0.154.0, records content-free completed-item counts from 200 recent local sessions, maps every installed item and request family through Peel's reducer and renderer, and evaluates completed and streaming Markdown, HTML, math, code, tables, lists, links, citations, image, audio, long-text, bidi, and malformed-syntax behavior. Stable and experimental ThreadItem unions were identical at the recorded SHA-256; no standalone HTML item exists in either authority.",
+  "ticket_id": "ticket-audit-codex-rendering-surface"
+}

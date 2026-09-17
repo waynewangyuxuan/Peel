@@ -37,6 +37,7 @@
   "kind": "ticket",
   "maturity": "firm",
   "outcome": "Voice Dictation treats an empty recognition result as a normal retryable listening miss and never exposes Electron IPC wrappers or raw speech-helper errors in the Composer.",
+  "deliveries": [],
   "provenance_refs": [
     "conversation:2026-08-27-voice-no-speech-raw-ipc-error"
   ],
@@ -47,6 +48,6 @@
       "type": "depends_on"
     }
   ],
-  "schema_version": 1,
+  "schema_version": 2,
   "ticket_id": "ticket-fix-voice-no-speech-recovery"
 }

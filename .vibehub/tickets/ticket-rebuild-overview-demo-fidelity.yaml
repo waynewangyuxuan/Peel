@@ -51,6 +51,7 @@
   "kind": "ticket",
   "maturity": "firm",
   "outcome": "Peel Overview becomes a deliberate, high-density spatial workspace that is recognizably faithful to the preserved Demo in composition, card hierarchy, edges, states, and interaction quality while retaining real deterministic data and stable large-Space behavior.",
+  "deliveries": [],
   "provenance_refs": [
     "conversation:2026-08-26-overview-seriously-unacceptable",
     ".vibehub/outcomes/ticket-deliver-v01-ui-polish.yaml"
@@ -62,6 +63,6 @@
       "type": "depends_on"
     }
   ],
-  "schema_version": 1,
+  "schema_version": 2,
   "ticket_id": "ticket-rebuild-overview-demo-fidelity"
 }

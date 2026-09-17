@@ -1,0 +1,37 @@
+{
+  "context_id": "constraint-thread-picker-instant-first-results",
+  "detail": "2026-09-16 的真实 dogfood 证明当前最近聊天路径仍不够快。测量显示普通 thread/list 约 1.6 秒、非空搜索约 2.7 秒，而显式 searchTerm 为空约 14.8 秒；用户明确指出即使优化到约两秒仍然太慢。后续优化必须同时消除空搜索慢路径，并以用户可感知的首批可用结果延迟为目标，而不能只把请求从超时降到两秒后宣称完成。",
+  "evidence": [
+    {
+      "note": "同机只读探针测得 ordinary-list 1625ms、nonempty-search 2697ms、empty-search 14785ms。",
+      "ref": "conversation:2026-09-16-live-dogfood-chat-performance-and-focus-affordances#latency-probe"
+    },
+    {
+      "note": "空 term 当前仍通过 searchThreads 发送显式空 searchTerm。",
+      "ref": "apps/desktop/src/main/peel-service.ts"
+    }
+  ],
+  "kind": "context",
+  "relations": [
+    {
+      "target_context_id": "intent-fast-scalable-thread-discovery",
+      "type": "relates_to"
+    }
+  ],
+  "schema_version": 1,
+  "source": {
+    "captured_at": "2026-09-17T05:44:26Z",
+    "quote": "两秒还是太慢",
+    "ref": "conversation:2026-09-16-live-dogfood-chat-performance-and-focus-affordances"
+  },
+  "state": "active",
+  "summary": "Thread Picker 的首批可用结果必须接近即时，两秒等待仍不可接受",
+  "tags": [
+    "dogfood",
+    "thread-picker",
+    "latency",
+    "performance",
+    "first-results"
+  ],
+  "type": "constraint"
+}

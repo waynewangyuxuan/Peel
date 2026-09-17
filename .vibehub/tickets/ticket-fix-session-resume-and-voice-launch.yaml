@@ -58,6 +58,7 @@
   "kind": "ticket",
   "maturity": "firm",
   "outcome": "Peel reliably continues stored Codex Chats and performs recoverable Voice Dictation from the independently launched packaged app, without raw IPC/server failures or Draft loss.",
+  "deliveries": [],
   "provenance_refs": [
     "conversation:2026-08-27-send-and-voice-dogfood-failure",
     "https://learn.chatgpt.com/docs/app-server",
@@ -71,6 +72,6 @@
       "type": "depends_on"
     }
   ],
-  "schema_version": 1,
+  "schema_version": 2,
   "ticket_id": "ticket-fix-session-resume-and-voice-launch"
 }

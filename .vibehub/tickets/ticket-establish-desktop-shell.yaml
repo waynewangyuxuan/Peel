@@ -45,12 +45,13 @@
   "kind": "ticket",
   "maturity": "firm",
   "outcome": "Peel has an evidence-backed, checked-in desktop-shell architecture decision that proves how it will host the existing web prototype while owning local Codex App Server, voice, persistence, and Git integration.",
+  "deliveries": [],
   "provenance_refs": [
     "conversation:2026-08-25-plan-peel-v01-v02",
     "commit:0630dc68d2c8858e799fc6433e6f1c081c9e6bda",
     "https://learn.chatgpt.com/docs/app-server"
   ],
   "relations": [],
-  "schema_version": 1,
+  "schema_version": 2,
   "ticket_id": "ticket-establish-desktop-shell"
 }

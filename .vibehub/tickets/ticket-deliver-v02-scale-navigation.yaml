@@ -48,6 +48,7 @@
   "kind": "ticket",
   "maturity": "firm",
   "outcome": "Large Peel Spaces support fast, reversible navigation and attention management across 30–50 real Thread nodes without sacrificing stable spatial memory.",
+  "deliveries": [],
   "provenance_refs": [
     "conversation:2026-08-25-plan-peel-v01-v02"
   ],
@@ -58,6 +59,6 @@
       "type": "depends_on"
     }
   ],
-  "schema_version": 1,
+  "schema_version": 2,
   "ticket_id": "ticket-deliver-v02-scale-navigation"
 }
