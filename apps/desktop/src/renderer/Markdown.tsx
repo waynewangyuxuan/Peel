@@ -1,7 +1,10 @@
 import { Children, Fragment, isValidElement, useEffect, useRef, useState, type ReactNode } from "react";
+import rehypeKatex from "rehype-katex";
 import ReactMarkdown, { defaultUrlTransform, type Components, type UrlTransform } from "react-markdown";
 import remarkBreaks from "remark-breaks";
 import remarkGfm from "remark-gfm";
+import remarkMath from "remark-math";
+import "katex/dist/katex.min.css";
 
 import { Icon } from "./icons";
 
@@ -35,11 +38,27 @@ export function MarkdownContent({ text, streaming = false, className = "" }: {
   className?: string;
 }): ReactNode {
   if (!text) return streaming ? <span className="stream-caret" aria-label="Streaming response">▋</span> : null;
-  const renderedText = streaming ? projectStreamingMarkdown(text) : text;
+  const renderedText = normalizeMathDelimiters(streaming ? projectStreamingMarkdown(text) : text);
   return <div className={["markdown-body", className].filter(Boolean).join(" ")}>
-    <ReactMarkdown remarkPlugins={[remarkGfm, remarkBreaks]} skipHtml components={components} urlTransform={safeUrlTransform}>{renderedText}</ReactMarkdown>
+    <ReactMarkdown
+      remarkPlugins={[remarkGfm, remarkMath, remarkBreaks]}
+      rehypePlugins={[[rehypeKatex, { output: "htmlAndMathml", strict: "warn", throwOnError: false, trust: false }]]}
+      skipHtml
+      components={components}
+      urlTransform={safeUrlTransform}
+    >{renderedText}</ReactMarkdown>
     {streaming && <span className="stream-caret" aria-label="Streaming response">▋</span>}
   </div>;
+}
+
+/** Codex commonly emits LaTeX's \(...\) and \[...\] delimiters; remark-math uses $/$$. */
+export function normalizeMathDelimiters(text: string): string {
+  return text.split(/(```[\s\S]*?(?:```|$)|~~~[\s\S]*?(?:~~~|$)|`+[^`\n]*?`+)/g).map((part, index) => {
+    if (index % 2 === 1) return part;
+    return part
+      .replace(/\\\[([\s\S]*?)\\\]/g, (_match, body: string) => `\n$$\n${body.trim()}\n$$\n`)
+      .replace(/\\\(([\s\S]*?)\\\)/g, (_match, body: string) => `$${body}$`);
+  }).join("");
 }
 
 const safeUrlTransform: UrlTransform = (url, key, node) => {

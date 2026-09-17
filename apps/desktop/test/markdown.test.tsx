@@ -2,7 +2,7 @@ import { renderToStaticMarkup } from "react-dom/server";
 import { describe, expect, it } from "vitest";
 import type { ThreadItem } from "@peel/codex-app-server";
 
-import { highlightCode, MarkdownContent } from "../src/renderer/Markdown";
+import { highlightCode, MarkdownContent, normalizeMathDelimiters } from "../src/renderer/Markdown";
 import { ItemView, TurnActions } from "../src/renderer/Transcript";
 import { plainTextPreview } from "../src/renderer/lib";
 
@@ -91,6 +91,41 @@ const safe = true;
     expect(html).toContain("target=\"_blank\"");
     expect(html).not.toContain("<script");
     expect(html).not.toContain("javascript:");
+  });
+
+  it("typesets Codex inline and display math as semantic accessible KaTeX", () => {
+    const source = String.raw`Inline \(x^2 + \sqrt{y}\).
+
+\[
+\mathrm{Attention}(Q,K,V)=\mathrm{softmax}\left(\frac{QK^\top}{\sqrt{d_k}}\right)V
+\]`;
+    const html = renderToStaticMarkup(<MarkdownContent text={source}/>);
+    expect(html).toContain("class=\"katex\"");
+    expect(html).toContain("class=\"katex-display\"");
+    expect(html).toContain("<math");
+    expect(html).toContain("<annotation encoding=\"application/x-tex\"");
+    expect(html).toContain("aria-hidden=\"true\"");
+    expect(html).toContain("Attention");
+  });
+
+  it("keeps incomplete streamed math readable and never parses code or trusted HTML commands as math markup", () => {
+    const incomplete = String.raw`Before \[ \frac{QK^\top}{\sqrt{d_k}}`;
+    expect(normalizeMathDelimiters(incomplete)).toBe(incomplete);
+    const streamingHtml = renderToStaticMarkup(<MarkdownContent text={incomplete} streaming/>);
+    expect(streamingHtml).toContain("frac");
+    expect(streamingHtml).not.toContain("katex-display");
+
+    const fenced = renderToStaticMarkup(<MarkdownContent text={"```text\n$x^2$ and \\[y\\]\n```"}/>);
+    expect(fenced).toContain("markdown-code");
+    expect(fenced).not.toContain("class=\"katex\"");
+
+    const unsafe = renderToStaticMarkup(<MarkdownContent text={String.raw`$\htmlClass{evil}{x}$ <script>unsafe()</script>`}/>);
+    expect(unsafe).not.toContain("class=\"evil\"");
+    expect(unsafe).not.toContain("<script");
+
+    const malformed = renderToStaticMarkup(<MarkdownContent text={String.raw`Malformed $\frac{$ remains readable.`}/>);
+    expect(malformed).toContain("Malformed");
+    expect(malformed).toContain("frac");
   });
 
   it("parses the exact quote and table shapes found in a real Codex Thread", () => {

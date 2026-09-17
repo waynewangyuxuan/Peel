@@ -271,6 +271,26 @@ test("real Thread-first Fork loop, recovery surfaces, scale, and restart", async
   await page.locator(".agent-message table").scrollIntoViewIfNeeded();
   await page.waitForTimeout(100);
   await page.screenshot({ path: join(desktopRoot, "test-results/ui-focus-markdown.png") });
+  const formula = page.locator(".agent-message .katex-display").first();
+  await expect(formula.locator("math")).toBeAttached();
+  await expect(formula.locator('annotation[encoding="application/x-tex"]')).toContainText("Attention");
+  const formulaLayout = await formula.evaluate((element) => ({
+    overflowX: getComputedStyle(element).overflowX,
+    withinPage: element.getBoundingClientRect().right <= document.documentElement.clientWidth + 1,
+    pageFits: document.documentElement.scrollWidth === document.documentElement.clientWidth,
+  }));
+  expect(formulaLayout).toMatchObject({ overflowX: "auto", withinPage: true, pageFits: true });
+  const selectedFormula = await formula.locator(".katex-html").evaluate((element) => {
+    const selection = window.getSelection();
+    const range = document.createRange();
+    range.selectNodeContents(element);
+    selection?.removeAllRanges();
+    selection?.addRange(range);
+    const text = selection?.toString() ?? "";
+    selection?.removeAllRanges();
+    return text;
+  });
+  expect(selectedFormula).toContain("Attention");
   const code = page.locator(".markdown-code").first();
   await expect(code.locator(".markdown-code-header > span")).toHaveText("ts");
   await expect(code.locator(".syntax-keyword")).toContainText("const");

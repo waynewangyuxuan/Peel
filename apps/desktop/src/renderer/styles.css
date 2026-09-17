@@ -169,6 +169,8 @@ kbd { margin-left: auto; border: 0; color: var(--faint); font-size: 10px; font-f
 .markdown-body hr { height: 1px; margin: 20px 0; border: 0; background: var(--line); }
 .markdown-body img { max-width: 100%; height: auto; border-radius: 8px; }
 .markdown-image-link { display: inline-flex; align-items: center; max-width: 100%; padding: 5px 8px; border: 1px solid var(--line); border-radius: 7px; background: var(--panel); color: var(--muted); font-size: 11px; }
+.markdown-body .katex-display { max-width: 100%; margin: 16px 0; padding: 2px 0 5px; overflow-x: auto; overflow-y: hidden; text-align: center; }
+.markdown-body .katex { max-width: 100%; }
 .markdown-body input[type="checkbox"] { margin: 0 7px 0 -20px; accent-color: var(--accent); }
 .markdown-body .contains-task-list { list-style: none; }
 .markdown-table-wrap { max-width: 100%; margin: 17px 0; overflow-x: auto; border: 1px solid var(--line); border-radius: 10px; background: var(--paper); }
