@@ -131,12 +131,17 @@ export class PeelService extends EventEmitter {
     const pending = this.#threadPageRequests.get(key);
     if (pending) return await pending;
     const cacheVersion = this.#threadCacheVersion;
-    const request = this.client.searchThreads(term, {
+    const request = (term ? this.client.searchThreads(term, {
       cursor,
       limit: THREAD_SEARCH_PAGE_SIZE,
       sortKey: "updated_at",
       sortDirection: "desc",
-    }).then((response) => {
+    }) : this.client.listThreads({
+      cursor,
+      limit: THREAD_SEARCH_PAGE_SIZE,
+      sortKey: "updated_at",
+      sortDirection: "desc",
+    })).then((response) => {
       if (cacheVersion === this.#threadCacheVersion) {
         this.#threadPages.set(key, { expiresAt: this.#now() + THREAD_SEARCH_CACHE_TTL_MS, response });
       }

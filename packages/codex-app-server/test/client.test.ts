@@ -42,6 +42,7 @@ test("typed list/search/read/turn/name calls preserve Codex-owned thread identit
   transport.results.set("thread/name/set", {});
   const client = new AppServerClient(transport as unknown as AppServerTransport);
 
+  assert.equal((await client.listThreads({ limit: 30 })).data[0]?.id, "root");
   assert.equal((await client.searchThreads("root")).data[0]?.id, "root");
   assert.equal((await client.readThread("root")).id, "root");
   assert.equal(
@@ -51,9 +52,11 @@ test("typed list/search/read/turn/name calls preserve Codex-owned thread identit
   await client.setThreadName("root", "Named root");
   assert.deepEqual(
     transport.calls.map((call) => call.method),
-    ["thread/list", "thread/read", "thread/resume", "turn/start", "thread/name/set"],
+    ["thread/list", "thread/list", "thread/read", "thread/resume", "turn/start", "thread/name/set"],
   );
-  assert.deepEqual(transport.calls[0]?.params, { searchTerm: "root" });
+  assert.deepEqual(transport.calls[0]?.params, { limit: 30 });
+  assert.equal(Object.hasOwn(transport.calls[0]?.params as object, "searchTerm"), false);
+  assert.deepEqual(transport.calls[1]?.params, { searchTerm: "root" });
   assert.equal(client.reducer.getThread("root")?.thread.id, "root");
 });
 

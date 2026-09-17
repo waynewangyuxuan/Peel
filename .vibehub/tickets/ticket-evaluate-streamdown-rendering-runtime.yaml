@@ -1,0 +1,80 @@
+{
+  "acceptance": [
+    {
+      "acceptance_id": "production-shaped-renderer-corpus",
+      "criterion": "A checked-in content-safe corpus exercises the current and candidate renderers with completed and partial streaming Markdown, the two reported math/CJK layouts, headings, nested/task lists, tables, blockquotes, links, citations, fenced and very long code, unsafe and remote media, bidi/CJK prose, malformed syntax, a 200,000-character response, large technical output, and synthetic 10/100/500-Turn transcripts."
+    },
+    {
+      "acceptance_id": "comparable-performance-measurement",
+      "criterion": "A repeatable production-build Electron harness reports current-versus-candidate cold and warm first content, Markdown work, React commit or paint, long tasks, frame cadence during a long streamed response, session switch, DOM node count, and heap or retained-object evidence for the 10/100/500-Turn corpus; results distinguish thread-read time from reducer and renderer time."
+    },
+    {
+      "acceptance_id": "safe-streamdown-prototype",
+      "criterion": "An isolated Streamdown prototype preserves readable incomplete streams, semantic/selectable completed math, exact code and copy text, local horizontal overflow, safe links, click-only remote media, and current raw-HTML and untrusted-content protections; parser or plugin failure degrades only the affected message to readable text rather than blanking Focus."
+    },
+    {
+      "acceptance_id": "peel-semantics-compatibility",
+      "criterion": "The prototype or integration analysis demonstrates that Codex Thread, Turn, and ThreadItem remain authoritative; approvals, requests, commands, file changes, Activity, attachments, unknown fallback, exact completed-Turn Branch from here, saved Draft, and saved Scroll stay in Peel-owned components or adapters without lossy conversion to a generic chat-message model."
+    },
+    {
+      "acceptance_id": "measured-long-transcript-techniques",
+      "criterion": "At least stable row identity and tail-only streaming invalidation are measured; render-cost first paint with bounded transition backfill, memoized Markdown/math blocks, lazy heavy syntax support, content visibility for settled history, and size-based readable fallback are each adopted, rejected, or deferred with evidence. Naive full virtualization is not selected without scroll, selection, image, exact-Turn navigation, and prepend-anchor evidence."
+    },
+    {
+      "acceptance_id": "renderer-adoption-decision",
+      "criterion": "A checked-in decision recommends adopt, defer, or reject Streamdown and separately recommends whether assistant-ui runtime deserves later evaluation, citing correctness, security, accessibility, dependency maintenance/license, bundle cost, and measured performance; it names the smallest production implementation Ticket if adoption is justified."
+    }
+  ],
+  "constraints": [
+    "Do not perform a broad assistant-ui migration in this Ticket; Streamdown is evaluated independently behind Peel's existing renderer boundary.",
+    "Do not enable arbitrary raw HTML, script, iframe, forms, event handlers, remote embeds, or untrusted style in the transcript.",
+    "Do not replace Codex App Server state with a parallel chat-history store or fabricate Turn and lineage semantics.",
+    "Do not claim a renderer win from synthetic parser timing alone; measure the production Electron surface and separate backend latency from render latency.",
+    "Preserve the accepted math geometry, streaming readability, selection, copy, Branch, approval, Draft, Scroll, unknown-item, and Open in Codex behavior."
+  ],
+  "context": "Peel currently reparses each accumulated streaming string through ReactMarkdown and traverses the full transcript, while the accepted audit identifies unbounded large-thread risk but requires measurement before optimization. Hermes Desktop provides a mature reference: Streamdown-based block rendering, stable message identity, memoized math, lazy heavy code support, cost-budgeted first paint and incremental backfill, content visibility for settled history, and a committed performance harness. This Ticket is an A/B decision spike rather than an unconditional framework migration. Streamdown is evaluated first behind Peel's existing ThreadItem-to-view boundary; assistant-ui runtime adoption remains optional and must not replace Codex App Server authority, exact Turn anchors, approvals, tool surfaces, Branch behavior, or Space metadata.",
+  "context_refs": [
+    {
+      "purpose": "Provides the accepted protocol, safety, format, and performance-risk audit baseline.",
+      "ref": ".vibehub/outcomes/ticket-audit-codex-rendering-surface.yaml"
+    },
+    {
+      "purpose": "Defines the measurement-first P2 boundary and required 10/100/500-Turn evidence.",
+      "ref": "docs/review/rendering-audit/README.md"
+    },
+    {
+      "purpose": "Keeps typed Codex lifecycle and the raw-HTML safety boundary ahead of speculative rendering features.",
+      "ref": ".vibehub/rooms/product/note-rendering-protocol-before-html.yaml"
+    },
+    {
+      "purpose": "Defines the full-fidelity Focus behaviors that a candidate renderer cannot regress.",
+      "ref": ".vibehub/rooms/product/contract-focus-chat-fidelity.yaml"
+    },
+    {
+      "purpose": "Provides the accepted production geometry and CJK math regression baseline.",
+      "ref": ".vibehub/outcomes/ticket-fix-display-math-clipping-and-cjk-scripts.yaml"
+    },
+    {
+      "purpose": "Owns the current ReactMarkdown, streaming projection, KaTeX, URL, image, code, and copy behavior under comparison.",
+      "ref": "apps/desktop/src/renderer/Markdown.tsx"
+    },
+    {
+      "purpose": "Owns Turn grouping, semantic item surfaces, Branch placement, scrolling, and current transcript traversal.",
+      "ref": "apps/desktop/src/renderer/Transcript.tsx"
+    }
+  ],
+  "deliveries": [],
+  "kind": "ticket",
+  "maturity": "firm",
+  "outcome": "A production-shaped, measured renderer spike determines whether Peel should adopt Streamdown for Markdown and which Hermes-proven incremental rendering techniques materially improve long Codex transcripts, without surrendering Codex Turn semantics or weakening security.",
+  "provenance_refs": [
+    "conversation:2026-09-17-hermes-renderer-reference-and-performance-plan",
+    "https://github.com/NousResearch/hermes-agent/blob/main/apps/desktop/src/components/assistant-ui/markdown-text.tsx",
+    "https://github.com/NousResearch/hermes-agent/blob/main/apps/desktop/src/components/assistant-ui/thread/list.tsx",
+    "https://github.com/NousResearch/hermes-agent/blob/main/apps/desktop/scripts/perf/README.md",
+    "https://github.com/assistant-ui/skills/blob/main/assistant-ui/skills/markdown/references/streamdown.md"
+  ],
+  "relations": [],
+  "schema_version": 2,
+  "ticket_id": "ticket-evaluate-streamdown-rendering-runtime"
+}

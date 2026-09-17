@@ -1,0 +1,20 @@
+{
+  "accepted_acceptance_ids": [
+    "omit-empty-search-term",
+    "shared-warm-recent-request",
+    "responsive-loading-and-refresh",
+    "empty-search-regression-coverage",
+    "live-codex-latency-evidence"
+  ],
+  "closed_at": "2026-09-17T23:03:25Z",
+  "evidence_ids": [
+    "evidence-thread-picker-empty-query-routing",
+    "evidence-thread-picker-live-codex-latency"
+  ],
+  "kind": "ticket_outcome",
+  "schema_version": 1,
+  "status": "successful",
+  "summary": "Independent closeout accepted all five criteria after reading the exact Ticket, both Evidence records, the prior Thread Picker discovery Outcome, implementation, adapter/service/Electron tests, and the live verification script. PeelService trims the query once and routes normalized-empty first or cursor pages through client.listThreads with cursor, 30-item limit, updated_at descending sort, the existing term-plus-cursor cache key, the 15,000ms TTL, and shared in-flight map; only a normalized non-empty term reaches searchThreads with that exact term. Adapter tests prove listThreads omits searchTerm while searchThreads serializes a real term. Service tests prove connection warmup and concurrent empty Picker calls share one request, reuse the cache through 14,999ms, expire at 15,000ms, and keep cursor/search parameters distinct. The focused production Electron test independently passed 1/1 and verified one delayed warm request, an editable search field plus visible non-blocking loading state, warm reopen below 100ms with no extra request, paginated empty requests without searchTerm, and exact non-empty search. The established v0.1 journey retains provisional results below 100ms, query-cache reuse, late-response rejection, close/reopen reset, de-duplicated pagination, and selection; its independent rerun passed all Picker assertions before an unrelated later Overview failed-status-dot assertion at line 853, so the monolithic journey is not reported as passing. Independent verification also passed 25/25 App Server tests, 76/76 desktop tests, the full desktop build, git diff checking, and VibeHub validation. A fresh read-only installed-Codex run recorded transport ready in 218ms, request issuance at 0ms after ready, ordinary recent-list completion in 6,703ms with searchTerm omitted, cold Picker content in 2,974ms, and warm Picker content in 13ms. The variable remaining server-list latency is explicitly separated from warm renderer latency and is not an unresolved criterion for this routing correction.",
+  "ticket_id": "ticket-fix-thread-picker-empty-search-latency",
+  "unresolved_acceptance_ids": []
+}

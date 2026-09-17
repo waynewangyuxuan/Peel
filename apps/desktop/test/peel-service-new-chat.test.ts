@@ -50,16 +50,16 @@ describe("PeelService new Chat entry", () => {
     const directory = await mkdtemp(join(tmpdir(), "peel-new-chat-test-"));
     directories.push(directory);
     const service = new PeelService(directory);
-    const search = vi.spyOn(service.client, "searchThreads").mockResolvedValue(noThreads());
+    const list = vi.spyOn(service.client, "listThreads").mockResolvedValue(noThreads());
     const thread = emptyThread("fresh-thread", "/repo/current");
     const start = vi.spyOn(service.client, "startThread").mockResolvedValue({ thread } as never);
     service.transport.emit("ready", {});
-    await vi.waitFor(() => expect(search).toHaveBeenCalledTimes(1));
+    await vi.waitFor(() => expect(list).toHaveBeenCalledTimes(1));
 
     const state = await service.startNewChat({ cwd: "/repo/current" });
 
     expect(start).toHaveBeenCalledWith({ cwd: "/repo/current" });
-    expect(search).toHaveBeenCalledTimes(1);
+    expect(list).toHaveBeenCalledTimes(1);
     expect(state.activeThreadId).toBe(thread.id);
     expect(state.activeSpaceId).not.toBeNull();
     const space = state.spaces[state.activeSpaceId!]!;
@@ -73,7 +73,7 @@ describe("PeelService new Chat entry", () => {
     directories.push(directory);
     const marker = join(directory, "fail-persist");
     const service = new PeelService(directory, { stateFailureMarker: marker });
-    vi.spyOn(service.client, "searchThreads").mockResolvedValue(noThreads());
+    vi.spyOn(service.client, "listThreads").mockResolvedValue(noThreads());
     const thread = emptyThread("failed-fresh-thread", "/repo/current");
     vi.spyOn(service.client, "startThread").mockResolvedValue({ thread } as never);
     const remove = vi.spyOn(service.client, "deleteThread").mockResolvedValue(undefined);
@@ -92,7 +92,7 @@ describe("PeelService new Chat entry", () => {
     directories.push(directory);
     const service = new PeelService(directory);
     const thread = emptyThread("fresh-title-thread", "/repo/current");
-    vi.spyOn(service.client, "searchThreads").mockResolvedValue(noThreads());
+    vi.spyOn(service.client, "listThreads").mockResolvedValue(noThreads());
     vi.spyOn(service.client, "startThread").mockResolvedValue({ thread } as never);
     vi.spyOn(service.client, "startTurn").mockResolvedValue("turn-first");
     const setThreadName = vi.spyOn(service.client, "setThreadName").mockResolvedValue(undefined);
@@ -125,7 +125,7 @@ describe("PeelService new Chat entry", () => {
     directories.push(directory);
     const service = new PeelService(directory);
     const thread = emptyThread("protected-title-thread", "/repo/current");
-    vi.spyOn(service.client, "searchThreads").mockResolvedValue(noThreads());
+    vi.spyOn(service.client, "listThreads").mockResolvedValue(noThreads());
     vi.spyOn(service.client, "startThread").mockResolvedValue({ thread } as never);
     vi.spyOn(service.client, "startTurn").mockResolvedValue("turn-protected");
     vi.spyOn(service.client, "setThreadName").mockResolvedValue(undefined);

@@ -123,6 +123,9 @@ test("real Thread-first Fork loop, recovery surfaces, scale, and restart", async
   await expect(page.locator(".welcome").getByRole("button", { name: "Search Chats", exact: true })).toBeEnabled();
   await page.screenshot({ path: join(desktopRoot, "test-results/ui-welcome.png") });
   await expect.poll(async () => (await readFile(rpcLog, "utf8")).includes('"method":"thread/list"')).toBe(true);
+  const initialRecentRequest = (await readRpcEvents()).find((event) => event.method === "thread/list");
+  expect(initialRecentRequest?.params).toBeDefined();
+  expect(initialRecentRequest?.params).not.toHaveProperty("searchTerm");
   const threadListsBeforeNewChat = (await readFile(rpcLog, "utf8")).match(/"method":"thread\/list"/g)?.length ?? 0;
   const newChatStarted = performance.now();
   await page.locator(".welcome").getByRole("button", { name: "New Chat", exact: true }).click();
@@ -243,6 +246,11 @@ test("real Thread-first Fork loop, recovery surfaces, scale, and restart", async
 
   await page.getByRole("button", { name: "Load more" }).click();
   await expect(page.locator(".thread-result")).toHaveCount(60);
+  await expect.poll(async () => (await readRpcEvents()).some((event) =>
+    event.method === "thread/list"
+      && event.params?.cursor === "offset:30"
+      && !Object.hasOwn(event.params, "searchTerm")
+  )).toBe(true);
   await page.getByText("Catalog direction 54", { exact: true }).click();
   await expect(page.getByRole("heading", { name: "Catalog direction 54" })).toBeVisible();
   await page.locator(".space-sidebar").getByRole("button", { name: "Search Chats" }).click();
