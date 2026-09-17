@@ -181,7 +181,7 @@ kbd { margin-left: auto; border: 0; color: var(--faint); font-size: 10px; font-f
 .markdown-table-wrap tr:last-child td { border-bottom: 0; }
 .markdown-table-wrap th { background: color-mix(in srgb, var(--panel) 72%, var(--paper)); font-weight: 650; color: #4f4f4b; }
 .stream-caret { display: inline-block; margin-left: 2px; color: var(--accent); font-size: .82em; }
-.code-block, .activity-item pre, .approval-card pre, .diff-patch { font-family: ui-monospace, SFMono-Regular, Menlo, Consolas, monospace; white-space: pre-wrap; overflow-wrap: anywhere; }
+.code-block, .activity-item pre, .request-card pre, .diff-patch { font-family: ui-monospace, SFMono-Regular, Menlo, Consolas, monospace; white-space: pre-wrap; overflow-wrap: anywhere; }
 .markdown-code { margin: 17px 0; overflow: hidden; border: 1px solid #353533; border-radius: 11px; background: #20201e; color: #e8e8e3; box-shadow: 0 1px 2px rgba(0,0,0,.08); }
 .markdown-code-header { display: flex; align-items: center; justify-content: space-between; min-height: 34px; padding: 0 8px 0 13px; border-bottom: 1px solid rgba(255,255,255,.1); background: #292927; color: #aaa9a3; font-family: ui-monospace, SFMono-Regular, Menlo, Consolas, monospace; font-size: 9.5px; }
 .copy-code { display: inline-flex; align-items: center; gap: 5px; min-height: 27px; padding: 4px 6px; border: 0; border-radius: 6px; background: transparent; color: #d4d3cd; font: inherit; transition: color 100ms ease, background-color 100ms ease, transform 80ms var(--ease-out); }
@@ -247,6 +247,41 @@ kbd { margin-left: auto; border: 0; color: var(--faint); font-size: 10px; font-f
 .approval-actions { display: flex; justify-content: flex-end; gap: 7px; }
 .approval-actions button { padding: 6px 9px; border: 1px solid var(--line); border-radius: 6px; background: var(--paper); }
 .approval-actions button.primary { color: white; border-color: var(--accent); background: var(--accent); }
+.request-card { min-width: 0; max-width: 100%; margin: 14px 0; padding: 14px; overflow: hidden; border: 1px solid color-mix(in srgb, var(--amber) 40%, var(--line)); border-radius: 11px; background: color-mix(in srgb, var(--amber) 6%, var(--paper)); }
+.request-header strong { color: var(--ink); font-size: 12.5px; }
+.request-header p, .request-summary { margin: 5px 0 0; color: var(--muted); font-size: 11.5px; line-height: 1.45; }
+.request-command { max-width: 100%; max-height: 180px; margin: 10px 0; padding: 10px; overflow: auto; border-radius: 7px; background: var(--panel); font-size: 10.5px; white-space: pre; overflow-wrap: normal; }
+.request-actions { display: flex; flex-wrap: wrap; justify-content: flex-end; gap: 7px; margin-top: 12px; }
+.request-actions button { min-height: 31px; padding: 6px 9px; border: 1px solid var(--line); border-radius: 7px; background: var(--paper); color: var(--ink); }
+.request-actions button.primary { color: white; border-color: var(--accent); background: var(--accent); }
+.request-actions button:disabled { opacity: .48; cursor: default; }
+.request-amendments { display: flex; flex-wrap: wrap; gap: 7px; margin: 9px 0; }
+.request-amendments button { padding: 6px 9px; border: 1px solid var(--line-strong); border-radius: 7px; background: var(--panel); color: var(--ink); }
+.request-questions, .elicitation-fields { display: grid; gap: 12px; margin-top: 12px; }
+.request-questions fieldset { min-width: 0; margin: 0; padding: 10px; border: 1px solid var(--line); border-radius: 8px; }
+.request-questions legend { max-width: 100%; padding: 0 4px; color: var(--ink); font-size: 11.5px; line-height: 1.4; }
+.request-option { display: flex; align-items: flex-start; gap: 8px; margin-top: 8px; font-size: 11px; }
+.request-option input { flex: 0 0 auto; margin-top: 2px; }
+.request-option span { min-width: 0; }
+.request-option strong, .request-option small { display: block; overflow-wrap: anywhere; }
+.request-option small, .elicitation-field small { margin-top: 2px; color: var(--muted); font-weight: 400; }
+.request-text-input, .elicitation-field input, .elicitation-field select, .elicitation-field textarea { width: 100%; min-width: 0; margin-top: 8px; padding: 7px 8px; border: 1px solid var(--line); border-radius: 7px; background: var(--paper); color: var(--ink); }
+.elicitation-field textarea { min-height: 96px; resize: vertical; font-family: ui-monospace, SFMono-Regular, Menlo, Consolas, monospace; font-size: 10.5px; }
+.permission-summary { margin: 10px 0 0; padding-left: 20px; color: var(--muted); font-size: 11.5px; line-height: 1.55; }
+.elicitation-field { display: grid; min-width: 0; color: var(--ink); font-size: 11.5px; }
+.elicitation-field input[type="checkbox"] { width: auto; justify-self: start; }
+.elicitation-url { margin-top: 10px; font-size: 11.5px; }
+.elicitation-url a { color: var(--accent); }
+.request-error { margin-top: 10px; color: var(--red); font-size: 11px; }
+.codex-notice { min-width: 0; max-width: 100%; margin: 12px 0; padding: 11px 12px; border: 1px solid var(--line); border-radius: 9px; background: var(--panel); color: var(--ink); }
+.codex-notice.error { border-color: color-mix(in srgb, var(--red) 42%, var(--line)); }
+.codex-notice.warning { border-color: color-mix(in srgb, var(--amber) 42%, var(--line)); }
+.codex-notice strong, .codex-notice p, .codex-notice small { display: block; overflow-wrap: anywhere; }
+.codex-notice p { margin: 4px 0 0; font-size: 11.5px; line-height: 1.45; }
+.codex-notice small { margin-top: 5px; color: var(--muted); }
+.host-diagnostics { position: fixed; z-index: 190; top: 66px; right: 18px; display: grid; width: min(360px, calc(100vw - 36px)); gap: 8px; pointer-events: none; }
+.host-diagnostics > div { display: grid; gap: 3px; padding: 10px 12px; border: 1px solid var(--line-strong); border-radius: 9px; background: var(--paper); box-shadow: var(--shadow); font-size: 11px; }
+.host-diagnostics span { color: var(--muted); overflow-wrap: anywhere; }
 .working-indicator { display: flex; align-items: center; gap: 4px; padding: 18px 0; color: var(--muted); font-size: 11px; }
 .working-indicator span { width: 4px; height: 4px; border-radius: 50%; background: var(--blue); animation: pulse .9s ease-in-out infinite; }
 .working-indicator span:nth-child(2) { animation-delay: .15s; }.working-indicator span:nth-child(3) { animation-delay: .3s; margin-right: 5px; }

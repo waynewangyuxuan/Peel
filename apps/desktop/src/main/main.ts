@@ -4,13 +4,13 @@ import { dirname, join } from "node:path";
 import { fileURLToPath } from "node:url";
 
 import type {
-  ApprovalDecisionInput,
   CommitForkInput,
   DictationAudioInput,
   OpenTargetInput,
   PeelState,
   SearchThreadsInput,
   SendTurnInput,
+  ServerRequestResponseInput,
   StartNewChatInput,
   StartSpaceInput,
 } from "../shared/contracts";
@@ -127,7 +127,7 @@ function registerIpc(peel: PeelService, voice: VoiceService): void {
     if (quitAfterVoiceVerification) setTimeout(() => app.quit(), 1_500);
     return result;
   });
-  ipcMain.handle(IPC.decideApproval, (_event, input: ApprovalDecisionInput) => peel.decideApproval(input));
+  ipcMain.handle(IPC.respondServerRequest, (_event, input: ServerRequestResponseInput) => peel.respondServerRequest(input));
   ipcMain.handle(IPC.copyText, (_event, text: string) => { clipboard.writeText(text); });
   ipcMain.handle(IPC.beginDictation, async (_event, threadId: string) => await peel.dictation.begin(threadId));
   ipcMain.handle(IPC.appendDictationAudio, async (_event, input: DictationAudioInput) => await peel.dictation.append(input));
@@ -139,7 +139,8 @@ function registerIpc(peel: PeelService, voice: VoiceService): void {
     openPath: async (path) => await shell.openPath(path),
   }));
   peel.on("notification", (payload) => window?.webContents.send(IPC.codexNotification, payload));
-  peel.on("serverRequest", (payload) => window?.webContents.send(IPC.serverRequest, payload));
+  peel.on("pendingRequests", (payload) => window?.webContents.send(IPC.pendingRequests, payload));
+  peel.on("notices", (payload) => window?.webContents.send(IPC.notices, payload));
   peel.on("connection", (payload) => window?.webContents.send(IPC.connection, payload));
 }
 

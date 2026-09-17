@@ -2,12 +2,13 @@ import type { AppServerServerRequest, CodexThread, CodexTurn, ReducedThread, Thr
 import type { WorkspaceDiffSummary } from "@peel/git-workspace";
 import { useEffect, useLayoutEffect, useRef, useState, type ChangeEvent, type KeyboardEvent, type ReactNode } from "react";
 
-import type { ApprovalDecisionInput, ForkDraft, SpaceNode } from "../shared/contracts";
+import type { CodexNotice, ForkDraft, ServerRequestResponseInput, SpaceNode } from "../shared/contracts";
 import { Icon } from "./icons";
 import { itemText, itemTextFromKeys } from "./lib";
 import { startPcmRecorder, type RecorderSession } from "./audio";
 import { HighlightedCode, MarkdownContent } from "./Markdown";
 import { voiceFailurePresentation, type VoiceFailurePresentation } from "./voice-error";
+import { requestTurnId, ServerRequestCard } from "./ServerRequestCard";
 
 interface TranscriptProps {
   thread: CodexThread;
@@ -15,7 +16,8 @@ interface TranscriptProps {
   node: SpaceNode;
   diff: WorkspaceDiffSummary | null;
   draft: string;
-  approvals: AppServerServerRequest[];
+  requests: AppServerServerRequest[];
+  notices: CodexNotice[];
   highlightTurnId: string | null;
   restoreScrollTop: number;
   onHighlightScrolled(turnId: string): void;
@@ -23,7 +25,7 @@ interface TranscriptProps {
   onScroll(value: number): void;
   onSend(input: UserInput[]): Promise<void>;
   onBranch(turn: CodexTurn): void;
-  onApproval(input: ApprovalDecisionInput): Promise<void>;
+  onRequestResponse(input: ServerRequestResponseInput): Promise<void>;
   onDiff(): void;
   onOpenCodex(): void;
 }
@@ -34,7 +36,8 @@ export function Transcript({
   node,
   diff,
   draft,
-  approvals,
+  requests,
+  notices,
   highlightTurnId,
   restoreScrollTop,
   onHighlightScrolled,
@@ -42,7 +45,7 @@ export function Transcript({
   onScroll,
   onSend,
   onBranch,
-  onApproval,
+  onRequestResponse,
   onDiff,
   onOpenCodex,
 }: TranscriptProps): ReactNode {
@@ -287,8 +290,12 @@ export function Transcript({
         highlighted={turn.id === highlightTurnId}
         onBranch={() => onBranch(turn)}
         onOpenCodex={onOpenCodex}
+        requests={requests.filter((request) => requestTurnId(request) === turn.id)}
+        notices={notices.filter((notice) => notice.turnId === turn.id)}
+        onRequestResponse={onRequestResponse}
       />)}
-      {approvals.map((approval) => <ApprovalCard key={String(approval.id)} request={approval} onDecide={onApproval} />)}
+      {notices.filter((notice) => notice.turnId === null).map((notice) => <NoticeCard key={notice.id} notice={notice}/>)}
+      {requests.filter((request) => requestTurnId(request) === null).map((request) => <ServerRequestCard key={String(request.id)} request={request} onRespond={onRequestResponse}/>)}
       {active && <div className="working-indicator"><span/><span/><span/> Codex is working</div>}
       <div className="transcript-end" />
     </div>
@@ -340,12 +347,15 @@ function userFacingIpcError(error: unknown): string {
     .trim() || "The message could not be sent. Your draft is unchanged; try again.";
 }
 
-function TurnView({ turn, reduced, highlighted, onBranch, onOpenCodex }: {
+function TurnView({ turn, reduced, highlighted, requests, notices, onBranch, onOpenCodex, onRequestResponse }: {
   turn: CodexTurn;
   reduced: ReducedThread["turns"][number] | null;
   highlighted: boolean;
+  requests: AppServerServerRequest[];
+  notices: CodexNotice[];
   onBranch(): void;
   onOpenCodex(): void;
+  onRequestResponse(input: ServerRequestResponseInput): Promise<void>;
 }): ReactNode {
   const items = reduced?.items ?? turn.items.map((item) => ({
     item,
@@ -363,6 +373,9 @@ function TurnView({ turn, reduced, highlighted, onBranch, onOpenCodex }: {
       streaming={!completed}
       onOpenCodex={onOpenCodex}
     />) }
+    {notices.map((notice) => <NoticeCard key={notice.id} notice={notice}/>)}
+    {turn.error !== null && turn.error !== undefined && <TurnErrorDetail error={turn.error}/>}
+    {requests.map((request) => <ServerRequestCard key={String(request.id)} request={request} onRespond={onRequestResponse}/>)}
     <TurnActions status={turn.status} onBranch={onBranch}/>
   </section>;
 }
@@ -498,21 +511,22 @@ function fileChangeLabel(sections: TechnicalSection[]): string {
   return `Updated ${sections.length} file${sections.length === 1 ? "" : "s"}`;
 }
 
-function ApprovalCard({ request, onDecide }: {
-  request: AppServerServerRequest;
-  onDecide(input: ApprovalDecisionInput): Promise<void>;
-}): ReactNode {
-  const params = request.params as Record<string, unknown>;
-  const label = request.method.includes("fileChange") ? "File change approval" : "Command approval";
-  return <div className="approval-card">
-    <div className="approval-title">{label}</div>
-    <pre>{String(params.command ?? params.reason ?? "Codex needs your approval to continue.")}</pre>
-    <div className="approval-actions">
-      <button onClick={() => void onDecide({ id: request.id, method: request.method, decision: "decline" })}>Decline</button>
-      <button onClick={() => void onDecide({ id: request.id, method: request.method, decision: "acceptForSession" })}>Allow for task</button>
-      <button className="primary" onClick={() => void onDecide({ id: request.id, method: request.method, decision: "accept" })}>Allow</button>
-    </div>
-  </div>;
+function NoticeCard({ notice }: { notice: CodexNotice }): ReactNode {
+  return <aside className={`codex-notice ${notice.kind}`} role={notice.kind === "error" ? "alert" : "status"}>
+    <strong>{notice.kind === "error" ? "Codex encountered a problem" : "Codex warning"}</strong>
+    <p>{notice.message}</p>
+    {notice.willRetry && <small>Codex will retry this Turn.</small>}
+  </aside>;
+}
+
+function TurnErrorDetail({ error }: { error: unknown }): ReactNode {
+  const record = error && typeof error === "object" && !Array.isArray(error) ? error as Record<string, unknown> : {};
+  const message = typeof record.message === "string" ? record.message : typeof error === "string" ? error : "This Turn did not complete.";
+  return <aside className="codex-notice error persisted-turn-error" role="alert">
+    <strong>Turn failed</strong>
+    <p>{message}</p>
+    <small>The failure detail remains available in this conversation.</small>
+  </aside>;
 }
 
 export function ForkComposer({ fork, parentTitle, parentWorktreeName, error, busy, onChange, onCancel, onCommit }: {

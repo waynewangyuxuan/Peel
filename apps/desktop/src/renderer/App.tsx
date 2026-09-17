@@ -3,7 +3,7 @@ import type { WorkspaceDiffSummary } from "@peel/git-workspace";
 import { useCallback, useEffect, useMemo, useRef, useState, type ReactNode } from "react";
 import { flushSync } from "react-dom";
 
-import { THREAD_SEARCH_CACHE_TTL_MS, type ForkDraft, type PeelState, type Point, type SpaceNode, type SpaceRecord, type ThreadSnapshot } from "../shared/contracts";
+import { THREAD_SEARCH_CACHE_TTL_MS, type CodexNotice, type ForkDraft, type PeelState, type Point, type SpaceNode, type SpaceRecord, type ThreadSnapshot } from "../shared/contracts";
 import { emptyState, suggestedChildPosition, temporaryTitle } from "../shared/state";
 import { ForkComposer, Transcript } from "./Transcript";
 import { Overview } from "./Overview";
@@ -21,7 +21,8 @@ export function App(): ReactNode {
   const [connectionError, setConnectionError] = useState<string | null>(null);
   const [threads, setThreads] = useState<Record<string, ThreadSnapshot>>({});
   const [diffs, setDiffs] = useState<Record<string, WorkspaceDiffSummary>>({});
-  const [approvals, setApprovals] = useState<AppServerServerRequest[]>([]);
+  const [pendingRequests, setPendingRequests] = useState<AppServerServerRequest[]>([]);
+  const [notices, setNotices] = useState<CodexNotice[]>([]);
   const [forkDraft, setForkDraft] = useState<ForkDraft | null>(null);
   const [forkError, setForkError] = useState<string | null>(null);
   const [forkBusy, setForkBusy] = useState(false);
@@ -63,6 +64,8 @@ export function App(): ReactNode {
       installState(bootstrap.state);
       setConnected(bootstrap.connected);
       setConnectionError(bootstrap.connectionError);
+      setPendingRequests(bootstrap.pendingRequests);
+      setNotices(bootstrap.notices);
     }).catch((error) => {
       installState(emptyState());
       setConnectionError(messageOf(error));
@@ -98,9 +101,8 @@ export function App(): ReactNode {
         }
       }
     });
-    const offRequest = window.peel.onServerRequest((request) => {
-      setApprovals((current) => [...current.filter((item) => item.id !== request.id), request]);
-    });
+    const offPendingRequests = window.peel.onPendingRequests(setPendingRequests);
+    const offNotices = window.peel.onNotices(setNotices);
     const offFlush = window.peel.onFlushRequest(async () => {
       if (saveTimer.current !== null) window.clearTimeout(saveTimer.current);
       saveTimer.current = null;
@@ -109,7 +111,8 @@ export function App(): ReactNode {
     return () => {
       offConnection();
       offNotification();
-      offRequest();
+      offPendingRequests();
+      offNotices();
       offFlush();
       if (highlightTimer.current !== null) window.clearTimeout(highlightTimer.current);
     };
@@ -339,7 +342,8 @@ export function App(): ReactNode {
             node={activeNode}
             diff={diffs[activeNode.threadId] ?? null}
             draft={currentDraft}
-            approvals={approvals.filter((request) => (request.params as Record<string, unknown>).threadId === activeNode.threadId)}
+            requests={pendingRequests.filter((request) => requestThreadId(request) === activeNode.threadId)}
+            notices={notices.filter((notice) => notice.threadId === activeNode.threadId)}
             highlightTurnId={highlightTarget?.threadId === activeNode.threadId ? highlightTarget.turnId : null}
             restoreScrollTop={state.threadViews[activeNode.threadId]?.scrollTop ?? 0}
             onHighlightScrolled={(turnId) => acknowledgeHighlightScroll(activeNode.threadId, turnId)}
@@ -353,7 +357,7 @@ export function App(): ReactNode {
             }, 600)}
             onSend={send}
             onBranch={(turn) => beginFork(turn.id)}
-            onApproval={async (input) => { await window.peel.decideApproval(input); setApprovals((all) => all.filter((item) => item.id !== input.id)); }}
+            onRequestResponse={async (input) => await window.peel.respondServerRequest(input)}
             onDiff={() => setDiffThreadId(activeNode.threadId)}
             onOpenCodex={() => void openCodex(activeNode)}
           /> : <ThreadLoading/>}
@@ -371,6 +375,7 @@ export function App(): ReactNode {
         />}
       </>}
     </main>
+    {notices.some((notice) => notice.threadId === null) && <HostDiagnostics notices={notices.filter((notice) => notice.threadId === null)}/>}
     {showThreadPicker && <ThreadPicker connected={connected} onClose={() => setShowThreadPicker(false)} onStart={async (threadId) => {
       installState(await window.peel.startSpace({ threadId }));
       setShowThreadPicker(false);
@@ -379,6 +384,21 @@ export function App(): ReactNode {
     {diffThreadId && activeSpace?.nodes[diffThreadId] && <DiffDrawer node={activeSpace.nodes[diffThreadId]} onClose={() => setDiffThreadId(null)} onOpenCodex={openCodex} />}
     {toast && <div className="toast" onAnimationEnd={() => setToast(null)}>{toast}</div>}
   </div>;
+}
+
+function HostDiagnostics({ notices }: { notices: CodexNotice[] }): ReactNode {
+  return <aside className="host-diagnostics" aria-label="Codex diagnostics">
+    {notices.slice(-3).map((notice) => <div key={notice.id} className={notice.kind} role={notice.kind === "error" ? "alert" : "status"}>
+      <strong>{notice.kind === "error" ? "Codex error" : "Codex notice"}</strong>
+      <span>{notice.message}</span>
+    </div>)}
+  </aside>;
+}
+
+function requestThreadId(request: AppServerServerRequest): string | null {
+  const params = request.params as Record<string, unknown>;
+  if (typeof params.threadId === "string") return params.threadId;
+  return typeof params.conversationId === "string" ? params.conversationId : null;
 }
 
 function SpaceSidebar({ state, connected, newChatBusy, onSelect, onNewChat, onSearch }: {

@@ -198,7 +198,17 @@ export class AppServerClient extends EventEmitter {
   }
 
   answerUserInput(id: RequestId, answers: Record<string, string[]>): void {
-    this.transport.respond(id, { answers });
+    this.transport.respond(id, {
+      answers: Object.fromEntries(Object.entries(answers).map(([questionId, values]) => [questionId, { answers: values }])),
+    });
+  }
+
+  respondMcpElicitation(
+    id: RequestId,
+    action: "accept" | "decline" | "cancel",
+    content: unknown = null,
+  ): void {
+    this.transport.respond(id, { action, content: action === "accept" ? content : null, _meta: null });
   }
 
   rejectServerRequest(id: RequestId, code: number, message: string, data?: unknown): void {

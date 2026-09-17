@@ -1,0 +1,20 @@
+{
+  "accepted_acceptance_ids": [
+    "complete-request-dispatch",
+    "exact-turn-request-placement",
+    "resolved-request-cleanup",
+    "visible-errors-and-warnings",
+    "request-contract-evidence"
+  ],
+  "closed_at": "2026-09-17T21:46:20Z",
+  "evidence_ids": [
+    "evidence-appserver-request-and-error-electron-regression",
+    "evidence-appserver-request-contract-and-lifecycle"
+  ],
+  "kind": "ticket_outcome",
+  "schema_version": 1,
+  "status": "successful",
+  "summary": "Independent closeout accepted all five criteria after checking the installed Codex 0.154.0 generated types, exact Ticket and Context, both Evidence records, implementation, tests, and production Electron behavior. The schema guard proves exactly ten stable ServerRequest methods and the host exhaustively routes each to a method-specific lifecycle or an immediate typed -32601 unsupported_host_capability response without reflecting private arguments. Command/file approvals, nested requestUserInput answers, generated permission grants, MCP action/content/_meta responses, and both policy-amendment forms use their own response contracts; permission grants omit nullable request fields as required by GrantedPermissionProfile, permission UI classifies read/write/deny entries without exposing paths, and generic MCP form content is recursively checked against its supplied schema before response. Main-owned pending state deduplicates requests, survives bootstrap, clears on local response, external serverRequest/resolved, or disconnect, and treats late resolution idempotently. Thread/Turn requests render inside the exact producing Turn, nullable-Turn MCP requests remain in their owning Thread, and host requests never enter the active transcript. Retryable Turn errors, persistent failed-Turn detail, Thread warnings, and path-free global diagnostics remain visibly scoped without inventing ThreadItems. Fresh verification passed the installed-schema check, 25 App Server + 12 Git workspace + 76 desktop tests, full/package builds, focused request Electron regression on the final tree, the focused Electron suite 4/4 before the final validation-only hardening, git diff checking, and VibeHub validation. The monolithic v0.1 journey's known later failed-resume assertion was not counted as passing and is unrelated to this Ticket.",
+  "ticket_id": "ticket-route-appserver-requests-and-errors",
+  "unresolved_acceptance_ids": []
+}

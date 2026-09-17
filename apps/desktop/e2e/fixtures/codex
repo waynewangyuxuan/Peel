@@ -80,6 +80,11 @@ const notify = (method, params) => send({ method, params });
 const reader = readline.createInterface({ input: process.stdin });
 reader.on("line", (line) => {
   const message = JSON.parse(line);
+  if ((typeof message.id === "number" || typeof message.id === "string") && !message.method && ("result" in message || "error" in message)) {
+    log({ method: "fixture/server-response", params: message });
+    notify("serverRequest/resolved", { threadId: "thread-root", requestId: message.id });
+    return;
+  }
   if (!message.id || !message.method) return;
   const { id, method, params = {} } = message;
   log({ method, params });
@@ -218,6 +223,39 @@ reader.on("line", (line) => {
     started.items.push(user);
     notify("item/started", { threadId: thread.id, turnId, item: user });
     notify("item/completed", { threadId: thread.id, turnId, item: user });
+    if (textInput?.text === "Exercise every server request route") {
+      thread.status = { type: "active", activeFlags: ["waitingOnApproval", "waitingOnUserInput"] };
+      notify("thread/status/changed", { threadId: thread.id, status: thread.status });
+      const scope = { threadId: thread.id, turnId, itemId: `${turnId}-request`, startedAtMs: Date.now() };
+      send({ id: 401, method: "item/commandExecution/requestApproval", params: { ...scope, kind: "command", command: "npm test", reason: "Verify the current workspace" } });
+      send({ id: 401, method: "item/commandExecution/requestApproval", params: { ...scope, kind: "command", command: "npm test --replacement", reason: "Verify the current workspace" } });
+      send({ id: 402, method: "item/fileChange/requestApproval", params: { ...scope, reason: "Apply reviewed patch", grantRoot: null } });
+      send({ id: 403, method: "item/tool/requestUserInput", params: { ...scope, questions: [{ id: "direction", header: "Direction", question: "Which direction should Codex take?", isOther: true, isSecret: false, options: [{ label: "Focused", description: "Keep the scope narrow" }, { label: "Broad", description: "Explore more options" }] }], isBlocking: true, autoResolutionMs: null } });
+      send({ id: 404, method: "item/permissions/requestApproval", params: { ...scope, environmentId: null, cwd: thread.cwd, reason: "Connect to the test service", permissions: { network: { enabled: true }, fileSystem: null } } });
+      send({ id: 405, method: "mcpServer/elicitation/request", params: { threadId: thread.id, turnId, serverName: "Design MCP", mode: "form", _meta: null, message: "Choose the project for this request", requestedSchema: { type: "object", properties: { project: { type: "string", title: "Project", description: "Project name" } }, required: ["project"] } } });
+      send({ id: 406, method: "item/fileChange/requestApproval", params: { ...scope, reason: "Externally resolved request", grantRoot: null } });
+      send({ id: 412, method: "item/commandExecution/requestApproval", params: { ...scope, kind: "command", command: "npm run focused", reason: "Apply the proposed command rule", proposedExecpolicyAmendment: { command: "npm run focused" } } });
+      send({ id: 413, method: "item/commandExecution/requestApproval", params: { ...scope, kind: "command", command: "curl https://example.com", reason: "Apply the proposed network rule", proposedNetworkPolicyAmendments: [{ host: "example.com", action: "allow" }] } });
+      send({ id: 407, method: "item/tool/call", params: { threadId: thread.id, turnId, callId: "hidden-call", namespace: null, tool: "hidden-tool", arguments: { token: "never-render" } } });
+      send({ id: 408, method: "account/chatgptAuthTokens/refresh", params: { reason: "unauthorized", previousAccountId: "never-render-account" } });
+      send({ id: 409, method: "attestation/generate", params: {} });
+      send({ id: 410, method: "applyPatchApproval", params: { conversationId: thread.id, callId: "legacy-file", fileChanges: {}, reason: null, grantRoot: null } });
+      send({ id: 411, method: "execCommandApproval", params: { conversationId: thread.id, callId: "legacy-command", approvalId: null, command: ["hidden"], cwd: thread.cwd, reason: null, parsedCmd: [] } });
+      notify("error", { threadId: thread.id, turnId, error: { message: "The service briefly failed", codexErrorInfo: null, additionalDetails: null, misalignment: null }, willRetry: true });
+      notify("warning", { threadId: thread.id, message: "Review the permissions before continuing" });
+      notify("configWarning", { summary: "Codex configuration notice", details: "A deprecated fixture setting is active", path: "/private/fixture/config.toml" });
+      setTimeout(() => notify("serverRequest/resolved", { threadId: thread.id, requestId: 406 }), 4_000);
+      setTimeout(() => {
+        started.status = "failed";
+        started.error = { message: "Persistent fixture Turn failure", codexErrorInfo: null, additionalDetails: null, misalignment: null };
+        started.completedAt = now + 1;
+        started.durationMs = 1000;
+        thread.status = { type: "idle" };
+        notify("turn/completed", { threadId: thread.id, turn: started });
+        notify("thread/status/changed", { threadId: thread.id, status: thread.status });
+      }, 5_000);
+      return;
+    }
     const plan = item("plan", `${turnId}-plan`, "", { status: "inProgress" });
     const reasoning = item("reasoning", `${turnId}-reasoning`, "", { status: "inProgress" });
     const command = item("commandExecution", `${turnId}-command`, "", { command: "printf stream", status: "inProgress" });

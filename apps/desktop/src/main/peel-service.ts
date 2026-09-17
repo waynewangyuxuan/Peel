@@ -6,8 +6,10 @@ import {
   AppServerClient,
   AppServerRpcError,
   AppServerTransport,
+  serverRequestRoute,
   type AppServerNotification,
   type AppServerServerRequest,
+  type JsonObject,
   type ThreadListResponse,
 } from "@peel/codex-app-server";
 import { GitWorkspaceAdapter, GitWorkspaceError } from "@peel/git-workspace";
@@ -15,13 +17,14 @@ import { GitWorkspaceAdapter, GitWorkspaceError } from "@peel/git-workspace";
 import {
   THREAD_SEARCH_CACHE_TTL_MS,
   THREAD_SEARCH_PAGE_SIZE,
-  type ApprovalDecisionInput,
   type BootstrapPayload,
+  type CodexNotice,
   type CommitForkInput,
   type CommitForkResult,
   type PeelState,
   type SearchThreadsInput,
   type SendTurnInput,
+  type ServerRequestResponseInput,
   type StartNewChatInput,
   type StartSpaceInput,
   type ThreadSnapshot,
@@ -51,6 +54,8 @@ export class PeelService extends EventEmitter {
   readonly #titleQueues = new Map<string, Promise<void>>();
   readonly #threadPages = new Map<string, CachedThreadPage>();
   readonly #threadPageRequests = new Map<string, Promise<ThreadListResponse>>();
+  readonly #pendingServerRequests = new Map<string, AppServerServerRequest>();
+  readonly #notices = new Map<string, CodexNotice>();
   readonly #now: () => number;
   #threadCacheVersion = 0;
   #connected = false;
@@ -65,6 +70,8 @@ export class PeelService extends EventEmitter {
     this.client = new AppServerClient(this.transport);
     this.dictation = new RealtimeDictationService(this.client);
     this.client.on("notification", (notification: AppServerNotification) => {
+      this.#handleRequestResolution(notification);
+      this.#recordNotice(notification);
       const threadId = typeof notification.params.threadId === "string" ? notification.params.threadId : null;
       const reduced = threadId ? this.client.getThreadState(threadId) : null;
       this.emit("notification", {
@@ -73,13 +80,19 @@ export class PeelService extends EventEmitter {
       });
       void this.#handleAutomaticTitle(notification);
     });
-    this.client.on("serverRequest", (request: AppServerServerRequest) => this.emit("serverRequest", request));
+    this.client.on("serverRequest", (request: AppServerServerRequest) => this.#handleServerRequest(request));
     this.transport.on("ready", () => {
       this.#setConnection(true, null);
       this.#warmRecentThreads();
     });
-    this.transport.on("disconnected", (error: Error) => this.#setConnection(false, error.message));
-    this.transport.on("failed", (error: Error) => this.#setConnection(false, error.message));
+    this.transport.on("disconnected", (error: Error) => {
+      this.#clearPendingRequests();
+      this.#setConnection(false, error.message);
+    });
+    this.transport.on("failed", (error: Error) => {
+      this.#clearPendingRequests();
+      this.#setConnection(false, error.message);
+    });
   }
 
   async connect(): Promise<void> {
@@ -103,6 +116,8 @@ export class PeelService extends EventEmitter {
       connected: this.#connected,
       connectionError: this.#connectionError,
       capabilities: this.client.capabilities.snapshot() as unknown as Record<string, unknown>,
+      pendingRequests: [...this.#pendingServerRequests.values()],
+      notices: [...this.#notices.values()],
     };
   }
 
@@ -385,9 +400,83 @@ export class PeelService extends EventEmitter {
     });
   }
 
-  decideApproval(input: ApprovalDecisionInput): void {
-    if (input.method.includes("fileChange")) this.client.approveFileChange(input.id, input.decision);
-    else this.client.approveCommand(input.id, input.decision);
+  respondServerRequest(input: ServerRequestResponseInput): void {
+    const key = requestKey(input.id);
+    const request = this.#pendingServerRequests.get(key);
+    if (!request) return;
+    const route = serverRequestRoute(request.method);
+    if (route === "command-approval" && input.kind === "command") {
+      const params = recordOf(request.params);
+      if (input.decision === "acceptProposedExecpolicyAmendment") {
+        const amendment = params.proposedExecpolicyAmendment;
+        if (!isRecord(amendment)) throw new Error("This command request has no proposed exec policy amendment");
+        this.client.approveCommand(input.id, { acceptWithExecpolicyAmendment: { execpolicy_amendment: amendment as JsonObject } });
+      } else if (isRecord(input.decision) && typeof input.decision.applyProposedNetworkPolicyAmendment === "number") {
+        const amendments = params.proposedNetworkPolicyAmendments;
+        const amendment = Array.isArray(amendments) ? amendments[input.decision.applyProposedNetworkPolicyAmendment] : null;
+        if (!isRecord(amendment)) throw new Error("This command request has no matching network policy amendment");
+        this.client.approveCommand(input.id, { applyNetworkPolicyAmendment: { network_policy_amendment: amendment as JsonObject } });
+      } else {
+        this.client.approveCommand(input.id, input.decision);
+      }
+    } else if (route === "file-change-approval" && input.kind === "file-change") {
+      this.client.approveFileChange(input.id, input.decision);
+    } else if (route === "user-input" && input.kind === "user-input") {
+      validateUserInputAnswers(request, input.answers);
+      this.client.answerUserInput(input.id, input.answers);
+    } else if (route === "permissions" && input.kind === "permissions") {
+      const requested = recordOf(request.params).permissions;
+      const permissions = input.decision === "grant" && isRecord(requested)
+        ? grantedPermissions(requested)
+        : {};
+      this.client.grantPermissions(input.id, permissions, input.scope);
+    } else if (route === "mcp-elicitation" && input.kind === "mcp-elicitation") {
+      const content = input.action === "accept" ? input.content ?? null : null;
+      validateMcpElicitationContent(request, input.action, content);
+      this.client.respondMcpElicitation(input.id, input.action, content);
+    } else {
+      throw new Error(`Response kind ${input.kind} does not match ${request.method}`);
+    }
+    this.#pendingServerRequests.delete(key);
+    this.#emitPendingRequests();
+  }
+
+  #handleServerRequest(request: AppServerServerRequest): void {
+    const route = serverRequestRoute(request.method);
+    if (route.startsWith("unsupported-")) {
+      this.client.rejectServerRequest(request.id, -32601, `Peel does not support the ${request.method} host capability`, {
+        kind: "unsupported_host_capability",
+        method: request.method,
+      });
+      return;
+    }
+    this.#pendingServerRequests.set(requestKey(request.id), request);
+    this.#emitPendingRequests();
+  }
+
+  #handleRequestResolution(notification: AppServerNotification): void {
+    if (notification.method !== "serverRequest/resolved") return;
+    const requestId = recordOf(notification.params).requestId;
+    if (typeof requestId !== "number" && typeof requestId !== "string") return;
+    if (this.#pendingServerRequests.delete(requestKey(requestId))) this.#emitPendingRequests();
+  }
+
+  #clearPendingRequests(): void {
+    if (this.#pendingServerRequests.size === 0) return;
+    this.#pendingServerRequests.clear();
+    this.#emitPendingRequests();
+  }
+
+  #emitPendingRequests(): void {
+    this.emit("pendingRequests", [...this.#pendingServerRequests.values()]);
+  }
+
+  #recordNotice(notification: AppServerNotification): void {
+    const notice = noticeFromNotification(notification, this.#now());
+    if (!notice) return;
+    this.#notices.set(notice.id, notice);
+    while (this.#notices.size > 50) this.#notices.delete(this.#notices.keys().next().value as string);
+    this.emit("notices", [...this.#notices.values()]);
   }
 
   async #handleAutomaticTitle(notification: AppServerNotification): Promise<void> {
@@ -475,4 +564,186 @@ function isUnavailableThread(error: unknown): boolean {
   return error instanceof AppServerRpcError
     && (error.code === -32600 || error.code === -32004)
     && /thread.*(?:not found|unknown)|unknown.*thread/i.test(error.message);
+}
+
+function requestKey(id: number | string): string {
+  return `${typeof id}:${String(id)}`;
+}
+
+function recordOf(value: unknown): Record<string, unknown> {
+  return isRecord(value) ? value : {};
+}
+
+function isRecord(value: unknown): value is Record<string, unknown> {
+  return Boolean(value) && typeof value === "object" && !Array.isArray(value);
+}
+
+function validateUserInputAnswers(request: AppServerServerRequest, answers: Record<string, string[]>): void {
+  const questions = recordOf(request.params).questions;
+  if (!Array.isArray(questions)) throw new Error("The user-input request has no valid questions");
+  const questionIds = questions
+    .map((question) => isRecord(question) && typeof question.id === "string" ? question.id : null)
+    .filter((id): id is string => Boolean(id));
+  if (questionIds.length !== questions.length) throw new Error("The user-input request contains an invalid question");
+  for (const id of questionIds) {
+    const values = answers[id];
+    if (!Array.isArray(values) || values.length === 0 || values.some((value) => typeof value !== "string" || !value.trim())) {
+      throw new Error("Answer every Codex question before continuing");
+    }
+  }
+  if (Object.keys(answers).some((id) => !questionIds.includes(id))) throw new Error("The response contains an unknown Codex question");
+}
+
+function validateMcpElicitationContent(
+  request: AppServerServerRequest,
+  action: "accept" | "decline" | "cancel",
+  content: unknown,
+): void {
+  if (action !== "accept") return;
+  const params = recordOf(request.params);
+  if (params.mode === "url") {
+    if (content !== null) throw new Error("URL elicitation acceptance cannot include form content");
+    return;
+  }
+  const schema = recordOf(params.requestedSchema);
+  if (params.mode === "openai/form" || params.mode === "openaiForm") {
+    if (!matchesJsonSchema(content, schema)) throw new Error("The MCP response does not match its requested schema");
+    return;
+  }
+  const fields = recordOf(schema.properties);
+  if (!isRecord(content)) throw new Error("MCP form content must be an object");
+  const response = content;
+  const required = Array.isArray(schema.required)
+    ? schema.required.filter((name): name is string => typeof name === "string")
+    : [];
+  for (const name of required) {
+    if (!(name in response)) throw new Error(`Complete the required MCP field: ${name}`);
+  }
+  for (const [name, value] of Object.entries(response)) {
+    if (!(name in fields)) throw new Error(`The MCP response contains an unknown field: ${name}`);
+    const field = recordOf(fields[name]);
+    const type = field.type;
+    const choices = mcpFieldChoices(field);
+    const valid = type === "boolean"
+      ? typeof value === "boolean"
+      : type === "number" || type === "integer"
+        ? typeof value === "number" && Number.isFinite(value) && (type !== "integer" || Number.isInteger(value))
+        : type === "array"
+          ? Array.isArray(value) && value.every((entry) => typeof entry === "string" && (choices.length === 0 || choices.includes(entry)))
+          : choices.length > 0
+            ? typeof value === "string" && choices.includes(value)
+          : typeof value === "string";
+    if (!valid) throw new Error(`The MCP field ${name} does not match its requested type`);
+    if (typeof value === "number" && typeof field.minimum === "number" && value < field.minimum) throw new Error(`The MCP field ${name} is below its minimum`);
+    if (typeof value === "number" && typeof field.maximum === "number" && value > field.maximum) throw new Error(`The MCP field ${name} is above its maximum`);
+    if (typeof value === "string" && typeof field.minLength === "number" && value.length < field.minLength) throw new Error(`The MCP field ${name} is too short`);
+    if (typeof value === "string" && typeof field.maxLength === "number" && value.length > field.maxLength) throw new Error(`The MCP field ${name} is too long`);
+  }
+}
+
+function mcpFieldChoices(field: Record<string, unknown>): string[] {
+  if (Array.isArray(field.enum)) return field.enum.filter((value): value is string => typeof value === "string");
+  const items = recordOf(field.items);
+  if (Array.isArray(items.enum)) return items.enum.filter((value): value is string => typeof value === "string");
+  const oneOf = Array.isArray(field.oneOf) ? field.oneOf : Array.isArray(items.oneOf) ? items.oneOf : [];
+  return oneOf.filter(isRecord).flatMap((option) => typeof option.const === "string" ? [option.const] : []);
+}
+
+function grantedPermissions(requested: Record<string, unknown>): JsonObject {
+  const granted: JsonObject = {};
+  if (isRecord(requested.network)) granted.network = requested.network as JsonObject;
+  if (isRecord(requested.fileSystem)) granted.fileSystem = requested.fileSystem as JsonObject;
+  return granted;
+}
+
+function matchesJsonSchema(value: unknown, schema: Record<string, unknown>): boolean {
+  if (Array.isArray(schema.enum) && !schema.enum.some((candidate) => jsonEqual(candidate, value))) return false;
+  if ("const" in schema && !jsonEqual(schema.const, value)) return false;
+  if (Array.isArray(schema.allOf) && !schema.allOf.every((candidate) => matchesJsonSchema(value, recordOf(candidate)))) return false;
+  if (Array.isArray(schema.anyOf) && !schema.anyOf.some((candidate) => matchesJsonSchema(value, recordOf(candidate)))) return false;
+  if (Array.isArray(schema.oneOf) && schema.oneOf.filter((candidate) => matchesJsonSchema(value, recordOf(candidate))).length !== 1) return false;
+  const allowedTypes = Array.isArray(schema.type) ? schema.type : schema.type === undefined ? [] : [schema.type];
+  if (allowedTypes.length > 0 && !allowedTypes.some((type) => matchesJsonType(value, type))) return false;
+  if (isRecord(value)) {
+    const properties = recordOf(schema.properties);
+    const required = Array.isArray(schema.required) ? schema.required.filter((name): name is string => typeof name === "string") : [];
+    if (required.some((name) => !(name in value))) return false;
+    if (schema.additionalProperties === false && Object.keys(value).some((name) => !(name in properties))) return false;
+    for (const [name, fieldValue] of Object.entries(value)) {
+      if (name in properties && !matchesJsonSchema(fieldValue, recordOf(properties[name]))) return false;
+    }
+  }
+  if (Array.isArray(value)) {
+    if (typeof schema.minItems === "number" && value.length < schema.minItems) return false;
+    if (typeof schema.maxItems === "number" && value.length > schema.maxItems) return false;
+    const items = recordOf(schema.items);
+    if (Object.keys(items).length > 0 && !value.every((item) => matchesJsonSchema(item, items))) return false;
+  }
+  if (typeof value === "string") {
+    if (typeof schema.minLength === "number" && value.length < schema.minLength) return false;
+    if (typeof schema.maxLength === "number" && value.length > schema.maxLength) return false;
+    if (typeof schema.pattern === "string") {
+      try {
+        if (!new RegExp(schema.pattern).test(value)) return false;
+      } catch {
+        return false;
+      }
+    }
+  }
+  if (typeof value === "number") {
+    if (typeof schema.minimum === "number" && value < schema.minimum) return false;
+    if (typeof schema.maximum === "number" && value > schema.maximum) return false;
+  }
+  return true;
+}
+
+function matchesJsonType(value: unknown, type: unknown): boolean {
+  if (type === "null") return value === null;
+  if (type === "array") return Array.isArray(value);
+  if (type === "object") return isRecord(value);
+  if (type === "integer") return typeof value === "number" && Number.isInteger(value);
+  return type === typeof value;
+}
+
+function jsonEqual(left: unknown, right: unknown): boolean {
+  try {
+    return JSON.stringify(left) === JSON.stringify(right);
+  } catch {
+    return false;
+  }
+}
+
+function noticeFromNotification(notification: AppServerNotification, createdAt: number): CodexNotice | null {
+  const params = recordOf(notification.params);
+  let kind: CodexNotice["kind"];
+  let message: string;
+  let threadId = typeof params.threadId === "string" ? params.threadId : null;
+  let turnId: string | null = null;
+  let willRetry = false;
+  if (notification.method === "error") {
+    kind = "error";
+    const error = recordOf(params.error);
+    message = typeof error.message === "string" ? error.message : "Codex reported a Turn error";
+    turnId = typeof params.turnId === "string" ? params.turnId : null;
+    willRetry = params.willRetry === true;
+  } else if (notification.method === "warning" || notification.method === "guardianWarning") {
+    kind = "warning";
+    message = typeof params.message === "string" ? params.message : "Codex reported a warning";
+  } else if (notification.method === "configWarning" || notification.method === "deprecationNotice") {
+    kind = "warning";
+    threadId = null;
+    message = [params.summary, params.details].filter((part): part is string => typeof part === "string" && Boolean(part.trim())).join(" — ") || "Codex reported a warning";
+  } else {
+    return null;
+  }
+  const safeMessage = message.replace(/\s+/g, " ").trim().slice(0, 1_000);
+  return {
+    id: [notification.method, threadId ?? "global", turnId ?? "thread", safeMessage].join(":"),
+    kind,
+    threadId,
+    turnId,
+    message: safeMessage,
+    willRetry,
+    createdAt,
+  };
 }

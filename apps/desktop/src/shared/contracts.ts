@@ -2,6 +2,7 @@ import type {
   AppServerNotification,
   AppServerServerRequest,
   CodexThread,
+  JsonValue,
   ReducedThread,
   ThreadListResponse,
   UserInput,
@@ -88,6 +89,8 @@ export interface BootstrapPayload {
   connected: boolean;
   connectionError: string | null;
   capabilities: Record<string, unknown>;
+  pendingRequests: AppServerServerRequest[];
+  notices: CodexNotice[];
 }
 
 export interface StartSpaceInput {
@@ -135,10 +138,21 @@ export interface SendTurnInput {
   cwd?: string;
 }
 
-export interface ApprovalDecisionInput {
-  id: number | string;
-  method: string;
-  decision: "accept" | "acceptForSession" | "decline" | "cancel";
+export type ServerRequestResponseInput =
+  | { id: number | string; kind: "command"; decision: "accept" | "acceptForSession" | "decline" | "cancel" | "acceptProposedExecpolicyAmendment" | { applyProposedNetworkPolicyAmendment: number } }
+  | { id: number | string; kind: "file-change"; decision: "accept" | "acceptForSession" | "decline" | "cancel" }
+  | { id: number | string; kind: "user-input"; answers: Record<string, string[]> }
+  | { id: number | string; kind: "permissions"; decision: "deny" | "grant"; scope: "turn" | "session" }
+  | { id: number | string; kind: "mcp-elicitation"; action: "accept" | "decline" | "cancel"; content?: JsonValue | null };
+
+export interface CodexNotice {
+  id: string;
+  kind: "error" | "warning";
+  threadId: string | null;
+  turnId: string | null;
+  message: string;
+  willRetry: boolean;
+  createdAt: number;
 }
 
 export interface OpenTargetInput {
@@ -188,9 +202,10 @@ export interface PeelApi {
   finishDictation(threadId: string): Promise<VoiceTranscription>;
   cancelDictation(threadId: string): Promise<void>;
   transcribeWav(bytes: ArrayBuffer): Promise<VoiceTranscription>;
-  decideApproval(input: ApprovalDecisionInput): Promise<void>;
+  respondServerRequest(input: ServerRequestResponseInput): Promise<void>;
   onCodexNotification(listener: (update: CodexNotificationUpdate) => void): () => void;
-  onServerRequest(listener: (request: AppServerServerRequest) => void): () => void;
+  onPendingRequests(listener: (requests: AppServerServerRequest[]) => void): () => void;
+  onNotices(listener: (notices: CodexNotice[]) => void): () => void;
   onConnection(listener: (payload: { connected: boolean; error: string | null }) => void): () => void;
   onFlushRequest(listener: () => Promise<void>): () => void;
 }
@@ -214,9 +229,10 @@ export const IPC = {
   finishDictation: "peel:voice:finish",
   cancelDictation: "peel:voice:cancel",
   transcribeWav: "peel:voice:transcribe",
-  decideApproval: "peel:approval:decide",
+  respondServerRequest: "peel:server-request:respond",
   codexNotification: "peel:event:codex",
-  serverRequest: "peel:event:server-request",
+  pendingRequests: "peel:event:pending-requests",
+  notices: "peel:event:notices",
   connection: "peel:event:connection",
   flushRequest: "peel:event:flush-request",
   flushComplete: "peel:event:flush-complete",
