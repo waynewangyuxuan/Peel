@@ -15,6 +15,7 @@ import type {
   StartSpaceInput,
 } from "../shared/contracts";
 import { IPC } from "../shared/contracts";
+import { openTarget } from "./open-target";
 import { PeelService } from "./peel-service";
 import { VoiceService } from "./voice-service";
 
@@ -132,18 +133,11 @@ function registerIpc(peel: PeelService, voice: VoiceService): void {
   ipcMain.handle(IPC.appendDictationAudio, async (_event, input: DictationAudioInput) => await peel.dictation.append(input));
   ipcMain.handle(IPC.finishDictation, async (_event, threadId: string) => await peel.dictation.finish(threadId));
   ipcMain.handle(IPC.cancelDictation, async (_event, threadId: string) => await peel.dictation.cancel(threadId));
-  ipcMain.handle(IPC.openTarget, async (_event, input: OpenTargetInput) => {
-    if (input.kind === "codex") {
-      if (input.threadId) clipboard.writeText(input.threadId);
-      await shell.openExternal("https://chatgpt.com/codex");
-      return;
-    }
-    if (input.path && existsSync(input.path)) {
-      await shell.openPath(input.path);
-      return;
-    }
-    await shell.openPath(input.cwd);
-  });
+  ipcMain.handle(IPC.openTarget, async (_event, input: OpenTargetInput) => await openTarget(input, {
+    exists: existsSync,
+    openExternal: async (url) => await shell.openExternal(url),
+    openPath: async (path) => await shell.openPath(path),
+  }));
   peel.on("notification", (payload) => window?.webContents.send(IPC.codexNotification, payload));
   peel.on("serverRequest", (payload) => window?.webContents.send(IPC.serverRequest, payload));
   peel.on("connection", (payload) => window?.webContents.send(IPC.connection, payload));

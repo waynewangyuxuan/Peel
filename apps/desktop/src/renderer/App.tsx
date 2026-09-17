@@ -10,6 +10,7 @@ import { Overview } from "./Overview";
 import { BrandMark, PeelBrand } from "./Brand";
 import { Icon } from "./icons";
 import { clip, itemText, latestCompletedTurn, relativeTime } from "./lib";
+import { openCodexInDesktop } from "./open-codex";
 import { mergeThreadPage, threadMatches } from "./thread-search";
 
 export function App(): ReactNode {
@@ -281,6 +282,10 @@ export function App(): ReactNode {
       node.titleOrigin = "manual";
     }, 0);
   };
+  const openCodex = async (node: Pick<SpaceNode, "cwd" | "threadId">): Promise<void> => {
+    const error = await openCodexInDesktop(window.peel.openTarget, node);
+    if (error) setToast(error);
+  };
   return <div className={`app ${state.viewMode} ${forkDraft ? "forking" : ""}`}>
     <SpaceSidebar
       state={state}
@@ -311,7 +316,7 @@ export function App(): ReactNode {
           }, 0)}
           onRenameThread={async (name) => await renameThread(activeNode.threadId, name)}
           onDiff={() => setDiffThreadId(activeNode.threadId)}
-          onOpenCodex={() => void window.peel.openTarget({ kind: "codex", cwd: activeNode.cwd, threadId: activeNode.threadId })}
+          onOpenCodex={() => void openCodex(activeNode)}
         />
         {state.viewMode === "focus" ? <div className="focus-layout">
           <LineageRail space={activeSpace} activeThreadId={activeNode.threadId} threads={threads} onSelect={selectThread} onRename={renameThread}/>
@@ -338,7 +343,7 @@ export function App(): ReactNode {
             onBranch={(turn) => beginFork(turn.id)}
             onApproval={async (input) => { await window.peel.decideApproval(input); setApprovals((all) => all.filter((item) => item.id !== input.id)); }}
             onDiff={() => setDiffThreadId(activeNode.threadId)}
-            onOpenCodex={() => void window.peel.openTarget({ kind: "codex", cwd: activeNode.cwd, threadId: activeNode.threadId })}
+            onOpenCodex={() => void openCodex(activeNode)}
           /> : <ThreadLoading/>}
           {forkDraft && <ForkComposer fork={forkDraft} parentTitle={activeNode.title} parentWorktreeName={activeNode.worktreeName} error={forkError} busy={forkBusy} onChange={setForkDraft} onCancel={() => setForkDraft(null)} onCommit={commitFork}/>}
         </div> : <Overview
@@ -359,7 +364,7 @@ export function App(): ReactNode {
       setShowThreadPicker(false);
       setThreads({});
     }}/>} 
-    {diffThreadId && activeSpace?.nodes[diffThreadId] && <DiffDrawer node={activeSpace.nodes[diffThreadId]} onClose={() => setDiffThreadId(null)} />}
+    {diffThreadId && activeSpace?.nodes[diffThreadId] && <DiffDrawer node={activeSpace.nodes[diffThreadId]} onClose={() => setDiffThreadId(null)} onOpenCodex={openCodex} />}
     {toast && <div className="toast" onAnimationEnd={() => setToast(null)}>{toast}</div>}
   </div>;
 }
@@ -424,7 +429,7 @@ function TopBar({ space, node, mode, connected, onMode, onRenameSpace, onArchive
     <div className="segmented"><button className={mode === "focus" ? "active" : ""} onClick={() => onMode("focus")}><Icon name="chat"/> Focus <kbd>⌘1</kbd></button><button className={mode === "overview" ? "active" : ""} onClick={() => onMode("overview")}><Icon name="map"/> Overview <kbd>⌘2</kbd></button></div>
     <div className="topbar-actions">
       <button onClick={onDiff}><Icon name="diff"/> Diff</button>
-      <button onClick={onOpenCodex} title="Copy this Thread ID, then open Codex"><Icon name="external"/> Open Codex</button>
+      <button onClick={onOpenCodex} title="Open this Chat in the Codex desktop app"><Icon name="external"/> Open Codex</button>
       <button className="icon-button" onClick={() => setMenu(!menu)}><Icon name="more"/></button>
       {menu && <div className="topbar-menu"><button onClick={() => { setEditingThread(true); setMenu(false); }}>Rename Thread</button><button onClick={() => { setEditingSpace(true); setMenu(false); }}>Rename Space</button><button className="danger" onClick={onArchive}>Archive Space</button></div>}
     </div>
@@ -553,7 +558,7 @@ function ThreadPicker({ connected, onClose, onStart }: { connected: boolean; onC
   </div>;
 }
 
-function DiffDrawer({ node, onClose }: { node: SpaceNode; onClose(): void }): ReactNode {
+function DiffDrawer({ node, onClose, onOpenCodex }: { node: SpaceNode; onClose(): void; onOpenCodex(node: SpaceNode): Promise<void> }): ReactNode {
   const [value, setValue] = useState<{ summary: WorkspaceDiffSummary; patch: string } | null>(null);
   const [error, setError] = useState<string | null>(null);
   useEffect(() => { void window.peel.getDiff(node.cwd).then(setValue).catch((reason) => setError(messageOf(reason))); }, [node.cwd]);
@@ -566,7 +571,7 @@ function DiffDrawer({ node, onClose }: { node: SpaceNode; onClose(): void }): Re
         <div className="diff-summary"><span><strong>{value.summary.changedFileCount}</strong> changed files <span className="additions">+{value.summary.additions}</span><span className="deletions">−{value.summary.deletions}</span></span><small>Compared with <b>{value.summary.baseBranch}</b></small></div>
         <div className="file-list">{value.summary.files.map((file) => <div key={`${file.previousPath}-${file.path}`}><span className={`file-status ${file.status}`}>{file.status[0]?.toUpperCase()}</span><span>{file.previousPath ? `${file.previousPath} → ${file.path}` : file.path}</span><em><b>+{file.additions ?? "–"}</b> <i>−{file.deletions ?? "–"}</i></em></div>)}</div>
         <pre className="diff-patch">{value.patch || "No textual diff. Binary or metadata-only changes may still be listed above."}</pre>
-        <footer><button onClick={() => void window.peel.openTarget({ kind: "worktree", cwd: node.cwd })}><Icon name="folder"/> Open worktree</button><button onClick={() => void window.peel.openTarget({ kind: "codex", cwd: node.cwd, threadId: node.threadId })}><Icon name="external"/> Open in Codex</button><button className="primary-button" onClick={() => void window.peel.openTarget({ kind: "editor", cwd: node.cwd })}>Open in editor</button></footer>
+        <footer><button onClick={() => void window.peel.openTarget({ kind: "worktree", cwd: node.cwd })}><Icon name="folder"/> Open worktree</button><button onClick={() => void onOpenCodex(node)}><Icon name="external"/> Open in Codex</button><button className="primary-button" onClick={() => void window.peel.openTarget({ kind: "editor", cwd: node.cwd })}>Open in editor</button></footer>
       </>}
     </aside>
   </div>;

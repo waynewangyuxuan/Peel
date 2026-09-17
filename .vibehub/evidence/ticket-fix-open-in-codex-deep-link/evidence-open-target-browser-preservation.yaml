@@ -1,0 +1,17 @@
+{
+  "acceptance_ids": [
+    "open-target-regression-evidence"
+  ],
+  "evidence_id": "evidence-open-target-browser-preservation",
+  "kind": "ticket_evidence",
+  "origin": "agent",
+  "recorded_at": "2026-09-17T18:55:05Z",
+  "refs": [
+    "apps/desktop/e2e/open-codex.spec.ts",
+    "apps/desktop/test/open-target.test.ts",
+    "command:npx playwright test e2e/open-codex.spec.ts"
+  ],
+  "schema_version": 1,
+  "summary": "The dedicated Electron regression now exercises the real BrowserWindow external-link boundary after the Codex deep-link dispatch: a target=_blank HTTPS link is clicked in the renderer, the main-process setWindowOpenHandler denies in-app navigation, and the stubbed shell.openExternal receives the unchanged https://example.com/safe-markdown-link URL. The same test continues to pass exact Codex routing and failure feedback; unit coverage separately preserves file, editor, and worktree path dispatch.",
+  "ticket_id": "ticket-fix-open-in-codex-deep-link"
+}

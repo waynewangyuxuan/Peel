@@ -1,0 +1,19 @@
+{
+  "acceptance_ids": [
+    "exact-desktop-thread-deep-link",
+    "safe-unavailable-app-failure"
+  ],
+  "evidence_id": "evidence-exact-codex-desktop-deep-link",
+  "kind": "ticket_evidence",
+  "origin": "agent",
+  "recorded_at": "2026-09-17T18:55:05Z",
+  "refs": [
+    "apps/desktop/src/main/open-target.ts",
+    "apps/desktop/src/main/main.ts",
+    "apps/desktop/src/renderer/open-codex.ts",
+    "apps/desktop/src/renderer/App.tsx"
+  ],
+  "schema_version": 1,
+  "summary": "The desktop OpenTarget handler now validates a Codex UUID and dispatches codex://threads/<encoded-thread-id> through the registered OS protocol. The previous clipboard write and https://chatgpt.com/codex target are removed. Every renderer Open Codex entry point uses one guarded action that keeps Peel in place and shows an explicit install/retry toast when the IPC or protocol handler rejects.",
+  "ticket_id": "ticket-fix-open-in-codex-deep-link"
+}
