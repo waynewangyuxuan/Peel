@@ -1,6 +1,6 @@
 import type { AppServerServerRequest, CodexThread, CodexTurn, ReducedThread, ThreadItem, UserInput } from "@peel/codex-app-server";
 import type { WorkspaceDiffSummary } from "@peel/git-workspace";
-import { useEffect, useLayoutEffect, useRef, useState, type ChangeEvent, type KeyboardEvent, type PointerEvent as ReactPointerEvent, type ReactNode } from "react";
+import { useEffect, useLayoutEffect, useRef, useState, type ChangeEvent, type KeyboardEvent, type ReactNode } from "react";
 
 import type { ApprovalDecisionInput, ForkDraft, SpaceNode } from "../shared/contracts";
 import { Icon } from "./icons";
@@ -363,50 +363,15 @@ function TurnView({ turn, reduced, highlighted, onBranch, onOpenCodex }: {
       streaming={!completed}
       onOpenCodex={onOpenCodex}
     />) }
-    <div className="turn-actions">
-      <span>{turn.status === "inProgress" ? "Working" : turn.status === "failed" ? "Needs attention" : turn.status === "interrupted" ? "Stopped" : ""}</span>
-      {turn.status === "completed" && <button onClick={onBranch}><Icon name="branch" size={14}/> Branch from here</button>}
-    </div>
-    {turn.status === "completed" && <PeelHandle onPeel={onBranch}/>} 
+    <TurnActions status={turn.status} onBranch={onBranch}/>
   </section>;
 }
 
-function PeelHandle({ onPeel }: { onPeel(): void }): ReactNode {
-  const gesture = useRef<{ pointerId: number; startX: number; startY: number; moved: boolean } | null>(null);
-  const [preview, setPreview] = useState<{ x: number; y: number } | null>(null);
-  const down = (event: ReactPointerEvent<HTMLButtonElement>): void => {
-    if (event.button !== 0) return;
-    event.preventDefault();
-    event.currentTarget.setPointerCapture(event.pointerId);
-    gesture.current = { pointerId: event.pointerId, startX: event.clientX, startY: event.clientY, moved: false };
-    setPreview({ x: event.clientX, y: event.clientY });
-  };
-  const move = (event: ReactPointerEvent<HTMLButtonElement>): void => {
-    const active = gesture.current;
-    if (!active || active.pointerId !== event.pointerId) return;
-    if (Math.hypot(event.clientX - active.startX, event.clientY - active.startY) > 6) active.moved = true;
-    setPreview({ x: event.clientX, y: event.clientY });
-  };
-  const finish = (event: ReactPointerEvent<HTMLButtonElement>, cancelled = false): void => {
-    const active = gesture.current;
-    if (!active || active.pointerId !== event.pointerId) return;
-    if (event.currentTarget.hasPointerCapture(event.pointerId)) event.currentTarget.releasePointerCapture(event.pointerId);
-    gesture.current = null;
-    setPreview(null);
-    if (!cancelled) onPeel();
-  };
-  return <button
-    className="peel-handle"
-    aria-label="Peel a branch from this turn"
-    title="Drag to peel a new direction"
-    onPointerDown={down}
-    onPointerMove={move}
-    onPointerUp={(event) => finish(event)}
-    onPointerCancel={(event) => finish(event, true)}
-  >
-    <span/>
-    {preview && <i className="peel-drag-preview" style={{ left: preview.x + 14, top: preview.y - 18 }}>New direction</i>}
-  </button>;
+export function TurnActions({ status, onBranch }: { status: CodexTurn["status"]; onBranch(): void }): ReactNode {
+  return <div className="turn-actions">
+    <span>{status === "inProgress" ? "Working" : status === "failed" ? "Needs attention" : status === "interrupted" ? "Stopped" : ""}</span>
+    {status === "completed" && <button type="button" onClick={onBranch}><Icon name="branch" size={14}/> Branch from here</button>}
+  </div>;
 }
 
 export function ItemView({ item, streamedText, streamedReasoningContent = "", streaming, onOpenCodex }: {

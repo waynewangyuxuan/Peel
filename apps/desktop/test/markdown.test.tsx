@@ -3,7 +3,7 @@ import { describe, expect, it } from "vitest";
 import type { ThreadItem } from "@peel/codex-app-server";
 
 import { highlightCode, MarkdownContent } from "../src/renderer/Markdown";
-import { ItemView } from "../src/renderer/Transcript";
+import { ItemView, TurnActions } from "../src/renderer/Transcript";
 import { plainTextPreview } from "../src/renderer/lib";
 
 const LIVE_REDACTED_EXCERPT = `我们先把命题压实。
@@ -18,6 +18,13 @@ const LIVE_REDACTED_EXCERPT = `我们先把命题压实。
 | Tests | 连续性、时间线、人物动机 |`;
 
 describe("MarkdownContent", () => {
+  it("renders one persistent native Branch action only for completed turns", () => {
+    const completed = renderToStaticMarkup(<TurnActions status="completed" onBranch={() => undefined}/>);
+    expect(completed.match(/<button/g)).toHaveLength(1);
+    expect(completed).toContain("Branch from here");
+    expect(completed).not.toContain("peel-handle");
+    expect(renderToStaticMarkup(<TurnActions status="inProgress" onBranch={() => undefined}/>)).not.toContain("<button");
+  });
   it("turns Markdown into calm plain-text previews for spatial cards", () => {
     expect(plainTextPreview(`## Direction
 

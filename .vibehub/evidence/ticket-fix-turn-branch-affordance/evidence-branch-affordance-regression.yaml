@@ -1,0 +1,21 @@
+{
+  "acceptance_ids": [
+    "single-persistent-branch-action",
+    "branch-behavior-preserved",
+    "branch-regression-evidence"
+  ],
+  "evidence_id": "evidence-branch-affordance-regression",
+  "kind": "ticket_evidence",
+  "origin": "agent",
+  "recorded_at": "2026-09-17T18:31:00Z",
+  "refs": [
+    "apps/desktop/test/markdown.test.tsx",
+    "apps/desktop/e2e/v01-journey.spec.ts",
+    "command:npm run typecheck --workspace @peel/desktop",
+    "command:npm test --workspace @peel/desktop -- --run test/markdown.test.tsx",
+    "command:npm run test:e2e --workspace @peel/desktop -- e2e/v01-journey.spec.ts"
+  ],
+  "schema_version": 1,
+  "summary": "Desktop typecheck and all 55 desktop unit tests pass, including a TurnActions regression proving one completed-turn native button and no in-progress action. The rebuilt production Electron journey passed the new assertions for two persistent root Turn buttons, no handle/preview DOM, narrow-window visibility, keyboard Enter activation, cancellation with no thread/fork RPC, exact completed-Turn fork, First Send, live Focus streaming, scroll and Approval; it later failed only at the unrelated existing Overview card-readability assertion at line 514.",
+  "ticket_id": "ticket-fix-turn-branch-affordance"
+}

@@ -363,11 +363,14 @@ test("real Thread-first Fork loop, recovery surfaces, scale, and restart", async
     return performance.now() - start;
   });
   expect(forkLatency).toBeLessThan(150);
+  await expect(page.getByRole("button", { name: "Branch from here" })).toHaveCount(2);
+  await expect(page.locator(".peel-handle, .peel-drag-preview")).toHaveCount(0);
   await page.locator(".fork-surface textarea").fill("Cancel this local-only direction");
   await page.waitForTimeout(250);
   await page.screenshot({ path: join(desktopRoot, "test-results/ui-fork-draft.png") });
   await app!.evaluate(({ BrowserWindow }) => BrowserWindow.getAllWindows()[0]?.setSize(1000, 720));
   await expect.poll(() => page.evaluate(() => window.innerWidth)).toBe(1000);
+  await expect(page.getByRole("button", { name: "Branch from here" }).last()).toBeVisible();
   await page.waitForTimeout(300);
   const narrowForkLayout = await page.evaluate(() => {
     const primary = document.querySelector<HTMLElement>(".fork-footer .primary-button")!.getBoundingClientRect();
@@ -391,13 +394,9 @@ test("real Thread-first Fork loop, recovery surfaces, scale, and restart", async
   const beforeSend = await readFile(rpcLog, "utf8");
   expect(beforeSend).not.toContain('"method":"thread/fork"');
 
-  const peelHandle = page.getByRole("button", { name: "Peel a branch from this turn" }).last();
-  const handleBox = await peelHandle.boundingBox();
-  if (!handleBox) throw new Error("Peel handle did not have a layout box");
-  await page.mouse.move(handleBox.x + handleBox.width / 2, handleBox.y + handleBox.height / 2);
-  await page.mouse.down();
-  await page.mouse.move(handleBox.x + 82, handleBox.y + 24, { steps: 4 });
-  await page.mouse.up();
+  const branchButton = page.getByRole("button", { name: "Branch from here" }).last();
+  await branchButton.focus();
+  await page.keyboard.press("Enter");
   await expect(page.locator(".fork-surface")).toBeVisible();
   await page.locator(".fork-surface textarea").fill("Try a compact navigation direction");
   await page.getByRole("button", { name: "Create & send" }).click();
