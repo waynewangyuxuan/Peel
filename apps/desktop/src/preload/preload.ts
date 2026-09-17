@@ -1,11 +1,12 @@
 import { contextBridge, ipcRenderer } from "electron";
-import type { AppServerNotification, AppServerServerRequest, ThreadListResponse } from "@peel/codex-app-server";
+import type { AppServerServerRequest, ThreadListResponse } from "@peel/codex-app-server";
 
 import type {
   ApprovalDecisionInput,
   BootstrapPayload,
   CommitForkInput,
   CommitForkResult,
+  CodexNotificationUpdate,
   OpenTargetInput,
   PeelApi,
   PeelState,
@@ -45,7 +46,7 @@ const api: PeelApi = {
   cancelDictation: async (threadId: string) => { await ipcRenderer.invoke(IPC.cancelDictation, threadId); },
   transcribeWav: async (bytes) => await ipcRenderer.invoke(IPC.transcribeWav, bytes) as VoiceTranscription,
   decideApproval: async (input: ApprovalDecisionInput) => { await ipcRenderer.invoke(IPC.decideApproval, input); },
-  onCodexNotification: (listener: (payload: AppServerNotification) => void) =>
+  onCodexNotification: (listener: (payload: CodexNotificationUpdate) => void) =>
     subscription(IPC.codexNotification, listener),
   onServerRequest: (listener: (payload: AppServerServerRequest) => void) =>
     subscription(IPC.serverRequest, listener),

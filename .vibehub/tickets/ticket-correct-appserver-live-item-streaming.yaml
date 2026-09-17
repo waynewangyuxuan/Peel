@@ -1,0 +1,59 @@
+{
+  "acceptance": [
+    {
+      "acceptance_id": "item-specific-delta-reduction",
+      "criterion": "The reducer explicitly handles item/agentMessage/delta, item/plan/delta, item/reasoning/summaryTextDelta, item/reasoning/summaryPartAdded, item/reasoning/textDelta, and item/commandExecution/outputDelta with ordered, item-scoped state; deprecated item/fileChange/outputDelta is either reconstructed as compatibility output or deliberately ignored by an asserted test."
+    },
+    {
+      "acceptance_id": "reasoning-channel-fidelity",
+      "criterion": "Streaming Reasoning preserves readable summary section boundaries separately from raw reasoning content, renders the supported public summary path without duplicated text, and never rewrites the final completed summary/content fields."
+    },
+    {
+      "acceptance_id": "authoritative-completion",
+      "criterion": "item/completed atomically replaces provisional stream state for agent, plan, reasoning, and command items; stale, duplicate, out-of-order, or post-completion deltas cannot mutate the final item, while Turn completion and aggregate diff authority remain unchanged."
+    },
+    {
+      "acceptance_id": "live-rendering-behavior",
+      "criterion": "Focus shows agent prose, plan text, Reasoning summary, and command output while they stream, using the existing safe Markdown or exact technical-output route as appropriate, without waiting for a full Thread reread or introducing scroll jumps."
+    },
+    {
+      "acceptance_id": "streaming-contract-evidence",
+      "criterion": "Generated-schema-backed fixtures and adapter, renderer, and Electron tests cover every in-scope delta method named by this Ticket, summary boundary, multiple interleaved items, completion mismatch, stale ordering, interrupted/failed Turns, safe Markdown projection, command exactness, and existing agent streaming behavior."
+    }
+  ],
+  "constraints": [
+    "The exact installed Codex App Server schema and official item/delta documentation are protocol authority.",
+    "Do not concatenate semantically different reasoning channels into authoritative item fields or fabricate missing boundaries.",
+    "Do not change semantic renderers for MCP, dynamic tools, web search, review, media, or unknown future items in this Ticket.",
+    "Keep full Thread reread reconciliation as a recovery path, not the primary live-stream implementation."
+  ],
+  "context": "The accepted rendering audit found that the reducer's lowercase /delta suffix check handles agent and plan deltas but drops reasoning summary/raw deltas, reasoning summary boundaries, and command outputDelta events. Full Thread rereads can mask the issue only after latency or completion. This Ticket corrects live item reconstruction without expanding semantic item presentation or changing stored Codex facts.",
+  "context_refs": [
+    {
+      "purpose": "Provides the independently accepted delta gap and priority.",
+      "ref": ".vibehub/outcomes/ticket-audit-codex-rendering-surface.yaml"
+    },
+    {
+      "purpose": "Provides the exact item, delta, route, safety, and performance matrix.",
+      "ref": "docs/review/rendering-audit/README.md"
+    },
+    {
+      "purpose": "Defines streaming, scroll, technical-output, and unknown-item fidelity.",
+      "ref": ".vibehub/rooms/product/contract-focus-chat-fidelity.yaml"
+    }
+  ],
+  "deliveries": [],
+  "kind": "ticket",
+  "maturity": "firm",
+  "outcome": "Peel reconstructs current agent-message, plan, reasoning-summary/raw-content, and command-execution output streams with item-specific semantics and treats item/completed as the exact authoritative replacement.",
+  "provenance_refs": [
+    "conversation:2026-09-17-start-rendering-implementation",
+    "https://developers.openai.com/codex/app-server",
+    "packages/codex-app-server/src/reducer.ts",
+    "packages/codex-app-server/test/reducer.test.ts",
+    "apps/desktop/src/renderer/Transcript.tsx"
+  ],
+  "relations": [],
+  "schema_version": 2,
+  "ticket_id": "ticket-correct-appserver-live-item-streaming"
+}

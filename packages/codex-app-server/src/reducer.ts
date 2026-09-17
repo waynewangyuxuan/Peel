@@ -3,7 +3,11 @@ import type { AppServerNotification, CodexThread, CodexTurn, ThreadItem, ThreadS
 interface ItemState {
   item: ThreadItem;
   completed: boolean;
-  deltas: string[];
+  textDeltas: string[];
+  reasoningSummarySections: Map<number, string[]>;
+  reasoningContentSections: Map<number, string[]>;
+  commandOutputDeltas: string[];
+  legacyFileChangeOutputDeltas: string[];
   lastEmittedAtMs: number;
 }
 
@@ -28,6 +32,8 @@ export interface ReducedItem {
   item: ThreadItem;
   completed: boolean;
   streamedText: string;
+  streamedReasoningContent: string;
+  streamedReasoningSummarySections: string[];
 }
 
 export interface ReducedTurn {
@@ -72,7 +78,7 @@ function turnState(turn: CodexTurn): TurnState {
     items: new Map(
       turn.items.map((item) => [
         item.id,
-        { item: structuredClone(item), completed: true, deltas: [], lastEmittedAtMs: 0 },
+        itemState(item, true, 0),
       ]),
     ),
     aggregateDiff: reconstructDiff(turn),
@@ -176,26 +182,64 @@ export class AppServerReducer {
         const completed = notification.method === "item/completed";
         const existing = turn.items.get(params.item.id);
         if (existing?.completed && !completed) return false;
-        turn.items.set(params.item.id, {
-          item: structuredClone(params.item),
-          completed,
-          deltas: completed ? [] : (existing?.deltas ?? []),
-          lastEmittedAtMs: at,
-        });
+        turn.items.set(params.item.id, completed
+          ? itemState(params.item, true, at)
+          : existing
+            ? { ...existing, item: structuredClone(params.item), completed: false, lastEmittedAtMs: at }
+            : itemState(params.item, false, at));
         upsertItem(turn.turn, params.item);
+        return true;
+      }
+      case "item/agentMessage/delta":
+      case "item/plan/delta": {
+        const expectedType = notification.method === "item/agentMessage/delta" ? "agentMessage" : "plan";
+        const item = this.#streamingItem(state, params, at, expectedType);
+        if (!item || typeof params.delta !== "string") return false;
+        item.textDeltas.push(params.delta);
+        item.lastEmittedAtMs = at;
+        return true;
+      }
+      case "item/reasoning/summaryPartAdded": {
+        const item = this.#streamingItem(state, params, at, "reasoning");
+        if (!item || !isNonNegativeInteger(params.summaryIndex)) return false;
+        ensureSection(item.reasoningSummarySections, params.summaryIndex);
+        item.lastEmittedAtMs = at;
+        return true;
+      }
+      case "item/reasoning/summaryTextDelta": {
+        const item = this.#streamingItem(state, params, at, "reasoning");
+        if (!item || typeof params.delta !== "string" || !isNonNegativeInteger(params.summaryIndex)) return false;
+        ensureSection(item.reasoningSummarySections, params.summaryIndex).push(params.delta);
+        item.lastEmittedAtMs = at;
+        return true;
+      }
+      case "item/reasoning/textDelta": {
+        const item = this.#streamingItem(state, params, at, "reasoning");
+        if (!item || typeof params.delta !== "string" || !isNonNegativeInteger(params.contentIndex)) return false;
+        ensureSection(item.reasoningContentSections, params.contentIndex).push(params.delta);
+        item.lastEmittedAtMs = at;
+        return true;
+      }
+      case "item/commandExecution/outputDelta": {
+        const item = this.#streamingItem(state, params, at, "commandExecution");
+        if (!item || typeof params.delta !== "string") return false;
+        item.commandOutputDeltas.push(params.delta);
+        item.lastEmittedAtMs = at;
+        return true;
+      }
+      case "item/fileChange/outputDelta": {
+        const item = this.#streamingItem(state, params, at, "fileChange");
+        if (!item || typeof params.delta !== "string") return false;
+        item.legacyFileChangeOutputDeltas.push(params.delta);
+        item.lastEmittedAtMs = at;
         return true;
       }
       default: {
         if (!notification.method.startsWith("item/") || !notification.method.endsWith("/delta")) return false;
-        const turn = this.#turn(state, turnIdOf(params));
-        const itemId = typeof params.itemId === "string" ? params.itemId : null;
-        if (!turn || !itemId) return false;
-        const item = turn.items.get(itemId);
-        if (!item || item.completed || (notification.emittedAtMs !== undefined && at < item.lastEmittedAtMs)) {
-          return false;
-        }
+        const item = this.#streamingItem(state, params, at);
+        if (!item) return false;
         const delta = typeof params.delta === "string" ? params.delta : JSON.stringify(params.delta ?? "");
-        item.deltas.push(delta);
+        item.textDeltas.push(delta);
         item.lastEmittedAtMs = at;
         return true;
       }
@@ -241,6 +285,50 @@ export class AppServerReducer {
   #turn(state: ThreadState, turnId: string | null): TurnState | null {
     return turnId ? (state.turns.get(turnId) ?? null) : null;
   }
+
+  #streamingItem(
+    state: ThreadState,
+    params: Record<string, unknown>,
+    at: number,
+    expectedType?: string,
+  ): ItemState | null {
+    const turn = this.#turn(state, turnIdOf(params));
+    const itemId = typeof params.itemId === "string" ? params.itemId : null;
+    if (!turn || !itemId) return null;
+    const item = turn.items.get(itemId);
+    if (!item || item.completed || at < item.lastEmittedAtMs || (expectedType && item.item.type !== expectedType)) return null;
+    return item;
+  }
+}
+
+function itemState(item: ThreadItem, completed: boolean, lastEmittedAtMs: number): ItemState {
+  return {
+    item: structuredClone(item),
+    completed,
+    textDeltas: [],
+    reasoningSummarySections: new Map(),
+    reasoningContentSections: new Map(),
+    commandOutputDeltas: [],
+    legacyFileChangeOutputDeltas: [],
+    lastEmittedAtMs,
+  };
+}
+
+function isNonNegativeInteger(value: unknown): value is number {
+  return typeof value === "number" && Number.isInteger(value) && value >= 0;
+}
+
+function ensureSection(sections: Map<number, string[]>, index: number): string[] {
+  const existing = sections.get(index);
+  if (existing) return existing;
+  const created: string[] = [];
+  sections.set(index, created);
+  return created;
+}
+
+function joinedSections(sections: Map<number, string[]>): string[] {
+  const lastIndex = Math.max(-1, ...sections.keys());
+  return Array.from({ length: lastIndex + 1 }, (_, index) => sections.get(index)?.join("") ?? "");
 }
 
 function isThreadStatus(value: unknown): value is ThreadStatus {
@@ -281,11 +369,24 @@ function toReducedTurn(state: TurnState): ReducedTurn {
   return {
     turn: structuredClone(state.turn),
     completed: state.completed,
-    items: [...state.items.values()].map((item) => ({
-      item: structuredClone(item.item),
-      completed: item.completed,
-      streamedText: item.deltas.join(""),
-    })),
+    items: [...state.items.values()].map((item) => {
+      const summarySections = joinedSections(item.reasoningSummarySections);
+      const contentSections = joinedSections(item.reasoningContentSections);
+      const streamedText = item.item.type === "reasoning"
+        ? summarySections.join("\n\n")
+        : item.item.type === "commandExecution"
+          ? item.commandOutputDeltas.join("")
+          : item.item.type === "fileChange"
+            ? item.legacyFileChangeOutputDeltas.join("")
+            : item.textDeltas.join("");
+      return {
+        item: structuredClone(item.item),
+        completed: item.completed,
+        streamedText,
+        streamedReasoningContent: contentSections.join("\n\n"),
+        streamedReasoningSummarySections: summarySections,
+      };
+    }),
     aggregateDiff: state.aggregateDiff,
   };
 }

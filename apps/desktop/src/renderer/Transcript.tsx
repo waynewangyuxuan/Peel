@@ -4,7 +4,7 @@ import { useEffect, useLayoutEffect, useRef, useState, type ChangeEvent, type Ke
 
 import type { ApprovalDecisionInput, ForkDraft, SpaceNode } from "../shared/contracts";
 import { Icon } from "./icons";
-import { itemText } from "./lib";
+import { itemText, itemTextFromKeys } from "./lib";
 import { startPcmRecorder, type RecorderSession } from "./audio";
 import { HighlightedCode, MarkdownContent } from "./Markdown";
 import { voiceFailurePresentation, type VoiceFailurePresentation } from "./voice-error";
@@ -347,9 +347,22 @@ function TurnView({ turn, reduced, highlighted, onBranch, onOpenCodex }: {
   onBranch(): void;
   onOpenCodex(): void;
 }): ReactNode {
-  const items = reduced?.items ?? turn.items.map((item) => ({ item, completed: true, streamedText: "" }));
+  const items = reduced?.items ?? turn.items.map((item) => ({
+    item,
+    completed: true,
+    streamedText: "",
+    streamedReasoningContent: "",
+    streamedReasoningSummarySections: [],
+  }));
   return <section className={`turn ${highlighted ? "highlighted" : ""}`} data-turn-id={turn.id}>
-    {items.map(({ item, streamedText, completed }) => <ItemView key={item.id} item={item} streamedText={streamedText} streaming={!completed} onOpenCodex={onOpenCodex}/>) }
+    {items.map(({ item, streamedText, streamedReasoningContent, completed }) => <ItemView
+      key={item.id}
+      item={item}
+      streamedText={streamedText}
+      streamedReasoningContent={streamedReasoningContent}
+      streaming={!completed}
+      onOpenCodex={onOpenCodex}
+    />) }
     <div className="turn-actions">
       <span>{turn.status === "inProgress" ? "Working" : turn.status === "failed" ? "Needs attention" : turn.status === "interrupted" ? "Stopped" : ""}</span>
       {turn.status === "completed" && <button onClick={onBranch}><Icon name="branch" size={14}/> Branch from here</button>}
@@ -396,12 +409,24 @@ function PeelHandle({ onPeel }: { onPeel(): void }): ReactNode {
   </button>;
 }
 
-export function ItemView({ item, streamedText, streaming, onOpenCodex }: { item: ThreadItem; streamedText: string; streaming: boolean; onOpenCodex(): void }): ReactNode {
-  const text = itemText(item) + streamedText;
+export function ItemView({ item, streamedText, streamedReasoningContent = "", streaming, onOpenCodex }: {
+  item: ThreadItem;
+  streamedText: string;
+  streamedReasoningContent?: string;
+  streaming: boolean;
+  onOpenCodex(): void;
+}): ReactNode {
+  const completedText = item.type === "reasoning"
+    ? itemTextFromKeys(item, ["summary", "content", "text", "message"], "\n\n")
+    : itemText(item);
+  const text = completedText + streamedText;
   if (item.type === "userMessage") return <article className="message user-message"><MarkdownContent text={text || "User message"} className="user-markdown"/></article>;
   if (item.type === "agentMessage") return <article className="message agent-message"><MarkdownContent text={text} streaming={streaming}/></article>;
+  if (item.type === "plan") return <ActivityDisclosure icon="more" label={streaming ? "Planning" : "Plan"} state={activityState(item, streaming)} defaultOpen={streaming}>
+    <MarkdownContent text={text || "Plan"} streaming={streaming}/>
+  </ActivityDisclosure>;
   if (item.type === "reasoning") return <ActivityDisclosure icon="reasoning" label={streaming ? "Thinking" : "Reasoning"} state={activityState(item, streaming)} defaultOpen={streaming} kind="reasoning">
-    <MarkdownContent text={text || "Reasoning activity"} streaming={streaming}/>
+    <MarkdownContent text={text || streamedReasoningContent || "Reasoning activity"} streaming={streaming}/>
   </ActivityDisclosure>;
   if (item.type === "commandExecution") {
     const state = activityState(item, streaming);
@@ -471,10 +496,11 @@ function commandText(item: ThreadItem): string {
 }
 
 function commandOutput(text: string, command: string): string {
-  const trimmed = text.trim();
-  if (!trimmed || trimmed === command.trim()) return "";
-  if (trimmed.startsWith(`${command.trim()}\n`)) return trimmed.slice(command.trim().length + 1);
-  return trimmed;
+  if (!text.trim()) return "";
+  const normalizedCommand = command.trim();
+  if (text.trim() === normalizedCommand) return "";
+  if (text.startsWith(`${normalizedCommand}\n`)) return text.slice(normalizedCommand.length + 1);
+  return text;
 }
 
 interface TechnicalSection { label: string; value: string; language?: string }

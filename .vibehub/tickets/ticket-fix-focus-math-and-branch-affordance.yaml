@@ -6,55 +6,46 @@
     },
     {
       "acceptance_id": "streaming-and-copy-fidelity",
-      "criterion": "Incomplete streamed math remains readable without breaking surrounding Markdown or causing page-width overflow, and completed math preserves selectable/copyable source meaning while headings, tables, blockquotes, links, fenced code, and existing streaming projection behavior remain intact."
+      "criterion": "Incomplete streamed math remains readable source text without breaking surrounding Markdown or causing page-width overflow; completed math preserves selectable/copyable source meaning while headings, tables, blockquotes, links, fenced code, and existing streaming projection behavior remain intact."
     },
     {
-      "acceptance_id": "single-persistent-branch-action",
-      "criterion": "A completed Turn renders exactly one branch affordance: a keyboard-accessible button labeled Branch from here at the Turn footer. The circular PeelHandle and its drag preview are absent from the DOM and stylesheet, and the footer action is visible without hover or focus at supported desktop widths."
-    },
-    {
-      "acceptance_id": "branch-behavior-preserved",
-      "criterion": "Activating Branch from here still opens the same cancellable local Fork Draft anchored to the exact completed Turn, preserves the no-durable-state-before-First-Send contract, and behaves correctly for long responses, multiple Turns, keyboard activation, and narrow supported windows."
-    },
-    {
-      "acceptance_id": "focus-regression-evidence",
-      "criterion": "Automated unit and production Electron evidence covers the reported formula, safe-content rejection, incomplete streaming math, persistent branch visibility, absence of the duplicate circular handle, exact-Turn Fork Draft creation, and retention of the existing Focus Markdown, Activity, scroll, draft, Voice, Approval, and Overview journeys."
+      "acceptance_id": "math-regression-evidence",
+      "criterion": "Automated unit and production Electron evidence covers inline and display formulas, the reported Attention expression, malformed and incomplete streamed delimiters, safe-content rejection, accessibility semantics, copy/selection, overflow, and retention of the existing Focus Markdown and Activity journeys."
     }
   ],
   "constraints": [
-    "Use a maintained math AST/typesetting path compatible with the existing safe ReactMarkdown renderer; do not enable raw HTML, arbitrary script execution, or remote interactive embeds.",
-    "Do not reinterpret Command output, patches, diffs, or unknown machine facts as prose math.",
-    "Keep Branch from here visually clear but subordinate to conversation content; do not introduce another gesture-only or duplicate branch control.",
-    "Preserve the exact completed-Turn anchor and existing Fork lifecycle semantics."
+    "Use a maintained math AST/typesetting path compatible with the existing safe ReactMarkdown renderer; do not enable raw HTML, arbitrary script execution, remote interactive embeds, or inline style injection.",
+    "Do not reinterpret Command output, patches, diffs, unknown machine facts, or code fences as prose math.",
+    "Keep streaming repair render-only; authoritative Codex text remains unchanged."
   ],
-  "context": "Live dogfood exposed two Focus fidelity defects in the same completed-response surface: LaTeX display math leaks as literal control syntax, and the branch action is split between a hidden text action and an unlabeled circular handle positioned halfway through long Turns. The user selected the final interaction: remove the circle and make Branch from here persistent and more visible.",
+  "context": "The rendering audit confirmed that math fidelity is a prose-parser concern independent from the Branch interaction. This rewritten Ticket keeps the existing ID for Git history but removes Branch acceptance into its own Ticket, leaving one coherent safe-math deliverable for user, assistant, Reasoning, Subagent, and error prose.",
   "context_refs": [
     {
-      "purpose": "Captures the reported raw-LaTeX failure and the required safe math boundary.",
+      "purpose": "Captures the reported raw-LaTeX failure and safe math boundary.",
       "ref": ".vibehub/rooms/product/constraint-focus-math-typesetting.yaml"
-    },
-    {
-      "purpose": "Records the user's final decision to remove the circle and keep one visible Turn-footer action.",
-      "ref": ".vibehub/rooms/product/decision-turn-branch-action-placement.yaml"
     },
     {
       "purpose": "Preserves the complete Focus reading, streaming, selection, and fallback contract.",
       "ref": ".vibehub/rooms/product/contract-focus-chat-fidelity.yaml"
     },
     {
-      "purpose": "Provides the completed safe Markdown and streaming baseline that this correction must retain.",
+      "purpose": "Provides the completed safe Markdown and streaming baseline.",
       "ref": ".vibehub/outcomes/ticket-rebuild-chat-reading-surface.yaml"
+    },
+    {
+      "purpose": "Provides the independently accepted rendering audit and split recommendation.",
+      "ref": ".vibehub/outcomes/ticket-audit-codex-rendering-surface.yaml"
     }
   ],
   "deliveries": [],
   "kind": "ticket",
   "maturity": "firm",
-  "outcome": "Focus Chat safely typesets common Codex math and exposes one clear, persistent Branch from here action at the completed Turn boundary.",
+  "outcome": "Focus Chat safely typesets common Codex math in completed and streaming prose without enabling raw HTML or changing technical-output semantics.",
   "provenance_refs": [
     "conversation:2026-09-16-live-dogfood-chat-performance-and-focus-affordances#image-1-math",
+    "conversation:2026-09-17-start-rendering-implementation",
     "apps/desktop/src/renderer/Markdown.tsx",
-    "apps/desktop/src/renderer/Transcript.tsx",
-    "apps/desktop/src/renderer/styles.css"
+    "apps/desktop/test/markdown.test.tsx"
   ],
   "relations": [],
   "schema_version": 2,

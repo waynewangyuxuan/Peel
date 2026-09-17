@@ -65,7 +65,12 @@ export class PeelService extends EventEmitter {
     this.client = new AppServerClient(this.transport);
     this.dictation = new RealtimeDictationService(this.client);
     this.client.on("notification", (notification: AppServerNotification) => {
-      this.emit("notification", notification);
+      const threadId = typeof notification.params.threadId === "string" ? notification.params.threadId : null;
+      const reduced = threadId ? this.client.getThreadState(threadId) : null;
+      this.emit("notification", {
+        notification,
+        snapshot: reduced ? { thread: reduced.thread, reduced } : null,
+      });
       void this.#handleAutomaticTitle(notification);
     });
     this.client.on("serverRequest", (request: AppServerServerRequest) => this.emit("serverRequest", request));

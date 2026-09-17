@@ -57,6 +57,95 @@ test("completed item is authoritative over duplicate and out-of-order deltas", (
   assert.equal(reduced?.items[0]?.item.text, "final");
 });
 
+test("reconstructs item-specific live streams without flattening reasoning sections", () => {
+  const reducer = new AppServerReducer();
+  reducer.rebuild(thread("t", [turn("turn-1", "inProgress")]));
+  const items = [
+    item("message-1", "agentMessage"),
+    item("plan-1", "plan"),
+    item("reasoning-1", "reasoning"),
+    item("command-1", "commandExecution", { command: "printf raw", status: "inProgress" }),
+    item("file-1", "fileChange", { status: "inProgress" }),
+  ];
+  items.forEach((startedItem, index) => assert.equal(reducer.apply({
+    method: "item/started",
+    emittedAtMs: index + 1,
+    params: { threadId: "t", turnId: "turn-1", item: startedItem },
+  }), true));
+
+  const notifications = [
+    ["item/agentMessage/delta", 10, { itemId: "message-1", delta: "Hello **world**" }],
+    ["item/plan/delta", 11, { itemId: "plan-1", delta: "- Inspect\n- Fix" }],
+    ["item/reasoning/summaryPartAdded", 12, { itemId: "reasoning-1", summaryIndex: 0 }],
+    ["item/reasoning/summaryTextDelta", 13, { itemId: "reasoning-1", summaryIndex: 0, delta: "First " }],
+    ["item/reasoning/summaryTextDelta", 14, { itemId: "reasoning-1", summaryIndex: 0, delta: "summary" }],
+    ["item/reasoning/summaryPartAdded", 15, { itemId: "reasoning-1", summaryIndex: 1 }],
+    ["item/reasoning/summaryTextDelta", 16, { itemId: "reasoning-1", summaryIndex: 1, delta: "Second summary" }],
+    ["item/reasoning/textDelta", 17, { itemId: "reasoning-1", contentIndex: 0, delta: "raw-a" }],
+    ["item/reasoning/textDelta", 18, { itemId: "reasoning-1", contentIndex: 1, delta: "raw-b" }],
+    ["item/commandExecution/outputDelta", 19, { itemId: "command-1", delta: "**not markdown**\n" }],
+    ["item/commandExecution/outputDelta", 20, { itemId: "command-1", delta: "done" }],
+    ["item/fileChange/outputDelta", 21, { itemId: "file-1", delta: "legacy patch output" }],
+  ] as const;
+  for (const [method, emittedAtMs, itemParams] of notifications) {
+    assert.equal(reducer.apply({
+      method,
+      emittedAtMs,
+      params: { threadId: "t", turnId: "turn-1", ...itemParams },
+    }), true, method);
+  }
+
+  const reduced = reducer.getTurn("t", "turn-1");
+  const byId = new Map(reduced?.items.map((reducedItem) => [reducedItem.item.id, reducedItem]));
+  assert.equal(byId.get("message-1")?.streamedText, "Hello **world**");
+  assert.equal(byId.get("plan-1")?.streamedText, "- Inspect\n- Fix");
+  assert.deepEqual(byId.get("reasoning-1")?.streamedReasoningSummarySections, ["First summary", "Second summary"]);
+  assert.equal(byId.get("reasoning-1")?.streamedText, "First summary\n\nSecond summary");
+  assert.equal(byId.get("reasoning-1")?.streamedReasoningContent, "raw-a\n\nraw-b");
+  assert.equal(byId.get("command-1")?.streamedText, "**not markdown**\ndone");
+  assert.equal(byId.get("file-1")?.streamedText, "legacy patch output");
+});
+
+test("rejects mismatched, stale, duplicate, and post-completion item deltas", () => {
+  const reducer = new AppServerReducer();
+  reducer.rebuild(thread("t", [turn("turn-1", "inProgress")]));
+  reducer.apply({
+    method: "item/started",
+    emittedAtMs: 10,
+    params: { threadId: "t", turnId: "turn-1", item: item("command-1", "commandExecution") },
+  });
+  assert.equal(reducer.apply({
+    method: "item/agentMessage/delta",
+    emittedAtMs: 11,
+    params: { threadId: "t", turnId: "turn-1", itemId: "command-1", delta: "wrong channel" },
+  }), false);
+  const valid = {
+    method: "item/commandExecution/outputDelta",
+    emittedAtMs: 12,
+    params: { threadId: "t", turnId: "turn-1", itemId: "command-1", delta: "one" },
+  };
+  assert.equal(reducer.apply(valid), true);
+  assert.equal(reducer.apply(valid), false);
+  assert.equal(reducer.apply({ ...valid, emittedAtMs: 11, params: { ...valid.params, delta: "stale" } }), false);
+  assert.equal(reducer.apply({
+    method: "item/completed",
+    emittedAtMs: 13,
+    params: {
+      threadId: "t",
+      turnId: "turn-1",
+      item: item("command-1", "commandExecution", { command: "printf final", aggregatedOutput: "final", status: "completed" }),
+    },
+  }), true);
+  assert.equal(reducer.apply({ ...valid, emittedAtMs: 14, params: { ...valid.params, delta: "too late" } }), false);
+
+  const reduced = reducer.getTurn("t", "turn-1")?.items[0];
+  assert.equal(reduced?.completed, true);
+  assert.equal(reduced?.streamedText, "");
+  assert.equal(reduced?.streamedReasoningContent, "");
+  assert.deepEqual(reduced?.streamedReasoningSummarySections, []);
+  assert.equal(reduced?.item.aggregatedOutput, "final");
+});
+
 test("turn completion and latest aggregate diff become authoritative", () => {
   const reducer = new AppServerReducer();
   reducer.rebuild(thread("t", [turn("turn-1", "inProgress")]));
@@ -80,6 +169,36 @@ test("turn completion and latest aggregate diff become authoritative", () => {
     }),
     false,
   );
+});
+
+test("interrupted and failed turn snapshots replace provisional item streams", () => {
+  for (const status of ["interrupted", "failed"] as const) {
+    const reducer = new AppServerReducer();
+    reducer.rebuild(thread("t", [turn("turn-1", "inProgress")]));
+    reducer.apply({
+      method: "item/started",
+      emittedAtMs: 1,
+      params: { threadId: "t", turnId: "turn-1", item: item("message-1") },
+    });
+    reducer.apply({
+      method: "item/agentMessage/delta",
+      emittedAtMs: 2,
+      params: { threadId: "t", turnId: "turn-1", itemId: "message-1", delta: "provisional" },
+    });
+    reducer.apply({
+      method: "turn/completed",
+      emittedAtMs: 3,
+      params: {
+        threadId: "t",
+        turn: turn("turn-1", status, [item("message-1", "agentMessage", { text: `${status} final` })]),
+      },
+    });
+    const reduced = reducer.getTurn("t", "turn-1");
+    assert.equal(reduced?.completed, true);
+    assert.equal(reduced?.turn.status, status);
+    assert.equal(reduced?.items[0]?.streamedText, "");
+    assert.equal(reduced?.items[0]?.item.text, `${status} final`);
+  }
 });
 
 test("status and name notifications update deterministic derived state", () => {

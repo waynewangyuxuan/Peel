@@ -76,6 +76,11 @@ export interface ThreadSnapshot {
   reduced: ReducedThread | null;
 }
 
+export interface CodexNotificationUpdate {
+  notification: AppServerNotification;
+  snapshot: ThreadSnapshot | null;
+}
+
 export interface BootstrapPayload {
   state: PeelState;
   connected: boolean;
@@ -182,7 +187,7 @@ export interface PeelApi {
   cancelDictation(threadId: string): Promise<void>;
   transcribeWav(bytes: ArrayBuffer): Promise<VoiceTranscription>;
   decideApproval(input: ApprovalDecisionInput): Promise<void>;
-  onCodexNotification(listener: (notification: AppServerNotification) => void): () => void;
+  onCodexNotification(listener: (update: CodexNotificationUpdate) => void): () => void;
   onServerRequest(listener: (request: AppServerServerRequest) => void): () => void;
   onConnection(listener: (payload: { connected: boolean; error: string | null }) => void): () => void;
   onFlushRequest(listener: () => Promise<void>): () => void;

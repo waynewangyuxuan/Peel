@@ -405,6 +405,16 @@ test("real Thread-first Fork loop, recovery surfaces, scale, and restart", async
   const streamingAgent = page.locator(".turn").last().locator(".agent-message");
   await expect(streamingAgent.locator("strong")).toContainText("A streamed result");
   expect(await streamingAgent.innerText()).not.toContain("**");
+  const streamingTurn = page.locator(".turn").last();
+  const livePlan = streamingTurn.locator(".activity-item").filter({ hasText: "Live plan detail" });
+  const liveReasoning = streamingTurn.locator(".activity-item").filter({ hasText: "Reasoning summary one" });
+  const liveCommand = streamingTurn.locator(".activity-item").filter({ hasText: "raw command output" });
+  await expect(livePlan.locator("strong")).toHaveText("Live plan detail");
+  await expect(liveReasoning.locator("strong")).toHaveText("summary one");
+  await expect(liveReasoning).toContainText("Summary two");
+  await expect(liveReasoning).not.toContainText("Raw reasoning fallback");
+  await expect(liveCommand).toContainText("  **raw command output**");
+  await expect(liveCommand.locator("strong")).toHaveCount(0);
   await page.locator(".transcript").evaluate((element) => {
     element.scrollTop = element.scrollHeight;
     element.dispatchEvent(new Event("scroll"));
@@ -419,6 +429,9 @@ test("real Thread-first Fork loop, recovery surfaces, scale, and restart", async
   await page.waitForTimeout(190);
   expect(await page.locator(".transcript").evaluate((element) => element.scrollTop)).toBeLessThan(4);
   await expect(page.getByText("Command approval")).toBeVisible();
+  const streamedChildReads = (await readRpcEvents()).filter((event) =>
+    event.method === "thread/read" && event.params?.threadId === "thread-child-1");
+  expect(streamedChildReads.length).toBeLessThanOrEqual(1);
   await page.locator(".thread-name").dblclick();
   await page.locator(".topbar-title input").fill("Manual branch name");
   await page.locator(".topbar-title input").press("Enter");

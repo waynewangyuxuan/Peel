@@ -27,6 +27,22 @@ describe("MarkdownContent", () => {
 - ~~Remove chrome~~`)).toBe("Direction A streamed result for this direction. Preserve Focus Remove chrome");
   });
 
+  it("falls through empty text fields to authoritative summary and output fields", () => {
+    expect(plainTextPreview("**ready**")).toBe("ready");
+    const reasoning = {
+      type: "reasoning",
+      text: "",
+      content: ["raw content must stay secondary"],
+      summary: ["First", "Second"],
+    } as unknown as ThreadItem;
+    const command = { type: "commandExecution", text: "", aggregatedOutput: "exact output" } as unknown as ThreadItem;
+    const reasoningHtml = renderToStaticMarkup(<ItemView item={reasoning} streamedText="" streaming={false} onOpenCodex={() => undefined}/>);
+    expect(reasoningHtml).toContain("First");
+    expect(reasoningHtml).toContain("Second");
+    expect(reasoningHtml).not.toContain("raw content must stay secondary");
+    expect(renderToStaticMarkup(<ItemView item={command} streamedText="" streaming={false} onOpenCodex={() => undefined}/>)).toContain("exact output");
+  });
+
   it("renders CommonMark and GFM structures without executing raw HTML", () => {
     const html = renderToStaticMarkup(<MarkdownContent text={`# Plan
 
@@ -137,6 +153,62 @@ const safe = true;
     expect(commandHtml).toContain("class=\"syntax-string\"");
     expect(commandHtml).toContain("**raw**");
     expect(commandHtml).not.toContain("<strong>raw</strong>");
+  });
+
+  it("renders live plan and reasoning streams as safe Markdown with visible activity state", () => {
+    const plan = { id: "plan-1", type: "plan", status: "inProgress" } as unknown as ThreadItem;
+    const planHtml = renderToStaticMarkup(<ItemView
+      item={plan}
+      streamedText={"- **Inspect**\n<script>unsafe()</script>"}
+      streaming
+      onOpenCodex={() => undefined}
+    />);
+    expect(planHtml).toContain("Planning");
+    expect(planHtml).toContain("Working");
+    expect(planHtml).toContain("<ul>");
+    expect(planHtml).toContain("<strong>Inspect</strong>");
+    expect(planHtml).toContain("Streaming response");
+    expect(planHtml).not.toContain("<script>");
+
+    const reasoning = { id: "reasoning-1", type: "reasoning", status: "inProgress" } as unknown as ThreadItem;
+    const summaryHtml = renderToStaticMarkup(<ItemView
+      item={reasoning}
+      streamedText={"First summary\n\nSecond **summary**"}
+      streamedReasoningContent="raw private fallback"
+      streaming
+      onOpenCodex={() => undefined}
+    />);
+    expect(summaryHtml).toContain("Thinking");
+    expect(summaryHtml).toContain("First summary");
+    expect(summaryHtml).toContain("<strong>summary</strong>");
+    expect(summaryHtml).not.toContain("raw private fallback");
+
+    const rawHtml = renderToStaticMarkup(<ItemView
+      item={reasoning}
+      streamedText=""
+      streamedReasoningContent="Raw **fallback**"
+      streaming
+      onOpenCodex={() => undefined}
+    />);
+    expect(rawHtml).toContain("Raw <strong>fallback</strong>");
+  });
+
+  it("preserves live command output exactly as technical text", () => {
+    const command = {
+      id: "command-1",
+      type: "commandExecution",
+      command: "printf raw",
+      status: "inProgress",
+    } as unknown as ThreadItem;
+    const html = renderToStaticMarkup(<ItemView
+      item={command}
+      streamedText={"  **raw**\nnext  \n"}
+      streaming
+      onOpenCodex={() => undefined}
+    />);
+    expect(html).toContain("Running a command");
+    expect(html).toContain("  **raw**\nnext  \n");
+    expect(html).not.toContain("<strong>raw</strong>");
   });
 
   it("adds safe visual hierarchy to source and diff code without changing its text", () => {

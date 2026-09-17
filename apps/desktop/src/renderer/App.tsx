@@ -29,8 +29,6 @@ export function App(): ReactNode {
   const [newChatBusy, setNewChatBusy] = useState(false);
   const [diffThreadId, setDiffThreadId] = useState<string | null>(null);
   const [toast, setToast] = useState<string | null>(null);
-  const refreshTimers = useRef(new Map<string, number>());
-  const refreshPending = useRef(new Set<string>());
   const highlightTimer = useRef<number | null>(null);
 
   const installState = useCallback((next: PeelState): void => {
@@ -72,10 +70,11 @@ export function App(): ReactNode {
       setConnected(payload.connected);
       setConnectionError(payload.error);
     });
-    const offNotification = window.peel.onCodexNotification((notification) => {
+    const offNotification = window.peel.onCodexNotification(({ notification, snapshot }) => {
       const params = notification.params as Record<string, unknown>;
       const threadId = typeof params.threadId === "string" ? params.threadId : null;
       if (!threadId) return;
+      if (snapshot) setThreads((current) => ({ ...current, [threadId]: snapshot }));
       if (notification.method === "thread/name/updated" && typeof params.name === "string") {
         mutate((draft) => {
           for (const space of Object.values(draft.spaces)) {
@@ -86,24 +85,16 @@ export function App(): ReactNode {
           }
         }, 0);
       }
-      refreshPending.current.add(threadId);
-      const scheduleRefresh = (): void => {
-        if (refreshTimers.current.has(threadId)) return;
-        refreshPending.current.delete(threadId);
-        void readThread(threadId).then((snapshot) => {
-          const current = stateRef.current;
-          if (current.viewMode !== "focus" || current.activeThreadId !== threadId) return;
+      if (notification.method === "turn/completed" && snapshot) {
+        const current = stateRef.current;
+        if (current.viewMode === "focus" && current.activeThreadId === threadId && current.activeSpaceId) {
           const latest = latestCompletedTurn(snapshot.thread);
-          if (!latest || !current.activeSpaceId) return;
-          mutate((draft) => { const node = draft.spaces[current.activeSpaceId!]?.nodes[threadId]; if (node) node.lastViewedTurnId = latest.id; }, 400);
-        }).catch(() => undefined);
-        const timer = window.setTimeout(() => {
-          refreshTimers.current.delete(threadId);
-          if (refreshPending.current.has(threadId)) scheduleRefresh();
-        }, 70);
-        refreshTimers.current.set(threadId, timer);
-      };
-      scheduleRefresh();
+          if (latest) mutate((draft) => {
+            const node = draft.spaces[current.activeSpaceId!]?.nodes[threadId];
+            if (node) node.lastViewedTurnId = latest.id;
+          }, 400);
+        }
+      }
     });
     const offRequest = window.peel.onServerRequest((request) => {
       setApprovals((current) => [...current.filter((item) => item.id !== request.id), request]);
@@ -120,7 +111,7 @@ export function App(): ReactNode {
       offFlush();
       if (highlightTimer.current !== null) window.clearTimeout(highlightTimer.current);
     };
-  }, [installState, mutate, readThread]);
+  }, [installState, mutate]);
 
   const activeSpace = state?.activeSpaceId ? state.spaces[state.activeSpaceId] ?? null : null;
   const activeNode = activeSpace && state?.activeThreadId ? activeSpace.nodes[state.activeThreadId] ?? null : null;
@@ -265,7 +256,6 @@ export function App(): ReactNode {
       installState(bootstrap.state);
       setForkDraft(null);
       setToast(result.persistenceWarning ? "Fork sent; local state recovered after a temporary save failure" : result.worktreeName ? `Fork created in ${result.worktreeName}` : "Fork created");
-      void readThread(result.threadId);
     } catch (error) {
       setForkError(messageOf(error));
     } finally {

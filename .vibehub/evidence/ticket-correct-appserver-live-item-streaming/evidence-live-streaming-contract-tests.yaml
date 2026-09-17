@@ -1,0 +1,24 @@
+{
+  "acceptance_ids": [
+    "item-specific-delta-reduction",
+    "reasoning-channel-fidelity",
+    "authoritative-completion",
+    "live-rendering-behavior",
+    "streaming-contract-evidence"
+  ],
+  "evidence_id": "evidence-live-streaming-contract-tests",
+  "kind": "ticket_evidence",
+  "origin": "agent",
+  "recorded_at": "2026-09-17T18:16:29Z",
+  "refs": [
+    "packages/codex-app-server/test/reducer.test.ts",
+    "apps/desktop/test/markdown.test.tsx",
+    "apps/desktop/e2e/fixtures/codex",
+    "apps/desktop/e2e/v01-journey.spec.ts",
+    "command:npm test",
+    "command:npm run test:e2e --workspace @peel/desktop -- e2e/v01-journey.spec.ts"
+  ],
+  "schema_version": 1,
+  "summary": "Adapter fixtures cover every named in-scope delta, interleaved item state, reasoning boundaries, type mismatch, duplicate/stale/post-completion rejection, authoritative item completion, and interrupted/failed turn snapshots. Renderer tests cover safe live plan/reasoning Markdown, raw-reasoning fallback, completed-field fallback, and exact non-Markdown command output. The repository-wide npm test passed (24 adapter, 12 git-workspace, 54 desktop tests). The Electron journey exercised and passed the new live plan/reasoning/command assertions plus existing agent streaming assertions before later failing in an unrelated pre-existing draft-recovery assertion; two earlier attempts also stopped on unrelated branch-gesture and 250 ms timing flakes.",
+  "ticket_id": "ticket-correct-appserver-live-item-streaming"
+}
