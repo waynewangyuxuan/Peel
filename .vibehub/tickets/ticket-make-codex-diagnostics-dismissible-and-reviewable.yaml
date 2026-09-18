@@ -1,0 +1,56 @@
+{
+  "acceptance": [
+    {
+      "acceptance_id": "transient-dismissible-diagnostics",
+      "criterion": "Every surfaced global diagnostic has a visible, keyboard-accessible close action; warnings and notices automatically fade after a short readable interval, errors remain until explicitly dismissed, and reduced-motion users receive the same lifecycle without decorative motion."
+    },
+    {
+      "acceptance_id": "session-history-with-context",
+      "criterion": "A discoverable Diagnostics entry opens the latest 50 session diagnostics newest-first with timestamp, severity, sanitized message, and producing conversation title or Thread identifier when scoped, otherwise Global; manually dismissed and automatically faded items remain reviewable for the session."
+    },
+    {
+      "acceptance_id": "dedupe-and-recurrence-semantics",
+      "criterion": "One diagnostic identity does not continuously re-toast, a later occurrence refreshes its recorded time or equivalent recurrence metadata without unbounded growth, new errors still surface, and dismissing UI never claims that the underlying Codex condition was repaired."
+    },
+    {
+      "acceptance_id": "diagnostics-lifecycle-regression",
+      "criterion": "Unit and production-Electron tests cover the current pagination deprecation notice, Thread-scoped warning/error context, explicit close, warning timeout, sticky error, history access, newest-first ordering, 50-item bound, sanitization, and an unobstructed top bar after dismissal or fade."
+    }
+  ],
+  "constraints": [
+    "Preserve the accepted separation between Turn errors, Thread warnings, and global host diagnostics; diagnostics must not masquerade as conversation content.",
+    "Retain the in-memory 50-item cap and do not add durable saved-state or telemetry storage for this session history.",
+    "Never hide or auto-expire error history, leak private configuration paths or tokens, or treat dismissal as recovery.",
+    "Do not suppress all deprecation notifications or absorb the larger thread pagination protocol migration into this UX Ticket."
+  ],
+  "context": "Dogfood found a global Codex deprecation warning permanently pinned at the upper-right with no explanation or close action. The service already keeps the latest 50 sanitized diagnostics with timestamps and Thread scope in memory, but the renderer presents global items in a pointer-disabled overlay with neither lifecycle nor history. This Ticket turns that existing session data into transient, controllable notifications plus an inspectable history, without suppressing protocol problems.",
+  "context_refs": [
+    {
+      "purpose": "Preserves the accepted diagnostic scoping, sanitization, unsupported-method response, and application-server routing behavior.",
+      "ref": ".vibehub/outcomes/ticket-route-appserver-requests-and-errors.yaml"
+    },
+    {
+      "purpose": "Owns the existing deduplicated 50-item in-memory diagnostic collection and sanitized App Server notification mapping.",
+      "ref": "apps/desktop/src/main/peel-service.ts"
+    },
+    {
+      "purpose": "Owns global HostDiagnostics rendering and the shell location for a session-history entry point.",
+      "ref": "apps/desktop/src/renderer/App.tsx"
+    },
+    {
+      "purpose": "Owns accepted Turn- and Thread-scoped diagnostic presentation that must remain separate from global diagnostics.",
+      "ref": "apps/desktop/src/renderer/Transcript.tsx"
+    }
+  ],
+  "deliveries": [],
+  "kind": "ticket",
+  "maturity": "firm",
+  "outcome": "Codex diagnostics remain understandable and reviewable without permanently covering the workspace: warnings and notices fade, every surfaced item can be closed, and recent session history records when and where each diagnostic occurred.",
+  "provenance_refs": [
+    "conversation:2026-09-17-codex-diagnostic-persists-without-close",
+    "dogfood:global-full-history-hydration-deprecation-notice"
+  ],
+  "relations": [],
+  "schema_version": 2,
+  "ticket_id": "ticket-make-codex-diagnostics-dismissible-and-reviewable"
+}

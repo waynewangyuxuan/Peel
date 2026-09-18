@@ -1,0 +1,18 @@
+{
+  "accepted_acceptance_ids": [
+    "transient-dismissible-diagnostics",
+    "session-history-with-context",
+    "dedupe-and-recurrence-semantics",
+    "diagnostics-lifecycle-regression"
+  ],
+  "closed_at": "2026-09-18T06:16:32Z",
+  "evidence_ids": [
+    "evidence-codex-diagnostics-lifecycle-and-history"
+  ],
+  "kind": "ticket_outcome",
+  "schema_version": 1,
+  "status": "successful",
+  "summary": "Independent closeout accepted all four criteria after reading the exact Ticket, every Context reference, the acceptance-linked Evidence, the full main/renderer/Transcript implementations, focused tests and fixture changes, and the complete working-tree diff while preserving the unrelated package-lock.json change. Global diagnostics now have visible keyboard-operable close buttons; warnings begin fading within the eight-second readable lifecycle and are then removed, errors remain until dismissal, and the global reduced-motion rule collapses decorative transitions without changing lifecycle. A discoverable Top Bar or empty-workspace entry opens session-only history ordered newest-first with timestamp, severity, sanitized mapped message, Global or resolved Thread title/identifier scope, optional Turn context, and an explicit statement that dismissal does not repair Codex; faded and dismissed toasts remain in the main-owned history. Main-process identity dedupe now deletes/reinserts a recurrence with a strictly monotonic timestamp, retains only the latest 50 identities, and emits new errors without persisting diagnostics into saved state. Thread and Turn notices remain in Transcript rather than masquerading as global content. Independent verification passed all 91 desktop unit tests, including recurrence, path omission and 50-item retention; desktop typecheck; the full desktop build; git diff checking; and four production-Electron regressions 4/4. The focused lifecycle case reproduced config and pagination warnings, Thread-scoped warning/error context and a sticky global error, then verified explicit close, automatic warning removal, sticky-error dismissal, newest-first five-item history, timestamps, scope, private-path omission, Escape close, and the unobstructed Top Bar; server-request routing also remained intact. No acceptance IDs remain unresolved.",
+  "ticket_id": "ticket-make-codex-diagnostics-dismissible-and-reviewable",
+  "unresolved_acceptance_ids": []
+}

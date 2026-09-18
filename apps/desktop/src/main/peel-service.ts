@@ -57,6 +57,7 @@ export class PeelService extends EventEmitter {
   readonly #pendingServerRequests = new Map<string, AppServerServerRequest>();
   readonly #notices = new Map<string, CodexNotice>();
   readonly #now: () => number;
+  #lastNoticeCreatedAt = 0;
   #threadCacheVersion = 0;
   #connected = false;
   #connectionError: string | null = null;
@@ -504,7 +505,11 @@ export class PeelService extends EventEmitter {
   #recordNotice(notification: AppServerNotification): void {
     const notice = noticeFromNotification(notification, this.#now());
     if (!notice) return;
-    this.#notices.set(notice.id, notice);
+    const createdAt = Math.max(notice.createdAt, this.#lastNoticeCreatedAt + 1);
+    this.#lastNoticeCreatedAt = createdAt;
+    const next = createdAt === notice.createdAt ? notice : { ...notice, createdAt };
+    this.#notices.delete(next.id);
+    this.#notices.set(next.id, next);
     while (this.#notices.size > 50) this.#notices.delete(this.#notices.keys().next().value as string);
     this.emit("notices", [...this.#notices.values()]);
   }

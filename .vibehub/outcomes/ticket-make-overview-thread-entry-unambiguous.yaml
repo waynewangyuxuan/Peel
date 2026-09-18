@@ -1,0 +1,18 @@
+{
+  "accepted_acceptance_ids": [
+    "consistent-current-thread-entry",
+    "explicit-parent-return",
+    "rename-drag-and-selection-fidelity",
+    "overview-entry-regression"
+  ],
+  "closed_at": "2026-09-18T06:16:32Z",
+  "evidence_ids": [
+    "evidence-overview-thread-entry-electron-regression"
+  ],
+  "kind": "ticket_outcome",
+  "schema_version": 1,
+  "status": "successful",
+  "summary": "Independent closeout accepted all four criteria after reading the exact Ticket, every Context reference, the acceptance-linked Evidence, the full current Overview and selection implementation, focused tests, and the complete working-tree diff while preserving the unrelated package-lock.json change. Ordinary non-control card pointer-up now opens the represented Thread, title single-click opens after a bounded delay, provenance copy bubbles to the current card, latest-user/latest-result stay scoped to the represented Thread, and the hidden named Open button preserves keyboard entry. Parent return is isolated to one visibly labeled, bounded Parent control and passes the stored forkedAtTurnId for exact highlighting; Root has no such action. Double-click cancels the title-open timer and enters rename, moved pointer gestures suppress open, geometry/positions and active-path semantics remain intact, and App.tsx keeps Transcript keyed by active Thread with a cancellation/current-selection guard that prevents delayed reads from replacing the visible selection. Independent verification passed desktop typecheck, all 91 desktop unit tests, the full desktop build, git diff checking, and four production-Electron regressions 4/4: the deterministic three-node Overview test covered title, passive provenance, latest result, exact parent return/highlight, delayed-read Child-to-Sibling switching, drag-without-open, keyboard entry, and restart restoration; semantic geometry preserved drag, edges, zoom, saved positions, and keyboard opening; request-routing remained intact. Existing production journey coverage also directly exercises Overview double-click rename, exact-turn transcript entry, stale-read restoration, active-path behavior, and restart before its separately known unrelated late assertion. No acceptance IDs remain unresolved.",
+  "ticket_id": "ticket-make-overview-thread-entry-unambiguous",
+  "unresolved_acceptance_ids": []
+}

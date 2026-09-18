@@ -15,6 +15,9 @@ import { mergeThreadPage, threadMatches } from "./thread-search";
 import { reconcileThreadSnapshot } from "./thread-snapshot";
 import { beginTranscriptUpdate, installTranscriptPerformanceApi, transcriptSnapshotMode } from "./transcript-performance";
 
+const DIAGNOSTIC_WARNING_TTL_MS = 8_000;
+const DIAGNOSTIC_FADE_MS = 600;
+
 export function App(): ReactNode {
   const [state, setState] = useState<PeelState | null>(null);
   const stateRef = useRef<PeelState>(emptyState());
@@ -33,6 +36,7 @@ export function App(): ReactNode {
   const [showThreadPicker, setShowThreadPicker] = useState(false);
   const [newChatBusy, setNewChatBusy] = useState(false);
   const [diffThreadId, setDiffThreadId] = useState<string | null>(null);
+  const [showDiagnostics, setShowDiagnostics] = useState(false);
   const [toast, setToast] = useState<string | null>(null);
   const highlightTimer = useRef<number | null>(null);
 
@@ -376,7 +380,7 @@ export function App(): ReactNode {
       onSearch={() => setShowThreadPicker(true)}
     />
     <main className="workspace">
-      {!activeSpace || !activeNode ? <Welcome connected={connected} error={connectionError} newChatBusy={newChatBusy} onNewChat={() => void startNewChat()} onSearch={() => setShowThreadPicker(true)} /> : <>
+      {!activeSpace || !activeNode ? <Welcome connected={connected} error={connectionError} newChatBusy={newChatBusy} diagnosticsCount={notices.length} onNewChat={() => void startNewChat()} onSearch={() => setShowThreadPicker(true)} onDiagnostics={() => setShowDiagnostics(true)} /> : <>
         <TopBar
           key={activeNode.threadId}
           space={activeSpace}
@@ -394,6 +398,8 @@ export function App(): ReactNode {
           onRenameThread={async (name) => await renameThread(activeNode.threadId, name)}
           onDiff={() => setDiffThreadId(activeNode.threadId)}
           onOpenCodex={openActiveCodex}
+          diagnosticsCount={notices.length}
+          onDiagnostics={() => setShowDiagnostics(true)}
         />
         {state.viewMode === "focus" ? <div className="focus-layout">
           <LineageRail space={activeSpace} activeThreadId={activeNode.threadId} threads={threads} onSelect={selectThread} onRename={renameThread}/>
@@ -446,17 +452,88 @@ export function App(): ReactNode {
       clearThreads();
     }}/>} 
     {diffThreadId && activeSpace?.nodes[diffThreadId] && <DiffDrawer node={activeSpace.nodes[diffThreadId]} onClose={() => setDiffThreadId(null)} onOpenCodex={openCodex} />}
+    {showDiagnostics && <DiagnosticsDrawer notices={notices} state={state} onClose={() => setShowDiagnostics(false)}/>}
     {toast && <div className="toast" onAnimationEnd={() => setToast(null)}>{toast}</div>}
   </div>;
 }
 
 function HostDiagnostics({ notices }: { notices: CodexNotice[] }): ReactNode {
+  const [dismissed, setDismissed] = useState<Set<string>>(() => new Set());
+  const [fading, setFading] = useState<Set<string>>(() => new Set());
+
+  useEffect(() => {
+    const timers: number[] = [];
+    const now = Date.now();
+    for (const notice of notices) {
+      if (notice.kind === "error") continue;
+      const key = diagnosticInstanceKey(notice);
+      if (dismissed.has(key)) continue;
+      const age = Math.max(0, now - notice.createdAt);
+      timers.push(window.setTimeout(() => {
+        setFading((current) => new Set(current).add(key));
+      }, Math.max(0, DIAGNOSTIC_WARNING_TTL_MS - DIAGNOSTIC_FADE_MS - age)));
+      timers.push(window.setTimeout(() => {
+        setDismissed((current) => new Set(current).add(key));
+      }, Math.max(0, DIAGNOSTIC_WARNING_TTL_MS - age)));
+    }
+    return () => timers.forEach((timer) => window.clearTimeout(timer));
+  }, [dismissed, notices]);
+
+  const visible = [...notices]
+    .sort((left, right) => left.createdAt - right.createdAt)
+    .filter((notice) => !dismissed.has(diagnosticInstanceKey(notice)))
+    .slice(-3);
+  if (visible.length === 0) return null;
   return <aside className="host-diagnostics" aria-label="Codex diagnostics">
-    {notices.slice(-3).map((notice) => <div key={notice.id} className={notice.kind} role={notice.kind === "error" ? "alert" : "status"}>
-      <strong>{notice.kind === "error" ? "Codex error" : "Codex notice"}</strong>
-      <span>{notice.message}</span>
-    </div>)}
+    {visible.map((notice) => {
+      const key = diagnosticInstanceKey(notice);
+      return <div key={key} className={`host-diagnostic ${notice.kind} ${fading.has(key) ? "fading" : ""}`} role={notice.kind === "error" ? "alert" : "status"}>
+        <div className="host-diagnostic-heading"><strong>{notice.kind === "error" ? "Codex error" : "Codex notice"}</strong><button className="icon-button" aria-label={`Dismiss ${notice.kind === "error" ? "Codex error" : "Codex notice"}`} onClick={() => setDismissed((current) => new Set(current).add(key))}><Icon name="close" size={13}/></button></div>
+        <span>{notice.message}</span>
+      </div>;
+    })}
   </aside>;
+}
+
+function DiagnosticsDrawer({ notices, state, onClose }: { notices: CodexNotice[]; state: PeelState; onClose(): void }): ReactNode {
+  const ordered = [...notices].sort((left, right) => right.createdAt - left.createdAt);
+  useEffect(() => {
+    const onKey = (event: globalThis.KeyboardEvent): void => { if (event.key === "Escape") onClose(); };
+    window.addEventListener("keydown", onKey);
+    return () => window.removeEventListener("keydown", onKey);
+  }, [onClose]);
+  return <div className="drawer-backdrop diagnostics-backdrop" onPointerDown={(event) => { if (event.target === event.currentTarget) onClose(); }}>
+    <aside className="diagnostics-drawer" role="dialog" aria-modal="true" aria-label="Codex diagnostics history">
+      <header><div><div className="eyebrow">This session</div><h2>Codex diagnostics</h2><p>Closing a message hides it here in Peel; it does not change the underlying Codex condition.</p></div><button className="icon-button" aria-label="Close Diagnostics" onClick={onClose} autoFocus><Icon name="close"/></button></header>
+      <div className="diagnostics-list">
+        {ordered.length === 0 && <div className="diagnostics-empty">No diagnostics in this session.</div>}
+        {ordered.map((notice) => <article className={`diagnostic-history-item ${notice.kind}`} key={diagnosticInstanceKey(notice)}>
+          <div className="diagnostic-history-meta"><span className={`diagnostic-kind ${notice.kind}`}>{notice.kind === "error" ? "Error" : "Warning"}</span><time dateTime={new Date(notice.createdAt).toISOString()}>{diagnosticTime(notice.createdAt)}</time></div>
+          <p>{notice.message}</p>
+          <footer><span>{diagnosticScope(notice, state)}</span>{notice.turnId && <span>Turn {shortIdentifier(notice.turnId)}</span>}</footer>
+        </article>)}
+      </div>
+      <footer>{ordered.length} session diagnostic{ordered.length === 1 ? "" : "s"} · keeps the latest 50</footer>
+    </aside>
+  </div>;
+}
+
+function diagnosticInstanceKey(notice: CodexNotice): string {
+  return `${notice.id}:${notice.createdAt}`;
+}
+
+function diagnosticTime(createdAt: number): string {
+  return new Intl.DateTimeFormat(undefined, { hour: "numeric", minute: "2-digit", second: "2-digit" }).format(createdAt);
+}
+
+function diagnosticScope(notice: CodexNotice, state: PeelState): string {
+  if (!notice.threadId) return "Global";
+  const node = Object.values(state.spaces).flatMap((space) => Object.values(space.nodes)).find((candidate) => candidate.threadId === notice.threadId);
+  return node ? `${node.title} · ${shortIdentifier(notice.threadId)}` : `Thread ${shortIdentifier(notice.threadId)}`;
+}
+
+function shortIdentifier(value: string): string {
+  return value.length > 16 ? `${value.slice(0, 8)}…${value.slice(-4)}` : value;
 }
 
 function requestThreadId(request: AppServerServerRequest): string | null {
@@ -498,17 +575,19 @@ function SpaceSidebar({ state, connected, newChatBusy, onSelect, onNewChat, onSe
   </aside>;
 }
 
-function TopBar({ space, node, mode, connected, onMode, onRenameSpace, onArchive, onRenameThread, onDiff, onOpenCodex }: {
+function TopBar({ space, node, mode, connected, diagnosticsCount, onMode, onRenameSpace, onArchive, onRenameThread, onDiff, onOpenCodex, onDiagnostics }: {
   space: SpaceRecord;
   node: SpaceNode;
   mode: PeelState["viewMode"];
   connected: boolean;
+  diagnosticsCount: number;
   onMode(mode: PeelState["viewMode"]): void;
   onRenameSpace(name: string): void;
   onArchive(): void;
   onRenameThread(name: string): Promise<void>;
   onDiff(): void;
   onOpenCodex(): void;
+  onDiagnostics(): void;
 }): ReactNode {
   const [editingThread, setEditingThread] = useState(false);
   const [editingSpace, setEditingSpace] = useState(false);
@@ -524,6 +603,7 @@ function TopBar({ space, node, mode, connected, onMode, onRenameSpace, onArchive
     </div>
     <div className="segmented"><button className={mode === "focus" ? "active" : ""} onClick={() => onMode("focus")}><Icon name="chat"/> Focus <kbd>⌘1</kbd></button><button className={mode === "overview" ? "active" : ""} onClick={() => onMode("overview")}><Icon name="map"/> Overview <kbd>⌘2</kbd></button></div>
     <div className="topbar-actions">
+      {diagnosticsCount > 0 && <button className="diagnostics-trigger" aria-label={`Diagnostics history, ${diagnosticsCount} item${diagnosticsCount === 1 ? "" : "s"}`} onClick={onDiagnostics}><Icon name="warning"/><span>Diagnostics</span><b>{diagnosticsCount}</b></button>}
       <button onClick={onDiff}><Icon name="diff"/> Diff</button>
       <button onClick={onOpenCodex} title="Open this Chat in the Codex desktop app"><Icon name="external"/> Open Codex</button>
       <button className="icon-button" onClick={() => setMenu(!menu)}><Icon name="more"/></button>
@@ -673,14 +753,16 @@ function DiffDrawer({ node, onClose, onOpenCodex }: { node: SpaceNode; onClose()
   </div>;
 }
 
-function Welcome({ connected, error, newChatBusy, onNewChat, onSearch }: {
+function Welcome({ connected, error, newChatBusy, diagnosticsCount, onNewChat, onSearch, onDiagnostics }: {
   connected: boolean;
   error: string | null;
   newChatBusy: boolean;
+  diagnosticsCount: number;
   onNewChat(): void;
   onSearch(): void;
+  onDiagnostics(): void;
 }): ReactNode {
-  return <div className="welcome"><div className="welcome-art"><span/><span/><span/><i/><i/></div><div className="eyebrow">Spatial work for Codex</div><h1>Keep every good direction<br/>within reach.</h1><p>Begin with a fresh Codex Chat now, or find one you already started. Every real Fork stays visible and easy to return to.</p><div className="welcome-actions"><button className="primary-button large" onClick={onNewChat} disabled={!connected || newChatBusy}><Icon name={newChatBusy ? "spinner" : "plus"}/> {newChatBusy ? "Creating…" : "New Chat"}</button><button className="secondary-button large" onClick={onSearch} disabled={!connected}><Icon name="search"/> Search Chats</button></div>{!connected && <div className="connection-error">Codex is unavailable{error ? ` — ${error}` : ""}</div>}<small>⌘N creates immediately · ⌘K searches existing Chats</small></div>;
+  return <div className="welcome"><div className="welcome-art"><span/><span/><span/><i/><i/></div><div className="eyebrow">Spatial work for Codex</div><h1>Keep every good direction<br/>within reach.</h1><p>Begin with a fresh Codex Chat now, or find one you already started. Every real Fork stays visible and easy to return to.</p><div className="welcome-actions"><button className="primary-button large" onClick={onNewChat} disabled={!connected || newChatBusy}><Icon name={newChatBusy ? "spinner" : "plus"}/> {newChatBusy ? "Creating…" : "New Chat"}</button><button className="secondary-button large" onClick={onSearch} disabled={!connected}><Icon name="search"/> Search Chats</button></div>{!connected && <div className="connection-error">Codex is unavailable{error ? ` — ${error}` : ""}</div>}{diagnosticsCount > 0 && <button className="welcome-diagnostics" onClick={onDiagnostics}><Icon name="warning" size={13}/> Review {diagnosticsCount} Codex diagnostic{diagnosticsCount === 1 ? "" : "s"}</button>}<small>⌘N creates immediately · ⌘K searches existing Chats</small></div>;
 }
 
 function ThreadLoading(): ReactNode {

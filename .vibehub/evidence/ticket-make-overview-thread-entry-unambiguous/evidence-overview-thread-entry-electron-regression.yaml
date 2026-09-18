@@ -1,0 +1,27 @@
+{
+  "acceptance_ids": [
+    "consistent-current-thread-entry",
+    "explicit-parent-return",
+    "rename-drag-and-selection-fidelity",
+    "overview-entry-regression"
+  ],
+  "evidence_id": "evidence-overview-thread-entry-electron-regression",
+  "kind": "ticket_evidence",
+  "origin": "agent",
+  "recorded_at": "2026-09-18T06:11:38Z",
+  "refs": [
+    "apps/desktop/src/renderer/Overview.tsx",
+    "apps/desktop/src/renderer/styles.css",
+    "apps/desktop/e2e/overview-thread-entry.spec.ts",
+    "apps/desktop/e2e/semantic-geometry.spec.ts",
+    "command:npx playwright test e2e/overview-thread-entry.spec.ts",
+    "command:npx playwright test e2e/overview-thread-entry.spec.ts e2e/diagnostics-lifecycle.spec.ts",
+    "command:npx playwright test e2e/semantic-geometry.spec.ts e2e/server-request-routing.spec.ts e2e/v01-journey.spec.ts",
+    "command:npm run typecheck --workspace @peel/desktop",
+    "command:npm run test --workspace @peel/desktop",
+    "command:git diff --check"
+  ],
+  "schema_version": 1,
+  "summary": "Production Overview now gives passive card regions deterministic current-node ownership on pointer-up, makes title single-click open the represented Thread while preserving delayed double-click rename, keeps Latest user/result entry within that Thread, and moves parent navigation into a bounded labeled Parent button that preserves the exact fork Turn. A focused production-Electron three-node Root/Child/Sibling regression passed 1/1 after exercising title, passive provenance copy, latest result, explicit parent return and highlight, delayed-read rapid sibling switching, drag-without-open, keyboard entry, and restart restoration. The existing semantic-geometry Electron regression also passed, preserving zoom geometry, real edges, explicit Fit, saved positions, and drag semantics. The complete v0.1 journey rerun traversed its Overview, rename, exact-turn, scale, keyboard, and restart stages before reaching the separately known late failed-resume alert assertion; that unrelated terminal failure is not counted as passing evidence.",
+  "ticket_id": "ticket-make-overview-thread-entry-unambiguous"
+}

@@ -1,0 +1,29 @@
+{
+  "acceptance_ids": [
+    "transient-dismissible-diagnostics",
+    "session-history-with-context",
+    "dedupe-and-recurrence-semantics",
+    "diagnostics-lifecycle-regression"
+  ],
+  "evidence_id": "evidence-codex-diagnostics-lifecycle-and-history",
+  "kind": "ticket_evidence",
+  "origin": "agent",
+  "recorded_at": "2026-09-18T06:11:38Z",
+  "refs": [
+    "apps/desktop/src/main/peel-service.ts",
+    "apps/desktop/src/renderer/App.tsx",
+    "apps/desktop/src/renderer/styles.css",
+    "apps/desktop/test/peel-service-server-requests.test.ts",
+    "apps/desktop/e2e/diagnostics-lifecycle.spec.ts",
+    "apps/desktop/e2e/server-request-routing.spec.ts",
+    "apps/desktop/e2e/fixtures/codex",
+    "command:npx playwright test e2e/overview-thread-entry.spec.ts e2e/diagnostics-lifecycle.spec.ts",
+    "command:npx playwright test e2e/semantic-geometry.spec.ts e2e/server-request-routing.spec.ts e2e/v01-journey.spec.ts",
+    "command:npm run test --workspace @peel/desktop",
+    "command:npm run build --workspace @peel/desktop",
+    "command:git diff --check"
+  ],
+  "schema_version": 1,
+  "summary": "Global Codex diagnostics now expose keyboard-accessible close controls; warnings stay readable, fade at eight seconds, and then leave the workspace, while errors remain until explicitly dismissed. Top Bar and empty-workspace entries open a session-only Diagnostics drawer containing newest-first timestamps, severity, sanitized message, Global or Thread title/identifier scope, and optional Turn context; closing or fading a toast leaves its history intact and the drawer explains that dismissal does not repair Codex. Main-process recurrence refreshes a diagnostic's monotonic timestamp and recency without duplicate growth, with a latest-50 bound. The focused production-Electron lifecycle regression passed 1/1 against config, current pagination deprecation, Thread warning/error, and global error fixtures, verifying explicit close, timeout, sticky error, history retention/order/scope, Escape close, and no private path. The request-routing Electron regression passed and all 91 desktop unit tests passed, including recurrence, sanitization, and 50-item retention.",
+  "ticket_id": "ticket-make-codex-diagnostics-dismissible-and-reviewable"
+}

@@ -17,6 +17,7 @@ import {
 import type { WorkspaceDiffSummary } from "@peel/git-workspace";
 
 import type { CameraState, Point, SpaceNode, SpaceRecord } from "../shared/contracts";
+import { Icon } from "./icons";
 import { clip, itemText, latestCompletedTurn, plainTextPreview, relativeTime } from "./lib";
 import { CARD_WIDTH, CARD_HEIGHT, MIN_SCALE, MAX_SCALE, edgeCurve, fitSemanticCamera, resolveSemanticZoomMode, semanticGeometry, type SemanticZoomMode } from "./overview-zoom";
 
@@ -276,11 +277,13 @@ export function Overview({ space, activeThreadId, threads, diffs, onCamera, onNo
     if (drag.current?.pointerId === event.pointerId) {
       flushNodeFrame();
       const completed = drag.current;
-      suppressOpen.current = completed.moved;
+      const shouldOpen = !completed.moved && event.type === "pointerup";
+      suppressOpen.current = true;
       drag.current = null;
       setDraggingThreadId(null);
       onNodePositionRef.current(completed.threadId, completed.current);
-      if (suppressOpen.current) requestAnimationFrame(() => { suppressOpen.current = false; });
+      if (shouldOpen) onFocus(completed.threadId);
+      requestAnimationFrame(() => { suppressOpen.current = false; });
     }
 
     if (event.currentTarget.hasPointerCapture(event.pointerId)) event.currentTarget.releasePointerCapture(event.pointerId);
@@ -425,6 +428,7 @@ function OverviewCard({ cardRef, node, position, parent, thread, parentThread, d
   onHover(hovered: boolean): void;
 }): ReactNode {
   const [editing, setEditing] = useState(false);
+  const titleOpenTimer = useRef<number | null>(null);
   const latestTurn = thread ? latestCompletedTurn(thread) : null;
   const isRunning = thread?.status.type === "active";
   const flags = thread?.status.type === "active" ? thread.status.activeFlags ?? [] : [];
@@ -447,6 +451,26 @@ function OverviewCard({ cardRef, node, position, parent, thread, parentThread, d
           : [{ label: "Idle", tone: "idle" }];
   const primaryStatus = statuses[0]!;
   const compactSummary = latestResult || latestUser || forkSnippet || "No activity yet";
+
+  useEffect(() => () => {
+    if (titleOpenTimer.current !== null) window.clearTimeout(titleOpenTimer.current);
+  }, []);
+
+  const openFromTitle = (event: ReactMouseEvent<HTMLHeadingElement>): void => {
+    event.stopPropagation();
+    if (titleOpenTimer.current !== null) window.clearTimeout(titleOpenTimer.current);
+    titleOpenTimer.current = window.setTimeout(() => {
+      titleOpenTimer.current = null;
+      onOpen();
+    }, 180);
+  };
+
+  const renameFromTitle = (event: ReactMouseEvent<HTMLHeadingElement>): void => {
+    event.stopPropagation();
+    if (titleOpenTimer.current !== null) window.clearTimeout(titleOpenTimer.current);
+    titleOpenTimer.current = null;
+    setEditing(true);
+  };
 
   return <article
     ref={cardRef}
@@ -485,20 +509,26 @@ function OverviewCard({ cardRef, node, position, parent, thread, parentThread, d
               }}
             /> : <h3
               title={node.title}
-              onClick={(event: ReactMouseEvent<HTMLHeadingElement>) => event.stopPropagation()}
-              onDoubleClick={(event: ReactMouseEvent<HTMLHeadingElement>) => { event.stopPropagation(); setEditing(true); }}
+              onClick={openFromTitle}
+              onDoubleClick={renameFromTitle}
             >{node.title}</h3>}
           </div>
           <div className="card-status-group">{statuses.map((status) => <div className={`card-status ${status.tone}`} key={status.tone}><i className={`status-dot ${status.tone}`}/>{status.label}</div>)}</div>
         </div>
 
-        {parent && <button className="card-origin" onClick={(event: ReactMouseEvent<HTMLButtonElement>) => { event.stopPropagation(); onFocusParent(parent.threadId, node.forkedAtTurnId ?? undefined); }}>
-          <strong>Branched from {parent.title}</strong>{forkSnippet && <span> · “{clip(forkSnippet, 52)}”</span>}
-        </button>}
+        {parent && <div className="card-origin">
+          <span className="card-origin-copy"><strong>Branched from {parent.title}</strong>{forkSnippet && <span> · “{clip(forkSnippet, 52)}”</span>}</span>
+          <button
+            className="card-parent-button"
+            aria-label={`Open parent ${parent.title} at branch point`}
+            title="Open parent at branch point"
+            onClick={(event: ReactMouseEvent<HTMLButtonElement>) => { event.stopPropagation(); onFocusParent(parent.threadId, node.forkedAtTurnId ?? undefined); }}
+          ><Icon name="arrowBack" size={12}/> Parent</button>
+        </div>}
 
         <div className="card-facts">
-          <button onClick={(event: ReactMouseEvent<HTMLButtonElement>) => { event.stopPropagation(); onFocusTurn(latestUserTurn?.id); }} disabled={!latestUserTurn}><span>Latest user</span><b>{clip(latestUser || "No user message loaded", 92)}</b></button>
-          <button onClick={(event: ReactMouseEvent<HTMLButtonElement>) => { event.stopPropagation(); onFocusTurn(latestResultTurn?.id); }} disabled={!latestResultTurn}><span>Latest result</span><b>{clip(latestResult || "No completed result", 92)}</b></button>
+          <button onClick={(event: ReactMouseEvent<HTMLButtonElement>) => { event.stopPropagation(); onFocusTurn(latestUserTurn?.id); }} aria-disabled={!latestUserTurn}><span>Latest user</span><b>{clip(latestUser || "No user message loaded", 92)}</b></button>
+          <button onClick={(event: ReactMouseEvent<HTMLButtonElement>) => { event.stopPropagation(); onFocusTurn(latestResultTurn?.id); }} aria-disabled={!latestResultTurn}><span>Latest result</span><b>{clip(latestResult || "No completed result", 92)}</b></button>
         </div>
 
         <footer className="card-footer">

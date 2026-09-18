@@ -288,6 +288,8 @@ reader.on("line", (line) => {
       notify("error", { threadId: thread.id, turnId, error: { message: "The service briefly failed", codexErrorInfo: null, additionalDetails: null, misalignment: null }, willRetry: true });
       notify("warning", { threadId: thread.id, message: "Review the permissions before continuing" });
       notify("configWarning", { summary: "Codex configuration notice", details: "A deprecated fixture setting is active", path: "/private/fixture/config.toml" });
+      notify("deprecationNotice", { summary: "Full-history hydration is deprecated", details: "Page through bounded Thread history instead", path: "/private/fixture/config.toml" });
+      notify("error", { error: { message: "Codex host requires attention", codexErrorInfo: null, additionalDetails: null, misalignment: null }, willRetry: false });
       setTimeout(() => notify("serverRequest/resolved", { threadId: thread.id, requestId: 406 }), 4_000);
       setTimeout(() => {
         started.status = "failed";

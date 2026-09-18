@@ -13,10 +13,10 @@ afterEach(async () => {
   await Promise.all(directories.splice(0).map(async (directory) => await rm(directory, { recursive: true, force: true })));
 });
 
-async function service(): Promise<PeelService> {
+async function service(options: { now?: () => number } = {}): Promise<PeelService> {
   const directory = await mkdtemp(join(tmpdir(), "peel-server-request-test-"));
   directories.push(directory);
-  return new PeelService(directory);
+  return new PeelService(directory, options);
 }
 
 function request(id: number, method: string, params: Record<string, unknown> = {}): AppServerServerRequest {
@@ -138,6 +138,26 @@ describe("PeelService ServerRequest routing", () => {
       expect.objectContaining({ kind: "warning", threadId: "thread", turnId: null, message: "Review the generated change" }),
       expect.objectContaining({ kind: "warning", threadId: null, turnId: null, message: "Configuration needs attention — Update the deprecated key" }),
     ]));
+    expect(JSON.stringify(notices)).not.toContain("/private/config.toml");
+  });
+
+  it("refreshes recurring diagnostics and retains only the latest 50 session entries", async () => {
+    const peel = await service({ now: () => 1_000 });
+    const recurring = { method: "deprecationNotice", params: { summary: "Pagination changed", details: "Use bounded history", path: "/private/config.toml" } };
+    peel.client.emit("notification", recurring);
+    peel.client.emit("notification", recurring);
+
+    let notices = (await peel.bootstrap()).notices;
+    expect(notices).toHaveLength(1);
+    expect(notices[0]).toMatchObject({ createdAt: 1_001, message: "Pagination changed — Use bounded history", threadId: null });
+
+    for (let index = 0; index < 50; index += 1) {
+      peel.client.emit("notification", { method: "warning", params: { threadId: `thread-${index}`, message: `Warning ${index}` } });
+    }
+    notices = (await peel.bootstrap()).notices;
+    expect(notices).toHaveLength(50);
+    expect(notices.some((notice) => notice.message === "Pagination changed — Use bounded history")).toBe(false);
+    expect(notices.at(-1)).toMatchObject({ message: "Warning 49", threadId: "thread-49" });
     expect(JSON.stringify(notices)).not.toContain("/private/config.toml");
   });
 });

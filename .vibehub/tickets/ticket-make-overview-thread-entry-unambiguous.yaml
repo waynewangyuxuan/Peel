@@ -1,0 +1,56 @@
+{
+  "acceptance": [
+    {
+      "acceptance_id": "consistent-current-thread-entry",
+      "criterion": "Pointer activation on the ordinary card body, title, provenance copy, Latest user, and Latest result regions opens the represented Thread, and keyboard activation of the card does the same; no visually passive card region silently redirects to the parent."
+    },
+    {
+      "acceptance_id": "explicit-parent-return",
+      "criterion": "A non-Root card retains one clearly labeled and spatially bounded parent-return control; only that control returns to the parent Thread and highlights the exact forkedAtTurnId, while Root cards expose no parent action."
+    },
+    {
+      "acceptance_id": "rename-drag-and-selection-fidelity",
+      "criterion": "Double-click rename, card drag, active-path styling, rapid Root/Child/Sibling switching, and repeated Overview/Focus transitions remain reliable; a delayed stale Thread read cannot replace the visibly selected Thread, and dragging never opens a conversation."
+    },
+    {
+      "acceptance_id": "overview-entry-regression",
+      "criterion": "Automated production-Electron coverage exercises a deterministic three-node Root/Child/Sibling fixture through the distinct card hit regions, the explicit parent action and exact-turn highlight, rapid switching, and restart persistence, with the header and transcript always matching the intended Thread."
+    }
+  ],
+  "constraints": [
+    "Preserve the existing Fork topology, stable node positions, camera behavior, card data hierarchy, and active-path semantics.",
+    "Preserve exact parent-turn return as an explicit capability; do not remove it or make the whole card a parent shortcut.",
+    "Preserve double-click rename and keyboard access without adding a second conversation-selection model.",
+    "Do not solve the issue with timing guesses alone; ordinary visual regions must have deterministic ownership."
+  ],
+  "context": "Dogfood found that an Overview node appears to open the wrong conversation intermittently. Direct UI reproduction and code inspection show deterministic hit-target ambiguity: the broad Branched-from provenance row redirects to the parent, the title consumes single clicks, and other card regions open the current node. The current node must become the unambiguous default without removing exact parent-turn return.",
+  "context_refs": [
+    {
+      "purpose": "Preserves the accepted Overview card anatomy, explicit provenance, interactions, stable spatial layout, and production-Electron evidence baseline.",
+      "ref": ".vibehub/outcomes/ticket-rebuild-overview-demo-fidelity.yaml"
+    },
+    {
+      "purpose": "Defines selected-Thread fidelity, per-Thread restoration, and stale-read protection when entering Focus.",
+      "ref": ".vibehub/rooms/product/contract-focus-chat-fidelity.yaml"
+    },
+    {
+      "purpose": "Contains the conflicting article, title, provenance-row, snippet, and drag hit targets observed during reproduction.",
+      "ref": "apps/desktop/src/renderer/Overview.tsx"
+    },
+    {
+      "purpose": "Owns the active Thread selection, Focus transition, exact-turn highlight, and stale-read guard used by Overview navigation.",
+      "ref": "apps/desktop/src/renderer/App.tsx"
+    }
+  ],
+  "deliveries": [],
+  "kind": "ticket",
+  "maturity": "firm",
+  "outcome": "Every Overview node reliably opens its own conversation from all ordinary card regions, while returning to the parent remains a clearly labeled, deliberately targeted action.",
+  "provenance_refs": [
+    "conversation:2026-09-17-overview-node-sometimes-opens-parent",
+    "dogfood:packaged-peel-three-node-space-hit-target-reproduction"
+  ],
+  "relations": [],
+  "schema_version": 2,
+  "ticket_id": "ticket-make-overview-thread-entry-unambiguous"
+}
