@@ -26,6 +26,7 @@ const configuredCodexBinary = process.env.PEEL_CODEX_BINARY || argumentValue("--
 const configuredVoiceHelper = process.env.PEEL_VOICE_HELPER || argumentValue("--peel-voice-helper");
 const configuredStateFailureMarker = process.env.PEEL_TEST_STATE_FAILURE_MARKER || argumentValue("--peel-test-state-failure-marker");
 const configuredTranscriptBenchmark = process.env.PEEL_NATIVE_TRANSCRIPT_BENCHMARK;
+const configuredStartupHydrationDelay = process.env.PEEL_STARTUP_TEST_HYDRATION_DELAY_MS;
 const configuredTmpdir = argumentValue("--peel-test-tmpdir");
 const quitAfterVoiceVerification = process.argv.includes("--peel-test-quit-after-voice");
 app.setName(APP_DISPLAY_NAME);
@@ -53,6 +54,7 @@ function rendererUrl(): string {
   const url = new URL(development || `file://${join(appRoot(), "dist/renderer/index.html")}`);
   if (process.env.PEEL_RENDERING_BENCHMARK === "1") url.searchParams.set("rendering-benchmark", "1");
   if (configuredTranscriptBenchmark) url.searchParams.set("transcript-performance", configuredTranscriptBenchmark);
+  if (configuredStartupHydrationDelay) url.searchParams.set("startup-hydration-delay-ms", configuredStartupHydrationDelay);
   return url.toString();
 }
 
@@ -72,7 +74,7 @@ async function createWindow(): Promise<void> {
     minHeight: 680,
     titleBarStyle: "hiddenInset",
     trafficLightPosition: { x: 16, y: 16 },
-    backgroundColor: "#e9e9e6",
+    backgroundColor: "#f6f6f5",
     icon: appIconPath(),
     show: false,
     webPreferences: {
@@ -174,8 +176,8 @@ app.whenReady().then(async () => {
     : join(appRoot(), "native/bin/peel-speech"));
   const voice = new VoiceService(voiceHelperPath);
   registerIpc(service, voice);
-  await createWindow();
   void service.connect();
+  await createWindow();
   app.on("activate", () => {
     if (BrowserWindow.getAllWindows().length === 0) void createWindow();
   });

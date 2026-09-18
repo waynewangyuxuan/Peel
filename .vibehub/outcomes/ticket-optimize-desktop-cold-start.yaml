@@ -1,0 +1,20 @@
+{
+  "accepted_acceptance_ids": [
+    "measured-packaged-launch-baseline",
+    "immediate-honest-first-frame",
+    "parallel-nonblocking-initialization",
+    "startup-improvement-gate",
+    "startup-regression-coverage"
+  ],
+  "closed_at": "2026-09-18T20:55:23Z",
+  "evidence_ids": [
+    "evidence-desktop-startup-performance",
+    "evidence-desktop-startup-regressions"
+  ],
+  "kind": "ticket_outcome",
+  "schema_version": 1,
+  "status": "successful",
+  "summary": "Independent closeout accepted all five criteria. The checked-in same-host report contains seven unfiltered baseline and seven optimized packaged samples with baseline commit 41550b3 and Apple-silicon/Node environment; medians pass the ticket gates at 441 ms FCP, 490 ms local shell, and 532 ms connected action versus limits of 488/504/613 ms. The final production entry is 193.06 KB, 27.5% of the 703 KB baseline, with App and Markdown asynchronous. Source and the delayed-hydration regression show a styled honest Peel frame before App hydration and Codex connect starting before window load; delayed and failed initialization retain a responsive accurately disabled shell. Independent reruns passed desktop typecheck, 91/91 unit tests, the focused Electron suite 5/5, and packaged two-launch asset/Draft verification. No acceptance gaps remain.",
+  "ticket_id": "ticket-optimize-desktop-cold-start",
+  "unresolved_acceptance_ids": []
+}

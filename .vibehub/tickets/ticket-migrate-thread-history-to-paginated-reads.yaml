@@ -1,0 +1,84 @@
+{
+  "acceptance": [
+    {
+      "acceptance_id": "schema-aligned-paginated-adapter",
+      "criterion": "Generated installed-schema-backed protocol types and client methods cover thread/turns/list and thread/items/list cursors, sort direction, item-view semantics, response ordering, and capability fallback; ordinary read, resume, and fork paths request metadata-only responses where supported instead of deprecated full-history hydration."
+    },
+    {
+      "acceptance_id": "bounded-initial-and-backfill-reads",
+      "criterion": "Focus initially requests a bounded newest history page, exposes deterministic older-history backfill through protocol cursors, deduplicates page boundaries, and preserves the user's visual anchor while loading older Turns or full Items on demand."
+    },
+    {
+      "acceptance_id": "authoritative-transcript-fidelity",
+      "criterion": "Pagination preserves exact Turn and Item order, stable IDs, completion/status/error state, Branch lastTurnId anchors, approvals and notices, live reducer deltas, Draft/Scroll restoration, text selection, math/code rendering, and reconnect reconciliation with Codex remaining the sole transcript authority."
+    },
+    {
+      "acceptance_id": "warning-and-performance-proof",
+      "criterion": "Production Electron evidence against the installed Codex runtime shows no full-history hydration deprecation warning on ordinary open/resume/fork, proves bounded initial payload and DOM growth for 10/100/500-Turn fixtures, and shows optimized median first-content timing is no greater than baseline plus the larger of 10% of baseline or 50 ms."
+    },
+    {
+      "acceptance_id": "backward-capability-fallback",
+      "criterion": "When paginated history methods are unavailable, Peel follows an explicit capability-gated fallback with one scoped diagnostic and retains usable exact history; it never silently returns an empty or partial transcript as complete."
+    }
+  ],
+  "constraints": [
+    "Codex App Server remains the sole authority for Threads, Turns, Items, lifecycle, and fork anchors.",
+    "Do not infer missing history, fabricate pagination completion, or store a shadow transcript in Peel state.",
+    "Do not regress live-tail notification handling, exact Branch anchors, request/error placement, or bounded renderer backfill.",
+    "Use generated installed-schema facts and capability gating; do not assume every supported Codex version exposes identical pagination fields."
+  ],
+  "context": "The installed Codex App Server schema now marks includeTurns full-history hydration as deprecated and exposes thread/turns/list plus thread/items/list with cursors and explicit item views. Peel still uses thread/read(includeTurns: true), resume, and fork responses that rebuild whole histories, which produces persistent diagnostic warnings and prevents the renderer's bounded-history UI from being backed by bounded protocol reads. Migrate the adapter and service contract without introducing a parallel transcript source of truth.",
+  "context_refs": [
+    {
+      "purpose": "Provides the accepted stable-row identity, pipeline measurements, and no-shadow-transcript boundary.",
+      "ref": ".vibehub/outcomes/ticket-optimize-native-transcript-rendering.yaml"
+    },
+    {
+      "purpose": "Provides the accepted renderer-side bounded history and visual-anchor behavior that protocol pagination should feed.",
+      "ref": ".vibehub/outcomes/ticket-add-bounded-focus-history-backfill.yaml"
+    },
+    {
+      "purpose": "Provides current diagnostic scoping and exact request/error placement behavior.",
+      "ref": ".vibehub/outcomes/ticket-route-appserver-requests-and-errors.yaml"
+    },
+    {
+      "purpose": "Owns current full thread/read, resume, fork, reducer rebuild, and reconnect loading behavior.",
+      "ref": "packages/codex-app-server/src/client.ts"
+    },
+    {
+      "purpose": "Owns the currently incomplete typed method map that must align with generated pagination schemas.",
+      "ref": "packages/codex-app-server/src/protocol.ts"
+    },
+    {
+      "purpose": "Owns installed-schema detection used to capability-gate generated pagination support.",
+      "ref": "packages/codex-app-server/src/schema.ts"
+    },
+    {
+      "purpose": "Owns stable, experimental, and unavailable App Server capability classification.",
+      "ref": "packages/codex-app-server/src/capabilities.ts"
+    },
+    {
+      "purpose": "Provides the generated-schema drift guard that must include the new pagination contract.",
+      "ref": "packages/codex-app-server/scripts/check-installed-schema.mjs"
+    },
+    {
+      "purpose": "Requires generated-schema detection, honest fallback, and pure supported behavior across Codex versions.",
+      "ref": ".vibehub/rooms/product/constraint-app-server-capability-gating.yaml"
+    },
+    {
+      "purpose": "Owns renderer-facing thread snapshots and direct-send resume flow.",
+      "ref": "apps/desktop/src/main/peel-service.ts"
+    }
+  ],
+  "deliveries": [],
+  "kind": "ticket",
+  "maturity": "firm",
+  "outcome": "Peel hydrates Codex conversation history through the current paginated Thread Turn and Item APIs, removing full-history deprecation warnings while preserving exact transcript, fork-anchor, and streaming behavior.",
+  "provenance_refs": [
+    "conversation:2026-09-18-followup-history-pagination",
+    "local-schema:codex-app-server-0.154.0"
+  ],
+  "relations": [],
+  "schema_version": 2,
+  "ticket_id": "ticket-migrate-thread-history-to-paginated-reads"
+}

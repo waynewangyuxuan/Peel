@@ -6,9 +6,33 @@
     <meta name="color-scheme" content="light dark" />
     <meta http-equiv="Content-Security-Policy" content="default-src 'self'; script-src 'self'; style-src 'self' 'unsafe-inline'; img-src 'self' data: blob:; media-src 'self' blob:; connect-src 'self'; font-src 'self' data:" />
     <title>Peel</title>
+    <style>
+      html, body, #root { width: 100%; height: 100%; margin: 0; overflow: hidden; }
+      body { background: #f6f6f5; color: #20201e; font-family: ui-sans-serif, -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif; }
+      .static-launch-shell { width: 100%; height: 100%; display: grid; place-items: center; background: #f6f6f5; }
+      .static-launch-content { display: flex; flex-direction: column; align-items: center; gap: 12px; color: #71716d; }
+      .static-launch-mark { width: 44px; height: 44px; padding: 7px; border-radius: 13px; color: #fff; background: #242422; box-sizing: border-box; }
+      .static-launch-content strong { color: #20201e; font-size: 15px; font-weight: 620; letter-spacing: -.01em; }
+      .static-launch-content span { font-size: 11px; }
+    </style>
   </head>
   <body>
-    <div id="root"></div>
+    <div id="root">
+      <div class="static-launch-shell" data-peel-launch-shell role="status" aria-label="Opening Peel">
+        <div class="static-launch-content">
+          <svg class="static-launch-mark" viewBox="0 0 120 120" aria-hidden="true" focusable="false">
+            <defs>
+              <clipPath id="static-phase-lower"><path d="M0 86 120 56V120H0Z"/></clipPath>
+              <clipPath id="static-phase-upper"><path d="M0 0H120V49L0 79Z"/></clipPath>
+            </defs>
+            <path d="M28 105V48C28 28 42 16 63 16H70C91 16 104 29 104 49C104 70 90 82 69 82H50V105H28ZM50 38V62H69C78 62 83 58 83 50C83 42 78 38 69 38H50Z" fill="currentColor" fill-rule="evenodd" clip-rule="evenodd" clip-path="url(#static-phase-lower)"/>
+            <path d="M28 105V48C28 28 42 16 63 16H70C91 16 104 29 104 49C104 70 90 82 69 82H50V105H28ZM50 38V62H69C78 62 83 58 83 50C83 42 78 38 69 38H50Z" fill="currentColor" fill-rule="evenodd" clip-rule="evenodd" clip-path="url(#static-phase-upper)" transform="translate(7 0)"/>
+          </svg>
+          <strong>Peel</strong>
+          <span>Opening your workspace…</span>
+        </div>
+      </div>
+    </div>
     <script type="module" src="/src/renderer/main.tsx"></script>
   </body>
 </html>

@@ -397,7 +397,7 @@ export function Overview({ space, activeThreadId, threads, diffs, onCamera, onNo
           active={node.threadId === activeThreadId}
           dragging={node.threadId === draggingThreadId}
           onPointerDown={(event) => beginNode(event, node)}
-          onOpen={() => { if (!suppressOpen.current) onFocus(node.threadId); }}
+          onOpen={(explicit = false) => { if (explicit || !suppressOpen.current) onFocus(node.threadId); }}
           onFocusTurn={(turnId) => onFocus(node.threadId, turnId)}
           onFocusParent={(threadId, turnId) => onFocus(threadId, turnId)}
           onRename={onRename}
@@ -420,7 +420,7 @@ function OverviewCard({ cardRef, node, position, parent, thread, parentThread, d
   active: boolean;
   dragging: boolean;
   onPointerDown(event: PointerEvent<HTMLElement>): void;
-  onOpen(): void;
+  onOpen(explicit?: boolean): void;
   onFocusTurn(turnId?: string): void;
   onFocusParent(threadId: string, turnId?: string): void;
   onRename(threadId: string, name: string): Promise<void>;
@@ -461,7 +461,7 @@ function OverviewCard({ cardRef, node, position, parent, thread, parentThread, d
     if (titleOpenTimer.current !== null) window.clearTimeout(titleOpenTimer.current);
     titleOpenTimer.current = window.setTimeout(() => {
       titleOpenTimer.current = null;
-      onOpen();
+      onOpen(true);
     }, 180);
   };
 
@@ -479,12 +479,12 @@ function OverviewCard({ cardRef, node, position, parent, thread, parentThread, d
     onPointerDown={onPointerDown}
     onPointerEnter={() => onHover(true)}
     onPointerLeave={() => onHover(false)}
-    onClick={onOpen}
+    onClick={() => onOpen(false)}
     role="group"
     aria-label={node.title}
   >
     <div className="overview-card-surface">
-      <button className="card-open-button" aria-label={`Open ${node.title}`} onClick={(event: ReactMouseEvent<HTMLButtonElement>) => { event.stopPropagation(); onOpen(); }}/>
+      <button className="card-open-button" aria-label={`Open ${node.title}`} onClick={(event: ReactMouseEvent<HTMLButtonElement>) => { event.stopPropagation(); onOpen(true); }}/>
 
       <div className="card-detail">
         <div className="card-heading">

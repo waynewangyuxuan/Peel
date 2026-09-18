@@ -6,7 +6,7 @@ import readline from "node:readline";
 const now = Math.floor(Date.now() / 1000);
 const cwd = process.env.TMPDIR || process.cwd();
 const logPath = process.env.TMPDIR ? join(process.env.TMPDIR, "peel-mock-rpc.jsonl") : null;
-const log = (event) => { if (logPath) appendFileSync(logPath, `${JSON.stringify(event)}\n`); };
+const log = (event) => { if (logPath) appendFileSync(logPath, `${JSON.stringify({ atMs: Date.now(), ...event })}\n`); };
 const item = (type, id, text, extra = {}) => ({ type, id, text, ...extra });
 const turn = (id, prompt, answer) => ({
   id,
@@ -112,7 +112,20 @@ reader.on("line", (line) => {
   if (!message.id || !message.method) return;
   const { id, method, params = {} } = message;
   log({ method, params });
-  if (method === "initialize") return send({ id, result: { userAgent: "peel-e2e", platform: "darwin" } });
+  if (method === "initialize") {
+    const failMarker = process.env.TMPDIR ? join(process.env.TMPDIR, "fail-initialize") : null;
+    if (failMarker && existsSync(failMarker)) {
+      unlinkSync(failMarker);
+      return send({ id, error: { code: -32070, message: "Mock Codex initialization failed" } });
+    }
+    const delayMarker = process.env.TMPDIR ? join(process.env.TMPDIR, "delay-initialize") : null;
+    if (delayMarker && existsSync(delayMarker)) {
+      unlinkSync(delayMarker);
+      setTimeout(() => send({ id, result: { userAgent: "peel-e2e", platform: "darwin" } }), 1_200);
+      return;
+    }
+    return send({ id, result: { userAgent: "peel-e2e", platform: "darwin" } });
+  }
   if (method === "thread/list") {
     const search = String(params.searchTerm || "").toLowerCase();
     const available = [...threads.values(), ...catalogThreads.filter((thread) => !threads.has(thread.id))]

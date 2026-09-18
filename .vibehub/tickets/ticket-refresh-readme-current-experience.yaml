@@ -1,0 +1,63 @@
+{
+  "acceptance": [
+    {
+      "acceptance_id": "fresh-current-product-captures",
+      "criterion": "Tracked repository-relative Focus and Overview screenshots are regenerated from the current production Electron app at a readable desktop viewport, visibly use the current branded shell, named Chats, Branch from here affordance, Parent navigation where applicable, and current Overview cards without exposing local private paths, credentials, or unrelated user data."
+    },
+    {
+      "acceptance_id": "readme-copy-matches-current-build",
+      "criterion": "README product, capability, status, and launch copy is checked against the current implementation and successful Outcomes; stale version/runtime claims are corrected without claiming signing, notarization, public distribution, arbitrary graph editing, Git management, or unsupported Codex capabilities."
+    },
+    {
+      "acceptance_id": "durable-legible-assets",
+      "criterion": "Both screenshots render from a clean GitHub checkout through repository-relative links, remain legible at original detail and normal README width, use reasonably sized PNG assets, and are not references to ignored test output or absolute local paths."
+    },
+    {
+      "acceptance_id": "readme-link-and-command-verification",
+      "criterion": "An automated local check resolves every README image and repository link and verifies that documented install, build, test, package, launch, and output-path commands match package scripts and desktop documentation."
+    }
+  ],
+  "constraints": [
+    "Use real current Peel UI captures, not generated mockups or edited conceptual art.",
+    "Do not turn the README into a changelog, internal ticket inventory, or replacement PRD.",
+    "Do not include personal conversation content, private filesystem paths, credentials, or machine-specific diagnostics in durable screenshots.",
+    "Preserve the Thread-first single-root real-Fork product model and current local unsigned dogfood boundary."
+  ],
+  "context": "The root README still embeds August Focus and Overview captures that visibly predate automatic Chat naming, persistent Branch from here affordances, explicit Parent navigation, current Markdown/math fixes, and dismissible diagnostic history. A new visitor therefore sees stale product behavior even though the surrounding copy describes a newer build. Refresh the durable assets from the current production Electron UI and make only the copy changes needed to keep the README honest and useful.",
+  "context_refs": [
+    {
+      "purpose": "Provides the accepted README structure, factual boundary, and durable-asset standard being refreshed.",
+      "ref": ".vibehub/outcomes/ticket-publish-project-readme.yaml"
+    },
+    {
+      "purpose": "Provides the accepted visual hierarchy and production-shell baseline.",
+      "ref": ".vibehub/outcomes/ticket-reset-shell-material-hierarchy.yaml"
+    },
+    {
+      "purpose": "Provides the newest visible graph-entry and explicit Parent-navigation behavior that the README should no longer contradict.",
+      "ref": ".vibehub/outcomes/ticket-make-overview-thread-entry-unambiguous.yaml"
+    },
+    {
+      "purpose": "Provides the newest visible diagnostic lifecycle and history behavior that the README should no longer contradict.",
+      "ref": ".vibehub/outcomes/ticket-make-codex-diagnostics-dismissible-and-reviewable.yaml"
+    },
+    {
+      "purpose": "Current repository entry point and existing screenshot placement.",
+      "ref": "README.md"
+    },
+    {
+      "purpose": "Authoritative desktop build, package, and launch documentation.",
+      "ref": "apps/desktop/README.md"
+    }
+  ],
+  "deliveries": [],
+  "kind": "ticket",
+  "maturity": "firm",
+  "outcome": "The repository README shows the current Peel experience with fresh, legible product screenshots and accurately describes the latest shipped interaction and local launch path.",
+  "provenance_refs": [
+    "conversation:2026-09-18-refresh-readme-and-startup-experience"
+  ],
+  "relations": [],
+  "schema_version": 2,
+  "ticket_id": "ticket-refresh-readme-current-experience"
+}

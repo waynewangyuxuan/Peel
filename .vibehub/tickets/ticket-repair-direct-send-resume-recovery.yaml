@@ -1,0 +1,67 @@
+{
+  "acceptance": [
+    {
+      "acceptance_id": "scoped-resume-failure-feedback",
+      "criterion": "When the first direct send for an unloaded existing Chat fails during thread/resume, the active Composer shows an accessible actionable failure tied to that Chat, and global diagnostic history records only the appropriate safe context without leaving a permanent blocking banner."
+    },
+    {
+      "acceptance_id": "draft-and-attachment-preservation",
+      "criterion": "The exact unsent text, attachments, dictation edits, and Composer focus remain intact after resume failure and through the same-session retry; the text Draft also remains durable across a close/reopen or app restart before retry."
+    },
+    {
+      "acceptance_id": "idempotent-successful-retry",
+      "criterion": "After the resume fault clears, one deliberate retry performs at most one successful resume and one turn/start, clears the Draft only after accepted send, and produces no duplicate Turn, optimistic user message, or diagnostic."
+    },
+    {
+      "acceptance_id": "focused-and-journey-regression",
+      "criterion": "A focused Electron regression deterministically forces resume failure and recovery, and the previously failing full v0.1 journey passes through the direct-send scenario while retaining New Chat, Fork first-send, restart, streaming, and diagnostics behavior."
+    }
+  ],
+  "constraints": [
+    "Do not silently create a replacement Thread when resume fails.",
+    "Do not clear Composer state before Codex accepts turn/start.",
+    "Do not weaken adapter loaded-state or reconnect semantics merely to satisfy the fixture.",
+    "Keep errors scoped to the producing Chat and avoid exposing private paths or protocol payloads."
+  ],
+  "context": "The full v0.1 Electron journey now consistently reaches a late direct-send scenario where a forced thread/resume failure should surface a recoverable alert and preserve the message, but the current assertion does not observe that feedback. This is independently schedulable from the recently completed rendering and diagnostics work and needs a focused causal fix rather than being treated as noise in unrelated verification.",
+  "context_refs": [
+    {
+      "purpose": "Provides the accepted scoped diagnostic and failure-presentation contract.",
+      "ref": ".vibehub/outcomes/ticket-route-appserver-requests-and-errors.yaml"
+    },
+    {
+      "purpose": "Provides the accepted direct-send Draft preservation and recovery baseline.",
+      "ref": ".vibehub/outcomes/ticket-deliver-v01-spatial-loop.yaml"
+    },
+    {
+      "purpose": "Contains the deterministic failed-resume scenario and current failing assertion.",
+      "ref": "apps/desktop/e2e/v01-journey.spec.ts"
+    },
+    {
+      "purpose": "Owns direct-send resume, turn start, and user-facing failure translation.",
+      "ref": "apps/desktop/src/main/peel-service.ts"
+    },
+    {
+      "purpose": "Owns direct-send orchestration, Draft installation, and failure feedback state.",
+      "ref": "apps/desktop/src/renderer/App.tsx"
+    },
+    {
+      "purpose": "Owns the Composer text, attachment, dictation, focus, and retry interaction.",
+      "ref": "apps/desktop/src/renderer/Transcript.tsx"
+    },
+    {
+      "purpose": "Owns loaded-thread state, resume deduplication, and pre-turn ensureLoaded behavior.",
+      "ref": "packages/codex-app-server/src/client.ts"
+    }
+  ],
+  "deliveries": [],
+  "kind": "ticket",
+  "maturity": "firm",
+  "outcome": "Sending from an externally discovered or unloaded Codex Chat recovers cleanly from resume failure, preserves the draft, and retries exactly once without duplicate Turns or misleading UI.",
+  "provenance_refs": [
+    "conversation:2026-09-18-followup-failed-resume-regression"
+  ],
+  "relations": [],
+  "schema_version": 2,
+  "ticket_id": "ticket-repair-direct-send-resume-recovery"
+}
