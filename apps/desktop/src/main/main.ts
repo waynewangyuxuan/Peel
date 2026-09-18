@@ -15,6 +15,7 @@ import type {
   StartSpaceInput,
 } from "../shared/contracts";
 import { IPC } from "../shared/contracts";
+import { APP_DISPLAY_NAME, nativeAppIconPath } from "./app-identity";
 import { openTarget } from "./open-target";
 import { PeelService } from "./peel-service";
 import { VoiceService } from "./voice-service";
@@ -27,6 +28,7 @@ const configuredStateFailureMarker = process.env.PEEL_TEST_STATE_FAILURE_MARKER 
 const configuredTranscriptBenchmark = process.env.PEEL_NATIVE_TRANSCRIPT_BENCHMARK;
 const configuredTmpdir = argumentValue("--peel-test-tmpdir");
 const quitAfterVoiceVerification = process.argv.includes("--peel-test-quit-after-voice");
+app.setName(APP_DISPLAY_NAME);
 if (process.env.PEEL_RENDERING_BENCHMARK === "1" || configuredTranscriptBenchmark) app.commandLine.appendSwitch("enable-precise-memory-info");
 if (configuredUserDataPath) app.setPath("userData", configuredUserDataPath);
 if (configuredTmpdir) process.env.TMPDIR = configuredTmpdir;
@@ -54,6 +56,14 @@ function rendererUrl(): string {
   return url.toString();
 }
 
+function appIconPath(): string {
+  return nativeAppIconPath({
+    appRoot: appRoot(),
+    isPackaged: app.isPackaged,
+    resourcesPath: process.resourcesPath,
+  });
+}
+
 async function createWindow(): Promise<void> {
   window = new BrowserWindow({
     width: 1440,
@@ -63,6 +73,7 @@ async function createWindow(): Promise<void> {
     titleBarStyle: "hiddenInset",
     trafficLightPosition: { x: 16, y: 16 },
     backgroundColor: "#e9e9e6",
+    icon: appIconPath(),
     show: false,
     webPreferences: {
       preload: join(appRoot(), "dist/preload/preload.cjs"),
@@ -150,6 +161,7 @@ function registerIpc(peel: PeelService, voice: VoiceService): void {
 }
 
 app.whenReady().then(async () => {
+  if (process.platform === "darwin") app.dock?.setIcon(appIconPath());
   session.defaultSession.setPermissionRequestHandler((_webContents, permission, callback) => {
     callback(permission === "media");
   });
