@@ -1,0 +1,95 @@
+{
+  "acceptance": [
+    {
+      "acceptance_id": "bounded-production-focus-entry",
+      "criterion": "A production-build Electron A/B harness exercises the ordinary App to Focus to Transcript to MarkdownContent route with deterministic 10/100/500-Turn fixtures, at least two warmups, and at least seven measured baseline/backfill samples. For 500 Turns, median first-content and through-paint time with backfill are each at most 50% of the same-run full-mount baseline and no task of 50 ms or longer occurs before first content. For 10 and 100 Turns, median first-content and through-paint regress by no more than the greater of 10% or 5 ms. The harness records App Server read, snapshot construction, IPC, React commit, paint, long tasks, DOM descendants, and mounted Turn count."
+    },
+    {
+      "acceptance_id": "anchor-aware-initial-range",
+      "criterion": "Initial mounting includes the correct bounded range for each entry scenario: the newest live tail for ordinary bottom entry, the saved Scroll anchor when returning to a Thread, the exact highlighted Parent Turn reached by Branched from, and the requested completed Turn for any direct Branch/highlight navigation. The target is present before restoration or highlight is declared complete, with no temporary jump to an unrelated range."
+    },
+    {
+      "acceptance_id": "stable-incremental-history-prepend",
+      "criterion": "Approaching the mounted history boundary incrementally prepends older authoritative Turns in scheduled bounded chunks. On deterministic text, code, math, attachment, Activity, command, file-change, notice, error, approval, and unknown-item fixtures, the visible anchor moves by no more than 1 CSS pixel after each settled prepend; no individual backfill task reaches 50 ms, ordering and exact Turn IDs remain unchanged, and repeatedly loading earlier history eventually exposes every Turn with exact selectable text and Branch anchors."
+    },
+    {
+      "acceptance_id": "backfill-live-tail-responsiveness",
+      "criterion": "While historical backfill is pending or running, Composer input, code copy, Branch from here, Open in Codex, request/approval actions, and user scrolling remain operable. A replay with 100 completed Turns, a live tail, and 36 representative deltas keeps the live item visible, preserves user-controlled follow-bottom, processes all deltas, produces zero settled historical Turn or Markdown rerenders, and introduces no streaming task of 50 ms or longer."
+    },
+    {
+      "acceptance_id": "history-restoration-and-restart-fidelity",
+      "criterion": "Automated Focus coverage proves per-Thread Draft and Scroll restoration across switching and full app restart, returning from Parent to Child, highlighted Parent navigation, local horizontal overflow, math/CJK layout, remote-image placeholders, attachments, and exact completed-Turn Branch anchors both before and after the full history has backfilled."
+    },
+    {
+      "acceptance_id": "selection-and-image-anchor-stability",
+      "criterion": "An active text selection spanning multiple mounted Turns remains exact while older history is prepended, and after full backfill an automated selection across distant Turns returns the exact source text. Bounded local data: and blob: images retain their accepted sizing behavior; settling those images or prepending history around them moves the deterministic visible anchor by no more than 1 CSS pixel. Remote media remains click-only and cannot load automatically."
+    },
+    {
+      "acceptance_id": "bounded-backfill-architecture-boundary",
+      "criterion": "The implementation keeps Codex ReducedThread data authoritative and derives only a mounted Turn range plus restoration anchor; it does not copy conversation content into a parallel store, replace the Markdown runtime, add full transcript virtualization or content-visibility, omit history permanently, or weaken raw-HTML, URL, remote-media, parser-failure, or exact-copy safety boundaries."
+    }
+  ],
+  "constraints": [
+    "Keep the complete Codex ReducedThread snapshot authoritative; bounded mounting is presentation state, not a second chat-history model.",
+    "Preserve exact Turn IDs, item ordering, completion, request, notice, error, lineage, and Branch anchor semantics across not-yet-mounted and mounted history.",
+    "Do not adopt Streamdown or assistant-ui runtime, full transcript virtualization, content-visibility, or permanent history truncation in this Ticket.",
+    "Do not trade initial paint for a single later long task; backfill must remain interruptible by live-tail, Composer, navigation, and user-scroll work.",
+    "Benchmark the ordinary production Focus route and compare against a same-run full-mount baseline; do not substitute isolated parser or component timing."
+  ],
+  "context": "Production measurement after native stable-row optimization shows that a 500-Turn Focus entry still creates 29,506 descendants, takes 309.0 ms median through paint, and produces an approximately 263 ms long task, while App Server read plus snapshot construction costs only about 8.3 ms. Historical DOM creation is therefore the next independently schedulable bottleneck. The smallest follow-up is bounded initial mounting plus incremental prepend of the same authoritative Turn list, not a new transcript store, Markdown runtime replacement, full virtualization, or content-visibility.",
+  "context_refs": [
+    {
+      "purpose": "Provides the measured production Focus phase split, 500-Turn DOM/long-task result, and explicit decision that bounded backfill is the next separate boundary.",
+      "ref": "docs/review/native-transcript-performance/README.md"
+    },
+    {
+      "purpose": "Provides machine-readable baseline medians and the 29,506-descendant, approximately 263 ms long-task finding.",
+      "ref": "docs/review/native-transcript-performance/benchmark-summary.json"
+    },
+    {
+      "purpose": "Owns Focus switching, saved Draft/Scroll state, Branch/highlight navigation, and snapshot installation.",
+      "ref": "apps/desktop/src/renderer/App.tsx"
+    },
+    {
+      "purpose": "Owns transcript traversal, follow-bottom behavior, Turn anchors, per-Turn actions, and the historical DOM that must be mounted incrementally.",
+      "ref": "apps/desktop/src/renderer/Transcript.tsx"
+    },
+    {
+      "purpose": "Owns Markdown selection, image sizing, remote-media click gating, exact-copy behavior, and rendering safety that incremental history must preserve.",
+      "ref": "apps/desktop/src/renderer/Markdown.tsx"
+    },
+    {
+      "purpose": "Provides the ordinary production Focus measurement harness to extend with same-run full-mount/backfill comparison.",
+      "ref": "apps/desktop/e2e/native-transcript-performance.spec.ts"
+    },
+    {
+      "purpose": "Defines the Focus fidelity and restoration behaviors that bounded mounting cannot regress.",
+      "ref": ".vibehub/rooms/product/contract-focus-chat-fidelity.yaml"
+    },
+    {
+      "purpose": "Preserves Codex-owned conversation facts and prohibits a shadow transcript database.",
+      "ref": ".vibehub/rooms/product/contract-source-of-truth-ownership.yaml"
+    },
+    {
+      "purpose": "Records the accepted native reconciliation and tail-only invalidation contract that backfill extends.",
+      "ref": ".vibehub/evidence/ticket-optimize-native-transcript-rendering/evidence-native-transcript-identity-and-fidelity.yaml"
+    }
+  ],
+  "deliveries": [],
+  "kind": "ticket",
+  "maturity": "firm",
+  "outcome": "A long Focus transcript becomes readable and interactive quickly by mounting an anchor-aware bounded history range first and incrementally backfilling the remaining authoritative Turns without scroll jumps, lost content, or live-tail regressions.",
+  "provenance_refs": [
+    "conversation:2026-09-17-native-transcript-experience-over-renderer-migration",
+    "evidence:ticket-optimize-native-transcript-rendering/evidence-native-transcript-backfill-decision"
+  ],
+  "relations": [
+    {
+      "rationale": "Bounded mounting must extend the accepted stable-row reconciliation path and use its production Focus benchmark as the causal baseline.",
+      "target_ticket_id": "ticket-optimize-native-transcript-rendering",
+      "type": "depends_on"
+    }
+  ],
+  "schema_version": 2,
+  "ticket_id": "ticket-add-bounded-focus-history-backfill"
+}

@@ -51,6 +51,10 @@ export interface SpaceRecord {
 export interface ThreadViewState {
   draft: string;
   scrollTop: number;
+  scrollAnchor?: {
+    turnId: string;
+    offset: number;
+  } | null;
 }
 
 export interface PeelState {
@@ -77,6 +81,12 @@ export interface ForkDraft {
 export interface ThreadSnapshot {
   thread: CodexThread;
   reduced: ReducedThread | null;
+  performance?: {
+    source: "read" | "notification";
+    threadReadMs: number | null;
+    snapshotConstructionMs: number;
+    sentAtEpochMs: number;
+  };
 }
 
 export interface CodexNotificationUpdate {

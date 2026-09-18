@@ -17,6 +17,30 @@ const turn = (id, prompt, answer) => ({
   completedAt: now - 29,
   durationMs: 1000,
 });
+const performanceTurn = (threadId, count, index) => {
+  return turn(
+    `${threadId}-turn-${index + 1}`,
+    `Prompt ${index + 1} in the ${count}-Turn transcript`,
+    `### Result ${index + 1}\n\nSettled **Markdown** for Turn ${index + 1} keeps history selectable and stable.\n\n- Preserve exact Turn anchors\n- Keep \`inline code\` readable\n\n| Surface | Contract |\n| --- | --- |\n| Focus | Tail-only invalidation |\n\n\`\`\`ts\nconst turn = ${index + 1};\nconst stable = true;\nfunction renderOnlyTheTail(value: string) {\n  return value.trim();\n}\n\`\`\``,
+  );
+};
+const boundedBackfillTurn = (threadId, count, index) => {
+  const id = `${threadId}-turn-${index + 1}`;
+  const result = turn(
+    id,
+    `Prompt ${index + 1} in the ${count}-Turn transcript`,
+    `Settled **Markdown** for Turn ${index + 1} remains exact and selectable.${index === 9 || index === count - 1 ? "\n\n\`\`\`ts\nconst boundedHistory = true;\n\`\`\`" : ""}${index === 69 ? "\n\n\\[q_{\\text{苹果}}^{(1)} \\cdot k_{\\text{外卖}}^{(1)}\\]" : ""}${index === 489 ? "\n\n![bounded local image](data:image/svg+xml;base64,PHN2ZyB4bWxucz0iaHR0cDovL3d3dy53My5vcmcvMjAwMC9zdmciIHdpZHRoPSIzMjAiIGhlaWdodD0iODAiPjxyZWN0IHdpZHRoPSIzMjAiIGhlaWdodD0iODAiIGZpbGw9IiNjN2Q5Y2YiLz48L3N2Zz4=)\n\n![remote image](https://example.com/never-auto-load.png)" : ""}`,
+  );
+  if (index === 19) result.items.push(item("reasoning", `${id}-reasoning`, "Verify the bounded-history anchor before committing the range.", { status: "completed" }));
+  if (index === 29) result.items.push(item("commandExecution", `${id}-command`, "npm test\nAll bounded-history checks passed", { status: "completed", command: "npm test" }));
+  if (index === 39) result.items.push(item("fileChange", `${id}-file`, "", { status: "completed", changes: [{ path: "src/bounded.ts", diff: "+ preserveAnchor()" }] }));
+  if (index === 49) result.items.push(item("subAgentActivity", `${id}-activity`, "Checked the deterministic historical range.", { status: "completed" }));
+  if (index === 59) result.items.push(item("error", `${id}-error`, "A recoverable historical fixture error", { status: "failed" }));
+  if (index === 472 || index === count - 2) result.items.push(
+    item("futureCapability", `${id}-unknown`, "An unknown Codex item remains visible and locally inspectable.", { status: "completed" }),
+  );
+  return result;
+};
 const root = {
   id: "thread-root",
   sessionId: "session-root",
@@ -141,7 +165,7 @@ reader.on("line", (line) => {
     return send({ id, result: startResponse(thread) });
   }
   if (method === "thread/read" || method === "thread/resume") {
-    let thread = threads.get(params.threadId) || restoreCatalog(params.threadId) || restoreTestChild(params.threadId) || restoreSynthetic(params.threadId);
+    let thread = threads.get(params.threadId) || restoreCatalog(params.threadId) || restoreTestChild(params.threadId) || restoreSynthetic(params.threadId) || restorePerformance(params.threadId);
     const failResumeMarker = process.env.TMPDIR ? join(process.env.TMPDIR, "fail-resume") : null;
     if (method === "thread/resume" && failResumeMarker && existsSync(failResumeMarker)) {
       unlinkSync(failResumeMarker);
@@ -223,6 +247,26 @@ reader.on("line", (line) => {
     started.items.push(user);
     notify("item/started", { threadId: thread.id, turnId, item: user });
     notify("item/completed", { threadId: thread.id, turnId, item: user });
+    if (textInput?.text === "__PEEL_PERF_STREAM_36__") {
+      const agent = item("agentMessage", `${turnId}-a`, "");
+      started.items.push(agent);
+      notify("item/started", { threadId: thread.id, turnId, item: agent });
+      const fragments = Array.from({ length: 36 }, (_, index) => `Segment ${index + 1} keeps **streaming Markdown** responsive. `);
+      fragments.forEach((delta, index) => setTimeout(() => {
+        notify("item/agentMessage/delta", { threadId: thread.id, turnId, itemId: agent.id, delta });
+      }, 30 + index * 24));
+      setTimeout(() => {
+        agent.text = fragments.join("");
+        notify("item/completed", { threadId: thread.id, turnId, item: agent });
+        started.status = "completed";
+        started.completedAt = now + 1;
+        started.durationMs = 1000;
+        thread.status = { type: "idle" };
+        notify("turn/completed", { threadId: thread.id, turn: started });
+        notify("thread/status/changed", { threadId: thread.id, status: thread.status });
+      }, 30 + fragments.length * 24);
+      return;
+    }
     if (textInput?.text === "Exercise every server request route") {
       thread.status = { type: "active", activeFlags: ["waitingOnApproval", "waitingOnUserInput"] };
       notify("thread/status/changed", { threadId: thread.id, status: thread.status });
@@ -351,4 +395,31 @@ function restoreSynthetic(threadId) {
   }
   threads.set(threadId, synthetic);
   return synthetic;
+}
+
+function restorePerformance(threadId) {
+  const match = String(threadId).match(/^performance-(10|100|500)(?:-stream-\d+)?$/);
+  const boundedBackfill = threadId === "b5000000-0000-4000-8000-000000000500";
+  if (!match && !boundedBackfill && threadId !== "performance-oversized") return null;
+  const count = boundedBackfill ? 500 : match ? Number(match[1]) : 1;
+  const performanceThread = {
+    ...structuredClone(root),
+    id: threadId,
+    sessionId: `session-${threadId}`,
+    name: threadId === "performance-oversized" ? "Performance oversized message" : boundedBackfill ? "Bounded backfill 500 Turns" : `Performance ${count} Turns`,
+    preview: `Deterministic production Focus fixture for ${threadId}`,
+    projectId: null,
+    forkedFromId: null,
+    parentThreadId: null,
+    createdAt: now - count,
+    updatedAt: now,
+    status: { type: "idle" },
+    turns: threadId === "performance-oversized"
+      ? [turn("performance-oversized-turn", "Render the oversized response safely", `<script>window.__peelUnsafe = true</script>\n![remote](https://example.com/remote.png)\n${"x".repeat(200_000)}`)]
+      : Array.from({ length: count }, (_, index) => boundedBackfill
+        ? boundedBackfillTurn("bounded-backfill-500", count, index)
+        : performanceTurn(threadId, count, index)),
+  };
+  threads.set(threadId, performanceThread);
+  return performanceThread;
 }

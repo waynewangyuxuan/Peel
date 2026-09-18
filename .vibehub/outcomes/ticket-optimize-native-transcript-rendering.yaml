@@ -1,0 +1,22 @@
+{
+  "accepted_acceptance_ids": [
+    "stable-settled-transcript-identity",
+    "tail-only-focus-invalidation",
+    "oversized-message-readable-fallback",
+    "production-focus-performance-evidence",
+    "focus-fidelity-regression-coverage",
+    "evidence-based-followup-boundary"
+  ],
+  "closed_at": "2026-09-18T00:39:02Z",
+  "evidence_ids": [
+    "evidence-native-transcript-identity-and-fidelity",
+    "evidence-native-transcript-performance-and-oversized-fallback",
+    "evidence-native-transcript-backfill-decision"
+  ],
+  "kind": "ticket_outcome",
+  "schema_version": 1,
+  "status": "successful",
+  "summary": "Independent closeout accepted all six criteria after reading the exact Ticket, every Evidence record, the complete uncommitted implementation and benchmark diff, the existing App Server reducer coverage, focused Focus regressions, and the checked-in performance report. Renderer-boundary reconciliation preserves unchanged settled Turn and Item identity while replacing the notification target; memoized Turn, Item, and Markdown surfaces, stable callbacks, grouped request/notice lookup, and structural request/notice comparison keep live-tail invalidation local without creating a parallel transcript store. Fresh verification passed the Desktop production build, 82/82 Desktop tests, 25/25 App Server tests, 12/12 Git-workspace tests, git diff checking, VibeHub validation, and four focused production Electron regressions covering math/CJK layout, exact Open in Codex routing, request/notice/error ownership, and the isolated renderer contract. A fresh production-App Electron A/B ran two warmups and seven measured samples per mode on the ordinary App to Focus to Transcript to MarkdownContent path: the 36-delta streaming median fell from 36.05 ms to 1.40 ms (about 96.1%), with zero optimized historical Turn or Markdown renders and zero streaming long-task time. Fresh optimized versus baseline median first-content/through-paint results were 11.0/28.6 versus 10.0/29.4 ms for 10 Turns, 62.4/67.0 versus 62.7/69.6 ms for 100 Turns, 299.0/319.1 versus 289.0/309.0 ms for 500 Turns, and 266.4/286.6 versus 259.6/279.5 ms for the 10-to-500 warm switch; every measure remains inside the greater-of-10%-or-5-ms regression bound. The same run separately recorded App Server read, snapshot construction, IPC, reconciliation, React commit, two-frame paint, long tasks, 29,506 descendants at 500 Turns, and heap diagnostics. Its 200,086-character fixture stayed exact and selectable in an inert local-overflow pre, with zero interpreted unsafe elements and zero remote images; the exact 200,000-character unit boundary and below-threshold Markdown path also pass. The broad v0.1 journey again passed all relevant Focus, Branch, Markdown, Draft/Scroll, attachment, Activity, streaming, request, scale, and restart assertions before the known unrelated line-903 session-resume fixture expectation; it is explicitly not reported as a passing test. The implementation adds no Streamdown, assistant-ui runtime, full virtualization, content-visibility, or history truncation. Because fresh 500-Turn Focus still mounts 29,506 descendants and has a roughly 276 ms median long task while read plus snapshot work is about 8.4 ms, the separate bounded-history-backfill Ticket is evidence-based and correctly remains outside this delivery.",
+  "ticket_id": "ticket-optimize-native-transcript-rendering",
+  "unresolved_acceptance_ids": []
+}

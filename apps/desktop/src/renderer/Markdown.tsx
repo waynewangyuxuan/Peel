@@ -1,4 +1,4 @@
-import { Children, Fragment, isValidElement, useEffect, useRef, useState, type ReactNode } from "react";
+import { Children, Fragment, isValidElement, memo, useEffect, useRef, useState, type ReactNode } from "react";
 import rehypeKatex from "rehype-katex";
 import ReactMarkdown, { defaultUrlTransform, type Components, type UrlTransform } from "react-markdown";
 import remarkBreaks from "remark-breaks";
@@ -7,6 +7,9 @@ import remarkMath from "remark-math";
 import "katex/dist/katex.min.css";
 
 import { Icon } from "./icons";
+import { recordMarkdownRender, transcriptSnapshotMode } from "./transcript-performance";
+
+export const MARKDOWN_PLAIN_TEXT_LIMIT = 200_000;
 
 const components: Components = {
   a({ node: _node, ...props }): ReactNode {
@@ -32,12 +35,19 @@ const components: Components = {
   },
 };
 
-export function MarkdownContent({ text, streaming = false, className = "" }: {
+interface MarkdownContentProps {
   text: string;
   streaming?: boolean;
   className?: string;
-}): ReactNode {
+  performanceId?: string;
+}
+
+function MarkdownContentView({ text, streaming = false, className = "", performanceId }: MarkdownContentProps): ReactNode {
+  if (performanceId) recordMarkdownRender(performanceId);
   if (!text) return streaming ? <span className="stream-caret" aria-label="Streaming response">▋</span> : null;
+  if (text.length >= MARKDOWN_PLAIN_TEXT_LIMIT) return <div className={["markdown-body", className].filter(Boolean).join(" ")}>
+    <pre className="markdown-oversized-fallback" data-rendering-fallback="oversized">{text}</pre>
+  </div>;
   const renderedText = normalizeMathDelimiters(streaming ? projectStreamingMarkdown(text) : text);
   return <div className={["markdown-body", className].filter(Boolean).join(" ")}>
     <ReactMarkdown
@@ -50,6 +60,14 @@ export function MarkdownContent({ text, streaming = false, className = "" }: {
     {streaming && <span className="stream-caret" aria-label="Streaming response">▋</span>}
   </div>;
 }
+
+export const MarkdownContent = memo(MarkdownContentView, (previous, next) => {
+  if (transcriptSnapshotMode() === "baseline") return false;
+  return previous.text === next.text
+    && previous.streaming === next.streaming
+    && previous.className === next.className
+    && previous.performanceId === next.performanceId;
+});
 
 /** Codex commonly emits LaTeX's \(...\) and \[...\] delimiters; remark-math uses $/$$. */
 export function normalizeMathDelimiters(text: string): string {

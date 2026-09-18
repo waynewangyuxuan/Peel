@@ -1,0 +1,23 @@
+{
+  "acceptance_ids": [
+    "bounded-production-focus-entry",
+    "backfill-live-tail-responsiveness"
+  ],
+  "evidence_id": "evidence-bounded-focus-performance",
+  "kind": "ticket_evidence",
+  "origin": "agent",
+  "recorded_at": "2026-09-18T02:20:56Z",
+  "refs": [
+    "apps/desktop/e2e/native-transcript-performance.spec.ts",
+    "apps/desktop/e2e/bounded-transcript-backfill.spec.ts",
+    "apps/desktop/e2e/fixtures/codex",
+    "apps/desktop/src/renderer/transcript-performance.ts",
+    "docs/review/bounded-transcript-backfill/README.md",
+    "docs/review/bounded-transcript-backfill/benchmark-summary.json",
+    "command:npm run benchmark:transcript --workspace @peel/desktop -- --reporter=dot passed 1/1 in production Electron",
+    "command:npm run test:e2e --workspace @peel/desktop -- e2e/bounded-transcript-backfill.spec.ts --reporter=dot passed 1/1 in production Electron"
+  ],
+  "schema_version": 1,
+  "summary": "The final production Electron A/B run exercised App to Focus to Transcript to MarkdownContent with two warmups and seven measured samples per mode. Full-mount versus bounded medians were 10.9/31.0 versus 9.9/21.5 ms for 10 Turns, 74.9/86.5 versus 29.1/34.0 ms for 100 Turns, and 329.6/380.9 versus 42.6/48.0 ms for 500 Turns (first content/through paint). The 500-Turn path therefore used 12.9% and 12.6% of baseline, mounted 32/500 Turns and 1,896 descendants versus 500/500 and 29,506, and recorded no pre-content long task. The same run recorded App Server read, snapshot construction, IPC, reconciliation, React commit, paint, long tasks, DOM, mounted/total Turns, and heap diagnostics. Its 100-settled-Turn live-tail replay processed exactly 36 deltas with zero historical Turn renders, zero historical Markdown renders, no streaming long task, and a 1.6 ms median renderer cost versus 40.1 ms baseline. The production fidelity E2E additionally operated Composer input, code copy, Branch from here, and scrolling while scheduled history restoration was active.",
+  "ticket_id": "ticket-add-bounded-focus-history-backfill"
+}

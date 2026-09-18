@@ -18,7 +18,11 @@ describe("StateStore", () => {
     directories.push(directory);
     const store = new StateStore(directory);
     const state = emptyState();
-    state.threadViews.thread = { draft: "do not lose this", scrollTop: 912 };
+    state.threadViews.thread = {
+      draft: "do not lose this",
+      scrollTop: 912,
+      scrollAnchor: { turnId: "turn-211", offset: -24 },
+    };
     await store.save(state);
     expect(await store.load()).toEqual(state);
     expect(JSON.parse(await readFile(store.path, "utf8"))).toEqual(state);

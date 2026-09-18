@@ -2,7 +2,7 @@ import { renderToStaticMarkup } from "react-dom/server";
 import { describe, expect, it } from "vitest";
 import type { ThreadItem } from "@peel/codex-app-server";
 
-import { highlightCode, MarkdownContent, normalizeMathDelimiters } from "../src/renderer/Markdown";
+import { highlightCode, MARKDOWN_PLAIN_TEXT_LIMIT, MarkdownContent, normalizeMathDelimiters } from "../src/renderer/Markdown";
 import { ItemView, TurnActions } from "../src/renderer/Transcript";
 import { plainTextPreview } from "../src/renderer/lib";
 
@@ -93,6 +93,21 @@ const safe = true;
     expect(html).not.toContain("javascript:");
   });
 
+  it("uses an exact inert text fallback at the 200k boundary", () => {
+    const prefix = "<script>window.unsafe = true</script>\n![remote](https://example.com/image.png)\n";
+    const source = prefix + "x".repeat(MARKDOWN_PLAIN_TEXT_LIMIT - prefix.length);
+    const html = renderToStaticMarkup(<MarkdownContent text={source}/>);
+    expect(html).toContain('data-rendering-fallback="oversized"');
+    expect(html).toContain("&lt;script&gt;window.unsafe = true&lt;/script&gt;");
+    expect(html).toContain("![remote](https://example.com/image.png)");
+    expect(html).not.toContain("<script>");
+    expect(html).not.toContain("<img");
+
+    const normal = renderToStaticMarkup(<MarkdownContent text={`**${"y".repeat(MARKDOWN_PLAIN_TEXT_LIMIT - 5)}**`}/>);
+    expect(normal).not.toContain('data-rendering-fallback="oversized"');
+    expect(normal).toContain("<strong>");
+  });
+
   it("typesets Codex inline and display math as semantic accessible KaTeX", () => {
     const source = String.raw`Inline \(x^2 + \sqrt{y}\).
 
@@ -161,13 +176,16 @@ q_{\text{苹果}}^{(1)}\cdot k_{\text{外卖}}^{(1)}
 
 ![remote diagram](https://example.com/diagram.png)
 
-![inline image](data:image/png;base64,iVBORw0KGgo=)`}/>);
+![inline image](data:image/png;base64,iVBORw0KGgo=)
+
+![local blob](blob:https://peel.local/fixture)`}/>);
     expect(html.match(/<blockquote>/g)).toHaveLength(1);
     expect(html).toContain("<ul>");
     expect(html).toContain("<ol>");
     expect(html).toContain("href=\"https://example.com/path\"");
     expect(html).toContain("class=\"markdown-image-link\"");
     expect(html).toContain("src=\"data:image/png;base64,iVBORw0KGgo=\"");
+    expect(html).toContain("src=\"blob:https://peel.local/fixture\"");
     expect(html).not.toContain("src=\"https://example.com/diagram.png\"");
   });
 

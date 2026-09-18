@@ -103,9 +103,16 @@ export function normalizeState(candidate: unknown): PeelState {
   const activeThreadId = activeSpaceId && typeof state.activeThreadId === "string" && spaces[activeSpaceId]!.nodes[state.activeThreadId]
     ? state.activeThreadId
     : activeSpaceId ? spaces[activeSpaceId]!.rootThreadId : null;
-  const threadViews = Object.fromEntries(Object.entries(state.threadViews).filter((entry): entry is [string, ThreadViewState] => {
-    const value = entry[1];
-    return Boolean(value && typeof value.draft === "string" && Number.isFinite(value.scrollTop) && value.scrollTop >= 0);
+  const threadViews = Object.fromEntries(Object.entries(state.threadViews).flatMap(([threadId, candidate]) => {
+    const value = candidate as ThreadViewState | undefined;
+    if (!value || typeof value.draft !== "string" || !Number.isFinite(value.scrollTop) || value.scrollTop < 0) return [];
+    const anchor = value.scrollAnchor;
+    const scrollAnchor = anchor
+      && typeof anchor.turnId === "string"
+      && Number.isFinite(anchor.offset)
+      ? { turnId: anchor.turnId, offset: anchor.offset }
+      : null;
+    return [[threadId, { draft: value.draft, scrollTop: value.scrollTop, ...(scrollAnchor ? { scrollAnchor } : {}) } satisfies ThreadViewState]];
   }));
   return {
     version: 1,

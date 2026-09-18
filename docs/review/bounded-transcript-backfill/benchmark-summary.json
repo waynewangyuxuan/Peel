@@ -1,0 +1,58 @@
+{
+  "schema_version": 1,
+  "date": "2026-09-17",
+  "environment": "Mac Electron 44 / Chromium 152 production build",
+  "protocol": {
+    "route": "App -> Focus -> Transcript -> MarkdownContent",
+    "warmups_per_mode": 2,
+    "measured_samples_per_mode": 7,
+    "initial_turn_window": 32,
+    "backfill_chunk_turns": 1,
+    "stream_deltas": 36,
+    "stream_settled_turns": 100,
+    "baseline": "full authoritative transcript mount"
+  },
+  "median_ms": {
+    "baseline": {
+      "cold_focus_10": { "first_content": 10.9, "through_paint": 31.0 },
+      "cold_focus_100": { "first_content": 74.9, "through_paint": 86.5 },
+      "cold_focus_500": { "first_content": 329.6, "through_paint": 380.9 },
+      "warm_switch_10_to_500": { "first_content": 285.2, "through_paint": 342.8 },
+      "stream_renderer": 40.1
+    },
+    "bounded": {
+      "cold_focus_10": { "first_content": 9.9, "through_paint": 21.5 },
+      "cold_focus_100": { "first_content": 29.1, "through_paint": 34.0 },
+      "cold_focus_500": { "first_content": 42.6, "through_paint": 48.0 },
+      "warm_switch_10_to_500": { "first_content": 24.3, "through_paint": 29.9 },
+      "stream_renderer": 1.6
+    }
+  },
+  "cold_focus_500": {
+    "first_content_percent_of_baseline": 12.9,
+    "through_paint_percent_of_baseline": 12.6,
+    "baseline_dom_descendants": 29506,
+    "bounded_dom_descendants": 1896,
+    "baseline_mounted_turns": 500,
+    "bounded_mounted_turns": 32,
+    "bounded_pre_content_long_task_ms": 0
+  },
+  "streaming": {
+    "bounded_historical_turn_renders": 0,
+    "bounded_historical_markdown_renders": 0,
+    "bounded_delta_count_each_sample": 36,
+    "bounded_long_task_ms": 0,
+    "live_turn_visible_each_sample": true,
+    "user_scroll_preserved_each_sample": true,
+    "follow_bottom_resumed_each_sample": true
+  },
+  "backfill_e2e": {
+    "eventual_mounted_turns": 500,
+    "long_task_ms": 0,
+    "maximum_anchor_delta_px": 1,
+    "selection_preserved": true,
+    "full_restart_anchor_preserved": true,
+    "live_controls_operable": ["composer", "code-copy", "branch", "open-in-codex", "command-approval", "attachment", "scroll"],
+    "remote_images_loaded_automatically": 0
+  }
+}

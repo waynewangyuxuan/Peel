@@ -36,7 +36,7 @@ test("production Electron compares current Markdown with the isolated Streamdown
     const current = await runSuite(page, "current");
     assertSharedContract(current);
     expect((await application.evaluate(({ clipboard }) => clipboard.readText())).trimEnd()).toBe(expectedCopiedCode);
-    expect(current.correctness.oversizedFallback).toBe(false);
+    expect(current.correctness.oversizedFallback).toBe(true);
     expect(current.correctness.errorFallback).toBe(false);
 
     const streamdown = await runSuite(page, "streamdown");

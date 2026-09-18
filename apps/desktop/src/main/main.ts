@@ -24,9 +24,10 @@ const configuredUserDataPath = process.env.PEEL_USER_DATA_PATH || argumentValue(
 const configuredCodexBinary = process.env.PEEL_CODEX_BINARY || argumentValue("--peel-codex-binary");
 const configuredVoiceHelper = process.env.PEEL_VOICE_HELPER || argumentValue("--peel-voice-helper");
 const configuredStateFailureMarker = process.env.PEEL_TEST_STATE_FAILURE_MARKER || argumentValue("--peel-test-state-failure-marker");
+const configuredTranscriptBenchmark = process.env.PEEL_NATIVE_TRANSCRIPT_BENCHMARK;
 const configuredTmpdir = argumentValue("--peel-test-tmpdir");
 const quitAfterVoiceVerification = process.argv.includes("--peel-test-quit-after-voice");
-if (process.env.PEEL_RENDERING_BENCHMARK === "1") app.commandLine.appendSwitch("enable-precise-memory-info");
+if (process.env.PEEL_RENDERING_BENCHMARK === "1" || configuredTranscriptBenchmark) app.commandLine.appendSwitch("enable-precise-memory-info");
 if (configuredUserDataPath) app.setPath("userData", configuredUserDataPath);
 if (configuredTmpdir) process.env.TMPDIR = configuredTmpdir;
 let window: BrowserWindow | null = null;
@@ -49,6 +50,7 @@ function rendererUrl(): string {
   const development = process.env.PEEL_RENDERER_URL;
   const url = new URL(development || `file://${join(appRoot(), "dist/renderer/index.html")}`);
   if (process.env.PEEL_RENDERING_BENCHMARK === "1") url.searchParams.set("rendering-benchmark", "1");
+  if (configuredTranscriptBenchmark) url.searchParams.set("transcript-performance", configuredTranscriptBenchmark);
   return url.toString();
 }
 

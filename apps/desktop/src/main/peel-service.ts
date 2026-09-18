@@ -73,10 +73,21 @@ export class PeelService extends EventEmitter {
       this.#handleRequestResolution(notification);
       this.#recordNotice(notification);
       const threadId = typeof notification.params.threadId === "string" ? notification.params.threadId : null;
+      const snapshotStarted = performance.now();
       const reduced = threadId ? this.client.getThreadState(threadId) : null;
+      const snapshotConstructionMs = performance.now() - snapshotStarted;
       this.emit("notification", {
         notification,
-        snapshot: reduced ? { thread: reduced.thread, reduced } : null,
+        snapshot: reduced ? {
+          thread: reduced.thread,
+          reduced,
+          performance: {
+            source: "notification",
+            threadReadMs: null,
+            snapshotConstructionMs,
+            sentAtEpochMs: Date.now(),
+          },
+        } : null,
       });
       void this.#handleAutomaticTitle(notification);
     });
@@ -159,8 +170,22 @@ export class PeelService extends EventEmitter {
 
   async readThread(threadId: string): Promise<ThreadSnapshot> {
     this.#requireConnection();
+    const readStarted = performance.now();
     const thread = await this.client.readThread(threadId, true);
-    return { thread, reduced: this.client.getThreadState(threadId) };
+    const threadReadMs = performance.now() - readStarted;
+    const snapshotStarted = performance.now();
+    const reduced = this.client.getThreadState(threadId);
+    const snapshotConstructionMs = performance.now() - snapshotStarted;
+    return {
+      thread,
+      reduced,
+      performance: {
+        source: "read",
+        threadReadMs,
+        snapshotConstructionMs,
+        sentAtEpochMs: Date.now(),
+      },
+    };
   }
 
   async startNewChat(input: StartNewChatInput): Promise<PeelState> {

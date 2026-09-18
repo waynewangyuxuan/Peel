@@ -58,6 +58,21 @@ describe("Peel state model", () => {
     expect(normalizeState({ version: 2, spaces: {}, threadViews: {} })).toEqual(emptyState());
   });
 
+  it("preserves valid Turn scroll anchors and drops malformed anchors", () => {
+    const state = emptyState();
+    state.threadViews.valid = { draft: "kept", scrollTop: 912, scrollAnchor: { turnId: "turn-211", offset: -24.5 } };
+    state.threadViews.invalid = { draft: "still kept", scrollTop: 24, scrollAnchor: { turnId: "turn-2", offset: Number.NaN } };
+
+    const normalized = normalizeState(state);
+
+    expect(normalized.threadViews.valid).toEqual({
+      draft: "kept",
+      scrollTop: 912,
+      scrollAnchor: { turnId: "turn-211", offset: -24.5 },
+    });
+    expect(normalized.threadViews.invalid).toEqual({ draft: "still kept", scrollTop: 24 });
+  });
+
   it("repairs only legacy New Chat names and preserves every other legacy Space label", () => {
     const following = createSpace({ id: "following-root", name: null, preview: "", cwd: "/repo", createdAt: 1 });
     following.name = "New Chat";

@@ -1,0 +1,23 @@
+{
+  "acceptance_ids": [
+    "bounded-backfill-architecture-boundary"
+  ],
+  "evidence_id": "evidence-bounded-backfill-architecture",
+  "kind": "ticket_evidence",
+  "origin": "agent",
+  "recorded_at": "2026-09-18T02:20:56Z",
+  "refs": [
+    "apps/desktop/src/renderer/transcript-window.ts",
+    "apps/desktop/src/renderer/Transcript.tsx",
+    "apps/desktop/src/renderer/Markdown.tsx",
+    "apps/desktop/src/renderer/styles.css",
+    "apps/desktop/src/shared/contracts.ts",
+    ".vibehub/rooms/product/contract-source-of-truth-ownership.yaml",
+    ".vibehub/rooms/product/contract-focus-chat-fidelity.yaml",
+    "apps/desktop/test/markdown.test.tsx",
+    "command:git diff --check passed"
+  ],
+  "schema_version": 1,
+  "summary": "The implementation continues to render the complete Codex-owned ReducedThread snapshot and derives only a contiguous mounted index range plus a persisted Turn ID/offset viewport anchor. It adds no copied conversation store, runtime replacement, virtualization layer, content-visibility, or permanent omission: scheduled backfill eventually renders all exact source Turns. Existing Markdown remains in production with skipHtml, trusted KaTeX disabled, data/blob-only inline images, remote click-through placeholders, oversized inert text fallback, and exact-copy behavior. Per-Turn layout containment and incremental ResizeObserver registration bound layout work without hiding or discarding content.",
+  "ticket_id": "ticket-add-bounded-focus-history-backfill"
+}

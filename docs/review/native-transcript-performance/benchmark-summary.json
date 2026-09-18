@@ -1,0 +1,51 @@
+{
+  "schema_version": 1,
+  "date": "2026-09-17",
+  "environment": "Mac Electron 44 / Chromium 152 production build",
+  "protocol": {
+    "route": "App -> Focus -> Transcript -> MarkdownContent",
+    "warmups_per_mode": 2,
+    "measured_samples_per_mode": 7,
+    "stream_deltas": 36,
+    "stream_settled_turns": 100,
+    "regression_limit": "greater of 10% or 5ms",
+    "baseline": "full snapshot identity replacement with settled Markdown memoization disabled"
+  },
+  "median_ms": {
+    "baseline": {
+      "cold_focus_10": { "first_content": 10.5, "through_paint": 26.0 },
+      "cold_focus_100": { "first_content": 64.1, "through_paint": 69.5 },
+      "cold_focus_500": { "first_content": 295.6, "through_paint": 314.9 },
+      "warm_switch_10_to_500": { "first_content": 260.1, "through_paint": 279.9 },
+      "stream_renderer": 36.25
+    },
+    "optimized": {
+      "cold_focus_10": { "first_content": 11.2, "through_paint": 28.4 },
+      "cold_focus_100": { "first_content": 65.4, "through_paint": 70.0 },
+      "cold_focus_500": { "first_content": 289.8, "through_paint": 309.0 },
+      "warm_switch_10_to_500": { "first_content": 264.4, "through_paint": 284.7 },
+      "stream_renderer": 1.5
+    }
+  },
+  "streaming": {
+    "renderer_reduction_percent": 95.9,
+    "baseline_historical_turn_renders_median": 2600,
+    "baseline_historical_markdown_renders_median": 5200,
+    "optimized_historical_turn_renders": 0,
+    "optimized_historical_markdown_renders": 0,
+    "optimized_delta_count_each_sample": 36,
+    "long_task_ms": 0
+  },
+  "initial_500_turn_focus": {
+    "dom_descendants": 29506,
+    "optimized_long_task_median_ms": 263,
+    "bounded_backfill_followup": "justified"
+  },
+  "oversized": {
+    "source_characters": 200086,
+    "selected_exactly": true,
+    "interpreted_html_elements": 0,
+    "remote_images": 0,
+    "overflow": "auto"
+  }
+}

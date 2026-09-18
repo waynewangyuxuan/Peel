@@ -1,6 +1,6 @@
 import type { AppServerServerRequest, CodexThread, CodexTurn, ReducedThread, ThreadItem, UserInput } from "@peel/codex-app-server";
 import type { WorkspaceDiffSummary } from "@peel/git-workspace";
-import { useEffect, useLayoutEffect, useRef, useState, type ChangeEvent, type KeyboardEvent, type ReactNode } from "react";
+import { memo, startTransition, useCallback, useEffect, useLayoutEffect, useMemo, useRef, useState, type ChangeEvent, type KeyboardEvent, type ReactNode } from "react";
 
 import type { CodexNotice, ForkDraft, ServerRequestResponseInput, SpaceNode } from "../shared/contracts";
 import { Icon } from "./icons";
@@ -9,6 +9,16 @@ import { startPcmRecorder, type RecorderSession } from "./audio";
 import { HighlightedCode, MarkdownContent } from "./Markdown";
 import { voiceFailurePresentation, type VoiceFailurePresentation } from "./voice-error";
 import { requestTurnId, ServerRequestCard } from "./ServerRequestCard";
+import { commitTranscriptUpdates, recordItemRender, recordTranscriptBackfill, recordTranscriptRange, recordTurnRender, transcriptSnapshotMode } from "./transcript-performance";
+import {
+  TRANSCRIPT_BACKFILL_THRESHOLD_PX,
+  appendTranscriptRange,
+  initialTranscriptRange,
+  prependTranscriptRange,
+  rangeContains,
+  type TranscriptRange,
+  type TranscriptScrollAnchor,
+} from "./transcript-window";
 
 interface TranscriptProps {
   thread: CodexThread;
@@ -19,15 +29,56 @@ interface TranscriptProps {
   requests: AppServerServerRequest[];
   notices: CodexNotice[];
   highlightTurnId: string | null;
+  hasSavedScroll: boolean;
   restoreScrollTop: number;
+  restoreScrollAnchor: TranscriptScrollAnchor | null;
   onHighlightScrolled(turnId: string): void;
   onDraft(value: string): void;
-  onScroll(value: number): void;
+  onScroll(value: { scrollTop: number; scrollAnchor: TranscriptScrollAnchor | null }): void;
   onSend(input: UserInput[]): Promise<void>;
   onBranch(turn: CodexTurn): void;
   onRequestResponse(input: ServerRequestResponseInput): Promise<void>;
   onDiff(): void;
   onOpenCodex(): void;
+}
+
+const EMPTY_REQUESTS: AppServerServerRequest[] = [];
+const EMPTY_NOTICES: CodexNotice[] = [];
+
+function groupByTurn<T>(items: T[], turnIdOf: (item: T) => string | null): Map<string | null, T[]> {
+  const grouped = new Map<string | null, T[]>();
+  for (const item of items) {
+    const turnId = turnIdOf(item);
+    const group = grouped.get(turnId);
+    if (group) group.push(item);
+    else grouped.set(turnId, [item]);
+  }
+  return grouped;
+}
+
+function measureViewportAnchor(element: HTMLElement): TranscriptScrollAnchor | null {
+  const viewport = element.getBoundingClientRect();
+  const probeX = Math.min(viewport.right - 2, viewport.left + viewport.width / 2);
+  for (const offset of [2, 18, 48]) {
+    const candidate = document.elementFromPoint(probeX, Math.min(viewport.bottom - 2, viewport.top + offset));
+    const target = candidate?.closest<HTMLElement>("[data-turn-id]");
+    const turnId = target?.dataset.turnId;
+    if (target && turnId && element.contains(target)) {
+      return { turnId, offset: target.getBoundingClientRect().top - viewport.top };
+    }
+  }
+  const turns = [...element.querySelectorAll<HTMLElement>("[data-turn-id]")];
+  const target = turns.find((turn) => turn.getBoundingClientRect().bottom > viewport.top + 1) ?? turns.at(-1);
+  const turnId = target?.dataset.turnId;
+  if (!target || !turnId) return null;
+  return { turnId, offset: target.getBoundingClientRect().top - viewport.top };
+}
+
+function restoreViewportAnchor(element: HTMLElement, anchor: TranscriptScrollAnchor): void {
+  const target = element.querySelector<HTMLElement>(`[data-turn-id="${CSS.escape(anchor.turnId)}"]`);
+  if (!target) return;
+  const viewportTop = element.getBoundingClientRect().top;
+  element.scrollTop += target.getBoundingClientRect().top - viewportTop - anchor.offset;
 }
 
 export function Transcript({
@@ -39,7 +90,9 @@ export function Transcript({
   requests,
   notices,
   highlightTurnId,
+  hasSavedScroll,
   restoreScrollTop,
+  restoreScrollAnchor,
   onHighlightScrolled,
   onDraft,
   onScroll,
@@ -50,6 +103,29 @@ export function Transcript({
   onOpenCodex,
 }: TranscriptProps): ReactNode {
   const scroller = useRef<HTMLDivElement>(null);
+  const fullTranscriptMount = transcriptSnapshotMode() === "baseline";
+  const initialRange = useRef<TranscriptRange | null>(null);
+  if (!initialRange.current) initialRange.current = initialTranscriptRange({
+    turnIds: thread.turns.map((turn) => turn.id),
+    fullMount: fullTranscriptMount,
+    highlightTurnId,
+    restoreAnchor: restoreScrollAnchor,
+    hasSavedScroll,
+    restoreScrollTop,
+  });
+  const [mountedRange, setMountedRange] = useState<TranscriptRange>(initialRange.current);
+  const tailWindow = useRef(mountedRange.end >= thread.turns.length);
+  const rangeBusy = useRef(false);
+  const restoreAllHistory = useRef(false);
+  const pendingRangeChange = useRef<{
+    anchor: TranscriptScrollAnchor | null;
+    startedAt: number;
+    direction: "prepend" | "append";
+    addedTurns: number;
+  } | null>(null);
+  const stableViewportAnchor = useRef<TranscriptScrollAnchor | null>(null);
+  const resizeObserver = useRef<ResizeObserver | null>(null);
+  const observedRange = useRef<TranscriptRange>({ start: mountedRange.start, end: mountedRange.end });
   const [attachments, setAttachments] = useState<UserInput[]>([]);
   const [sending, setSending] = useState(false);
   const [sendError, setSendError] = useState<string | null>(null);
@@ -65,10 +141,42 @@ export function Transcript({
   const textarea = useRef<HTMLTextAreaElement>(null);
   const mounted = useRef(true);
   const draftRef = useRef(draft);
-  const followBottom = useRef(true);
+  const followBottom = useRef(!hasSavedScroll && !highlightTurnId);
   const restoredScroll = useRef(false);
   const acknowledgedHighlight = useRef<string | null>(null);
   draftRef.current = draft;
+
+  const totalTurns = thread.turns.length;
+  const mountedStart = fullTranscriptMount ? 0 : Math.min(mountedRange.start, totalTurns);
+  const mountedEnd = fullTranscriptMount || tailWindow.current
+    ? totalTurns
+    : Math.min(mountedRange.end, totalTurns);
+  const mountedTurns = thread.turns.slice(mountedStart, mountedEnd);
+
+  const rememberViewportAnchor = useCallback((): TranscriptScrollAnchor | null => {
+    const element = scroller.current;
+    const anchor = element ? measureViewportAnchor(element) : null;
+    stableViewportAnchor.current = anchor;
+    return anchor;
+  }, []);
+
+  const changeMountedRange = useCallback((direction: "prepend" | "append"): void => {
+    if (fullTranscriptMount || rangeBusy.current) return;
+    const current = { start: mountedStart, end: mountedEnd };
+    const next = direction === "prepend"
+      ? prependTranscriptRange(current)
+      : appendTranscriptRange(current, totalTurns);
+    if (next.start === current.start && next.end === current.end) return;
+    pendingRangeChange.current = {
+      anchor: rememberViewportAnchor(),
+      startedAt: performance.now(),
+      direction,
+      addedTurns: current.start - next.start + next.end - current.end,
+    };
+    rangeBusy.current = true;
+    if (next.end >= totalTurns) tailWindow.current = true;
+    startTransition(() => setMountedRange(next));
+  }, [fullTranscriptMount, mountedEnd, mountedStart, rememberViewportAnchor, totalTurns]);
 
   useEffect(() => () => {
     mounted.current = false;
@@ -112,11 +220,78 @@ export function Transcript({
   }, [draft]);
 
   useLayoutEffect(() => {
+    if (fullTranscriptMount || !highlightTurnId) return;
+    const targetIndex = thread.turns.findIndex((turn) => turn.id === highlightTurnId);
+    if (targetIndex < 0 || rangeContains({ start: mountedStart, end: mountedEnd }, targetIndex)) return;
+    const next = initialTranscriptRange({
+      turnIds: thread.turns.map((turn) => turn.id),
+      fullMount: false,
+      highlightTurnId,
+      restoreAnchor: null,
+      hasSavedScroll: false,
+      restoreScrollTop: 0,
+    });
+    tailWindow.current = next.end >= totalTurns;
+    setMountedRange(next);
+  }, [fullTranscriptMount, highlightTurnId, mountedEnd, mountedStart, thread.turns, totalTurns]);
+
+  useLayoutEffect(() => {
+    const element = scroller.current;
+    const pending = pendingRangeChange.current;
+    if (!element || !pending) return;
+    let residualAnchorDeltaPx = 0;
+    if (pending.anchor) {
+      const target = element.querySelector<HTMLElement>(`[data-turn-id="${CSS.escape(pending.anchor.turnId)}"]`);
+      if (target) {
+        const viewportTop = element.getBoundingClientRect().top;
+        const currentOffset = target.getBoundingClientRect().top - viewportTop;
+        element.scrollTop += currentOffset - pending.anchor.offset;
+        residualAnchorDeltaPx = Math.abs(target.getBoundingClientRect().top - viewportTop - pending.anchor.offset);
+      }
+    }
+    recordTranscriptBackfill({
+      threadId: thread.id,
+      direction: pending.direction,
+      durationMs: performance.now() - pending.startedAt,
+      addedTurns: pending.addedTurns,
+      anchorDeltaPx: residualAnchorDeltaPx,
+    });
+    pendingRangeChange.current = null;
+    rangeBusy.current = false;
+    stableViewportAnchor.current = pending.anchor ?? measureViewportAnchor(element);
+  }, [mountedRange.end, mountedRange.start, thread.id]);
+
+  useLayoutEffect(() => {
+    recordTranscriptRange(thread.id, mountedTurns.length, totalTurns);
+  }, [mountedTurns.length, thread.id, totalTurns]);
+
+  useEffect(() => {
+    if (fullTranscriptMount || tailWindow.current || mountedEnd >= totalTurns) return;
+    const timer = window.setTimeout(() => changeMountedRange("append"), 32);
+    return () => window.clearTimeout(timer);
+  }, [changeMountedRange, fullTranscriptMount, mountedEnd, totalTurns]);
+
+  useEffect(() => {
+    if (!restoreAllHistory.current || fullTranscriptMount) return;
+    if (mountedStart <= 0) {
+      restoreAllHistory.current = false;
+      return;
+    }
+    const timer = window.setTimeout(() => changeMountedRange("prepend"), 16);
+    return () => window.clearTimeout(timer);
+  }, [changeMountedRange, fullTranscriptMount, mountedStart]);
+
+  useLayoutEffect(() => {
+    commitTranscriptUpdates(thread.id);
+  }, [thread, reduced, thread.id]);
+
+  useLayoutEffect(() => {
     const element = scroller.current;
     if (!element || !followBottom.current) return;
     const selection = window.getSelection();
     if (selection && !selection.isCollapsed && selection.anchorNode && element.contains(selection.anchorNode)) return;
     element.scrollTop = element.scrollHeight;
+    rememberViewportAnchor();
   }, [thread, reduced]);
 
   useLayoutEffect(() => {
@@ -125,9 +300,12 @@ export function Transcript({
     if (!highlightTurnId) {
       acknowledgedHighlight.current = null;
       if (restoredScroll.current) return;
-      element.scrollTop = restoreScrollTop;
+      if (!hasSavedScroll) element.scrollTop = element.scrollHeight;
+      else if (restoreScrollAnchor) restoreViewportAnchor(element, restoreScrollAnchor);
+      else element.scrollTop = restoreScrollTop;
       followBottom.current = element.scrollHeight - element.scrollTop - element.clientHeight < 56;
       restoredScroll.current = true;
+      rememberViewportAnchor();
       return;
     }
     if (acknowledgedHighlight.current === highlightTurnId) return;
@@ -141,7 +319,54 @@ export function Transcript({
     if (targetBounds.bottom <= viewport.top || targetBounds.top >= viewport.bottom) return;
     acknowledgedHighlight.current = highlightTurnId;
     onHighlightScrolled(highlightTurnId);
-  }, [highlightTurnId, onHighlightScrolled, restoreScrollTop, thread.id]);
+    rememberViewportAnchor();
+  }, [hasSavedScroll, highlightTurnId, mountedEnd, mountedStart, onHighlightScrolled, rememberViewportAnchor, restoreScrollAnchor, restoreScrollTop, thread.id]);
+
+  useEffect(() => {
+    const element = scroller.current;
+    if (!element || typeof ResizeObserver === "undefined") return;
+    let initialized = false;
+    const observer = new ResizeObserver(() => {
+      if (!initialized) {
+        initialized = true;
+        rememberViewportAnchor();
+        return;
+      }
+      if (followBottom.current) {
+        element.scrollTop = element.scrollHeight;
+        rememberViewportAnchor();
+        return;
+      }
+      const anchor = stableViewportAnchor.current;
+      if (anchor) restoreViewportAnchor(element, anchor);
+      rememberViewportAnchor();
+    });
+    resizeObserver.current = observer;
+    element.querySelectorAll<HTMLElement>("[data-turn-id]").forEach((turn) => observer.observe(turn));
+    observedRange.current = { start: mountedStart, end: mountedEnd };
+    return () => {
+      observer.disconnect();
+      if (resizeObserver.current === observer) resizeObserver.current = null;
+    };
+  }, [rememberViewportAnchor, thread.id]);
+
+  useEffect(() => {
+    const element = scroller.current;
+    const observer = resizeObserver.current;
+    if (!element || !observer) return;
+    const previous = observedRange.current;
+    const additions = previous.end < mountedStart || previous.start > mountedEnd
+      ? thread.turns.slice(mountedStart, mountedEnd)
+      : [
+        ...thread.turns.slice(mountedStart, Math.min(previous.start, mountedEnd)),
+        ...thread.turns.slice(Math.max(previous.end, mountedStart), mountedEnd),
+      ];
+    for (const turn of additions) {
+      const target = element.querySelector<HTMLElement>(`[data-turn-id="${CSS.escape(turn.id)}"]`);
+      if (target) observer.observe(target);
+    }
+    observedRange.current = { start: mountedStart, end: mountedEnd };
+  }, [mountedEnd, mountedStart, thread.turns]);
 
   const submit = async (): Promise<void> => {
     const text = draft.trim();
@@ -267,11 +492,21 @@ export function Transcript({
   };
 
   const active = reduced?.status.type === "active";
+  const reducedByTurn = useMemo(() => new Map(reduced?.turns.map((turn) => [turn.turn.id, turn]) ?? []), [reduced?.turns]);
+  const requestsByTurn = useMemo(() => groupByTurn(requests, requestTurnId), [requests]);
+  const noticesByTurn = useMemo(() => groupByTurn(notices, (notice) => notice.turnId), [notices]);
   return <div className="transcript-column">
-    <div className="transcript" ref={scroller} onScroll={(event) => {
+    <div
+      className="transcript"
+      ref={scroller}
+      data-mounted-turns={mountedTurns.length}
+      data-total-turns={totalTurns}
+      onScroll={(event) => {
       const element = event.currentTarget;
       followBottom.current = element.scrollHeight - element.scrollTop - element.clientHeight < 56;
-      onScroll(element.scrollTop);
+      const scrollAnchor = rememberViewportAnchor();
+      onScroll({ scrollTop: element.scrollTop, scrollAnchor });
+      if (element.scrollTop <= TRANSCRIPT_BACKFILL_THRESHOLD_PX && mountedStart > 0) changeMountedRange("prepend");
     }}>
       <div className="thread-intro">
         <div className="eyebrow">Thread</div>
@@ -283,19 +518,28 @@ export function Transcript({
         </div>
       </div>
       {thread.turns.length === 0 && <div className="empty-thread">This Thread has no turns yet.</div>}
-      {thread.turns.map((turn) => <TurnView
+      {mountedStart > 0 && <button
+        type="button"
+        className="transcript-history-boundary"
+        onClick={() => {
+          restoreAllHistory.current = true;
+          changeMountedRange("prepend");
+        }}
+      >Load earlier messages <span>{mountedStart} remaining</span></button>}
+      {mountedTurns.map((turn) => <MemoizedTurnView
         key={turn.id}
         turn={turn}
-        reduced={reduced?.turns.find((candidate) => candidate.turn.id === turn.id) ?? null}
+        reduced={reducedByTurn.get(turn.id) ?? null}
         highlighted={turn.id === highlightTurnId}
-        onBranch={() => onBranch(turn)}
+        onBranch={onBranch}
         onOpenCodex={onOpenCodex}
-        requests={requests.filter((request) => requestTurnId(request) === turn.id)}
-        notices={notices.filter((notice) => notice.turnId === turn.id)}
+        requests={requestsByTurn.get(turn.id) ?? EMPTY_REQUESTS}
+        notices={noticesByTurn.get(turn.id) ?? EMPTY_NOTICES}
         onRequestResponse={onRequestResponse}
       />)}
-      {notices.filter((notice) => notice.turnId === null).map((notice) => <NoticeCard key={notice.id} notice={notice}/>)}
-      {requests.filter((request) => requestTurnId(request) === null).map((request) => <ServerRequestCard key={String(request.id)} request={request} onRespond={onRequestResponse}/>)}
+      {mountedEnd < totalTurns && <div className="transcript-history-progress" role="status">Restoring newer messages…</div>}
+      {(noticesByTurn.get(null) ?? EMPTY_NOTICES).map((notice) => <NoticeCard key={notice.id} notice={notice}/>)}
+      {(requestsByTurn.get(null) ?? EMPTY_REQUESTS).map((request) => <ServerRequestCard key={String(request.id)} request={request} onRespond={onRequestResponse}/>)}
       {active && <div className="working-indicator"><span/><span/><span/> Codex is working</div>}
       <div className="transcript-end" />
     </div>
@@ -347,16 +591,19 @@ function userFacingIpcError(error: unknown): string {
     .trim() || "The message could not be sent. Your draft is unchanged; try again.";
 }
 
-function TurnView({ turn, reduced, highlighted, requests, notices, onBranch, onOpenCodex, onRequestResponse }: {
+interface TurnViewProps {
   turn: CodexTurn;
   reduced: ReducedThread["turns"][number] | null;
   highlighted: boolean;
   requests: AppServerServerRequest[];
   notices: CodexNotice[];
-  onBranch(): void;
+  onBranch(turn: CodexTurn): void;
   onOpenCodex(): void;
   onRequestResponse(input: ServerRequestResponseInput): Promise<void>;
-}): ReactNode {
+}
+
+function TurnView({ turn, reduced, highlighted, requests, notices, onBranch, onOpenCodex, onRequestResponse }: TurnViewProps): ReactNode {
+  recordTurnRender(turn.id);
   const items = reduced?.items ?? turn.items.map((item) => ({
     item,
     completed: true,
@@ -364,8 +611,9 @@ function TurnView({ turn, reduced, highlighted, requests, notices, onBranch, onO
     streamedReasoningContent: "",
     streamedReasoningSummarySections: [],
   }));
+  const branch = useCallback(() => onBranch(turn), [onBranch, turn]);
   return <section className={`turn ${highlighted ? "highlighted" : ""}`} data-turn-id={turn.id}>
-    {items.map(({ item, streamedText, streamedReasoningContent, completed }) => <ItemView
+    {items.map(({ item, streamedText, streamedReasoningContent, completed }) => <MemoizedItemView
       key={item.id}
       item={item}
       streamedText={streamedText}
@@ -376,8 +624,27 @@ function TurnView({ turn, reduced, highlighted, requests, notices, onBranch, onO
     {notices.map((notice) => <NoticeCard key={notice.id} notice={notice}/>)}
     {turn.error !== null && turn.error !== undefined && <TurnErrorDetail error={turn.error}/>}
     {requests.map((request) => <ServerRequestCard key={String(request.id)} request={request} onRespond={onRequestResponse}/>)}
-    <TurnActions status={turn.status} onBranch={onBranch}/>
+    <TurnActions status={turn.status} onBranch={branch}/>
   </section>;
+}
+
+const MemoizedTurnView = memo(TurnView, turnViewPropsEqual);
+
+export function turnViewPropsEqual(previous: TurnViewProps, next: TurnViewProps): boolean {
+  return previous.turn === next.turn
+    && previous.reduced === next.reduced
+    && previous.highlighted === next.highlighted
+    && previous.onBranch === next.onBranch
+    && previous.onOpenCodex === next.onOpenCodex
+    && previous.onRequestResponse === next.onRequestResponse
+    && structurallyEqualLists(previous.requests, next.requests)
+    && structurallyEqualLists(previous.notices, next.notices);
+}
+
+function structurallyEqualLists(left: unknown[], right: unknown[]): boolean {
+  if (left === right) return true;
+  if (left.length !== right.length) return false;
+  return left.every((value, index) => value === right[index] || safeJson(value) === safeJson(right[index]));
 }
 
 export function TurnActions({ status, onBranch }: { status: CodexTurn["status"]; onBranch(): void }): ReactNode {
@@ -394,17 +661,18 @@ export function ItemView({ item, streamedText, streamedReasoningContent = "", st
   streaming: boolean;
   onOpenCodex(): void;
 }): ReactNode {
+  recordItemRender(item.id);
   const completedText = item.type === "reasoning"
     ? itemTextFromKeys(item, ["summary", "content", "text", "message"], "\n\n")
     : itemText(item);
   const text = completedText + streamedText;
-  if (item.type === "userMessage") return <article className="message user-message"><MarkdownContent text={text || "User message"} className="user-markdown"/></article>;
-  if (item.type === "agentMessage") return <article className="message agent-message"><MarkdownContent text={text} streaming={streaming}/></article>;
+  if (item.type === "userMessage") return <article className="message user-message"><MarkdownContent text={text || "User message"} className="user-markdown" performanceId={item.id}/></article>;
+  if (item.type === "agentMessage") return <article className="message agent-message"><MarkdownContent text={text} streaming={streaming} performanceId={item.id}/></article>;
   if (item.type === "plan") return <ActivityDisclosure icon="more" label={streaming ? "Planning" : "Plan"} state={activityState(item, streaming)} defaultOpen={streaming}>
-    <MarkdownContent text={text || "Plan"} streaming={streaming}/>
+    <MarkdownContent text={text || "Plan"} streaming={streaming} performanceId={item.id}/>
   </ActivityDisclosure>;
   if (item.type === "reasoning") return <ActivityDisclosure icon="reasoning" label={streaming ? "Thinking" : "Reasoning"} state={activityState(item, streaming)} defaultOpen={streaming} kind="reasoning">
-    <MarkdownContent text={text || streamedReasoningContent || "Reasoning activity"} streaming={streaming}/>
+    <MarkdownContent text={text || streamedReasoningContent || "Reasoning activity"} streaming={streaming} performanceId={item.id}/>
   </ActivityDisclosure>;
   if (item.type === "commandExecution") {
     const state = activityState(item, streaming);
@@ -424,16 +692,18 @@ export function ItemView({ item, streamedText, streamedReasoningContent = "", st
     </ActivityDisclosure>;
   }
   if (item.type === "collabAgentToolCall" || item.type === "subAgentActivity") return <ActivityDisclosure icon="agent" label={streaming ? "A subagent is working" : "Worked with a subagent"} state={activityState(item, streaming)} defaultOpen={streaming}>
-    <MarkdownContent text={text || safeJson(item)} streaming={streaming}/>
+    <MarkdownContent text={text || safeJson(item)} streaming={streaming} performanceId={item.id}/>
   </ActivityDisclosure>;
   if (item.type === "error") return <ActivityDisclosure icon="warning" label="Something needs attention" state="failed">
-    <MarkdownContent text={text || String(item.message ?? "Codex reported an error")}/>
+    <MarkdownContent text={text || String(item.message ?? "Codex reported an error")} performanceId={item.id}/>
   </ActivityDisclosure>;
   return <ActivityDisclosure icon="more" label="Additional Codex activity" state={activityState(item, streaming)} kind="technical">
     <TechnicalOutput sections={[{ label: item.type, value: text || safeJson(item) }]}/>
     <button className="open-codex-item" onClick={onOpenCodex}>Open in Codex <Icon name="external" size={12}/></button>
   </ActivityDisclosure>;
 }
+
+const MemoizedItemView = memo(ItemView);
 
 type ActivityState = "completed" | "active" | "failed";
 
