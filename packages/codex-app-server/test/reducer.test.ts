@@ -146,6 +146,42 @@ test("rejects mismatched, stale, duplicate, and post-completion item deltas", ()
   assert.equal(reduced?.item.aggregatedOutput, "final");
 });
 
+test("turn completion keeps a user message that the completion payload omits", () => {
+  const reducer = new AppServerReducer();
+  reducer.rebuild(thread("t", [turn("turn-1", "inProgress")]));
+  reducer.apply({
+    method: "item/completed",
+    emittedAtMs: 1,
+    params: {
+      threadId: "t",
+      turnId: "turn-1",
+      item: item("user-1", "userMessage", { content: [{ type: "text", text: "Explain attention" }] }),
+    },
+  });
+  reducer.apply({
+    method: "item/completed",
+    emittedAtMs: 2,
+    params: {
+      threadId: "t",
+      turnId: "turn-1",
+      item: item("agent-1", "agentMessage", { text: "Attention assigns weights." }),
+    },
+  });
+  reducer.apply({
+    method: "turn/completed",
+    emittedAtMs: 3,
+    params: {
+      threadId: "t",
+      turn: turn("turn-1", "completed", [
+        item("agent-1", "agentMessage", { text: "Attention assigns weights." }),
+      ]),
+    },
+  });
+  const items = reducer.getTurn("t", "turn-1")?.items.map((entry) => entry.item) ?? [];
+  assert.deepEqual(items.map((entry) => entry.type), ["userMessage", "agentMessage"]);
+  assert.match(JSON.stringify(items[0]), /Explain attention/);
+});
+
 test("turn completion and latest aggregate diff become authoritative", () => {
   const reducer = new AppServerReducer();
   reducer.rebuild(thread("t", [turn("turn-1", "inProgress")]));

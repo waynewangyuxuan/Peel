@@ -162,7 +162,10 @@ export class AppServerReducer {
         const next = turnState(params.turn);
         next.completed = completed;
         next.lastEmittedAtMs = at;
-        if (existing && !next.aggregateDiff) next.aggregateDiff = existing.aggregateDiff;
+        if (existing) {
+          retainItemsMissingFromCompletion(existing, next);
+          if (!next.aggregateDiff) next.aggregateDiff = existing.aggregateDiff;
+        }
         state.turns.set(params.turn.id, next);
         upsertTurn(state.thread, next.turn);
         return true;
@@ -351,6 +354,19 @@ function isTurn(value: unknown): value is CodexTurn {
     typeof (value as { id?: unknown }).id === "string" &&
     Array.isArray((value as { items?: unknown }).items)
   );
+}
+
+function retainItemsMissingFromCompletion(existing: TurnState, next: TurnState): void {
+  const incomingIds = new Set(next.turn.items.map((item) => item.id));
+  const retained = existing.turn.items.filter((item) => !incomingIds.has(item.id));
+  if (retained.length === 0) return;
+  next.turn.items = [...retained.map((item) => structuredClone(item)), ...next.turn.items];
+  const ordered = new Map<string, ItemState>();
+  for (const item of next.turn.items) {
+    const chosen = next.items.get(item.id) ?? existing.items.get(item.id);
+    if (chosen) ordered.set(item.id, chosen);
+  }
+  next.items = ordered;
 }
 
 function upsertTurn(thread: CodexThread, turn: CodexTurn): void {
