@@ -11,10 +11,18 @@ export function latestText(thread: CodexThread, role: "user" | "agent"): string 
 }
 
 export function itemText(item: ThreadItem | undefined): string {
+  return itemTextFromKeys(item, ["text", "content", "message", "summary", "aggregatedOutput", "output"]);
+}
+
+export function itemTextFromKeys(
+  item: ThreadItem | undefined,
+  keys: readonly string[],
+  arraySeparator = "\n",
+): string {
   if (!item) return "";
-  for (const key of ["text", "content", "message", "summary", "aggregatedOutput", "output"]) {
+  for (const key of keys) {
     const value = item[key];
-    if (typeof value === "string") return value;
+    if (typeof value === "string" && value) return value;
     if (Array.isArray(value)) {
       const text = value.map((part) => {
         if (typeof part === "string") return part;
@@ -23,7 +31,7 @@ export function itemText(item: ThreadItem | undefined): string {
           return typeof record.text === "string" ? record.text : typeof record.content === "string" ? record.content : "";
         }
         return "";
-      }).filter(Boolean).join("\n");
+      }).filter(Boolean).join(arraySeparator);
       if (text) return text;
     }
   }

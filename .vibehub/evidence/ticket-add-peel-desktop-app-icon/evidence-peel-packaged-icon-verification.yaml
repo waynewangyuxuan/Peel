@@ -1,0 +1,25 @@
+{
+  "acceptance_ids": [
+    "packaged-app-identity",
+    "native-icon-verification"
+  ],
+  "evidence_id": "evidence-peel-packaged-icon-verification",
+  "kind": "ticket_evidence",
+  "origin": "agent",
+  "recorded_at": "2026-09-18T04:00:56Z",
+  "refs": [
+    "apps/desktop/package.json",
+    "apps/desktop/scripts/verify-package.mjs",
+    "apps/desktop/build/Info.plist",
+    "apps/desktop/build/Peel.icns",
+    "apps/desktop/build/Peel.png",
+    "docs/review/peel-desktop-app-icon/README.md",
+    "command:npm run package:desktop passed",
+    "command:npm run verify:package --workspace @peel/desktop returned appName Peel, nativeAppIcon electron.icns, restoredDraft true, nativeVoiceHelper true",
+    "command:npm test passed 25 App Server + 12 Git workspace + 90 Desktop tests",
+    "command:sha256 generated and packaged ICNS/PNG pairs matched exactly"
+  ],
+  "schema_version": 1,
+  "summary": "The complete production build and electron-packager flow succeeded with the custom ICNS and local Dock PNG. Peel.app reports CFBundleName Peel and CFBundleIconFile electron.icns; the embedded ICNS and Peel.png hashes exactly match the generated checked-in assets. The packaged smoke verifier launched the actual bundle, observed runtime appName Peel, validated the linked non-empty ICNS plus 1024px PNG, found the native voice helper, and completed a close/relaunch Draft restoration journey. The full repository suite also passed 25 App Server, 12 Git workspace, and 90 Desktop tests, while git diff checking remained clean.",
+  "ticket_id": "ticket-add-peel-desktop-app-icon"
+}

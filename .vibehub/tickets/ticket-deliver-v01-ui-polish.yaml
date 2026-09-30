@@ -52,6 +52,7 @@
   "kind": "ticket",
   "maturity": "firm",
   "outcome": "Peel's complete production desktop surface is visibly aligned with the preserved Demo and feels deliberately finished without regressing the real v0.1 behavior contract.",
+  "deliveries": [],
   "provenance_refs": [
     "conversation:2026-08-26-dogfood-ui-search-feedback",
     "conversation:2026-08-26-demo-is-ui-direction"
@@ -63,6 +64,6 @@
       "type": "depends_on"
     }
   ],
-  "schema_version": 1,
+  "schema_version": 2,
   "ticket_id": "ticket-deliver-v01-ui-polish"
 }

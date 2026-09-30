@@ -1,0 +1,19 @@
+{
+  "acceptance_ids": [
+    "evidence-based-followup-boundary"
+  ],
+  "evidence_id": "evidence-native-transcript-backfill-decision",
+  "kind": "ticket_evidence",
+  "origin": "agent",
+  "recorded_at": "2026-09-18T00:26:29Z",
+  "refs": [
+    ".vibehub/outcomes/ticket-evaluate-streamdown-rendering-runtime.yaml",
+    "docs/review/rendering-performance/README.md",
+    "docs/review/native-transcript-performance/README.md",
+    "docs/review/native-transcript-performance/benchmark-summary.json",
+    "apps/desktop/e2e/native-transcript-performance.spec.ts"
+  ],
+  "schema_version": 1,
+  "summary": "This implementation adds neither Streamdown nor assistant-ui runtime, full virtualization, content-visibility, or bounded history backfill. The earlier completed renderer evaluation found no production-shaped advantage from changing Markdown runtime, while the real optimized 500-Turn Focus path still creates 29,506 descendants, takes a 309.0 ms median through paint, and produces an approximately 263 ms long task. Its App Server read plus snapshot construction is only about 8.3 ms, so the evidence now justifies a separate bounded initial-backfill Ticket focused on historical DOM creation while preserving anchors, Branch actions, exact selection, follow-bottom, highlight navigation, and saved Scroll restoration.",
+  "ticket_id": "ticket-optimize-native-transcript-rendering"
+}

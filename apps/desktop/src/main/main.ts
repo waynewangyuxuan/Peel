@@ -1,30 +1,41 @@
-import { app, BrowserWindow, clipboard, ipcMain, nativeTheme, session, shell } from "electron";
+import { app, BrowserWindow, clipboard, ipcMain, nativeTheme, protocol, session, shell } from "electron";
 import { existsSync } from "node:fs";
 import { dirname, join } from "node:path";
 import { fileURLToPath } from "node:url";
 
 import type {
-  ApprovalDecisionInput,
   CommitForkInput,
   DictationAudioInput,
   OpenTargetInput,
   PeelState,
   SearchThreadsInput,
   SendTurnInput,
+  ServerRequestResponseInput,
   StartNewChatInput,
   StartSpaceInput,
 } from "../shared/contracts";
 import { IPC } from "../shared/contracts";
+import { APP_DISPLAY_NAME, nativeAppIconPath } from "./app-identity";
+import { openTarget } from "./open-target";
 import { PeelService } from "./peel-service";
+import { readVisualizationFile } from "./visualization-file";
 import { VoiceService } from "./voice-service";
+import { VISUALIZATION_SCHEME, visualizationDocument } from "../shared/visualization";
 
 const currentDirectory = dirname(fileURLToPath(import.meta.url));
 const configuredUserDataPath = process.env.PEEL_USER_DATA_PATH || argumentValue("--peel-user-data-path");
 const configuredCodexBinary = process.env.PEEL_CODEX_BINARY || argumentValue("--peel-codex-binary");
 const configuredVoiceHelper = process.env.PEEL_VOICE_HELPER || argumentValue("--peel-voice-helper");
 const configuredStateFailureMarker = process.env.PEEL_TEST_STATE_FAILURE_MARKER || argumentValue("--peel-test-state-failure-marker");
+const configuredTranscriptBenchmark = process.env.PEEL_NATIVE_TRANSCRIPT_BENCHMARK;
+const configuredStartupHydrationDelay = process.env.PEEL_STARTUP_TEST_HYDRATION_DELAY_MS;
 const configuredTmpdir = argumentValue("--peel-test-tmpdir");
 const quitAfterVoiceVerification = process.argv.includes("--peel-test-quit-after-voice");
+protocol.registerSchemesAsPrivileged([
+  { scheme: VISUALIZATION_SCHEME, privileges: { standard: true, secure: true, supportFetchAPI: true, corsEnabled: false } },
+]);
+app.setName(APP_DISPLAY_NAME);
+if (process.env.PEEL_RENDERING_BENCHMARK === "1" || configuredTranscriptBenchmark) app.commandLine.appendSwitch("enable-precise-memory-info");
 if (configuredUserDataPath) app.setPath("userData", configuredUserDataPath);
 if (configuredTmpdir) process.env.TMPDIR = configuredTmpdir;
 let window: BrowserWindow | null = null;
@@ -45,7 +56,19 @@ function argumentValue(name: string): string | undefined {
 
 function rendererUrl(): string {
   const development = process.env.PEEL_RENDERER_URL;
-  return development || `file://${join(appRoot(), "dist/renderer/index.html")}`;
+  const url = new URL(development || `file://${join(appRoot(), "dist/renderer/index.html")}`);
+  if (process.env.PEEL_RENDERING_BENCHMARK === "1") url.searchParams.set("rendering-benchmark", "1");
+  if (configuredTranscriptBenchmark) url.searchParams.set("transcript-performance", configuredTranscriptBenchmark);
+  if (configuredStartupHydrationDelay) url.searchParams.set("startup-hydration-delay-ms", configuredStartupHydrationDelay);
+  return url.toString();
+}
+
+function appIconPath(): string {
+  return nativeAppIconPath({
+    appRoot: appRoot(),
+    isPackaged: app.isPackaged,
+    resourcesPath: process.resourcesPath,
+  });
 }
 
 async function createWindow(): Promise<void> {
@@ -56,7 +79,8 @@ async function createWindow(): Promise<void> {
     minHeight: 680,
     titleBarStyle: "hiddenInset",
     trafficLightPosition: { x: 16, y: 16 },
-    backgroundColor: "#e9e9e6",
+    backgroundColor: "#f6f6f5",
+    icon: appIconPath(),
     show: false,
     webPreferences: {
       preload: join(appRoot(), "dist/preload/preload.cjs"),
@@ -126,30 +150,38 @@ function registerIpc(peel: PeelService, voice: VoiceService): void {
     if (quitAfterVoiceVerification) setTimeout(() => app.quit(), 1_500);
     return result;
   });
-  ipcMain.handle(IPC.decideApproval, (_event, input: ApprovalDecisionInput) => peel.decideApproval(input));
+  ipcMain.handle(IPC.respondServerRequest, (_event, input: ServerRequestResponseInput) => peel.respondServerRequest(input));
   ipcMain.handle(IPC.copyText, (_event, text: string) => { clipboard.writeText(text); });
   ipcMain.handle(IPC.beginDictation, async (_event, threadId: string) => await peel.dictation.begin(threadId));
   ipcMain.handle(IPC.appendDictationAudio, async (_event, input: DictationAudioInput) => await peel.dictation.append(input));
   ipcMain.handle(IPC.finishDictation, async (_event, threadId: string) => await peel.dictation.finish(threadId));
   ipcMain.handle(IPC.cancelDictation, async (_event, threadId: string) => await peel.dictation.cancel(threadId));
-  ipcMain.handle(IPC.openTarget, async (_event, input: OpenTargetInput) => {
-    if (input.kind === "codex") {
-      if (input.threadId) clipboard.writeText(input.threadId);
-      await shell.openExternal("https://chatgpt.com/codex");
-      return;
-    }
-    if (input.path && existsSync(input.path)) {
-      await shell.openPath(input.path);
-      return;
-    }
-    await shell.openPath(input.cwd);
-  });
+  ipcMain.handle(IPC.openTarget, async (_event, input: OpenTargetInput) => await openTarget(input, {
+    exists: existsSync,
+    openExternal: async (url) => await shell.openExternal(url),
+    openPath: async (path) => await shell.openPath(path),
+  }));
   peel.on("notification", (payload) => window?.webContents.send(IPC.codexNotification, payload));
-  peel.on("serverRequest", (payload) => window?.webContents.send(IPC.serverRequest, payload));
+  peel.on("pendingRequests", (payload) => window?.webContents.send(IPC.pendingRequests, payload));
+  peel.on("notices", (payload) => window?.webContents.send(IPC.notices, payload));
   peel.on("connection", (payload) => window?.webContents.send(IPC.connection, payload));
 }
 
 app.whenReady().then(async () => {
+  protocol.handle(VISUALIZATION_SCHEME, async (request) => {
+    try {
+      const filePath = new URL(request.url).searchParams.get("path") ?? "";
+      const html = visualizationDocument(await readVisualizationFile(filePath));
+      return new Response(html, { headers: visualizationHeaders() });
+    } catch (error) {
+      const message = error instanceof Error ? error.message : "Visualization unavailable.";
+      return new Response(`<!doctype html><p>${escapeHtml(message)}</p>`, {
+        status: 404,
+        headers: { "Content-Type": "text/html; charset=utf-8" },
+      });
+    }
+  });
+  if (process.platform === "darwin") app.dock?.setIcon(appIconPath());
   session.defaultSession.setPermissionRequestHandler((_webContents, permission, callback) => {
     callback(permission === "media");
   });
@@ -162,8 +194,8 @@ app.whenReady().then(async () => {
     : join(appRoot(), "native/bin/peel-speech"));
   const voice = new VoiceService(voiceHelperPath);
   registerIpc(service, voice);
-  await createWindow();
   void service.connect();
+  await createWindow();
   app.on("activate", () => {
     if (BrowserWindow.getAllWindows().length === 0) void createWindow();
   });
@@ -186,3 +218,14 @@ app.on("before-quit", (event) => {
 app.on("window-all-closed", () => {
   if (process.platform !== "darwin") app.quit();
 });
+
+function visualizationHeaders(): Headers {
+  return new Headers({
+    "Content-Type": "text/html; charset=utf-8",
+    "Content-Security-Policy": "default-src 'none'; script-src 'unsafe-inline'; style-src 'unsafe-inline'; img-src data:;",
+  });
+}
+
+function escapeHtml(value: string): string {
+  return value.replace(/[&<>"']/g, (character) => ({ "&": "&amp;", "<": "&lt;", ">": "&gt;", "\"": "&quot;", "'": "&#39;" })[character] ?? character);
+}

@@ -1,0 +1,27 @@
+{
+  "acceptance_ids": [
+    "reasoning-channel-fidelity",
+    "authoritative-completion",
+    "live-rendering-behavior",
+    "streaming-contract-evidence"
+  ],
+  "evidence_id": "evidence-notification-snapshot-live-path",
+  "kind": "ticket_evidence",
+  "origin": "agent",
+  "recorded_at": "2026-09-17T18:22:14Z",
+  "refs": [
+    "apps/desktop/src/main/peel-service.ts",
+    "apps/desktop/src/shared/contracts.ts",
+    "apps/desktop/src/preload/preload.ts",
+    "apps/desktop/src/renderer/App.tsx",
+    "apps/desktop/src/renderer/Transcript.tsx",
+    "apps/desktop/src/renderer/lib.ts",
+    "apps/desktop/test/markdown.test.tsx",
+    "apps/desktop/e2e/v01-journey.spec.ts",
+    "command:npm run typecheck --workspace @peel/desktop",
+    "command:npm test --workspace @peel/desktop -- --run test/markdown.test.tsx"
+  ],
+  "schema_version": 1,
+  "summary": "Independent review found and implementation removed the notification-time full thread/read loop: PeelService now publishes the reducer-derived ThreadSnapshot with each notification and App installs it directly, while full reads remain on initial load/recovery paths. Electron coverage asserts streaming a child produces at most its one initial read. Completed Reasoning now explicitly prefers public summary parts over simultaneous raw content, with a both-fields regression proving raw content is not duplicated into the public summary view. Desktop typecheck and all 54 desktop tests pass after these corrections.",
+  "ticket_id": "ticket-correct-appserver-live-item-streaming"
+}

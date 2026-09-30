@@ -1,0 +1,22 @@
+{
+  "accepted_acceptance_ids": [
+    "production-shaped-renderer-corpus",
+    "comparable-performance-measurement",
+    "safe-streamdown-prototype",
+    "peel-semantics-compatibility",
+    "measured-long-transcript-techniques",
+    "renderer-adoption-decision"
+  ],
+  "closed_at": "2026-09-17T23:24:46Z",
+  "evidence_ids": [
+    "evidence-streamdown-corpus-and-safety",
+    "evidence-streamdown-performance-and-decision",
+    "evidence-streamdown-final-split-timing"
+  ],
+  "kind": "ticket_outcome",
+  "schema_version": 1,
+  "status": "successful",
+  "summary": "Independent closeout accepted all six criteria after reading the Ticket, every Context reference, all three Evidence records, the complete decision report, current renderer and Transcript boundaries, implementation diff, dependency changes, corpus, candidate adapter, benchmark harness, and Electron regressions. Fresh Desktop verification passed typecheck, 76/76 unit tests, and the complete renderer/main/preload production build. A fresh production-Electron A/B passed every safety and correctness assertion and independently reproduced the decision: at 500 Turns Streamdown remained slower through Markdown plus commit (167.9 ms versus 142.8 ms), slower through paint (208.3 ms versus 191.5 ms), and slower on 10-to-500 switching (191.6 ms versus 166.6 ms), while retaining a steadier streaming p99 (18.5 ms versus 20.9 ms), zero historical rerenders, exactly 36 tail rerenders, and comparable stream total time. The isolated candidate preserves raw-HTML blocking, click-only remote media, hardened links, semantic KaTeX, exact code copy, local overflow, readable incomplete/oversized/error fallbacks, and does not enter production Transcript or replace Codex Thread, Turn, ThreadItem, approval, Branch, Draft, Scroll, Activity, attachment, or unknown-item ownership. The normal Focus math regression also passed unchanged geometry assertions at screen-safe 1400x900 and narrow 1000x720; reducing only the impossible 1440x960 host request is legitimate because macOS exposed a 1440x949 work area and no assertion was weakened. The checked-in decision therefore correctly defers Streamdown and assistant-ui runtime adoption, documents accessibility and security limits, records the 112.14 kB-gzip candidate chunk, 136-package and 88 MB Mermaid costs, and adopts or explicitly defers/rejects each long-transcript technique without selecting unsupported virtualization. No Streamdown production implementation Ticket is justified; a native transcript-cost follow-up is the smallest recommended next step.",
+  "ticket_id": "ticket-evaluate-streamdown-rendering-runtime",
+  "unresolved_acceptance_ids": []
+}

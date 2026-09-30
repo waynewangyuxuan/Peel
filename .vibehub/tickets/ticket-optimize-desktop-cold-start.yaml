@@ -1,0 +1,72 @@
+{
+  "acceptance": [
+    {
+      "acceptance_id": "measured-packaged-launch-baseline",
+      "criterion": "A deterministic packaged production Electron harness records at least seven cold-launch samples before and after the change on the same host, separating process launch to first visible branded paint, first usable local shell, Codex transport ready, and first connected action; raw samples, medians, environment, and baseline commit are checked in as evidence."
+    },
+    {
+      "acceptance_id": "immediate-honest-first-frame",
+      "criterion": "The first visible window contains the Peel mark and a stable launch or shell surface rather than an empty, transparent, or unstyled frame; it appears before full conversation rendering code and never implies Codex is connected before connection state is known."
+    },
+    {
+      "acceptance_id": "parallel-nonblocking-initialization",
+      "criterion": "Window creation, local-state bootstrap, and Codex App Server connection begin without the current avoidable serial dependency; a slow, unavailable, or failing Codex process leaves the local shell responsive with accurate connecting/offline recovery UI and does not prevent opening the window."
+    },
+    {
+      "acceptance_id": "startup-improvement-gate",
+      "criterion": "On the recorded same-host packaged benchmark, optimized median process-launch-to-first-visible-branded-paint and first usable local shell are each no greater than baseline plus the larger of 10% of baseline or 50 ms, and optimized median connected-action timing is no greater than baseline plus the larger of 10% of baseline or 100 ms. The production renderer JavaScript synchronously required before the branded first frame is at most 35% of the recorded 703 KB baseline entry bundle, and a delayed-hydration regression proves the Codex initialize request begins before the full App module hydrates."
+    },
+    {
+      "acceptance_id": "startup-regression-coverage",
+      "criterion": "Automated tests cover normal connection, intentionally delayed Codex initialization, connection failure, restart with saved state, and production asset loading; existing package verification, Draft restoration, native Voice packaging, Focus/Overview navigation, and diagnostics behavior remain passing."
+    }
+  ],
+  "constraints": [
+    "Optimize perceived and measured startup without replacing Electron, Streamdown, or the accepted renderer stack.",
+    "Do not cache or fabricate Codex connection, Thread, status, or transcript facts to make launch appear faster.",
+    "Do not weaken context isolation, sandboxing, CSP, external-navigation denial, or current process ownership.",
+    "Keep benchmark-only instrumentation out of ordinary user-visible UI and distinguish first paint from connected readiness."
+  ],
+  "context": "The Electron BrowserWindow remains hidden until ready-to-show, the HTML root is empty until the full statically imported React application loads, and Peel starts its Codex App Server connection only after createWindow has awaited renderer loading. This serial path makes a healthy launch feel blank or slow and delays connection readiness. Establish a reproducible packaged-app baseline, render an honest branded shell as early as possible, overlap independent initialization, and retain explicit offline/reconnecting behavior rather than hiding real Codex delays. Execution measured a 438 ms baseline median first-contentful paint and found Electron process/window startup dominates that interval: splitting the synchronous renderer from 703 KB to 193 KB changes what the user sees first and removes avoidable application work, but cannot honestly promise a 30% process-launch reduction. The performance gate therefore protects same-host paint/shell/connection timing while requiring a material first-frame bundle reduction and direct proof that Codex initialization is no longer gated by full App hydration.",
+  "context_refs": [
+    {
+      "purpose": "Provides the accepted Electron architecture and process ownership boundary.",
+      "ref": ".vibehub/outcomes/ticket-establish-desktop-shell.yaml"
+    },
+    {
+      "purpose": "Provides the current production measurement discipline and optimized Focus rendering baseline.",
+      "ref": ".vibehub/outcomes/ticket-optimize-native-transcript-rendering.yaml"
+    },
+    {
+      "purpose": "Owns BrowserWindow visibility, renderer loading, and current post-load Codex connection ordering.",
+      "ref": "apps/desktop/src/main/main.ts"
+    },
+    {
+      "purpose": "Owns the currently empty pre-React first frame.",
+      "ref": "apps/desktop/index.html"
+    },
+    {
+      "purpose": "Owns current static application loading and initial renderer mount.",
+      "ref": "apps/desktop/src/renderer/main.tsx"
+    },
+    {
+      "purpose": "Owns local-state bootstrap, connection presentation, and the current React launch screen.",
+      "ref": "apps/desktop/src/renderer/App.tsx"
+    },
+    {
+      "purpose": "Provides the existing packaged launch-to-connected-action probe to extend rather than duplicate.",
+      "ref": "apps/desktop/scripts/verify-live-codex.mjs"
+    }
+  ],
+  "deliveries": [],
+  "kind": "ticket",
+  "maturity": "firm",
+  "outcome": "Launching Peel immediately presents a branded, responsive shell while Codex connection and heavier conversation code initialize without serially blocking the first usable experience.",
+  "provenance_refs": [
+    "conversation:2026-09-18-refresh-readme-and-startup-experience",
+    "execution:2026-09-18-packaged-startup-baseline-and-first-optimization"
+  ],
+  "relations": [],
+  "schema_version": 2,
+  "ticket_id": "ticket-optimize-desktop-cold-start"
+}

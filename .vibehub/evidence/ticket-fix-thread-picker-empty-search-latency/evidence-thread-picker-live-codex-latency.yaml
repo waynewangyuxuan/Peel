@@ -1,0 +1,19 @@
+{
+  "acceptance_ids": [
+    "omit-empty-search-term",
+    "shared-warm-recent-request",
+    "live-codex-latency-evidence"
+  ],
+  "evidence_id": "evidence-thread-picker-live-codex-latency",
+  "kind": "ticket_evidence",
+  "origin": "agent",
+  "recorded_at": "2026-09-17T22:59:03Z",
+  "refs": [
+    "apps/desktop/scripts/verify-live-codex.mjs",
+    "command:npm run package --workspace @peel/desktop rebuilt out/Peel-darwin-arm64",
+    "command:npm run verify:live-codex --workspace @peel/desktop returned ok true transportConnectMs 157 transportReadyToListRequestMs 0 ordinaryRecentListMs 1938 ordinaryRecentListThreads 30 ordinaryRecentListSearchTerm omitted launchToSearchReadyMs 499 coldPickerFirstContentMs 2834 warmPickerFirstContentMs 15 firstPageThreads 30 hadNextCursor true listedThreads 59"
+  ],
+  "schema_version": 1,
+  "summary": "A rebuilt packaged Peel and a separate read-only Codex 0.154 ordinary-list probe passed against the installed local server. Transport became ready in 157ms; the ordinary thread/list request was issued in the same millisecond with searchTerm omitted and returned 30 Threads in 1,938ms. In the packaged UI, Search Chats became available 499ms after launch, a cold open reached first content in 2,834ms, and closing then reopening the already loaded Picker reached first content in 15ms. The first page exposed a real nextCursor and Load more produced 59 total locally available Threads. These measurements separate transport, server-list, cold UI, and warm-render latency and prove the former 15.8-second explicit-empty route is no longer used.",
+  "ticket_id": "ticket-fix-thread-picker-empty-search-latency"
+}

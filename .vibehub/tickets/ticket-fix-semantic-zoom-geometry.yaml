@@ -40,11 +40,20 @@
   "kind": "ticket",
   "maturity": "firm",
   "outcome": "Overview semantic zoom stays within each original card footprint, keeps fork edges attached to the visible surfaces, and preserves saved node positions.",
+  "deliveries": [
+    {
+      "kind": "pull_request",
+      "ref": "https://github.com/waynewangyuxuan/Peel/pull/1",
+      "state": "delivered",
+      "delivered_at": "2026-09-07T21:02:01Z",
+      "delivered_commit": "16edd76dffe422024ea63a56e4a6f5cc84611046"
+    }
+  ],
   "provenance_refs": [
     "conversation:2026-09-07-overlapping-semantic-map-labels",
     "https://github.com/waynewangyuxuan/Peel/pull/1"
   ],
   "relations": [],
-  "schema_version": 1,
+  "schema_version": 2,
   "ticket_id": "ticket-fix-semantic-zoom-geometry"
 }

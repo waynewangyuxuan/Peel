@@ -49,6 +49,7 @@
   "kind": "ticket",
   "maturity": "firm",
   "outcome": "Peel v0.1 is independently verified as a reliable spatial-return product rather than merely a functional Codex client or attractive graph.",
+  "deliveries": [],
   "provenance_refs": [
     "conversation:2026-08-25-plan-peel-v01-v02"
   ],
@@ -59,6 +60,6 @@
       "type": "depends_on"
     }
   ],
-  "schema_version": 1,
+  "schema_version": 2,
   "ticket_id": "ticket-validate-v01-dogfood"
 }

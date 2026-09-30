@@ -123,6 +123,9 @@ test("real Thread-first Fork loop, recovery surfaces, scale, and restart", async
   await expect(page.locator(".welcome").getByRole("button", { name: "Search Chats", exact: true })).toBeEnabled();
   await page.screenshot({ path: join(desktopRoot, "test-results/ui-welcome.png") });
   await expect.poll(async () => (await readFile(rpcLog, "utf8")).includes('"method":"thread/list"')).toBe(true);
+  const initialRecentRequest = (await readRpcEvents()).find((event) => event.method === "thread/list");
+  expect(initialRecentRequest?.params).toBeDefined();
+  expect(initialRecentRequest?.params).not.toHaveProperty("searchTerm");
   const threadListsBeforeNewChat = (await readFile(rpcLog, "utf8")).match(/"method":"thread\/list"/g)?.length ?? 0;
   const newChatStarted = performance.now();
   await page.locator(".welcome").getByRole("button", { name: "New Chat", exact: true }).click();
@@ -243,6 +246,11 @@ test("real Thread-first Fork loop, recovery surfaces, scale, and restart", async
 
   await page.getByRole("button", { name: "Load more" }).click();
   await expect(page.locator(".thread-result")).toHaveCount(60);
+  await expect.poll(async () => (await readRpcEvents()).some((event) =>
+    event.method === "thread/list"
+      && event.params?.cursor === "offset:30"
+      && !Object.hasOwn(event.params, "searchTerm")
+  )).toBe(true);
   await page.getByText("Catalog direction 54", { exact: true }).click();
   await expect(page.getByRole("heading", { name: "Catalog direction 54" })).toBeVisible();
   await page.locator(".space-sidebar").getByRole("button", { name: "Search Chats" }).click();
@@ -271,6 +279,26 @@ test("real Thread-first Fork loop, recovery surfaces, scale, and restart", async
   await page.locator(".agent-message table").scrollIntoViewIfNeeded();
   await page.waitForTimeout(100);
   await page.screenshot({ path: join(desktopRoot, "test-results/ui-focus-markdown.png") });
+  const formula = page.locator(".agent-message .katex-display").first();
+  await expect(formula.locator("math")).toBeAttached();
+  await expect(formula.locator('annotation[encoding="application/x-tex"]')).toContainText("Attention");
+  const formulaLayout = await formula.evaluate((element) => ({
+    overflowX: getComputedStyle(element).overflowX,
+    withinPage: element.getBoundingClientRect().right <= document.documentElement.clientWidth + 1,
+    pageFits: document.documentElement.scrollWidth === document.documentElement.clientWidth,
+  }));
+  expect(formulaLayout).toMatchObject({ overflowX: "auto", withinPage: true, pageFits: true });
+  const selectedFormula = await formula.locator(".katex-html").evaluate((element) => {
+    const selection = window.getSelection();
+    const range = document.createRange();
+    range.selectNodeContents(element);
+    selection?.removeAllRanges();
+    selection?.addRange(range);
+    const text = selection?.toString() ?? "";
+    selection?.removeAllRanges();
+    return text;
+  });
+  expect(selectedFormula).toContain("Attention");
   const code = page.locator(".markdown-code").first();
   await expect(code.locator(".markdown-code-header > span")).toHaveText("ts");
   await expect(code.locator(".syntax-keyword")).toContainText("const");
@@ -363,11 +391,14 @@ test("real Thread-first Fork loop, recovery surfaces, scale, and restart", async
     return performance.now() - start;
   });
   expect(forkLatency).toBeLessThan(150);
+  await expect(page.getByRole("button", { name: "Branch from here" })).toHaveCount(3);
+  await expect(page.locator(".peel-handle, .peel-drag-preview")).toHaveCount(0);
   await page.locator(".fork-surface textarea").fill("Cancel this local-only direction");
   await page.waitForTimeout(250);
   await page.screenshot({ path: join(desktopRoot, "test-results/ui-fork-draft.png") });
   await app!.evaluate(({ BrowserWindow }) => BrowserWindow.getAllWindows()[0]?.setSize(1000, 720));
   await expect.poll(() => page.evaluate(() => window.innerWidth)).toBe(1000);
+  await expect(page.getByRole("button", { name: "Branch from here" }).last()).toBeVisible();
   await page.waitForTimeout(300);
   const narrowForkLayout = await page.evaluate(() => {
     const primary = document.querySelector<HTMLElement>(".fork-footer .primary-button")!.getBoundingClientRect();
@@ -391,13 +422,9 @@ test("real Thread-first Fork loop, recovery surfaces, scale, and restart", async
   const beforeSend = await readFile(rpcLog, "utf8");
   expect(beforeSend).not.toContain('"method":"thread/fork"');
 
-  const peelHandle = page.getByRole("button", { name: "Peel a branch from this turn" }).last();
-  const handleBox = await peelHandle.boundingBox();
-  if (!handleBox) throw new Error("Peel handle did not have a layout box");
-  await page.mouse.move(handleBox.x + handleBox.width / 2, handleBox.y + handleBox.height / 2);
-  await page.mouse.down();
-  await page.mouse.move(handleBox.x + 82, handleBox.y + 24, { steps: 4 });
-  await page.mouse.up();
+  const branchButton = page.getByRole("button", { name: "Branch from here" }).last();
+  await branchButton.focus();
+  await page.keyboard.press("Enter");
   await expect(page.locator(".fork-surface")).toBeVisible();
   await page.locator(".fork-surface textarea").fill("Try a compact navigation direction");
   await page.getByRole("button", { name: "Create & send" }).click();
@@ -405,6 +432,16 @@ test("real Thread-first Fork loop, recovery surfaces, scale, and restart", async
   const streamingAgent = page.locator(".turn").last().locator(".agent-message");
   await expect(streamingAgent.locator("strong")).toContainText("A streamed result");
   expect(await streamingAgent.innerText()).not.toContain("**");
+  const streamingTurn = page.locator(".turn").last();
+  const livePlan = streamingTurn.locator(".activity-item").filter({ hasText: "Live plan detail" });
+  const liveReasoning = streamingTurn.locator(".activity-item").filter({ hasText: "Reasoning summary one" });
+  const liveCommand = streamingTurn.locator(".activity-item").filter({ hasText: "raw command output" });
+  await expect(livePlan.locator("strong")).toHaveText("Live plan detail");
+  await expect(liveReasoning.locator("strong")).toHaveText("summary one");
+  await expect(liveReasoning).toContainText("Summary two");
+  await expect(liveReasoning).not.toContainText("Raw reasoning fallback");
+  await expect(liveCommand).toContainText("  **raw command output**");
+  await expect(liveCommand.locator("strong")).toHaveCount(0);
   await page.locator(".transcript").evaluate((element) => {
     element.scrollTop = element.scrollHeight;
     element.dispatchEvent(new Event("scroll"));
@@ -419,6 +456,9 @@ test("real Thread-first Fork loop, recovery surfaces, scale, and restart", async
   await page.waitForTimeout(190);
   expect(await page.locator(".transcript").evaluate((element) => element.scrollTop)).toBeLessThan(4);
   await expect(page.getByText("Command approval")).toBeVisible();
+  const streamedChildReads = (await readRpcEvents()).filter((event) =>
+    event.method === "thread/read" && event.params?.threadId === "thread-child-1");
+  expect(streamedChildReads.length).toBeLessThanOrEqual(1);
   await page.locator(".thread-name").dblclick();
   await page.locator(".topbar-title input").fill("Manual branch name");
   await page.locator(".topbar-title input").press("Enter");
@@ -505,7 +545,7 @@ test("real Thread-first Fork loop, recovery surfaces, scale, and restart", async
   await expect(page.locator(".toast")).toHaveCount(0, { timeout: 5_000 });
   await page.screenshot({ path: join(desktopRoot, "test-results/ui-overview-2.png") });
   await renamedBranchCard.locator(".card-facts button").nth(1).click();
-  await expect(page.locator('.turn.highlighted[data-turn-id="turn-3"]')).toBeVisible();
+  await expect(page.locator('.turn.highlighted[data-turn-id="turn-4"]')).toBeVisible();
 
   const draft = page.getByLabel("Message");
   await draft.fill("This draft must survive restart");
@@ -711,15 +751,15 @@ test("real Thread-first Fork loop, recovery surfaces, scale, and restart", async
     element.dispatchEvent(new Event("scroll"));
   });
   await page.waitForTimeout(700);
-  await page.locator('.turn[data-turn-id="turn-3"] .turn-actions button').click();
+  await page.locator('.turn[data-turn-id="turn-4"] .turn-actions button').click();
   await page.locator(".fork-surface textarea").fill("Grandchild verifies exact long-turn return");
   await page.getByRole("button", { name: "Create & send" }).click();
   await expect(page.locator(".lineage-tree button")).toHaveCount(3);
   await page.locator(".branched-from").click();
-  const exactLongParentTurn = page.locator('.turn.highlighted[data-turn-id="turn-3"]');
+  const exactLongParentTurn = page.locator('.turn.highlighted[data-turn-id="turn-4"]');
   await expect(exactLongParentTurn).toBeVisible();
   await page.waitForTimeout(500);
-  const longParentTurn = page.locator('.turn[data-turn-id="turn-3"]');
+  const longParentTurn = page.locator('.turn[data-turn-id="turn-4"]');
   const exactReturn = await longParentTurn.evaluate((element) => {
     const bounds = element.getBoundingClientRect();
     const viewport = element.closest(".transcript")!.getBoundingClientRect();
@@ -752,7 +792,7 @@ test("real Thread-first Fork loop, recovery surfaces, scale, and restart", async
     [root.threadId]: { ...root, position: { x: 70, y: 270 } },
     [child.threadId]: { ...child, position: { x: 390, y: 115 } },
     [grandchild.threadId]: { ...grandchild, position: { x: 735, y: 40 }, title: "UI visual system", titleOrigin: "automatic", lastViewedTurnId: null },
-    "synthetic-demo-navigation": { ...root, threadId: "synthetic-demo-navigation", parentThreadId: child.threadId, forkedAtTurnId: "turn-3", createdAt: Date.now() + 2, position: { x: 735, y: 286 }, title: "Navigation and command palette", titleOrigin: "automatic", lastViewedTurnId: null },
+    "synthetic-demo-navigation": { ...root, threadId: "synthetic-demo-navigation", parentThreadId: child.threadId, forkedAtTurnId: "turn-4", createdAt: Date.now() + 2, position: { x: 735, y: 286 }, title: "Navigation and command palette", titleOrigin: "automatic", lastViewedTurnId: null },
     "synthetic-demo-backend": { ...root, threadId: "synthetic-demo-backend", parentThreadId: root.threadId, forkedAtTurnId: "turn-2", createdAt: Date.now() + 3, position: { x: 390, y: 505 }, title: "Codex backend integration", titleOrigin: "automatic", lastViewedTurnId: null },
     "synthetic-demo-worktree": { ...root, threadId: "synthetic-demo-worktree", parentThreadId: "synthetic-demo-backend", forkedAtTurnId: "turn-2", createdAt: Date.now() + 4, position: { x: 735, y: 535 }, title: "Isolated worktree direction", titleOrigin: "automatic", lastViewedTurnId: null },
   };

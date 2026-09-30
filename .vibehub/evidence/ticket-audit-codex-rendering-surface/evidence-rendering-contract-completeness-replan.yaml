@@ -1,0 +1,25 @@
+{
+  "acceptance_ids": [
+    "authoritative-content-inventory",
+    "renderer-route-matrix"
+  ],
+  "evidence_id": "evidence-rendering-contract-completeness-replan",
+  "kind": "ticket_evidence",
+  "origin": "agent",
+  "recorded_at": "2026-09-17T07:11:03Z",
+  "refs": [
+    "docs/review/rendering-audit/README.md",
+    "docs/review/rendering-audit/sanitized-local-payload-shapes.json",
+    ".vibehub/outcomes/ticket-audit-codex-rendering-surface.yaml",
+    "https://developers.openai.com/codex/app-server",
+    "apps/desktop/src/renderer/App.tsx",
+    "apps/desktop/src/renderer/Transcript.tsx",
+    "packages/codex-app-server/src/reducer.ts",
+    "command:generated-stable-ServerRequest-method-coverage#10-of-10-2026-09-16",
+    "command:generated-stable-ServerNotification-method-coverage#83-of-83-2026-09-16",
+    "command:jq-empty-sanitized-local-payload-shapes#passed-2026-09-16"
+  ],
+  "schema_version": 1,
+  "summary": "The replanned audit closes the partial Outcome's two concrete gaps. A checked-in JSON artifact records one representative local completed-item key/type structure for every observed type in the 200-file window while removing all scalar values and dynamic keys. The audit now names reasoning summaryPartAdded, distinguishes observed persisted shapes from App Server wire authority, maps all 10 generated stable ServerRequest methods including dynamic tool, auth refresh, attestation, and legacy approvals, and classifies all 83 generated stable ServerNotification methods by Peel's actual reducer/renderer route. It separately traces serverRequest/resolved, top-level error/warnings, invisible requests without threadId, pending-card cleanup, and corrects the earlier overbroad visible-card claim. Deterministic source-to-document checks found zero missing request or notification method names.",
+  "ticket_id": "ticket-audit-codex-rendering-surface"
+}

@@ -41,12 +41,25 @@ const realtimeNotifications = [
   "thread/realtime/error",
   "thread/realtime/closed",
 ];
+const serverRequests = [
+  "item/commandExecution/requestApproval",
+  "item/fileChange/requestApproval",
+  "item/tool/requestUserInput",
+  "mcpServer/elicitation/request",
+  "item/permissions/requestApproval",
+  "item/tool/call",
+  "account/chatgptAuthTokens/refresh",
+  "attestation/generate",
+  "applyPatchApproval",
+  "execCommandApproval",
+];
 
 try {
   execFileSync(binary, ["app-server", "generate-ts", "--out", generated], { stdio: "pipe" });
   execFileSync(binary, ["app-server", "generate-ts", "--experimental", "--out", experimentalGenerated], { stdio: "pipe" });
   const clientRequest = readFileSync(join(generated, "ClientRequest.ts"), "utf8");
   const serverNotification = readFileSync(join(generated, "ServerNotification.ts"), "utf8");
+  const serverRequest = readFileSync(join(generated, "ServerRequest.ts"), "utf8");
   const experimentalClientRequest = readFileSync(join(experimentalGenerated, "ClientRequest.ts"), "utf8");
   const experimentalServerNotification = readFileSync(join(experimentalGenerated, "ServerNotification.ts"), "utf8");
   for (const method of methods) assert.match(clientRequest, new RegExp(`"method": "${method.replace("/", "\\/")}"`));
@@ -55,8 +68,10 @@ try {
   }
   for (const method of realtimeMethods) assert.match(experimentalClientRequest, new RegExp(`"method": "${method.replace("/", "\\/")}"`));
   for (const method of realtimeNotifications) assert.match(experimentalServerNotification, new RegExp(`"method": "${method.replace("/", "\\/")}"`));
+  const generatedServerRequests = [...serverRequest.matchAll(/"method":\s*"([^"]+)"/g)].map((match) => match[1]);
+  assert.deepEqual(generatedServerRequests.sort(), [...serverRequests].sort(), "stable ServerRequest method set drifted");
   process.stdout.write(
-    `${JSON.stringify({ schema: "compatible", binary, methods: methods.length, notifications: notifications.length, realtimeMethods: realtimeMethods.length, realtimeNotifications: realtimeNotifications.length })}\n`,
+    `${JSON.stringify({ schema: "compatible", binary, methods: methods.length, notifications: notifications.length, serverRequests: serverRequests.length, realtimeMethods: realtimeMethods.length, realtimeNotifications: realtimeNotifications.length })}\n`,
   );
 } finally {
   rmSync(generated, { recursive: true, force: true });

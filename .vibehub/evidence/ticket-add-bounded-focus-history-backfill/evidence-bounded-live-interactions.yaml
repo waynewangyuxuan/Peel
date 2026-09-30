@@ -1,0 +1,24 @@
+{
+  "acceptance_ids": [
+    "stable-incremental-history-prepend",
+    "backfill-live-tail-responsiveness",
+    "history-restoration-and-restart-fidelity"
+  ],
+  "evidence_id": "evidence-bounded-live-interactions",
+  "kind": "ticket_evidence",
+  "origin": "agent",
+  "recorded_at": "2026-09-18T02:29:43Z",
+  "refs": [
+    "apps/desktop/e2e/bounded-transcript-backfill.spec.ts",
+    "apps/desktop/e2e/native-transcript-performance.spec.ts",
+    "apps/desktop/e2e/fixtures/codex",
+    "apps/desktop/src/renderer/Transcript.tsx",
+    "command:npm run test:e2e --workspace @peel/desktop -- e2e/bounded-transcript-backfill.spec.ts --reporter=dot passed 1/1 in production Electron in 18.2s",
+    "command:npm run benchmark:transcript --workspace @peel/desktop -- --reporter=dot passed 1/1 with seven optimized live-visible, user-scroll-preserved, follow-bottom-resumed samples",
+    "command:npm run typecheck --workspace @peel/desktop passed",
+    "command:git diff --check passed"
+  ],
+  "schema_version": 1,
+  "summary": "Fresh production Electron coverage closes the interaction-specific acceptance gaps. While the one-Turn backfill scheduler was actively restoring a 500-Turn Thread, the test edited the Composer, copied code, opened and cancelled Branch from here, dispatched an exact codex://threads/<UUID> Open in Codex deep link through a stubbed Electron shell, sent a live Turn that produced all stable request routes, accepted its command approval, observed its Codex error notice, and added then removed an image attachment. Restoration still reached all 501 authoritative Turns with zero browser long tasks and at most one CSS pixel anchor movement. After full backfill, an early completed Turn still opened its exact Branch draft. The refreshed production A/B benchmark explicitly asserted in all seven optimized streaming samples that the live Turn stayed visible, scrolling away from the bottom was preserved, returning to the bottom resumed follow behavior, exactly 36 deltas were processed, settled historical Turn/Markdown rerenders stayed zero, and streaming long-task time stayed zero.",
+  "ticket_id": "ticket-add-bounded-focus-history-backfill"
+}

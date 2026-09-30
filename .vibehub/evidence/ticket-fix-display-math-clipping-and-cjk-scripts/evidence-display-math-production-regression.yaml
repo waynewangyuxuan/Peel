@@ -1,0 +1,23 @@
+{
+  "acceptance_ids": [
+    "unclipped-display-glyphs",
+    "cjk-script-layout",
+    "math-layout-regression-evidence"
+  ],
+  "evidence_id": "evidence-display-math-production-regression",
+  "kind": "ticket_evidence",
+  "origin": "agent",
+  "recorded_at": "2026-09-17T19:13:02Z",
+  "refs": [
+    "apps/desktop/e2e/math-layout.spec.ts",
+    "apps/desktop/e2e/fixtures/codex",
+    "apps/desktop/test/markdown.test.tsx",
+    "apps/desktop/src/renderer/Markdown.tsx",
+    "command:npm test",
+    "command:npm run build",
+    "command:npx playwright test e2e/open-codex.spec.ts e2e/math-layout.spec.ts"
+  ],
+  "schema_version": 1,
+  "summary": "The dedicated Electron regression renders the exact reported formulas through Peel's compiled Markdown and CSS path at two viewports and asserts the resulting window.innerWidth/innerHeight are exactly 1440x960 and 1000x720. For the Latin expression it measures the whole visible KaTeX formula plus every non-empty visible text-node Range, including X/W, h subscripts, superscripts, punctuation, and italic overhang, and proves every bound remains vertically contained while overflow stays local. For both exact CJK expressions it measures q/k base, superscript, and CJK subscript centers and proves sup center < base center < sub center, verifies the targeted font/offset and container bounds, and emits separate screenshots. Repository verification passes 24 App Server, 12 Git workspace, and 64 desktop tests; typecheck and the full production build pass; the focused Open-in-Codex and math Electron suite passes 2/2. Existing Markdown coverage continues to prove raw HTML is disabled, KaTeX trust is false, MathML is emitted, incomplete streams stay readable, code is isolated, and copy remains source-faithful.",
+  "ticket_id": "ticket-fix-display-math-clipping-and-cjk-scripts"
+}

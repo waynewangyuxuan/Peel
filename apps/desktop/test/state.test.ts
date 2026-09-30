@@ -1,6 +1,17 @@
 import { describe, expect, it } from "vitest";
 
-import { automaticTitle, createSpace, emptyState, normalizeState, suggestedChildPosition, temporaryTitle } from "../src/shared/state";
+import { automaticTitle, createSpace, emptyState, normalizeState, shouldApplyIncomingThreadName, suggestedChildPosition, temporaryTitle } from "../src/shared/state";
+
+describe("incoming thread names", () => {
+  it("keeps the first prompt when a later Codex name arrives", () => {
+    const first = temporaryTitle("Explain attention in one concrete sentence", "New Chat");
+    expect(shouldApplyIncomingThreadName("temporary", "New Chat", "Codex draft")).toBe(true);
+    expect(shouldApplyIncomingThreadName("temporary", first, automaticTitle("Explain attention in one concrete sentence"))).toBe(true);
+    expect(shouldApplyIncomingThreadName("temporary", first, "能给一点比较厚的visual帮我理解吗")).toBe(false);
+    expect(shouldApplyIncomingThreadName("automatic", first, "能给一点比较厚的visual帮我理解吗")).toBe(false);
+    expect(shouldApplyIncomingThreadName("manual", first, "Renamed by me")).toBe(false);
+  });
+});
 
 describe("Peel state model", () => {
   it("creates exactly one root from an existing Thread without Project coupling", () => {
@@ -12,6 +23,7 @@ describe("Peel state model", () => {
       createdAt: 100,
     });
     expect(space.rootThreadId).toBe("thread-root");
+    expect(space.nameOrigin).toBe("default");
     expect(Object.keys(space.nodes)).toEqual(["thread-root"]);
     expect(space.nodes["thread-root"]).toMatchObject({ parentThreadId: null, forkedAtTurnId: null });
     expect(space).not.toHaveProperty("projectId");
@@ -55,6 +67,40 @@ describe("Peel state model", () => {
 
   it("rejects unrelated persisted shapes instead of partially trusting them", () => {
     expect(normalizeState({ version: 2, spaces: {}, threadViews: {} })).toEqual(emptyState());
+  });
+
+  it("preserves valid Turn scroll anchors and drops malformed anchors", () => {
+    const state = emptyState();
+    state.threadViews.valid = { draft: "kept", scrollTop: 912, scrollAnchor: { turnId: "turn-211", offset: -24.5 } };
+    state.threadViews.invalid = { draft: "still kept", scrollTop: 24, scrollAnchor: { turnId: "turn-2", offset: Number.NaN } };
+
+    const normalized = normalizeState(state);
+
+    expect(normalized.threadViews.valid).toEqual({
+      draft: "kept",
+      scrollTop: 912,
+      scrollAnchor: { turnId: "turn-211", offset: -24.5 },
+    });
+    expect(normalized.threadViews.invalid).toEqual({ draft: "still kept", scrollTop: 24 });
+  });
+
+  it("repairs only legacy New Chat names and preserves every other legacy Space label", () => {
+    const following = createSpace({ id: "following-root", name: null, preview: "", cwd: "/repo", createdAt: 1 });
+    following.name = "New Chat";
+    following.nodes[following.rootThreadId]!.title = "Useful recovered root title";
+    delete (following as { nameOrigin?: unknown }).nameOrigin;
+    const preserved = createSpace({ id: "preserved-root", name: null, preview: "", cwd: "/repo", createdAt: 2 });
+    preserved.name = "My deliberate legacy label";
+    preserved.nodes[preserved.rootThreadId]!.title = "A newer Root title";
+    delete (preserved as { nameOrigin?: unknown }).nameOrigin;
+    const state = emptyState();
+    state.spaces[following.id] = following;
+    state.spaces[preserved.id] = preserved;
+
+    const normalized = normalizeState(state);
+
+    expect(normalized.spaces[following.id]).toMatchObject({ name: "Useful recovered root title", nameOrigin: "default" });
+    expect(normalized.spaces[preserved.id]).toMatchObject({ name: "My deliberate legacy label", nameOrigin: "manual" });
   });
 
   it("drops a persisted Forest or cycle instead of weakening the single-root Fork invariant", () => {

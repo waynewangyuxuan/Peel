@@ -1,0 +1,22 @@
+{
+  "acceptance_ids": [
+    "unclipped-display-glyphs",
+    "cjk-script-layout"
+  ],
+  "evidence_id": "evidence-display-math-visual-containment",
+  "kind": "ticket_evidence",
+  "origin": "agent",
+  "recorded_at": "2026-09-17T19:13:02Z",
+  "refs": [
+    "apps/desktop/src/renderer/styles.css",
+    ".vibehub/evidence/ticket-fix-display-math-clipping-and-cjk-scripts/screenshots/latin-normal.png",
+    ".vibehub/evidence/ticket-fix-display-math-clipping-and-cjk-scripts/screenshots/latin-narrow.png",
+    ".vibehub/evidence/ticket-fix-display-math-clipping-and-cjk-scripts/screenshots/cjk-apples-takeout-normal.png",
+    ".vibehub/evidence/ticket-fix-display-math-clipping-and-cjk-scripts/screenshots/cjk-apples-takeout-narrow.png",
+    ".vibehub/evidence/ticket-fix-display-math-clipping-and-cjk-scripts/screenshots/cjk-takeout-company-normal.png",
+    ".vibehub/evidence/ticket-fix-display-math-clipping-and-cjk-scripts/screenshots/cjk-takeout-company-narrow.png"
+  ],
+  "schema_version": 1,
+  "summary": "Peel's production KaTeX display container now reserves enough vertical ink space for italic bases and superscripts while retaining local horizontal scrolling. A narrowly targeted KaTeX script selector applies a proportionate Songti fallback and downward offset only to CJK subscript spans. Six durable production Electron screenshots cover the full Latin expression and both exact reported CJK expressions independently at confirmed 1440x960 and 1000x720 viewports; they show complete glyph ink, superscripts above their bases, CJK subscripts below, and no visual collision or page-level overflow.",
+  "ticket_id": "ticket-fix-display-math-clipping-and-cjk-scripts"
+}

@@ -1,0 +1,57 @@
+{
+  "acceptance": [
+    {
+      "acceptance_id": "new-chat-default-title-transition",
+      "criterion": "A directly created empty Chat may initially display New Chat, but after the first text prompt establishes the Root temporary/automatic title, its default-owned Space label transitions to the same useful title in the sidebar without requiring restart or manual rename."
+    },
+    {
+      "acceptance_id": "manual-space-name-precedence",
+      "criterion": "Once a user explicitly renames a Space, later Root Thread temporary, automatic, manual, or thread/name/updated changes never overwrite that Space name; renaming the Space still does not write back to Codex Thread name."
+    },
+    {
+      "acceptance_id": "title-origin-persistence",
+      "criterion": "Peel persists enough Space-name provenance to distinguish default-following from manual Space names across switching and full application restart, with normalization for older saved state that lacks the new provenance field."
+    },
+    {
+      "acceptance_id": "legacy-new-chat-repair",
+      "criterion": "Existing persisted Spaces whose label is exactly the legacy default New Chat and whose Root has a non-default useful title are repaired deterministically; no other existing Space name is rewritten."
+    },
+    {
+      "acceptance_id": "naming-regression-evidence",
+      "criterion": "Service/state unit tests and the production Electron journey cover direct creation, first prompt, delayed automatic title, manual Space rename before and after completion, manual Thread rename, thread/name/updated, legacy-state normalization, sidebar rendering, and restart restoration without regressing Fork titles or Codex title synchronization."
+    }
+  ],
+  "constraints": [
+    "Space Name and Thread Name remain distinct product concepts; only default-owned Space names follow the Root lifecycle.",
+    "Never overwrite an explicit Space name or write a Space rename to Codex.",
+    "Legacy migration may treat only the exact New Chat label as the old generated default; all other existing labels are preserved.",
+    "Do not derive names semantically from assistant output; keep the existing deterministic first-prompt title behavior and Codex thread/name synchronization."
+  ],
+  "context": "Live dogfood shows multiple directly created Spaces permanently labeled New Chat even after they contain active conversations. Inspection confirms createSpace initializes both Root and Space to New Chat, but first-Turn automatic naming updates only the Root node. The repair must synchronize default-owned Space names without collapsing the intentional distinction between Space and Thread naming.",
+  "context_refs": [
+    {
+      "purpose": "Captures the reported sidebar failure and intended default-following/manual-precedence behavior.",
+      "ref": ".vibehub/rooms/product/intent-space-title-follows-root-until-manual.yaml"
+    },
+    {
+      "purpose": "Defines the existing Root Thread title lifecycle and the Space/Thread naming boundary.",
+      "ref": ".vibehub/rooms/product/contract-thread-title-lifecycle.yaml"
+    },
+    {
+      "purpose": "Provides the completed direct New Chat creation baseline this correction extends.",
+      "ref": ".vibehub/outcomes/ticket-rework-new-chat-composer-and-voice-feedback.yaml"
+    }
+  ],
+  "deliveries": [],
+  "kind": "ticket",
+  "maturity": "firm",
+  "outcome": "A directly created Chat acquires a useful Space label from its Root title lifecycle instead of remaining New Chat, while explicit Space names remain independent and protected.",
+  "provenance_refs": [
+    "conversation:2026-09-16-live-dogfood-chat-performance-and-focus-affordances#image-1-sidebar",
+    "apps/desktop/src/main/peel-service.ts",
+    "apps/desktop/src/shared/state.ts"
+  ],
+  "relations": [],
+  "schema_version": 2,
+  "ticket_id": "ticket-fix-new-chat-space-title-lifecycle"
+}

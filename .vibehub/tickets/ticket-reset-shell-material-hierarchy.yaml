@@ -74,6 +74,7 @@
   "kind": "ticket",
   "maturity": "firm",
   "outcome": "Peel's Focus, shared chrome, and Overview feel like one calm native Codex workspace rather than a stack of rounded SaaS components, while preserving the Demo's spatial information architecture and every shipped workflow.",
+  "deliveries": [],
   "provenance_refs": [
     "conversation:2026-08-27-shell-plasticity-diagnosis-and-reset",
     "apps/desktop/test-results/ui-focus-activity.png",
@@ -96,6 +97,6 @@
       "type": "depends_on"
     }
   ],
-  "schema_version": 1,
+  "schema_version": 2,
   "ticket_id": "ticket-reset-shell-material-hierarchy"
 }

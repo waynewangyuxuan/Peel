@@ -38,15 +38,23 @@ describe("PeelService Thread discovery cache", () => {
     const service = new PeelService(directory, { now: () => now });
     let resolveWarm!: (response: ThreadListResponse) => void;
     const warmResponse = new Promise<ThreadListResponse>((resolve) => { resolveWarm = resolve; });
-    const search = vi.spyOn(service.client, "searchThreads")
+    const list = vi.spyOn(service.client, "listThreads")
       .mockImplementationOnce(async () => await warmResponse)
       .mockResolvedValue(page("fresh"));
+    const search = vi.spyOn(service.client, "searchThreads").mockResolvedValue(page("search"));
 
     service.transport.emit("ready", {});
-    expect(search).toHaveBeenCalledTimes(1);
+    expect(list).toHaveBeenCalledTimes(1);
+    expect(list).toHaveBeenLastCalledWith({
+      cursor: null,
+      limit: 30,
+      sortKey: "updated_at",
+      sortDirection: "desc",
+    });
+    expect(search).not.toHaveBeenCalled();
     const first = service.searchThreads({ term: "" });
     const concurrent = service.searchThreads({ term: "" });
-    expect(search).toHaveBeenCalledTimes(1);
+    expect(list).toHaveBeenCalledTimes(1);
     resolveWarm(page("warm", "cursor-1"));
     await expect(Promise.all([first, concurrent])).resolves.toEqual([
       page("warm", "cursor-1"),
@@ -55,11 +63,11 @@ describe("PeelService Thread discovery cache", () => {
 
     now = 14_999;
     await expect(service.searchThreads({ term: "" })).resolves.toEqual(page("warm", "cursor-1"));
-    expect(search).toHaveBeenCalledTimes(1);
+    expect(list).toHaveBeenCalledTimes(1);
 
     now = 15_000;
     await expect(service.searchThreads({ term: "" })).resolves.toEqual(page("fresh"));
-    expect(search).toHaveBeenCalledTimes(2);
+    expect(list).toHaveBeenCalledTimes(2);
 
     await service.searchThreads({ term: "  Needle  ", cursor: "cursor-1" });
     expect(search).toHaveBeenLastCalledWith("Needle", {
@@ -68,5 +76,6 @@ describe("PeelService Thread discovery cache", () => {
       sortKey: "updated_at",
       sortDirection: "desc",
     });
+    expect(list).toHaveBeenCalledTimes(2);
   });
 });

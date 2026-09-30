@@ -2,8 +2,8 @@ import { renderToStaticMarkup } from "react-dom/server";
 import { describe, expect, it } from "vitest";
 import type { ThreadItem } from "@peel/codex-app-server";
 
-import { highlightCode, MarkdownContent } from "../src/renderer/Markdown";
-import { ItemView } from "../src/renderer/Transcript";
+import { highlightCode, MARKDOWN_PLAIN_TEXT_LIMIT, MarkdownContent, normalizeMathDelimiters } from "../src/renderer/Markdown";
+import { ItemView, TurnActions } from "../src/renderer/Transcript";
 import { plainTextPreview } from "../src/renderer/lib";
 
 const LIVE_REDACTED_EXCERPT = `我们先把命题压实。
@@ -18,6 +18,13 @@ const LIVE_REDACTED_EXCERPT = `我们先把命题压实。
 | Tests | 连续性、时间线、人物动机 |`;
 
 describe("MarkdownContent", () => {
+  it("renders one persistent native Branch action only for completed turns", () => {
+    const completed = renderToStaticMarkup(<TurnActions status="completed" onBranch={() => undefined}/>);
+    expect(completed.match(/<button/g)).toHaveLength(1);
+    expect(completed).toContain("Branch from here");
+    expect(completed).not.toContain("peel-handle");
+    expect(renderToStaticMarkup(<TurnActions status="inProgress" onBranch={() => undefined}/>)).not.toContain("<button");
+  });
   it("turns Markdown into calm plain-text previews for spatial cards", () => {
     expect(plainTextPreview(`## Direction
 
@@ -25,6 +32,22 @@ describe("MarkdownContent", () => {
 
 - Preserve \`Focus\`
 - ~~Remove chrome~~`)).toBe("Direction A streamed result for this direction. Preserve Focus Remove chrome");
+  });
+
+  it("falls through empty text fields to authoritative summary and output fields", () => {
+    expect(plainTextPreview("**ready**")).toBe("ready");
+    const reasoning = {
+      type: "reasoning",
+      text: "",
+      content: ["raw content must stay secondary"],
+      summary: ["First", "Second"],
+    } as unknown as ThreadItem;
+    const command = { type: "commandExecution", text: "", aggregatedOutput: "exact output" } as unknown as ThreadItem;
+    const reasoningHtml = renderToStaticMarkup(<ItemView item={reasoning} streamedText="" streaming={false} onOpenCodex={() => undefined}/>);
+    expect(reasoningHtml).toContain("First");
+    expect(reasoningHtml).toContain("Second");
+    expect(reasoningHtml).not.toContain("raw content must stay secondary");
+    expect(renderToStaticMarkup(<ItemView item={command} streamedText="" streaming={false} onOpenCodex={() => undefined}/>)).toContain("exact output");
   });
 
   it("renders CommonMark and GFM structures without executing raw HTML", () => {
@@ -70,6 +93,70 @@ const safe = true;
     expect(html).not.toContain("javascript:");
   });
 
+  it("uses an exact inert text fallback at the 200k boundary", () => {
+    const prefix = "<script>window.unsafe = true</script>\n![remote](https://example.com/image.png)\n";
+    const source = prefix + "x".repeat(MARKDOWN_PLAIN_TEXT_LIMIT - prefix.length);
+    const html = renderToStaticMarkup(<MarkdownContent text={source}/>);
+    expect(html).toContain('data-rendering-fallback="oversized"');
+    expect(html).toContain("&lt;script&gt;window.unsafe = true&lt;/script&gt;");
+    expect(html).toContain("![remote](https://example.com/image.png)");
+    expect(html).not.toContain("<script>");
+    expect(html).not.toContain("<img");
+
+    const normal = renderToStaticMarkup(<MarkdownContent text={`**${"y".repeat(MARKDOWN_PLAIN_TEXT_LIMIT - 5)}**`}/>);
+    expect(normal).not.toContain('data-rendering-fallback="oversized"');
+    expect(normal).toContain("<strong>");
+  });
+
+  it("typesets Codex inline and display math as semantic accessible KaTeX", () => {
+    const source = String.raw`Inline \(x^2 + \sqrt{y}\).
+
+\[
+\mathrm{Attention}(Q,K,V)=\mathrm{softmax}\left(\frac{QK^\top}{\sqrt{d_k}}\right)V
+\]`;
+    const html = renderToStaticMarkup(<MarkdownContent text={source}/>);
+    expect(html).toContain("class=\"katex\"");
+    expect(html).toContain("class=\"katex-display\"");
+    expect(html).toContain("<math");
+    expect(html).toContain("<annotation encoding=\"application/x-tex\"");
+    expect(html).toContain("aria-hidden=\"true\"");
+    expect(html).toContain("Attention");
+  });
+
+  it("keeps the exact reported Latin and CJK script formulas semantic", () => {
+    const html = renderToStaticMarkup(<MarkdownContent text={String.raw`\[
+Q_h=XW_h^Q,\qquad K_h=XW_h^K,\qquad V_h=XW_h^V
+\]
+
+\[
+q_{\text{苹果}}^{(1)}\cdot k_{\text{外卖}}^{(1)}
+\]`}/>);
+    expect(html.match(/class="katex-display"/g)).toHaveLength(2);
+    expect(html).toContain("class=\"mord cjk_fallback mtight\"");
+    expect(html).toContain("<mtext>苹果</mtext>");
+    expect(html).toContain("<annotation encoding=\"application/x-tex\">Q_h=XW_h^Q");
+  });
+
+  it("keeps incomplete streamed math readable and never parses code or trusted HTML commands as math markup", () => {
+    const incomplete = String.raw`Before \[ \frac{QK^\top}{\sqrt{d_k}}`;
+    expect(normalizeMathDelimiters(incomplete)).toBe(incomplete);
+    const streamingHtml = renderToStaticMarkup(<MarkdownContent text={incomplete} streaming/>);
+    expect(streamingHtml).toContain("frac");
+    expect(streamingHtml).not.toContain("katex-display");
+
+    const fenced = renderToStaticMarkup(<MarkdownContent text={"```text\n$x^2$ and \\[y\\]\n```"}/>);
+    expect(fenced).toContain("markdown-code");
+    expect(fenced).not.toContain("class=\"katex\"");
+
+    const unsafe = renderToStaticMarkup(<MarkdownContent text={String.raw`$\htmlClass{evil}{x}$ <script>unsafe()</script>`}/>);
+    expect(unsafe).not.toContain("class=\"evil\"");
+    expect(unsafe).not.toContain("<script");
+
+    const malformed = renderToStaticMarkup(<MarkdownContent text={String.raw`Malformed $\frac{$ remains readable.`}/>);
+    expect(malformed).toContain("Malformed");
+    expect(malformed).toContain("frac");
+  });
+
   it("parses the exact quote and table shapes found in a real Codex Thread", () => {
     const html = renderToStaticMarkup(<MarkdownContent text={LIVE_REDACTED_EXCERPT}/>);
     expect(html.match(/<blockquote>/g)).toHaveLength(2);
@@ -89,14 +176,58 @@ const safe = true;
 
 ![remote diagram](https://example.com/diagram.png)
 
-![inline image](data:image/png;base64,iVBORw0KGgo=)`}/>);
+![inline image](data:image/png;base64,iVBORw0KGgo=)
+
+![local blob](blob:https://peel.local/fixture)`}/>);
     expect(html.match(/<blockquote>/g)).toHaveLength(1);
     expect(html).toContain("<ul>");
     expect(html).toContain("<ol>");
     expect(html).toContain("href=\"https://example.com/path\"");
     expect(html).toContain("class=\"markdown-image-link\"");
     expect(html).toContain("src=\"data:image/png;base64,iVBORw0KGgo=\"");
+    expect(html).toContain("src=\"blob:https://peel.local/fixture\"");
     expect(html).not.toContain("src=\"https://example.com/diagram.png\"");
+  });
+
+  it("renders a safe static HTML subset and strips hostile markup", () => {
+    const staticHtml = renderToStaticMarkup(<MarkdownContent text={"<h2>Result</h2><p><strong>Static HTML</strong></p>"}/>);
+    expect(staticHtml).toContain("<h2>");
+    expect(staticHtml).toContain("Result");
+    expect(staticHtml).toContain("<strong>Static HTML</strong>");
+
+    const scriptHtml = renderToStaticMarkup(<MarkdownContent text={"<script>window.__peelUnsafe = true</script>"}/>);
+    expect(scriptHtml).not.toContain("<script");
+    expect(scriptHtml).not.toContain("window.__peelUnsafe");
+
+    const iframeHtml = renderToStaticMarkup(<MarkdownContent text={"<iframe src=\"https://evil.example\"></iframe>"}/>);
+    expect(iframeHtml).not.toContain("<iframe");
+    expect(iframeHtml).not.toContain("evil.example");
+
+    const anchorHtml = renderToStaticMarkup(<MarkdownContent text={"<a href=\"javascript:alert(1)\" onclick=\"alert(1)\" style=\"color:red\">x</a>"}/>);
+    expect(anchorHtml).not.toContain("javascript:");
+    expect(anchorHtml).not.toContain("onclick");
+    expect(anchorHtml).not.toContain("style=");
+    expect(anchorHtml).toContain(">x</a>");
+
+    const brokenScheme = renderToStaticMarkup(<MarkdownContent text={"<a href=\"java\nscript:alert(1)\">x</a><div>kept</div><input type=\"text\" value=\"secret\"><input type=\"checkbox\" checked>"}/>);
+    expect(brokenScheme).not.toContain("script:");
+    expect(brokenScheme).toContain("kept");
+    expect(brokenScheme).not.toContain("secret");
+    expect(brokenScheme).not.toContain("type=\"text\"");
+    expect(brokenScheme).toContain("type=\"checkbox\"");
+    expect(brokenScheme).toContain("disabled");
+
+    const remoteImg = renderToStaticMarkup(<MarkdownContent text={"<img src=\"https://example.com/x.png\" alt=\"remote\">"}/>);
+    expect(remoteImg).not.toContain("src=\"https://example.com/x.png\"");
+    expect(remoteImg).toContain("markdown-image-link");
+
+    const dataImg = renderToStaticMarkup(<MarkdownContent text={"<img src=\"data:image/png;base64,iVBORw0KGgo=\" alt=\"ok\">"}/>);
+    expect(dataImg).toContain("src=\"data:image/png;base64,iVBORw0KGgo=\"");
+    expect(dataImg).toContain("<img");
+
+    const mathHtml = renderToStaticMarkup(<MarkdownContent text={String.raw`Inline \(x^2\).`}/>);
+    expect(mathHtml).toContain("class=\"katex\"");
+    expect(mathHtml).toContain("<math");
   });
 
   it.each([
@@ -139,6 +270,62 @@ const safe = true;
     expect(commandHtml).not.toContain("<strong>raw</strong>");
   });
 
+  it("renders live plan and reasoning streams as safe Markdown with visible activity state", () => {
+    const plan = { id: "plan-1", type: "plan", status: "inProgress" } as unknown as ThreadItem;
+    const planHtml = renderToStaticMarkup(<ItemView
+      item={plan}
+      streamedText={"- **Inspect**\n<script>unsafe()</script>"}
+      streaming
+      onOpenCodex={() => undefined}
+    />);
+    expect(planHtml).toContain("Planning");
+    expect(planHtml).toContain("Working");
+    expect(planHtml).toContain("<ul>");
+    expect(planHtml).toContain("<strong>Inspect</strong>");
+    expect(planHtml).toContain("Streaming response");
+    expect(planHtml).not.toContain("<script>");
+
+    const reasoning = { id: "reasoning-1", type: "reasoning", status: "inProgress" } as unknown as ThreadItem;
+    const summaryHtml = renderToStaticMarkup(<ItemView
+      item={reasoning}
+      streamedText={"First summary\n\nSecond **summary**"}
+      streamedReasoningContent="raw private fallback"
+      streaming
+      onOpenCodex={() => undefined}
+    />);
+    expect(summaryHtml).toContain("Thinking");
+    expect(summaryHtml).toContain("First summary");
+    expect(summaryHtml).toContain("<strong>summary</strong>");
+    expect(summaryHtml).not.toContain("raw private fallback");
+
+    const rawHtml = renderToStaticMarkup(<ItemView
+      item={reasoning}
+      streamedText=""
+      streamedReasoningContent="Raw **fallback**"
+      streaming
+      onOpenCodex={() => undefined}
+    />);
+    expect(rawHtml).toContain("Raw <strong>fallback</strong>");
+  });
+
+  it("preserves live command output exactly as technical text", () => {
+    const command = {
+      id: "command-1",
+      type: "commandExecution",
+      command: "printf raw",
+      status: "inProgress",
+    } as unknown as ThreadItem;
+    const html = renderToStaticMarkup(<ItemView
+      item={command}
+      streamedText={"  **raw**\nnext  \n"}
+      streaming
+      onOpenCodex={() => undefined}
+    />);
+    expect(html).toContain("Running a command");
+    expect(html).toContain("  **raw**\nnext  \n");
+    expect(html).not.toContain("<strong>raw</strong>");
+  });
+
   it("adds safe visual hierarchy to source and diff code without changing its text", () => {
     const source = "const ready = true; // shipped\n";
     const sourceTokens = highlightCode(source, "ts");
@@ -149,5 +336,35 @@ const safe = true;
     const patchTokens = highlightCode(patch, "diff");
     expect(patchTokens.map((token) => token.value).join("")).toBe(patch);
     expect(patchTokens.map((token) => token.kind)).toEqual(["meta", "deletion", "addition"]);
+  });
+
+  it("embeds a visualize fence as a local frame and leaves other code blocks alone", () => {
+    const path = "/Users/waynewang/Peel/apps/desktop/.visualizations/attention-explainer.html";
+    const html = renderToStaticMarkup(<MarkdownContent text={`Before\n\n\`\`\`visualize\n${JSON.stringify({ path })}\n\`\`\`\n\nAfter`}/>);
+    expect(html).toContain("class=\"chat-visualization\"");
+    expect(html).toContain("sandbox=\"allow-scripts\"");
+    expect(html).toContain(encodeURIComponent(path));
+    expect(html).toContain("Before");
+    expect(html).toContain("After");
+    expect(html).not.toContain("Copy code");
+
+    const code = renderToStaticMarkup(<MarkdownContent text={"```js\nconst n = 1;\n```"}/>);
+    expect(code).toContain("Copy code");
+    expect(code).not.toContain("chat-visualization");
+
+    const sameLine = renderToStaticMarkup(<MarkdownContent text={`\`\`\`visualize${JSON.stringify({ path })}\n\`\`\``}/>);
+    expect(sameLine).toContain("class=\"chat-visualization\"");
+    expect(sameLine).toContain(encodeURIComponent(path));
+
+    const inline = renderToStaticMarkup(<MarkdownContent text={`看这里 \`visualize${JSON.stringify({ path })}\` 就好。`}/>);
+    expect(inline).toContain("class=\"chat-visualization\"");
+    expect(inline).toContain("看这里");
+
+    const sentinel = renderToStaticMarkup(<MarkdownContent text={`点矩阵左侧的词。\n\n\uE200visualize\uE202${JSON.stringify({ path })}\uE201\n\n读图时。`}/>);
+    expect(sentinel).toContain("class=\"chat-visualization\"");
+    expect(sentinel).toContain(encodeURIComponent(path));
+    expect(sentinel).toContain("点矩阵左侧的词。");
+    expect(sentinel).toContain("读图时。");
+    expect(sentinel).not.toContain("visualize{");
   });
 });

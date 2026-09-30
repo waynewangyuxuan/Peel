@@ -1,0 +1,25 @@
+{
+  "acceptance_ids": [
+    "complete-request-dispatch",
+    "resolved-request-cleanup",
+    "request-contract-evidence"
+  ],
+  "evidence_id": "evidence-appserver-request-contract-and-lifecycle",
+  "kind": "ticket_evidence",
+  "origin": "agent",
+  "recorded_at": "2026-09-17T21:39:28Z",
+  "refs": [
+    "packages/codex-app-server/src/protocol.ts",
+    "packages/codex-app-server/src/client.ts",
+    "packages/codex-app-server/scripts/check-installed-schema.mjs",
+    "packages/codex-app-server/test/client.test.ts",
+    "apps/desktop/src/main/peel-service.ts",
+    "apps/desktop/src/shared/contracts.ts",
+    "apps/desktop/test/peel-service-server-requests.test.ts",
+    "command:npm run check:schema --workspace @peel/codex-app-server",
+    "command:npm test"
+  ],
+  "schema_version": 1,
+  "summary": "The installed Codex 0.154.0 generated ServerRequest union is now checked as an exact 10-method set, and the browser-safe protocol adapter exhaustively classifies every stable method. Command/file approvals, requestUserInput, permissions, and MCP elicitation enter a typed pending-request lifecycle; command decisions include proposed exec-policy and network-policy amendment response variants, user-input answers use the generated nested answer shape, permission grants echo only the server-requested profile and scope, and MCP actions use action/content/_meta with typed form validation. Dynamic tool calls, auth refresh, attestation, both legacy approvals, and unknown future requests receive an immediate -32601 unsupported_host_capability error without reflecting private params. The main process owns deduplication and bootstrapped pending state, removes requests on local response, external serverRequest/resolved, and disconnect, and treats late resolution idempotently. Unit coverage drives all 10 stable methods, every owned response shape, mismatched-response rejection, duplicate replacement, external/late cleanup, reconnect cleanup, and secret/path non-disclosure. Installed-schema verification reports exactly 10 stable server requests, and the full repository test suite passes 25 App Server, 12 Git workspace, and 76 desktop tests.",
+  "ticket_id": "ticket-route-appserver-requests-and-errors"
+}

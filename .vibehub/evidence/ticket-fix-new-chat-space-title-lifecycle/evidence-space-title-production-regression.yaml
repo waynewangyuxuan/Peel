@@ -1,0 +1,28 @@
+{
+  "acceptance_ids": [
+    "new-chat-default-title-transition",
+    "manual-space-name-precedence",
+    "title-origin-persistence",
+    "legacy-new-chat-repair",
+    "naming-regression-evidence"
+  ],
+  "evidence_id": "evidence-space-title-production-regression",
+  "kind": "ticket_evidence",
+  "origin": "agent",
+  "recorded_at": "2026-09-17T21:15:22Z",
+  "refs": [
+    "apps/desktop/e2e/space-title.spec.ts",
+    "apps/desktop/e2e/fixtures/codex",
+    "apps/desktop/e2e/v01-journey.spec.ts",
+    ".vibehub/evidence/ticket-fix-new-chat-space-title-lifecycle/screenshots/default-space-follows-root.png",
+    ".vibehub/evidence/ticket-fix-new-chat-space-title-lifecycle/screenshots/manual-space-survives-automatic-title.png",
+    ".vibehub/evidence/ticket-fix-new-chat-space-title-lifecycle/screenshots/legacy-space-title-repair.png",
+    "command:npm test",
+    "command:npm run build",
+    "command:npx playwright test e2e/open-codex.spec.ts e2e/math-layout.spec.ts e2e/space-title.spec.ts",
+    "command:git diff --check"
+  ],
+  "schema_version": 1,
+  "summary": "The production Electron Space-title journey creates real empty Chats, proves immediate first-prompt and delayed automatic sidebar transitions, protects manual Space names made both before and after completion, verifies manual Root and Fork names still dispatch thread/name/set without changing a protected Space, and restarts the same profile to prove provenance persistence. It then loads field-less legacy state, visibly repairs only New Chat, preserves a custom legacy label, persists both inferred origins, and verifies them through another full restart. Three durable screenshots show the default-following, manual-protection, and legacy-repair states. All repository tests pass (24 App Server, 12 Git workspace, 68 desktop), the full production build passes, git diff checking passes, and the focused Open-in-Codex, math, and Space-title Electron suite passes 3/3.",
+  "ticket_id": "ticket-fix-new-chat-space-title-lifecycle"
+}

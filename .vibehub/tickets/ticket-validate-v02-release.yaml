@@ -45,6 +45,7 @@
   "kind": "ticket",
   "maturity": "draft",
   "outcome": "Peel v0.2 has a refined independent release gate that proves repeated work in large Spaces and only the native-Codex continuity behavior supported by post-v0.1 evidence, with Project APIs remaining optional.",
+  "deliveries": [],
   "provenance_refs": [
     "conversation:2026-08-25-plan-peel-v01-v02"
   ],
@@ -60,6 +61,6 @@
       "type": "depends_on"
     }
   ],
-  "schema_version": 1,
+  "schema_version": 2,
   "ticket_id": "ticket-validate-v02-release"
 }

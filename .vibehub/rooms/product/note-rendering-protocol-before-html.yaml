@@ -1,0 +1,45 @@
+{
+  "context_id": "note-rendering-protocol-before-html",
+  "detail": "The Codex 0.154 App Server contract carries structured ThreadItem variants plus text fields and item-specific deltas. Peel currently loses or generically renders several of those typed shapes and misroutes newer server requests, while the official contract and installed generated schema define no standalone HTML item. Rendering work should first preserve typed lifecycle, completion authority, structured inputs, semantic media metadata, and safe Markdown/math. Raw HTML stays disabled unless real payload evidence later justifies a separate sanitization and isolation decision.",
+  "evidence": [
+    {
+      "note": "Maps the installed content union, reducer and renderer routes, safe-format boundary, prioritized gaps, and follow-up Ticket boundaries.",
+      "ref": "docs/review/rendering-audit/README.md"
+    },
+    {
+      "note": "Defines ThreadItem variants, authoritative item completion, item-specific deltas, review output, and server request contracts without a standalone HTML item.",
+      "ref": "https://developers.openai.com/codex/app-server"
+    },
+    {
+      "note": "Current renderer deliberately skips raw HTML and applies safe URL and conservative remote-image policies.",
+      "ref": "apps/desktop/src/renderer/Markdown.tsx"
+    }
+  ],
+  "kind": "context",
+  "relations": [
+    {
+      "target_context_id": "contract-focus-chat-fidelity",
+      "type": "depends_on"
+    },
+    {
+      "target_context_id": "constraint-focus-math-typesetting",
+      "type": "relates_to"
+    }
+  ],
+  "schema_version": 1,
+  "source": {
+    "captured_at": "2026-09-17T06:58:06Z",
+    "quote": "我们可以做一下audit，看一下渲染整体上缺啥先。",
+    "ref": "conversation:2026-09-16-rendering-surface-audit-request"
+  },
+  "state": "active",
+  "summary": "Codex rendering expansion should prioritize the typed item and request lifecycle; raw HTML is not a current App Server item capability",
+  "tags": [
+    "app-server",
+    "html",
+    "protocol",
+    "rendering",
+    "security"
+  ],
+  "type": "note"
+}

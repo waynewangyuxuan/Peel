@@ -1,0 +1,42 @@
+{
+  "context_id": "intent-space-title-follows-root-until-manual",
+  "detail": "直接创建的 Chat 初始可以短暂显示 New Chat，但第一轮完成并生成可识别的 Root Thread 标题后，左侧 Space 不能永久停留为 New Chat。默认 Space 名应跟随 Root 标题生命周期；一旦用户显式重命名 Space，后续 Thread 自动或手动命名都不得覆盖这个独立的 Space 名称。",
+  "evidence": [
+    {
+      "note": "截图中多个已产生 direction 的 Space 仍全部显示 New Chat。",
+      "ref": "conversation:2026-09-16-live-dogfood-chat-performance-and-focus-affordances#image-1-sidebar"
+    },
+    {
+      "note": "自动标题完成路径只更新 Space node.title/titleOrigin，没有更新 root Space.name。",
+      "ref": "apps/desktop/src/main/peel-service.ts"
+    },
+    {
+      "note": "createSpace 初始把 root title 与 Space name 同时设为 New Chat，但没有 Space 名称来源字段来保护后续手动命名。",
+      "ref": "apps/desktop/src/shared/state.ts"
+    }
+  ],
+  "kind": "context",
+  "relations": [
+    {
+      "target_context_id": "contract-thread-title-lifecycle",
+      "type": "relates_to"
+    }
+  ],
+  "schema_version": 1,
+  "source": {
+    "captured_at": "2026-09-17T05:44:26Z",
+    "quote": "所有chat 在左边都叫new chat，起码我创建的是这样的。",
+    "ref": "conversation:2026-09-16-live-dogfood-chat-performance-and-focus-affordances"
+  },
+  "state": "active",
+  "summary": "新建 Chat 的 Space 名称应跟随 Root 自动标题，除非用户手动命名 Space",
+  "tags": [
+    "dogfood",
+    "space",
+    "thread-title",
+    "naming",
+    "sidebar",
+    "new-chat"
+  ],
+  "type": "intent"
+}

@@ -1,0 +1,49 @@
+{
+  "acceptance": [
+    {
+      "acceptance_id": "single-persistent-branch-action",
+      "criterion": "A completed Turn renders exactly one keyboard-accessible button labeled Branch from here at the Turn footer. The circular PeelHandle and its drag preview are absent from the DOM and stylesheet, and the footer action is visible without hover or focus at supported desktop widths."
+    },
+    {
+      "acceptance_id": "branch-behavior-preserved",
+      "criterion": "Pointer and keyboard activation open the same cancellable local Fork Draft anchored to the exact completed Turn, preserve the no-durable-state-before-First-Send contract, and behave correctly for long responses, multiple Turns, and narrow supported windows."
+    },
+    {
+      "acceptance_id": "branch-regression-evidence",
+      "criterion": "Unit and production Electron evidence proves persistent visibility, absence of the duplicate circular handle, exact-Turn Fork Draft creation, cancellation and First Send behavior, keyboard activation, and retention of existing Focus scroll, Draft, Approval, and Overview journeys."
+    }
+  ],
+  "constraints": [
+    "Keep Branch from here visually clear but subordinate to conversation content; do not introduce another gesture-only or duplicate control.",
+    "Preserve the exact completed-Turn anchor and existing Fork lifecycle semantics.",
+    "Do not change graph topology or create a Codex Thread before First Send."
+  ],
+  "context": "Live dogfood found a hidden footer action plus a circular drag handle positioned in the middle of long Turns. The user explicitly chose one persistent Branch from here button and removal of the circle. The rendering audit split this independent interaction correction from math typesetting.",
+  "context_refs": [
+    {
+      "purpose": "Records the user's final decision to remove the circle and keep one visible Turn-footer action.",
+      "ref": ".vibehub/rooms/product/decision-turn-branch-action-placement.yaml"
+    },
+    {
+      "purpose": "Preserves Focus interaction and exact-Turn behavior.",
+      "ref": ".vibehub/rooms/product/contract-focus-chat-fidelity.yaml"
+    },
+    {
+      "purpose": "Provides the independently accepted split recommendation.",
+      "ref": ".vibehub/outcomes/ticket-audit-codex-rendering-surface.yaml"
+    }
+  ],
+  "deliveries": [],
+  "kind": "ticket",
+  "maturity": "firm",
+  "outcome": "Each completed Turn exposes one clear, persistent Branch from here action at its footer, with the duplicate circular drag handle removed and Fork behavior preserved.",
+  "provenance_refs": [
+    "conversation:2026-09-16-live-dogfood-chat-performance-and-focus-affordances#branch-affordance",
+    "conversation:2026-09-17-start-rendering-implementation",
+    "apps/desktop/src/renderer/Transcript.tsx",
+    "apps/desktop/src/renderer/styles.css"
+  ],
+  "relations": [],
+  "schema_version": 2,
+  "ticket_id": "ticket-fix-turn-branch-affordance"
+}

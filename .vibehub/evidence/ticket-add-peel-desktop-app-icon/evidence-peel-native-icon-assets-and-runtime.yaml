@@ -1,0 +1,27 @@
+{
+  "acceptance_ids": [
+    "canonical-native-icon-assets",
+    "development-launch-identity"
+  ],
+  "evidence_id": "evidence-peel-native-icon-assets-and-runtime",
+  "kind": "ticket_evidence",
+  "origin": "agent",
+  "recorded_at": "2026-09-18T04:00:56Z",
+  "refs": [
+    "apps/desktop/build/Peel.svg",
+    "apps/desktop/build/Peel.png",
+    "apps/desktop/build/Peel.icns",
+    "apps/desktop/scripts/build-app-icon.mjs",
+    "apps/desktop/src/main/app-identity.ts",
+    "apps/desktop/src/main/main.ts",
+    "apps/desktop/test/app-identity.test.ts",
+    "apps/desktop/e2e/native-app-identity.spec.ts",
+    "docs/review/peel-desktop-app-icon/README.md",
+    "command:npm run test:e2e --workspace @peel/desktop -- native-app-identity.spec.ts passed 1/1",
+    "command:npm run typecheck --workspace @peel/desktop passed",
+    "command:npm run test --workspace @peel/desktop passed 90/90"
+  ],
+  "schema_version": 1,
+  "summary": "The checked-in 1024px SVG uses the exact accepted Phase path twice with the same lower and translated upper clips as Brand.tsx, on a local warm-neutral macOS tile. The generator produced a 1024x1024 RGBA PNG and a 136,759-byte ICNS containing the standard 16px through 1024px iconset; two consecutive generations were byte-for-byte stable at PNG sha256 d0f2224bbf8e8dadb6044b08bdc910af3d3daa1d1992c616e5707055a3394c06 and ICNS sha256 6254f939a719cfc9e64ce33eb7e6e588f8ecb21f2710d2737d16b318584815a7. Main sets the name to Peel and installs the resolved local PNG on the macOS Dock before creating the first BrowserWindow. The focused production Electron check launched the unpackaged app, observed app.getName() === Peel, and verified the matching renderer mark/name are visible. Desktop typecheck and all 90 unit tests passed.",
+  "ticket_id": "ticket-add-peel-desktop-app-icon"
+}

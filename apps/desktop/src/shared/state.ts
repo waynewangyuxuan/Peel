@@ -1,4 +1,4 @@
-import type { PeelState, Point, SpaceNode, SpaceRecord, ThreadViewState } from "./contracts";
+import type { PeelState, Point, SpaceNode, SpaceRecord, ThreadViewState, TitleOrigin } from "./contracts";
 
 const CARD_WIDTH = 294;
 const CARD_HEIGHT = 205;
@@ -20,6 +20,14 @@ export function temporaryTitle(prompt: string, fallback = "New direction"): stri
   const normalized = prompt.replace(/\s+/g, " ").trim();
   if (!normalized) return fallback;
   return normalized.length > 34 ? `${normalized.slice(0, 33).trimEnd()}…` : normalized;
+}
+
+export function shouldApplyIncomingThreadName(origin: TitleOrigin, currentTitle: string, incomingName: string): boolean {
+  if (origin !== "temporary") return false;
+  if (currentTitle === "New Chat") return true;
+  const incoming = incomingName.replace(/…$/, "").trim();
+  if (!incoming) return false;
+  return currentTitle === incomingName || currentTitle.startsWith(incoming);
 }
 
 export function automaticTitle(prompt: string): string {
@@ -57,6 +65,7 @@ export function createSpace(thread: {
   return {
     id: crypto.randomUUID(),
     name: title,
+    nameOrigin: "default",
     rootThreadId: thread.id,
     archived: false,
     createdAt: now,
@@ -94,14 +103,24 @@ export function normalizeState(candidate: unknown): PeelState {
   if (!candidate || typeof candidate !== "object") return emptyState();
   const state = candidate as Partial<PeelState>;
   if (state.version !== 1 || !state.spaces || !state.threadViews) return emptyState();
-  const spaces = Object.fromEntries(Object.entries(state.spaces).filter(([, space]) => validSpace(space)));
+  const spaces = Object.fromEntries(Object.entries(state.spaces).flatMap(([spaceId, space]) => {
+    const normalized = normalizeSpace(space);
+    return normalized ? [[spaceId, normalized]] : [];
+  }));
   const activeSpaceId = typeof state.activeSpaceId === "string" && spaces[state.activeSpaceId] ? state.activeSpaceId : null;
   const activeThreadId = activeSpaceId && typeof state.activeThreadId === "string" && spaces[activeSpaceId]!.nodes[state.activeThreadId]
     ? state.activeThreadId
     : activeSpaceId ? spaces[activeSpaceId]!.rootThreadId : null;
-  const threadViews = Object.fromEntries(Object.entries(state.threadViews).filter((entry): entry is [string, ThreadViewState] => {
-    const value = entry[1];
-    return Boolean(value && typeof value.draft === "string" && Number.isFinite(value.scrollTop) && value.scrollTop >= 0);
+  const threadViews = Object.fromEntries(Object.entries(state.threadViews).flatMap(([threadId, candidate]) => {
+    const value = candidate as ThreadViewState | undefined;
+    if (!value || typeof value.draft !== "string" || !Number.isFinite(value.scrollTop) || value.scrollTop < 0) return [];
+    const anchor = value.scrollAnchor;
+    const scrollAnchor = anchor
+      && typeof anchor.turnId === "string"
+      && Number.isFinite(anchor.offset)
+      ? { turnId: anchor.turnId, offset: anchor.offset }
+      : null;
+    return [[threadId, { draft: value.draft, scrollTop: value.scrollTop, ...(scrollAnchor ? { scrollAnchor } : {}) } satisfies ThreadViewState]];
   }));
   return {
     version: 1,
@@ -113,27 +132,39 @@ export function normalizeState(candidate: unknown): PeelState {
   };
 }
 
-function validSpace(value: unknown): value is SpaceRecord {
-  if (!value || typeof value !== "object") return false;
+function normalizeSpace(value: unknown): SpaceRecord | null {
+  if (!value || typeof value !== "object") return null;
   const space = value as Partial<SpaceRecord>;
-  if (typeof space.id !== "string" || typeof space.name !== "string" || typeof space.rootThreadId !== "string" || !space.nodes || !space.camera) return false;
+  if (typeof space.id !== "string" || typeof space.name !== "string" || typeof space.rootThreadId !== "string" || !space.nodes || !space.camera) return null;
   const nodes = space.nodes as Record<string, SpaceNode>;
   const root = nodes[space.rootThreadId];
-  if (!root || root.threadId !== space.rootThreadId || root.parentThreadId !== null || root.forkedAtTurnId !== null) return false;
-  if (![space.camera.x, space.camera.y, space.camera.scale].every(Number.isFinite) || space.camera.scale < .08 || space.camera.scale > 2) return false;
+  if (!root || root.threadId !== space.rootThreadId || root.parentThreadId !== null || root.forkedAtTurnId !== null) return null;
+  if (![space.camera.x, space.camera.y, space.camera.scale].every(Number.isFinite) || space.camera.scale < .08 || space.camera.scale > 2) return null;
   for (const [threadId, node] of Object.entries(nodes)) {
-    if (!node || node.threadId !== threadId || typeof node.title !== "string" || typeof node.cwd !== "string") return false;
-    if (![node.position?.x, node.position?.y].every(Number.isFinite)) return false;
-    if (threadId !== space.rootThreadId && (typeof node.parentThreadId !== "string" || typeof node.forkedAtTurnId !== "string" || !nodes[node.parentThreadId])) return false;
+    if (!node || node.threadId !== threadId || typeof node.title !== "string" || typeof node.cwd !== "string") return null;
+    if (![node.position?.x, node.position?.y].every(Number.isFinite)) return null;
+    if (threadId !== space.rootThreadId && (typeof node.parentThreadId !== "string" || typeof node.forkedAtTurnId !== "string" || !nodes[node.parentThreadId])) return null;
     const seen = new Set<string>();
     let cursor: SpaceNode | undefined = node;
     while (cursor.parentThreadId !== null) {
-      if (seen.has(cursor.threadId)) return false;
+      if (seen.has(cursor.threadId)) return null;
       seen.add(cursor.threadId);
       cursor = nodes[cursor.parentThreadId];
-      if (!cursor) return false;
+      if (!cursor) return null;
     }
-    if (cursor.threadId !== space.rootThreadId) return false;
+    if (cursor.threadId !== space.rootThreadId) return null;
   }
-  return Object.values(nodes).filter((node) => node.parentThreadId === null).length === 1;
+  if (Object.values(nodes).filter((node) => node.parentThreadId === null).length !== 1) return null;
+  const nameOrigin = space.nameOrigin === "default" || space.nameOrigin === "manual"
+    ? space.nameOrigin
+    : space.name === "New Chat" ? "default" : "manual";
+  const name = nameOrigin === "default" && space.name === "New Chat" && usefulTitle(root.title)
+    ? root.title.trim()
+    : space.name;
+  return { ...space, name, nameOrigin, nodes } as SpaceRecord;
+}
+
+function usefulTitle(value: string): boolean {
+  const normalized = value.trim();
+  return Boolean(normalized && !["New Chat", "New direction", "New branch", "Untitled thread"].includes(normalized));
 }

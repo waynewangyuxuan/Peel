@@ -1,0 +1,24 @@
+{
+  "accepted_acceptance_ids": [
+    "bounded-production-focus-entry",
+    "anchor-aware-initial-range",
+    "stable-incremental-history-prepend",
+    "backfill-live-tail-responsiveness",
+    "history-restoration-and-restart-fidelity",
+    "selection-and-image-anchor-stability",
+    "bounded-backfill-architecture-boundary"
+  ],
+  "closed_at": "2026-09-18T02:33:10Z",
+  "evidence_ids": [
+    "evidence-bounded-backfill-architecture",
+    "evidence-bounded-focus-performance",
+    "evidence-bounded-history-fidelity",
+    "evidence-bounded-live-interactions"
+  ],
+  "kind": "ticket_outcome",
+  "schema_version": 1,
+  "status": "successful",
+  "summary": "Independent closeout accepted all seven criteria after reading the exact Ticket, all four acceptance-linked Evidence records, the full implementation and production-test diff, source-of-truth and Focus-fidelity contracts, the benchmark report, and the relevant renderer, state, unit, and Electron coverage. Fresh verification passed Desktop typecheck and 87/87 unit tests, the complete production build, git diff checking, VibeHub validation, the expanded bounded-history production Electron journey, the full production Focus A/B benchmark, and four focused production regressions for math/CJK layout, exact Open in Codex routing, renderer safety, and server-request ownership. The fresh A/B ran two warmups plus seven measured samples per mode on App to Focus to Transcript to MarkdownContent: 500-Turn median first-content/through-paint fell from 330.9/394.9 ms full-mount to 44.7/49.4 ms bounded (13.5%/12.5% of baseline), mounted 32/500 Turns with 1,896 descendants instead of 500/500 with 29,506, and recorded zero optimized pre-content long tasks. The 10- and 100-Turn medians improved and remained inside their regression bounds. All seven optimized 100-Turn plus 36-delta samples kept the live Turn visible, preserved detached user scroll, resumed follow-bottom after returning, processed exactly 36 deltas, rendered zero settled historical Turns or Markdown, and recorded zero streaming long-task time. The bounded journey independently exercised initial live-tail, saved Turn-211 restoration across switching and full Electron restart, exact highlighted Parent Turn 123, one-Turn scheduled prepend to all 501 authoritative Turns, at-most-one-pixel settled anchor movement, no browser long task, active and distant cross-Turn selection, data/blob sizing and image settlement, click-only remote media, Composer/code-copy/Branch/Open-in-Codex/request-approval/notice/attachment/scroll interaction during restoration, and Branch from an early completed Turn after full backfill. Code inspection confirms ReducedThread remains authoritative and only a contiguous mounted range plus Turn/offset anchor are derived; the native Markdown runtime, raw-HTML exclusion, untrusted KaTeX, safe URL/media policy, oversized inert fallback, and exact-copy boundaries remain intact, with no shadow conversation store, Streamdown production adoption, virtualization, content-visibility, or permanent history omission.",
+  "ticket_id": "ticket-add-bounded-focus-history-backfill",
+  "unresolved_acceptance_ids": []
+}

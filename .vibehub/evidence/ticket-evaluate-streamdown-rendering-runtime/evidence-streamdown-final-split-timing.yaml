@@ -1,0 +1,22 @@
+{
+  "acceptance_ids": [
+    "comparable-performance-measurement",
+    "measured-long-transcript-techniques",
+    "renderer-adoption-decision"
+  ],
+  "evidence_id": "evidence-streamdown-final-split-timing",
+  "kind": "ticket_evidence",
+  "origin": "agent",
+  "recorded_at": "2026-09-17T23:22:57Z",
+  "refs": [
+    "apps/desktop/src/renderer/RenderingBenchmark.tsx",
+    "apps/desktop/e2e/rendering-performance.spec.ts",
+    "docs/review/rendering-performance/README.md",
+    "command:npm run typecheck --workspace @peel/desktop passed",
+    "command:npm run build:renderer --workspace @peel/desktop produced ordinary entry 704.05 kB/212.97 kB gzip and candidate 359.33 kB/112.14 kB gzip",
+    "command:npm run benchmark:rendering --workspace @peel/desktop passed 1/1 after split timing instrumentation"
+  ],
+  "schema_version": 1,
+  "summary": "Final production-Electron verification separates corpus construction, Markdown/render work through a React layout-effect commit marker, and the remaining post-commit two-animation-frame paint interval. Current versus Streamdown at 500 Turns measured 132.3/161.6ms through Markdown and commit and 174.9/201.2ms through paint; the 10-to-500 switch was 158.5/194.0ms. Streamdown therefore remained slower on transcript-scale work while its 36-update stream retained the steadier p99 frame interval, 16.8ms versus 25.4ms, with effectively tied total stream time, 599.5ms versus 609.0ms. Correctness, tail-only invalidation, heap/DOM, long-task, reducer, zero-thread-read, and fallback assertions all passed. The stronger split timing preserves the defer decision.",
+  "ticket_id": "ticket-evaluate-streamdown-rendering-runtime"
+}

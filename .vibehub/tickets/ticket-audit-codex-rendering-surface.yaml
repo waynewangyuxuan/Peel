@@ -1,0 +1,81 @@
+{
+  "acceptance": [
+    {
+      "acceptance_id": "authoritative-content-inventory",
+      "criterion": "A checked-in audit inventories the current official App Server ThreadItem, item-specific delta including reasoning summary boundaries, complete stable ServerRequest, and relevant notification contracts; compares them with the installed Codex 0.154 stable and experimental generated schema; and records content-free representative key/type shapes from locally stored completed items with all scalar values and dynamic keys removed. It explicitly distinguishes wire authority from persisted observation and protocol types from Markdown, HTML, math, media, and link syntax inside text."
+    },
+    {
+      "acceptance_id": "renderer-route-matrix",
+      "criterion": "The audit maps every installed ThreadItem variant, all stable ServerRequest methods, the full stable ServerNotification union by current routing class, and all supported or observed content shapes to Peel's exact transport, reducer, renderer, fallback, streaming, completion, pending-request cleanup, and automated-coverage behavior. It includes user inputs, phases, plans, reasoning boundaries, commands, file changes, function/MCP/dynamic/collaboration tools, web search, images, review, compaction, approvals, user prompts, permissions, elicitation, auth/attestation/legacy requests, errors, warnings, attachments, and unknown future items without claiming invisible host requests become UI cards."
+    },
+    {
+      "acceptance_id": "prose-format-and-media-matrix",
+      "criterion": "The audit evaluates completed and streaming prose fidelity for CommonMark/GFM, raw HTML, inline/display math, code highlighting/copy, tables, blockquotes, nested/task lists, links and citations, local/data/blob/remote images, audio/file references, very long and bidi/CJK text, and malformed or partial syntax, stating current behavior and the desired safe boundary for each."
+    },
+    {
+      "acceptance_id": "security-accessibility-performance-review",
+      "criterion": "The audit covers renderer sandbox assumptions, sanitization and URL policy, script/event/style injection, remote-content privacy, local-file disclosure, clipboard behavior, keyboard and screen-reader semantics, selection/copy fidelity, overflow/layout containment, streaming stability, and performance risks from large documents or expensive extensions."
+    },
+    {
+      "acceptance_id": "evidence-backed-gap-prioritization",
+      "criterion": "Every identified gap is backed by official documentation, generated schema, source inspection, a deterministic fixture, or a clearly labeled and sanitized real-payload observation; gaps are ranked by user impact, contract risk, security risk, and implementation coupling, with unsupported speculation explicitly excluded."
+    },
+    {
+      "acceptance_id": "smallest-follow-up-ticket-plan",
+      "criterion": "The audit recommends the smallest independently schedulable follow-up Ticket graph, identifies which existing rendering Ticket should be retained, revised, split, or superseded, and records open product decisions separately from implementation choices; no renderer behavior is changed by this audit Ticket."
+    }
+  ],
+  "constraints": [
+    "Treat the official App Server documentation and the exact installed generated schema as protocol authority; do not infer a native HTML item from model prose or another OpenAI API.",
+    "Do not enable raw HTML, add renderer dependencies, or change production rendering while executing the audit.",
+    "Do not copy sensitive conversation content into the repository; fixtures and local observations must remove scalar values and dynamic object keys.",
+    "Preserve unknown-item fallback and Open Codex escape behavior until a follow-up Ticket proves a better supported renderer.",
+    "Recommendations must keep Codex-owned content authoritative and Peel rendering deterministic."
+  ],
+  "context": "Live dogfood found raw LaTeX and awkward Fork affordances, raising the broader question of whether Peel faithfully presents everything current Codex can emit. Official App Server documentation says agentMessage remains accumulated text and lists a wider ThreadItem union; it does not define a standalone HTML item or promise executable embedded HTML. The first independent audit closeout was partial because local evidence lacked sanitized representative shapes and the route inventory omitted reasoning summary boundaries plus stable request and notification paths. This replanned contract makes those exact completeness boundaries explicit while retaining the original audit-only scope.",
+  "context_refs": [
+    {
+      "purpose": "Defines the full-fidelity Focus and safe unknown-item boundary the audit measures.",
+      "ref": ".vibehub/rooms/product/contract-focus-chat-fidelity.yaml"
+    },
+    {
+      "purpose": "Defines dogfood-level readability, Markdown, Activity, and interaction expectations.",
+      "ref": ".vibehub/rooms/product/constraint-focus-chat-interaction-quality.yaml"
+    },
+    {
+      "purpose": "Provides the current concrete formula-rendering failure.",
+      "ref": ".vibehub/rooms/product/constraint-focus-math-typesetting.yaml"
+    },
+    {
+      "purpose": "Provides the already planned narrow rendering correction that the broader audit may retain or refine.",
+      "ref": ".vibehub/tickets/ticket-fix-focus-math-and-branch-affordance.yaml"
+    },
+    {
+      "purpose": "Provides the accepted current Markdown, technical-output, streaming, and safety baseline.",
+      "ref": ".vibehub/outcomes/ticket-rebuild-chat-reading-surface.yaml"
+    }
+  ],
+  "deliveries": [],
+  "kind": "ticket",
+  "maturity": "firm",
+  "outcome": "A checked-in, evidence-backed rendering audit maps the current Codex App Server content contract to every Peel renderer, identifies fidelity and safety gaps, and proposes the smallest follow-up Ticket boundaries before renderer expansion.",
+  "provenance_refs": [
+    "conversation:2026-09-16-rendering-surface-audit-request",
+    "local-schema:codex-app-server-0.154.0",
+    "https://developers.openai.com/codex/app-server",
+    ".vibehub/outcomes/ticket-audit-codex-rendering-surface.yaml",
+    "docs/review/rendering-audit/README.md",
+    "docs/review/rendering-audit/sanitized-local-payload-shapes.json",
+    "apps/desktop/src/renderer/Markdown.tsx",
+    "apps/desktop/src/renderer/Transcript.tsx",
+    "apps/desktop/src/renderer/App.tsx",
+    "packages/codex-app-server/src/protocol.ts",
+    "packages/codex-app-server/src/reducer.ts",
+    "packages/codex-app-server/src/schema.ts",
+    "packages/codex-app-server/scripts/check-installed-schema.mjs",
+    "packages/codex-app-server/test/fixtures.ts"
+  ],
+  "relations": [],
+  "schema_version": 2,
+  "ticket_id": "ticket-audit-codex-rendering-surface"
+}

@@ -1,16 +1,18 @@
 import { contextBridge, ipcRenderer } from "electron";
-import type { AppServerNotification, AppServerServerRequest, ThreadListResponse } from "@peel/codex-app-server";
+import type { AppServerServerRequest, ThreadListResponse } from "@peel/codex-app-server";
 
 import type {
-  ApprovalDecisionInput,
   BootstrapPayload,
+  CodexNotice,
   CommitForkInput,
   CommitForkResult,
+  CodexNotificationUpdate,
   OpenTargetInput,
   PeelApi,
   PeelState,
   SearchThreadsInput,
   SendTurnInput,
+  ServerRequestResponseInput,
   StartNewChatInput,
   StartSpaceInput,
   ThreadSnapshot,
@@ -44,11 +46,13 @@ const api: PeelApi = {
   finishDictation: async (threadId: string) => await ipcRenderer.invoke(IPC.finishDictation, threadId) as VoiceTranscription,
   cancelDictation: async (threadId: string) => { await ipcRenderer.invoke(IPC.cancelDictation, threadId); },
   transcribeWav: async (bytes) => await ipcRenderer.invoke(IPC.transcribeWav, bytes) as VoiceTranscription,
-  decideApproval: async (input: ApprovalDecisionInput) => { await ipcRenderer.invoke(IPC.decideApproval, input); },
-  onCodexNotification: (listener: (payload: AppServerNotification) => void) =>
+  respondServerRequest: async (input: ServerRequestResponseInput) => { await ipcRenderer.invoke(IPC.respondServerRequest, input); },
+  onCodexNotification: (listener: (payload: CodexNotificationUpdate) => void) =>
     subscription(IPC.codexNotification, listener),
-  onServerRequest: (listener: (payload: AppServerServerRequest) => void) =>
-    subscription(IPC.serverRequest, listener),
+  onPendingRequests: (listener: (payload: AppServerServerRequest[]) => void) =>
+    subscription(IPC.pendingRequests, listener),
+  onNotices: (listener: (payload: CodexNotice[]) => void) =>
+    subscription(IPC.notices, listener),
   onConnection: (listener) => subscription(IPC.connection, listener),
   onFlushRequest: (listener) => {
     const wrapped = (): void => {

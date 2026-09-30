@@ -1,0 +1,61 @@
+{
+  "acceptance": [
+    {
+      "acceptance_id": "complete-request-dispatch",
+      "criterion": "All 10 stable generated ServerRequest methods are exhaustively classified. V2 command and file approvals retain correct decisions; requestUserInput, permissions, and MCP elicitation receive method-specific accessible UI and response shapes; dynamic tool, auth refresh, attestation, and legacy requests are either supported through an explicit host capability or rejected promptly with a typed deterministic unsupported response, never silently left pending."
+    },
+    {
+      "acceptance_id": "exact-turn-request-placement",
+      "criterion": "Thread- and Turn-scoped requests render beside the exact producing Turn with human labels, method-appropriate detail, keyboard operation, available decisions, and narrow-window containment; requests without Thread identity use an explicit host-level surface or deterministic non-UI handler rather than the active Transcript."
+    },
+    {
+      "acceptance_id": "resolved-request-cleanup",
+      "criterion": "serverRequest/resolved removes the matching pending request even when resolution, timeout, interruption, cleanup, or another client occurs outside Peel's local button handler; duplicate and late resolution notifications are idempotent."
+    },
+    {
+      "acceptance_id": "visible-errors-and-warnings",
+      "criterion": "Top-level error and user-actionable warning notifications with Thread/Turn identity render safe readable detail and retry state in the correct conversation without inventing ThreadItems; failed Turn error detail remains available after completion, while global diagnostic notifications do not masquerade as conversation content."
+    },
+    {
+      "acceptance_id": "request-contract-evidence",
+      "criterion": "Generated-schema-backed adapter, IPC, renderer, and Electron tests cover all 10 request methods, every supported response shape, deterministic rejection paths, exact-Turn association, server-side resolution cleanup, reconnect/duplicate behavior, error retry states, warning visibility, and retention of existing command/file approval journeys."
+    }
+  ],
+  "constraints": [
+    "Use the installed stable ServerRequest and ServerNotification unions as exhaustive protocol authority; experimental behavior stays capability-gated.",
+    "Never answer one request method with another method's response schema.",
+    "Do not expose auth tokens, attestation material, hidden tool arguments, or unrestricted local paths in Transcript UI.",
+    "Unsupported host capabilities must fail promptly and recoverably rather than hanging the Codex Turn."
+  ],
+  "context": "The accepted rendering audit found that Peel stores every server request in one approvals array, shows only requests with params.threadId, labels every visible non-file request as a command approval, and removes cards only after a local click. User-input, permission, MCP elicitation, dynamic tool, auth refresh, attestation, and legacy requests therefore receive invalid responses or remain invisible and unresolved; serverRequest/resolved and top-level errors/warnings lack dedicated presentation.",
+  "context_refs": [
+    {
+      "purpose": "Provides the independently accepted request, error, and cleanup gaps.",
+      "ref": ".vibehub/outcomes/ticket-audit-codex-rendering-surface.yaml"
+    },
+    {
+      "purpose": "Provides the full 10-method request matrix and notification routes.",
+      "ref": "docs/review/rendering-audit/README.md"
+    },
+    {
+      "purpose": "Requires approvals and failures inside their producing Thread with safe fallback.",
+      "ref": ".vibehub/rooms/product/contract-focus-chat-fidelity.yaml"
+    }
+  ],
+  "deliveries": [],
+  "kind": "ticket",
+  "maturity": "firm",
+  "outcome": "Every stable Codex server request and user-visible error/warning follows an explicit method-specific UI or deterministic unsupported path, with exact Thread/Turn placement and no stale pending cards.",
+  "provenance_refs": [
+    "conversation:2026-09-17-start-rendering-implementation",
+    "https://developers.openai.com/codex/app-server",
+    "apps/desktop/src/renderer/App.tsx",
+    "apps/desktop/src/renderer/Transcript.tsx",
+    "apps/desktop/src/main/peel-service.ts",
+    "packages/codex-app-server/src/client.ts",
+    "packages/codex-app-server/src/protocol.ts"
+  ],
+  "relations": [],
+  "schema_version": 2,
+  "ticket_id": "ticket-route-appserver-requests-and-errors"
+}

@@ -10,7 +10,7 @@ Peel is a macOS desktop app for people who use Codex on real projects and outgro
 
 ## Focus on the conversation
 
-Focus keeps the current Codex chat primary while a compact lineage rail shows where the Thread came from and which nearby branches need attention. Markdown, code, reasoning, commands, file changes, approvals, attachments, streaming, errors, and unknown Codex activity remain readable without turning Peel into an execution dashboard.
+Focus keeps the current Codex chat primary while a compact lineage rail shows where the Thread came from and which nearby branches need attention. Markdown, math, code, reasoning, commands, file changes, approvals, attachments, streaming, errors, and unknown Codex activity remain readable without turning Peel into an execution dashboard. Every completed Turn keeps a visible **Branch from here** action, and a branched Chat has an explicit return to its Parent.
 
 ![Peel Focus view showing a Codex conversation, lineage, activity, and Composer](docs/assets/peel-focus.png)
 
@@ -34,11 +34,12 @@ A Space has one root and real Codex Fork descendants. It is not a free-form grap
 
 - Direct New Chat and fast paginated search across existing Codex Threads.
 - A full-fidelity Focus surface with per-Thread Draft and Scroll restoration.
-- Exact-turn Forks, precise Parent return, manual naming, and recoverable first-send failures.
+- Exact-turn Forks, persistent **Branch from here** actions, precise Parent return, manual naming, and recoverable first-send failures.
 - Stable Overview cards with real Fork edges, drag, pan, zoom, Fit, and tested 30–50-node layouts.
 - Current Workspace or New Worktree at first send, plus a lightweight Diff against local `main`.
 - Voice Dictation that inserts editable text into the current Draft and never sends automatically.
 - Approval, attention, failure, changed-file, and folded subagent signals.
+- Dismissible global diagnostics with scoped, session-only history instead of permanent error banners.
 - Restart recovery from Codex-owned Thread state plus Peel-owned spatial state.
 - An explicit **Open Codex** escape hatch for every Thread.
 
@@ -55,7 +56,7 @@ Peel deliberately does **not** provide arbitrary graph editing, Project-first na
 
 ### Voice today
 
-Peel preflights the Codex App Server Realtime session before opening the microphone. On the currently verified Codex `0.149` runtime, the Realtime schema is present but a ChatGPT/SIWC-authenticated session is rejected because that path still requires API-key authentication. Peel does not ask for, inherit, or store an independent API key to bridge that gap; it quietly uses its replaceable native Apple Speech adapter instead. Both paths only update the editable Draft.
+Peel preflights the Codex App Server Realtime session before opening the microphone. On the currently verified Codex `0.154` runtime, the Realtime schema is present but a ChatGPT/SIWC-authenticated session is rejected because that path still requires API-key authentication. Peel does not ask for, inherit, or store an independent API key to bridge that gap; it quietly uses its replaceable native Apple Speech adapter instead. Both paths only update the editable Draft.
 
 ## Run it locally
 
@@ -81,6 +82,14 @@ npm run start:desktop
 ```text
 apps/desktop/out/Peel-darwin-arm64/Peel.app
 ```
+
+After the package exists, reopen it without rebuilding:
+
+```sh
+npm run launch --workspace @peel/desktop
+```
+
+Peel paints a lightweight branded frame before loading the conversation renderer and starts the Codex connection in parallel. A slow or unavailable Codex process no longer holds the window open path hostage; the local shell remains visible with honest connection state.
 
 Voice Dictation requests microphone and speech-recognition permissions when the selected engine first needs them. Capture, permission, and recognition failures leave the existing Draft unchanged.
 

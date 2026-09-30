@@ -1,13 +1,25 @@
 import type { AppServerServerRequest, CodexThread, CodexTurn, ReducedThread, ThreadItem, UserInput } from "@peel/codex-app-server";
 import type { WorkspaceDiffSummary } from "@peel/git-workspace";
-import { useEffect, useLayoutEffect, useRef, useState, type ChangeEvent, type KeyboardEvent, type PointerEvent as ReactPointerEvent, type ReactNode } from "react";
+import { Fragment, memo, startTransition, useCallback, useEffect, useLayoutEffect, useMemo, useRef, useState, type ChangeEvent, type KeyboardEvent, type ReactNode } from "react";
 
-import type { ApprovalDecisionInput, ForkDraft, SpaceNode } from "../shared/contracts";
+import type { CodexNotice, ForkDraft, ServerRequestResponseInput, SpaceNode } from "../shared/contracts";
 import { Icon } from "./icons";
-import { itemText } from "./lib";
+import { itemText, itemTextFromKeys } from "./lib";
 import { startPcmRecorder, type RecorderSession } from "./audio";
 import { HighlightedCode, MarkdownContent } from "./Markdown";
 import { voiceFailurePresentation, type VoiceFailurePresentation } from "./voice-error";
+import { requestTurnId, ServerRequestCard } from "./ServerRequestCard";
+import { commitTranscriptUpdates, recordItemRender, recordTranscriptBackfill, recordTranscriptRange, recordTurnRender, transcriptSnapshotMode } from "./transcript-performance";
+import { canFoldSteps, isFoldableStep } from "./transcript-steps";
+import {
+  TRANSCRIPT_BACKFILL_THRESHOLD_PX,
+  appendTranscriptRange,
+  initialTranscriptRange,
+  prependTranscriptRange,
+  rangeContains,
+  type TranscriptRange,
+  type TranscriptScrollAnchor,
+} from "./transcript-window";
 
 interface TranscriptProps {
   thread: CodexThread;
@@ -15,17 +27,59 @@ interface TranscriptProps {
   node: SpaceNode;
   diff: WorkspaceDiffSummary | null;
   draft: string;
-  approvals: AppServerServerRequest[];
+  requests: AppServerServerRequest[];
+  notices: CodexNotice[];
   highlightTurnId: string | null;
+  hasSavedScroll: boolean;
   restoreScrollTop: number;
+  restoreScrollAnchor: TranscriptScrollAnchor | null;
   onHighlightScrolled(turnId: string): void;
   onDraft(value: string): void;
-  onScroll(value: number): void;
+  onScroll(value: { scrollTop: number; scrollAnchor: TranscriptScrollAnchor | null }): void;
   onSend(input: UserInput[]): Promise<void>;
   onBranch(turn: CodexTurn): void;
-  onApproval(input: ApprovalDecisionInput): Promise<void>;
+  onRequestResponse(input: ServerRequestResponseInput): Promise<void>;
   onDiff(): void;
   onOpenCodex(): void;
+}
+
+const EMPTY_REQUESTS: AppServerServerRequest[] = [];
+const EMPTY_NOTICES: CodexNotice[] = [];
+
+function groupByTurn<T>(items: T[], turnIdOf: (item: T) => string | null): Map<string | null, T[]> {
+  const grouped = new Map<string | null, T[]>();
+  for (const item of items) {
+    const turnId = turnIdOf(item);
+    const group = grouped.get(turnId);
+    if (group) group.push(item);
+    else grouped.set(turnId, [item]);
+  }
+  return grouped;
+}
+
+function measureViewportAnchor(element: HTMLElement): TranscriptScrollAnchor | null {
+  const viewport = element.getBoundingClientRect();
+  const probeX = Math.min(viewport.right - 2, viewport.left + viewport.width / 2);
+  for (const offset of [2, 18, 48]) {
+    const candidate = document.elementFromPoint(probeX, Math.min(viewport.bottom - 2, viewport.top + offset));
+    const target = candidate?.closest<HTMLElement>("[data-turn-id]");
+    const turnId = target?.dataset.turnId;
+    if (target && turnId && element.contains(target)) {
+      return { turnId, offset: target.getBoundingClientRect().top - viewport.top };
+    }
+  }
+  const turns = [...element.querySelectorAll<HTMLElement>("[data-turn-id]")];
+  const target = turns.find((turn) => turn.getBoundingClientRect().bottom > viewport.top + 1) ?? turns.at(-1);
+  const turnId = target?.dataset.turnId;
+  if (!target || !turnId) return null;
+  return { turnId, offset: target.getBoundingClientRect().top - viewport.top };
+}
+
+function restoreViewportAnchor(element: HTMLElement, anchor: TranscriptScrollAnchor): void {
+  const target = element.querySelector<HTMLElement>(`[data-turn-id="${CSS.escape(anchor.turnId)}"]`);
+  if (!target) return;
+  const viewportTop = element.getBoundingClientRect().top;
+  element.scrollTop += target.getBoundingClientRect().top - viewportTop - anchor.offset;
 }
 
 export function Transcript({
@@ -34,19 +88,45 @@ export function Transcript({
   node,
   diff,
   draft,
-  approvals,
+  requests,
+  notices,
   highlightTurnId,
+  hasSavedScroll,
   restoreScrollTop,
+  restoreScrollAnchor,
   onHighlightScrolled,
   onDraft,
   onScroll,
   onSend,
   onBranch,
-  onApproval,
+  onRequestResponse,
   onDiff,
   onOpenCodex,
 }: TranscriptProps): ReactNode {
   const scroller = useRef<HTMLDivElement>(null);
+  const fullTranscriptMount = transcriptSnapshotMode() === "baseline";
+  const initialRange = useRef<TranscriptRange | null>(null);
+  if (!initialRange.current) initialRange.current = initialTranscriptRange({
+    turnIds: thread.turns.map((turn) => turn.id),
+    fullMount: fullTranscriptMount,
+    highlightTurnId,
+    restoreAnchor: restoreScrollAnchor,
+    hasSavedScroll,
+    restoreScrollTop,
+  });
+  const [mountedRange, setMountedRange] = useState<TranscriptRange>(initialRange.current);
+  const tailWindow = useRef(mountedRange.end >= thread.turns.length);
+  const rangeBusy = useRef(false);
+  const restoreAllHistory = useRef(false);
+  const pendingRangeChange = useRef<{
+    anchor: TranscriptScrollAnchor | null;
+    startedAt: number;
+    direction: "prepend" | "append";
+    addedTurns: number;
+  } | null>(null);
+  const stableViewportAnchor = useRef<TranscriptScrollAnchor | null>(null);
+  const resizeObserver = useRef<ResizeObserver | null>(null);
+  const observedRange = useRef<TranscriptRange>({ start: mountedRange.start, end: mountedRange.end });
   const [attachments, setAttachments] = useState<UserInput[]>([]);
   const [sending, setSending] = useState(false);
   const [sendError, setSendError] = useState<string | null>(null);
@@ -62,10 +142,42 @@ export function Transcript({
   const textarea = useRef<HTMLTextAreaElement>(null);
   const mounted = useRef(true);
   const draftRef = useRef(draft);
-  const followBottom = useRef(true);
+  const followBottom = useRef(!hasSavedScroll && !highlightTurnId);
   const restoredScroll = useRef(false);
   const acknowledgedHighlight = useRef<string | null>(null);
   draftRef.current = draft;
+
+  const totalTurns = thread.turns.length;
+  const mountedStart = fullTranscriptMount ? 0 : Math.min(mountedRange.start, totalTurns);
+  const mountedEnd = fullTranscriptMount || tailWindow.current
+    ? totalTurns
+    : Math.min(mountedRange.end, totalTurns);
+  const mountedTurns = thread.turns.slice(mountedStart, mountedEnd);
+
+  const rememberViewportAnchor = useCallback((): TranscriptScrollAnchor | null => {
+    const element = scroller.current;
+    const anchor = element ? measureViewportAnchor(element) : null;
+    stableViewportAnchor.current = anchor;
+    return anchor;
+  }, []);
+
+  const changeMountedRange = useCallback((direction: "prepend" | "append"): void => {
+    if (fullTranscriptMount || rangeBusy.current) return;
+    const current = { start: mountedStart, end: mountedEnd };
+    const next = direction === "prepend"
+      ? prependTranscriptRange(current)
+      : appendTranscriptRange(current, totalTurns);
+    if (next.start === current.start && next.end === current.end) return;
+    pendingRangeChange.current = {
+      anchor: rememberViewportAnchor(),
+      startedAt: performance.now(),
+      direction,
+      addedTurns: current.start - next.start + next.end - current.end,
+    };
+    rangeBusy.current = true;
+    if (next.end >= totalTurns) tailWindow.current = true;
+    startTransition(() => setMountedRange(next));
+  }, [fullTranscriptMount, mountedEnd, mountedStart, rememberViewportAnchor, totalTurns]);
 
   useEffect(() => () => {
     mounted.current = false;
@@ -109,11 +221,78 @@ export function Transcript({
   }, [draft]);
 
   useLayoutEffect(() => {
+    if (fullTranscriptMount || !highlightTurnId) return;
+    const targetIndex = thread.turns.findIndex((turn) => turn.id === highlightTurnId);
+    if (targetIndex < 0 || rangeContains({ start: mountedStart, end: mountedEnd }, targetIndex)) return;
+    const next = initialTranscriptRange({
+      turnIds: thread.turns.map((turn) => turn.id),
+      fullMount: false,
+      highlightTurnId,
+      restoreAnchor: null,
+      hasSavedScroll: false,
+      restoreScrollTop: 0,
+    });
+    tailWindow.current = next.end >= totalTurns;
+    setMountedRange(next);
+  }, [fullTranscriptMount, highlightTurnId, mountedEnd, mountedStart, thread.turns, totalTurns]);
+
+  useLayoutEffect(() => {
+    const element = scroller.current;
+    const pending = pendingRangeChange.current;
+    if (!element || !pending) return;
+    let residualAnchorDeltaPx = 0;
+    if (pending.anchor) {
+      const target = element.querySelector<HTMLElement>(`[data-turn-id="${CSS.escape(pending.anchor.turnId)}"]`);
+      if (target) {
+        const viewportTop = element.getBoundingClientRect().top;
+        const currentOffset = target.getBoundingClientRect().top - viewportTop;
+        element.scrollTop += currentOffset - pending.anchor.offset;
+        residualAnchorDeltaPx = Math.abs(target.getBoundingClientRect().top - viewportTop - pending.anchor.offset);
+      }
+    }
+    recordTranscriptBackfill({
+      threadId: thread.id,
+      direction: pending.direction,
+      durationMs: performance.now() - pending.startedAt,
+      addedTurns: pending.addedTurns,
+      anchorDeltaPx: residualAnchorDeltaPx,
+    });
+    pendingRangeChange.current = null;
+    rangeBusy.current = false;
+    stableViewportAnchor.current = pending.anchor ?? measureViewportAnchor(element);
+  }, [mountedRange.end, mountedRange.start, thread.id]);
+
+  useLayoutEffect(() => {
+    recordTranscriptRange(thread.id, mountedTurns.length, totalTurns);
+  }, [mountedTurns.length, thread.id, totalTurns]);
+
+  useEffect(() => {
+    if (fullTranscriptMount || tailWindow.current || mountedEnd >= totalTurns) return;
+    const timer = window.setTimeout(() => changeMountedRange("append"), 32);
+    return () => window.clearTimeout(timer);
+  }, [changeMountedRange, fullTranscriptMount, mountedEnd, totalTurns]);
+
+  useEffect(() => {
+    if (!restoreAllHistory.current || fullTranscriptMount) return;
+    if (mountedStart <= 0) {
+      restoreAllHistory.current = false;
+      return;
+    }
+    const timer = window.setTimeout(() => changeMountedRange("prepend"), 16);
+    return () => window.clearTimeout(timer);
+  }, [changeMountedRange, fullTranscriptMount, mountedStart]);
+
+  useLayoutEffect(() => {
+    commitTranscriptUpdates(thread.id);
+  }, [thread, reduced, thread.id]);
+
+  useLayoutEffect(() => {
     const element = scroller.current;
     if (!element || !followBottom.current) return;
     const selection = window.getSelection();
     if (selection && !selection.isCollapsed && selection.anchorNode && element.contains(selection.anchorNode)) return;
     element.scrollTop = element.scrollHeight;
+    rememberViewportAnchor();
   }, [thread, reduced]);
 
   useLayoutEffect(() => {
@@ -122,9 +301,12 @@ export function Transcript({
     if (!highlightTurnId) {
       acknowledgedHighlight.current = null;
       if (restoredScroll.current) return;
-      element.scrollTop = restoreScrollTop;
+      if (!hasSavedScroll) element.scrollTop = element.scrollHeight;
+      else if (restoreScrollAnchor) restoreViewportAnchor(element, restoreScrollAnchor);
+      else element.scrollTop = restoreScrollTop;
       followBottom.current = element.scrollHeight - element.scrollTop - element.clientHeight < 56;
       restoredScroll.current = true;
+      rememberViewportAnchor();
       return;
     }
     if (acknowledgedHighlight.current === highlightTurnId) return;
@@ -138,7 +320,54 @@ export function Transcript({
     if (targetBounds.bottom <= viewport.top || targetBounds.top >= viewport.bottom) return;
     acknowledgedHighlight.current = highlightTurnId;
     onHighlightScrolled(highlightTurnId);
-  }, [highlightTurnId, onHighlightScrolled, restoreScrollTop, thread.id]);
+    rememberViewportAnchor();
+  }, [hasSavedScroll, highlightTurnId, mountedEnd, mountedStart, onHighlightScrolled, rememberViewportAnchor, restoreScrollAnchor, restoreScrollTop, thread.id]);
+
+  useEffect(() => {
+    const element = scroller.current;
+    if (!element || typeof ResizeObserver === "undefined") return;
+    let initialized = false;
+    const observer = new ResizeObserver(() => {
+      if (!initialized) {
+        initialized = true;
+        rememberViewportAnchor();
+        return;
+      }
+      if (followBottom.current) {
+        element.scrollTop = element.scrollHeight;
+        rememberViewportAnchor();
+        return;
+      }
+      const anchor = stableViewportAnchor.current;
+      if (anchor) restoreViewportAnchor(element, anchor);
+      rememberViewportAnchor();
+    });
+    resizeObserver.current = observer;
+    element.querySelectorAll<HTMLElement>("[data-turn-id]").forEach((turn) => observer.observe(turn));
+    observedRange.current = { start: mountedStart, end: mountedEnd };
+    return () => {
+      observer.disconnect();
+      if (resizeObserver.current === observer) resizeObserver.current = null;
+    };
+  }, [rememberViewportAnchor, thread.id]);
+
+  useEffect(() => {
+    const element = scroller.current;
+    const observer = resizeObserver.current;
+    if (!element || !observer) return;
+    const previous = observedRange.current;
+    const additions = previous.end < mountedStart || previous.start > mountedEnd
+      ? thread.turns.slice(mountedStart, mountedEnd)
+      : [
+        ...thread.turns.slice(mountedStart, Math.min(previous.start, mountedEnd)),
+        ...thread.turns.slice(Math.max(previous.end, mountedStart), mountedEnd),
+      ];
+    for (const turn of additions) {
+      const target = element.querySelector<HTMLElement>(`[data-turn-id="${CSS.escape(turn.id)}"]`);
+      if (target) observer.observe(target);
+    }
+    observedRange.current = { start: mountedStart, end: mountedEnd };
+  }, [mountedEnd, mountedStart, thread.turns]);
 
   const submit = async (): Promise<void> => {
     const text = draft.trim();
@@ -264,11 +493,21 @@ export function Transcript({
   };
 
   const active = reduced?.status.type === "active";
+  const reducedByTurn = useMemo(() => new Map(reduced?.turns.map((turn) => [turn.turn.id, turn]) ?? []), [reduced?.turns]);
+  const requestsByTurn = useMemo(() => groupByTurn(requests, requestTurnId), [requests]);
+  const noticesByTurn = useMemo(() => groupByTurn(notices, (notice) => notice.turnId), [notices]);
   return <div className="transcript-column">
-    <div className="transcript" ref={scroller} onScroll={(event) => {
+    <div
+      className="transcript"
+      ref={scroller}
+      data-mounted-turns={mountedTurns.length}
+      data-total-turns={totalTurns}
+      onScroll={(event) => {
       const element = event.currentTarget;
       followBottom.current = element.scrollHeight - element.scrollTop - element.clientHeight < 56;
-      onScroll(element.scrollTop);
+      const scrollAnchor = rememberViewportAnchor();
+      onScroll({ scrollTop: element.scrollTop, scrollAnchor });
+      if (element.scrollTop <= TRANSCRIPT_BACKFILL_THRESHOLD_PX && mountedStart > 0) changeMountedRange("prepend");
     }}>
       <div className="thread-intro">
         <div className="eyebrow">Thread</div>
@@ -280,15 +519,28 @@ export function Transcript({
         </div>
       </div>
       {thread.turns.length === 0 && <div className="empty-thread">This Thread has no turns yet.</div>}
-      {thread.turns.map((turn) => <TurnView
+      {mountedStart > 0 && <button
+        type="button"
+        className="transcript-history-boundary"
+        onClick={() => {
+          restoreAllHistory.current = true;
+          changeMountedRange("prepend");
+        }}
+      >Load earlier messages <span>{mountedStart} remaining</span></button>}
+      {mountedTurns.map((turn) => <MemoizedTurnView
         key={turn.id}
         turn={turn}
-        reduced={reduced?.turns.find((candidate) => candidate.turn.id === turn.id) ?? null}
+        reduced={reducedByTurn.get(turn.id) ?? null}
         highlighted={turn.id === highlightTurnId}
-        onBranch={() => onBranch(turn)}
+        onBranch={onBranch}
         onOpenCodex={onOpenCodex}
+        requests={requestsByTurn.get(turn.id) ?? EMPTY_REQUESTS}
+        notices={noticesByTurn.get(turn.id) ?? EMPTY_NOTICES}
+        onRequestResponse={onRequestResponse}
       />)}
-      {approvals.map((approval) => <ApprovalCard key={String(approval.id)} request={approval} onDecide={onApproval} />)}
+      {mountedEnd < totalTurns && <div className="transcript-history-progress" role="status">Restoring newer messages…</div>}
+      {(noticesByTurn.get(null) ?? EMPTY_NOTICES).map((notice) => <NoticeCard key={notice.id} notice={notice}/>)}
+      {(requestsByTurn.get(null) ?? EMPTY_REQUESTS).map((request) => <ServerRequestCard key={String(request.id)} request={request} onRespond={onRequestResponse}/>)}
       {active && <div className="working-indicator"><span/><span/><span/> Codex is working</div>}
       <div className="transcript-end" />
     </div>
@@ -340,68 +592,106 @@ function userFacingIpcError(error: unknown): string {
     .trim() || "The message could not be sent. Your draft is unchanged; try again.";
 }
 
-function TurnView({ turn, reduced, highlighted, onBranch, onOpenCodex }: {
+interface TurnViewProps {
   turn: CodexTurn;
   reduced: ReducedThread["turns"][number] | null;
   highlighted: boolean;
-  onBranch(): void;
+  requests: AppServerServerRequest[];
+  notices: CodexNotice[];
+  onBranch(turn: CodexTurn): void;
   onOpenCodex(): void;
-}): ReactNode {
-  const items = reduced?.items ?? turn.items.map((item) => ({ item, completed: true, streamedText: "" }));
+  onRequestResponse(input: ServerRequestResponseInput): Promise<void>;
+}
+
+function TurnView({ turn, reduced, highlighted, requests, notices, onBranch, onOpenCodex, onRequestResponse }: TurnViewProps): ReactNode {
+  recordTurnRender(turn.id);
+  const items = reduced?.items ?? turn.items.map((item) => ({
+    item,
+    completed: true,
+    streamedText: "",
+    streamedReasoningContent: "",
+    streamedReasoningSummarySections: [],
+  }));
+  const branch = useCallback(() => onBranch(turn), [onBranch, turn]);
+  const types = items.map(({ item }) => item.type);
+  const foldable = canFoldSteps(types);
+  const [stepsFolded, setStepsFolded] = useState(false);
+  let foldPlaced = false;
   return <section className={`turn ${highlighted ? "highlighted" : ""}`} data-turn-id={turn.id}>
-    {items.map(({ item, streamedText, completed }) => <ItemView key={item.id} item={item} streamedText={streamedText} streaming={!completed} onOpenCodex={onOpenCodex}/>) }
-    <div className="turn-actions">
-      <span>{turn.status === "inProgress" ? "Working" : turn.status === "failed" ? "Needs attention" : turn.status === "interrupted" ? "Stopped" : ""}</span>
-      {turn.status === "completed" && <button onClick={onBranch}><Icon name="branch" size={14}/> Branch from here</button>}
-    </div>
-    {turn.status === "completed" && <PeelHandle onPeel={onBranch}/>} 
+    {items.map(({ item, streamedText, streamedReasoningContent, completed }) => {
+      const step = isFoldableStep(item.type);
+      if (foldable && stepsFolded && step) {
+        if (foldPlaced) return null;
+        foldPlaced = true;
+        return <StepFold key="step-fold" count={types.filter(isFoldableStep).length} folded onToggle={() => setStepsFolded(false)}/>;
+      }
+      const fold = foldable && step && !foldPlaced
+        ? <StepFold key="step-fold" count={types.filter(isFoldableStep).length} folded={false} onToggle={() => setStepsFolded(true)}/>
+        : null;
+      if (fold) foldPlaced = true;
+      return <Fragment key={item.id}>
+        {fold}
+        <MemoizedItemView
+          item={item}
+          streamedText={streamedText}
+          streamedReasoningContent={streamedReasoningContent}
+          streaming={!completed}
+          onOpenCodex={onOpenCodex}
+        />
+      </Fragment>;
+    })}
+    {notices.map((notice) => <NoticeCard key={notice.id} notice={notice}/>)}
+    {turn.error !== null && turn.error !== undefined && <TurnErrorDetail error={turn.error}/>}
+    {requests.map((request) => <ServerRequestCard key={String(request.id)} request={request} onRespond={onRequestResponse}/>)}
+    <TurnActions status={turn.status} onBranch={branch}/>
   </section>;
 }
 
-function PeelHandle({ onPeel }: { onPeel(): void }): ReactNode {
-  const gesture = useRef<{ pointerId: number; startX: number; startY: number; moved: boolean } | null>(null);
-  const [preview, setPreview] = useState<{ x: number; y: number } | null>(null);
-  const down = (event: ReactPointerEvent<HTMLButtonElement>): void => {
-    if (event.button !== 0) return;
-    event.preventDefault();
-    event.currentTarget.setPointerCapture(event.pointerId);
-    gesture.current = { pointerId: event.pointerId, startX: event.clientX, startY: event.clientY, moved: false };
-    setPreview({ x: event.clientX, y: event.clientY });
-  };
-  const move = (event: ReactPointerEvent<HTMLButtonElement>): void => {
-    const active = gesture.current;
-    if (!active || active.pointerId !== event.pointerId) return;
-    if (Math.hypot(event.clientX - active.startX, event.clientY - active.startY) > 6) active.moved = true;
-    setPreview({ x: event.clientX, y: event.clientY });
-  };
-  const finish = (event: ReactPointerEvent<HTMLButtonElement>, cancelled = false): void => {
-    const active = gesture.current;
-    if (!active || active.pointerId !== event.pointerId) return;
-    if (event.currentTarget.hasPointerCapture(event.pointerId)) event.currentTarget.releasePointerCapture(event.pointerId);
-    gesture.current = null;
-    setPreview(null);
-    if (!cancelled) onPeel();
-  };
-  return <button
-    className="peel-handle"
-    aria-label="Peel a branch from this turn"
-    title="Drag to peel a new direction"
-    onPointerDown={down}
-    onPointerMove={move}
-    onPointerUp={(event) => finish(event)}
-    onPointerCancel={(event) => finish(event, true)}
-  >
-    <span/>
-    {preview && <i className="peel-drag-preview" style={{ left: preview.x + 14, top: preview.y - 18 }}>New direction</i>}
-  </button>;
+const MemoizedTurnView = memo(TurnView, turnViewPropsEqual);
+
+export function turnViewPropsEqual(previous: TurnViewProps, next: TurnViewProps): boolean {
+  return previous.turn === next.turn
+    && previous.reduced === next.reduced
+    && previous.highlighted === next.highlighted
+    && previous.onBranch === next.onBranch
+    && previous.onOpenCodex === next.onOpenCodex
+    && previous.onRequestResponse === next.onRequestResponse
+    && structurallyEqualLists(previous.requests, next.requests)
+    && structurallyEqualLists(previous.notices, next.notices);
 }
 
-export function ItemView({ item, streamedText, streaming, onOpenCodex }: { item: ThreadItem; streamedText: string; streaming: boolean; onOpenCodex(): void }): ReactNode {
-  const text = itemText(item) + streamedText;
-  if (item.type === "userMessage") return <article className="message user-message"><MarkdownContent text={text || "User message"} className="user-markdown"/></article>;
-  if (item.type === "agentMessage") return <article className="message agent-message"><MarkdownContent text={text} streaming={streaming}/></article>;
+function structurallyEqualLists(left: unknown[], right: unknown[]): boolean {
+  if (left === right) return true;
+  if (left.length !== right.length) return false;
+  return left.every((value, index) => value === right[index] || safeJson(value) === safeJson(right[index]));
+}
+
+export function TurnActions({ status, onBranch }: { status: CodexTurn["status"]; onBranch(): void }): ReactNode {
+  return <div className="turn-actions">
+    <span>{status === "inProgress" ? "Working" : status === "failed" ? "Needs attention" : status === "interrupted" ? "Stopped" : ""}</span>
+    {status === "completed" && <button type="button" onClick={onBranch}><Icon name="branch" size={14}/> Branch from here</button>}
+  </div>;
+}
+
+export function ItemView({ item, streamedText, streamedReasoningContent = "", streaming, onOpenCodex }: {
+  item: ThreadItem;
+  streamedText: string;
+  streamedReasoningContent?: string;
+  streaming: boolean;
+  onOpenCodex(): void;
+}): ReactNode {
+  recordItemRender(item.id);
+  const completedText = item.type === "reasoning"
+    ? itemTextFromKeys(item, ["summary", "content", "text", "message"], "\n\n")
+    : itemText(item);
+  const text = completedText + streamedText;
+  if (item.type === "userMessage") return <article className="message user-message"><MarkdownContent text={text || "User message"} className="user-markdown" performanceId={item.id}/></article>;
+  if (item.type === "agentMessage") return <article className="message agent-message"><MarkdownContent text={text} streaming={streaming} performanceId={item.id}/></article>;
+  if (item.type === "plan") return <ActivityDisclosure icon="more" label={streaming ? "Planning" : "Plan"} state={activityState(item, streaming)} defaultOpen={streaming}>
+    <MarkdownContent text={text || "Plan"} streaming={streaming} performanceId={item.id}/>
+  </ActivityDisclosure>;
   if (item.type === "reasoning") return <ActivityDisclosure icon="reasoning" label={streaming ? "Thinking" : "Reasoning"} state={activityState(item, streaming)} defaultOpen={streaming} kind="reasoning">
-    <MarkdownContent text={text || "Reasoning activity"} streaming={streaming}/>
+    <MarkdownContent text={text || streamedReasoningContent || "Reasoning activity"} streaming={streaming} performanceId={item.id}/>
   </ActivityDisclosure>;
   if (item.type === "commandExecution") {
     const state = activityState(item, streaming);
@@ -421,16 +711,18 @@ export function ItemView({ item, streamedText, streaming, onOpenCodex }: { item:
     </ActivityDisclosure>;
   }
   if (item.type === "collabAgentToolCall" || item.type === "subAgentActivity") return <ActivityDisclosure icon="agent" label={streaming ? "A subagent is working" : "Worked with a subagent"} state={activityState(item, streaming)} defaultOpen={streaming}>
-    <MarkdownContent text={text || safeJson(item)} streaming={streaming}/>
+    <MarkdownContent text={text || safeJson(item)} streaming={streaming} performanceId={item.id}/>
   </ActivityDisclosure>;
   if (item.type === "error") return <ActivityDisclosure icon="warning" label="Something needs attention" state="failed">
-    <MarkdownContent text={text || String(item.message ?? "Codex reported an error")}/>
+    <MarkdownContent text={text || String(item.message ?? "Codex reported an error")} performanceId={item.id}/>
   </ActivityDisclosure>;
   return <ActivityDisclosure icon="more" label="Additional Codex activity" state={activityState(item, streaming)} kind="technical">
     <TechnicalOutput sections={[{ label: item.type, value: text || safeJson(item) }]}/>
     <button className="open-codex-item" onClick={onOpenCodex}>Open in Codex <Icon name="external" size={12}/></button>
   </ActivityDisclosure>;
 }
+
+const MemoizedItemView = memo(ItemView);
 
 type ActivityState = "completed" | "active" | "failed";
 
@@ -453,6 +745,13 @@ function ActivityDisclosure({ icon, label, state, defaultOpen = false, kind = "s
   </details>;
 }
 
+function StepFold({ count, folded, onToggle }: { count: number; folded: boolean; onToggle(): void }): ReactNode {
+  return <button type="button" className="step-fold" onClick={onToggle} aria-expanded={!folded}>
+    <Icon name="chevron" size={12}/>
+    {folded ? `Show ${count} steps` : "Fold steps"}
+  </button>;
+}
+
 function activityState(item: ThreadItem, streaming: boolean): ActivityState {
   const status = String(item.status ?? "").toLowerCase();
   if (status.includes("fail") || status.includes("error") || status.includes("declin")) return "failed";
@@ -471,10 +770,11 @@ function commandText(item: ThreadItem): string {
 }
 
 function commandOutput(text: string, command: string): string {
-  const trimmed = text.trim();
-  if (!trimmed || trimmed === command.trim()) return "";
-  if (trimmed.startsWith(`${command.trim()}\n`)) return trimmed.slice(command.trim().length + 1);
-  return trimmed;
+  if (!text.trim()) return "";
+  const normalizedCommand = command.trim();
+  if (text.trim() === normalizedCommand) return "";
+  if (text.startsWith(`${normalizedCommand}\n`)) return text.slice(normalizedCommand.length + 1);
+  return text;
 }
 
 interface TechnicalSection { label: string; value: string; language?: string }
@@ -507,21 +807,22 @@ function fileChangeLabel(sections: TechnicalSection[]): string {
   return `Updated ${sections.length} file${sections.length === 1 ? "" : "s"}`;
 }
 
-function ApprovalCard({ request, onDecide }: {
-  request: AppServerServerRequest;
-  onDecide(input: ApprovalDecisionInput): Promise<void>;
-}): ReactNode {
-  const params = request.params as Record<string, unknown>;
-  const label = request.method.includes("fileChange") ? "File change approval" : "Command approval";
-  return <div className="approval-card">
-    <div className="approval-title">{label}</div>
-    <pre>{String(params.command ?? params.reason ?? "Codex needs your approval to continue.")}</pre>
-    <div className="approval-actions">
-      <button onClick={() => void onDecide({ id: request.id, method: request.method, decision: "decline" })}>Decline</button>
-      <button onClick={() => void onDecide({ id: request.id, method: request.method, decision: "acceptForSession" })}>Allow for task</button>
-      <button className="primary" onClick={() => void onDecide({ id: request.id, method: request.method, decision: "accept" })}>Allow</button>
-    </div>
-  </div>;
+function NoticeCard({ notice }: { notice: CodexNotice }): ReactNode {
+  return <aside className={`codex-notice ${notice.kind}`} role={notice.kind === "error" ? "alert" : "status"}>
+    <strong>{notice.kind === "error" ? "Codex encountered a problem" : "Codex warning"}</strong>
+    <p>{notice.message}</p>
+    {notice.willRetry && <small>Codex will retry this Turn.</small>}
+  </aside>;
+}
+
+function TurnErrorDetail({ error }: { error: unknown }): ReactNode {
+  const record = error && typeof error === "object" && !Array.isArray(error) ? error as Record<string, unknown> : {};
+  const message = typeof record.message === "string" ? record.message : typeof error === "string" ? error : "This Turn did not complete.";
+  return <aside className="codex-notice error persisted-turn-error" role="alert">
+    <strong>Turn failed</strong>
+    <p>{message}</p>
+    <small>The failure detail remains available in this conversation.</small>
+  </aside>;
 }
 
 export function ForkComposer({ fork, parentTitle, parentWorktreeName, error, busy, onChange, onCancel, onCommit }: {

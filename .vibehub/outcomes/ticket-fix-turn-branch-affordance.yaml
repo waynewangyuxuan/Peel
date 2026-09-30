@@ -1,0 +1,18 @@
+{
+  "accepted_acceptance_ids": [
+    "single-persistent-branch-action",
+    "branch-behavior-preserved",
+    "branch-regression-evidence"
+  ],
+  "closed_at": "2026-09-17T18:34:27Z",
+  "evidence_ids": [
+    "evidence-single-persistent-branch-action",
+    "evidence-branch-affordance-regression"
+  ],
+  "kind": "ticket_outcome",
+  "schema_version": 1,
+  "status": "successful",
+  "summary": "Independent closeout accepted all three criteria. Every completed Turn now exposes exactly one persistent native Branch from here footer button, while the circular handle, drag preview, gesture state, and associated styles are absent. The existing exact-Turn callback and local Fork Draft lifecycle remain intact. Desktop typecheck and all 55 unit tests passed. A fresh rebuilt Electron journey independently verified pointer and keyboard activation, two completed-Turn actions, narrow-window visibility, cancellation without a thread/fork RPC, First Send behavior, exact long-Turn anchoring, and retained Focus, scroll, Approval, Draft, and Overview behavior; it proceeded through all in-scope assertions and failed only much later at the unrelated existing resume-alert assertion.",
+  "ticket_id": "ticket-fix-turn-branch-affordance",
+  "unresolved_acceptance_ids": []
+}

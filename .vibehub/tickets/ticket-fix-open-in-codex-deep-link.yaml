@@ -1,0 +1,52 @@
+{
+  "acceptance": [
+    {
+      "acceptance_id": "exact-desktop-thread-deep-link",
+      "criterion": "For a valid selected Codex thread ID, Open in Codex invokes the registered codex://threads/<URL-encoded-thread-id> deep link and the installed Codex desktop app opens that exact conversation; Peel never routes this action through https://chatgpt.com/codex."
+    },
+    {
+      "acceptance_id": "safe-unavailable-app-failure",
+      "criterion": "If the operating system cannot open the Codex deep link, Peel keeps the current conversation and presents a recoverable human-readable error without navigating to a download page, swallowing the rejection, or losing the thread ID."
+    },
+    {
+      "acceptance_id": "open-target-regression-evidence",
+      "criterion": "Automated main-process and renderer or Electron coverage proves exact URL construction, special-character encoding or invalid-input handling, successful dispatch, rejected dispatch feedback, and preservation of existing browser, file, and editor OpenTarget behavior."
+    }
+  ],
+  "constraints": [
+    "Use the installed app's registered codex protocol; do not hard-code an application bundle path or require a browser intermediary.",
+    "Do not expose the raw thread ID in a remote web URL or silently copy it as a substitute for opening the exact conversation.",
+    "Keep non-Codex OpenTarget behavior unchanged."
+  ],
+  "context": "Live dogfood confirmed that Peel's Open in Codex action opens https://chatgpt.com/codex, which redirects to a download or introduction page rather than the installed desktop app. The installed macOS app registers the codex URL scheme, and its bundled route parser accepts codex://threads/<conversation UUID> for an exact conversation. Peel already has the Codex thread ID at the action boundary, so this is a contained desktop-target correction.",
+  "context_refs": [
+    {
+      "purpose": "Requires a truthful Open in Codex escape hatch in the product shape.",
+      "ref": ".vibehub/rooms/product/constraint-product-shape-guardrails.yaml"
+    },
+    {
+      "purpose": "Keeps the action inside the Focus conversation contract and preserves current-thread state.",
+      "ref": ".vibehub/rooms/product/contract-focus-chat-fidelity.yaml"
+    },
+    {
+      "purpose": "Contains the current hard-coded web target and desktop IPC handler to replace.",
+      "ref": "apps/desktop/src/main/main.ts"
+    },
+    {
+      "purpose": "Contains the renderer action boundary where a rejected desktop dispatch must become visible and recoverable.",
+      "ref": "apps/desktop/src/renderer/App.tsx"
+    }
+  ],
+  "deliveries": [],
+  "kind": "ticket",
+  "maturity": "firm",
+  "outcome": "Open in Codex launches the installed Codex desktop app at the exact selected conversation instead of opening the Codex download or marketing webpage.",
+  "provenance_refs": [
+    "conversation:2026-09-17-live-dogfood-open-in-codex-download-page",
+    "local-app:/Applications/ChatGPT.app/Contents/Info.plist#CFBundleURLSchemes-codex",
+    "local-app:/Applications/ChatGPT.app/Contents/Resources/app.asar#codex-threads-route-parser"
+  ],
+  "relations": [],
+  "schema_version": 2,
+  "ticket_id": "ticket-fix-open-in-codex-deep-link"
+}

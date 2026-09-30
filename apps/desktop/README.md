@@ -23,7 +23,9 @@ npm test
 npm run test:e2e --workspace @peel/desktop
 ```
 
-The end-to-end journey launches Electron and therefore needs permission to start a local GUI process. It uses isolated Codex and Speech fixtures, a disposable Git repository, and a dedicated Peel user-data directory. The renderer records real mono PCM from `getUserMedia`. Before capture, Peel preflights its owned Codex App Server Realtime adapter; only a real `thread/realtime/started` selects it. Codex 0.149 rejects the existing ChatGPT/SIWC login for Realtime, so today's package selects the native Apple Speech helper before recording without exposing the protocol error. Peel never requires or inherits an independent API key.
+The end-to-end journey launches Electron and therefore needs permission to start a local GUI process. It uses isolated Codex and Speech fixtures, a disposable Git repository, and a dedicated Peel user-data directory. The renderer records real mono PCM from `getUserMedia`. Before capture, Peel preflights its owned Codex App Server Realtime adapter; only a real `thread/realtime/started` selects it. Codex 0.154 rejects the existing ChatGPT/SIWC login for Realtime, so today's package selects the native Apple Speech helper before recording without exposing the protocol error. Peel never requires or inherits an independent API key.
+
+The production shell has a static branded first frame and loads the heavier App and Markdown chunks asynchronously while Codex initialization begins in parallel. The deterministic packaged benchmark is available as `npm run benchmark:startup --workspace @peel/desktop`; the README captures can be regenerated from the isolated six-Thread fixture with `npm run capture:readme --workspace @peel/desktop` after packaging.
 
 ## Package and verify
 
@@ -36,4 +38,4 @@ The package is written to `apps/desktop/out/Peel-darwin-arm64/Peel.app`. The ver
 
 Voice Dictation requests the permissions required by the selected engine on first use. Recognition errors and capture interruption leave the existing draft untouched. The transcript is appended to the draft and is never sent automatically.
 
-“Copy ID & open Codex” copies the exact Thread ID to the clipboard and opens Codex as an explicit escape hatch. Peel does not fabricate an undocumented Thread deep link.
+“Open Codex” validates the exact Thread UUID and opens the installed desktop app through its declared `codex://threads/<threadId>` route. A missing or rejected handler leaves the selected Chat in place and shows a recoverable install/retry message.

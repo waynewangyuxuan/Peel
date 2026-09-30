@@ -1,0 +1,59 @@
+{
+  "acceptance": [
+    {
+      "acceptance_id": "canonical-native-icon-assets",
+      "criterion": "Checked-in native icon assets reuse the exact accepted Phase mark geometry, include a crisp 1024px source/render plus a valid multi-size macOS icns, require no runtime network or font, and can be regenerated reproducibly from a repository script without changing the renderer mark."
+    },
+    {
+      "acceptance_id": "development-launch-identity",
+      "criterion": "On macOS, an unpackaged Electron launch sets the Peel application name and Dock icon from the checked-in native asset before the first BrowserWindow is shown; unsupported platforms remain safe and startup behavior is otherwise unchanged."
+    },
+    {
+      "acceptance_id": "packaged-app-identity",
+      "criterion": "The production package command embeds the Peel icns in Peel.app, Info.plist points to the embedded icon, and the packaged executable presents Peel rather than Electron in Finder, Dock, and the app switcher."
+    },
+    {
+      "acceptance_id": "native-icon-verification",
+      "criterion": "Automated verification checks source dimensions/non-emptiness, the required icns representations, packaged Info.plist/resource linkage, and the development icon path; Desktop typecheck/build/tests and the packaged smoke journey pass without startup or state-restoration regression."
+    }
+  ],
+  "constraints": [
+    "Reuse the selected Phase mark exactly; do not redesign the logo or introduce a competing brand symbol.",
+    "Keep icon loading local and synchronous enough to establish native identity before showing the first window; do not add a splash delay, remote asset request, or font dependency.",
+    "Do not alter navigation, saved-state schemas, transcript behavior, or the renderer launch-screen interaction.",
+    "Preserve the unrelated local package-lock.json change and do not include it in this Ticket."
+  ],
+  "context": "Peel already renders the accepted split Phase mark in the sidebar and renderer launch screen, but the native Electron application does not configure an application icon. Development launches can therefore expose Electron's default Dock identity, and the packaged macOS app does not pass a custom icns asset to electron-packager. Reuse the exact accepted Phase geometry as a native app icon, with a restrained macOS-ready background and no new brand direction.",
+  "context_refs": [
+    {
+      "purpose": "Records successful acceptance of the exact Phase brand mark already used by Peel.",
+      "ref": ".vibehub/outcomes/ticket-polish-space-sidebar.yaml"
+    },
+    {
+      "purpose": "Defines the canonical accepted Phase path and split geometry to reuse.",
+      "ref": "apps/desktop/src/renderer/Brand.tsx"
+    },
+    {
+      "purpose": "Owns native app readiness and BrowserWindow creation.",
+      "ref": "apps/desktop/src/main/main.ts"
+    },
+    {
+      "purpose": "Owns Electron packaging arguments and reproducible asset generation scripts.",
+      "ref": "apps/desktop/package.json"
+    },
+    {
+      "purpose": "Owns packaged Peel.app smoke verification.",
+      "ref": "apps/desktop/scripts/verify-package.mjs"
+    }
+  ],
+  "deliveries": [],
+  "kind": "ticket",
+  "maturity": "firm",
+  "outcome": "Peel launches with its accepted Phase identity across the macOS Dock, app switcher, development runtime, and packaged application instead of the Electron default icon.",
+  "provenance_refs": [
+    "conversation:2026-09-17-add-peel-native-launch-logo"
+  ],
+  "relations": [],
+  "schema_version": 2,
+  "ticket_id": "ticket-add-peel-desktop-app-icon"
+}

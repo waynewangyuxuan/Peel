@@ -78,6 +78,7 @@
   "kind": "ticket",
   "maturity": "firm",
   "outcome": "The Peel repository has a polished root README that lets a new user understand the product, see the current interface, run the macOS dogfood build, and distinguish shipped v0.1 behavior from boundaries and future work without reading internal specifications.",
+  "deliveries": [],
   "provenance_refs": [
     "conversation:2026-08-28-create-root-readme"
   ],
@@ -88,6 +89,6 @@
       "type": "depends_on"
     }
   ],
-  "schema_version": 1,
+  "schema_version": 2,
   "ticket_id": "ticket-publish-project-readme"
 }

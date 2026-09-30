@@ -1,0 +1,84 @@
+{
+  "acceptance": [
+    {
+      "acceptance_id": "stable-settled-transcript-identity",
+      "criterion": "Across renderer reconciliation of successive snapshots for one active Thread, every unchanged completed Turn and ThreadItem retains referential identity while the affected live Turn and Item receive new identity. Reducer/reconciler tests cover item start, all supported text/reasoning/command/file deltas, item completion, Turn start/completion, and thread status/name updates. Separate App/Transcript tests prove notices and server requests continue to render their latest payload and invalidate only their owning Turn or thread-level surface."
+    },
+    {
+      "acceptance_id": "tail-only-focus-invalidation",
+      "criterion": "In a production Electron Focus transcript with 100 completed Turns plus one streaming tail, at least 36 representative deltas increase render counters only for the live Turn and affected item/Markdown subtree: settled Turn and completed Markdown counters remain unchanged, while Branch, highlight, notices, approvals/server requests, errors, and status changes still update their owning Turn."
+    },
+    {
+      "acceptance_id": "oversized-message-readable-fallback",
+      "criterion": "A Markdown-bearing item at or above 200,000 characters uses a bounded-cost, readable, selectable, exact-text fallback instead of the full Markdown/math pipeline; it neither blanks nor crashes Focus, keeps local overflow and copy fidelity, does not interpret or execute HTML markup or initiate automatic remote-media loads, and content below the threshold retains the accepted Markdown, math, code-copy, link, and image behavior."
+    },
+    {
+      "acceptance_id": "production-focus-performance-evidence",
+      "criterion": "A production-build Electron harness exercises the ordinary App to Focus Transcript to MarkdownContent route against the same deterministic 10/100/500-Turn App Server fixture, not RenderingBenchmarkApp. A test-only baseline mode preserves the current full-snapshot/no-reconciliation behavior for comparison. After at least two warmups, at least seven paired baseline/optimized samples record separate durations for App Server read, snapshot construction, IPC delivery, renderer reconciliation, React render-to-layout-commit, and commit-to-two-animation-frame paint, plus long tasks, DOM count, and heap or retained-object evidence. For a 100-completed-Turn plus live-tail replay of 36 deltas, the optimized median aggregate reconciliation-plus-React-render/commit duration is at most 50% of baseline. Across 10/100/500-Turn cold Focus entry and 10-to-500 warm switching, optimized median first-content and through-paint times regress by no more than the greater of 10% or 5 ms."
+    },
+    {
+      "acceptance_id": "focus-fidelity-regression-coverage",
+      "criterion": "Automated Focus coverage preserves exact completed-Turn Branch anchors, text selection, code copy, local horizontal overflow, math and CJK layout, streaming projection and caret, user-controlled follow-bottom, highlight navigation, per-Thread Draft and Scroll restoration, attachments, Activity, command/file change output, approvals/server requests, notices/errors, unknown-item fallback, and Open in Codex."
+    },
+    {
+      "acceptance_id": "evidence-based-followup-boundary",
+      "criterion": "Checked-in evidence compares the measured native result with the completed renderer evaluation and states whether bounded initial backfill deserves a separate Ticket; this implementation does not add Streamdown, assistant-ui runtime, full transcript virtualization, content-visibility, or bounded history backfill."
+    }
+  ],
+  "constraints": [
+    "Keep Codex App Server Thread, Turn, ThreadItem, completion, request, and lineage semantics authoritative; do not create a parallel chat-history store.",
+    "Preserve current raw-HTML denial, safe URL transformation, click-only remote media, exact code-copy text, and parser-failure readability boundaries.",
+    "Do not adopt Streamdown or assistant-ui runtime in this Ticket; the completed evaluation found no measured production advantage for Peel's current surface.",
+    "Do not use full transcript virtualization, content-visibility, or bounded history backfill until production Focus evidence demonstrates that initial historical mount, rather than thread-read or IPC, is the remaining user-visible bottleneck.",
+    "Do not report synthetic parser timing as Chat load performance; separate App Server thread/read, main-process snapshot work, IPC, renderer reconciliation, React commit, and paint."
+  ],
+  "context": "The completed Streamdown evaluation found that replacing Peel's Markdown runtime did not improve production-shaped first paint, session switching, or overall render cost, while the native renderer still rebuilds and transfers a full cloned ReducedThread for each notification. App.tsx installs each full snapshot, Transcript rescans Turns, requests, and notices and creates fresh callbacks/arrays, and unmemoized TurnView/MarkdownContent work is repeated for settled history. The smallest justified next step is therefore Peel-native: reconcile stable settled Turn/Item identities at the renderer boundary, memoize settled rows so only the active tail invalidates, add the already-evaluated 200,000-character readable fallback, and measure the real Focus pipeline before considering bounded history backfill.",
+  "context_refs": [
+    {
+      "purpose": "Provides the successful A/B evaluation, benchmark evidence, and decision to defer Streamdown and assistant-ui runtime.",
+      "ref": ".vibehub/outcomes/ticket-evaluate-streamdown-rendering-runtime.yaml"
+    },
+    {
+      "purpose": "Records the adopted native techniques and the measurement gate for any later bounded-backfill work.",
+      "ref": "docs/review/rendering-performance/README.md"
+    },
+    {
+      "purpose": "Owns full-snapshot installation, notification routing, Focus switching, Branch initiation, and Draft/Scroll state integration.",
+      "ref": "apps/desktop/src/renderer/App.tsx"
+    },
+    {
+      "purpose": "Owns full Turn traversal, item rendering, streaming presentation, per-Turn requests/notices, Branch actions, and scroll-follow behavior.",
+      "ref": "apps/desktop/src/renderer/Transcript.tsx"
+    },
+    {
+      "purpose": "Owns Markdown/math parsing, safe links and media, streaming projection, code copy, and the future oversized fallback boundary.",
+      "ref": "apps/desktop/src/renderer/Markdown.tsx"
+    },
+    {
+      "purpose": "Shows that each exposed ReducedThread currently deep-clones the full Thread, Turn, and Item graph after notification mutation.",
+      "ref": "packages/codex-app-server/src/reducer.ts"
+    },
+    {
+      "purpose": "Defines the Focus behaviors and recovery semantics that row memoization and snapshot reconciliation cannot regress.",
+      "ref": ".vibehub/rooms/product/contract-focus-chat-fidelity.yaml"
+    },
+    {
+      "purpose": "Keeps typed Codex lifecycle and the raw-HTML safety boundary ahead of speculative rendering features.",
+      "ref": ".vibehub/rooms/product/note-rendering-protocol-before-html.yaml"
+    },
+    {
+      "purpose": "Defines the accepted exact desktop deep-link and recoverable failure behavior that transcript memoization must preserve.",
+      "ref": ".vibehub/outcomes/ticket-fix-open-in-codex-deep-link.yaml"
+    }
+  ],
+  "deliveries": [],
+  "kind": "ticket",
+  "maturity": "firm",
+  "outcome": "Long and actively streaming Focus transcripts stay responsive through Peel-native stable settled-row identity, tail-only invalidation, and a safe oversized-message fallback, with production Electron evidence that distinguishes Codex read latency from snapshot, render, and paint cost.",
+  "provenance_refs": [
+    "conversation:2026-09-17-native-transcript-experience-over-renderer-migration"
+  ],
+  "relations": [],
+  "schema_version": 2,
+  "ticket_id": "ticket-optimize-native-transcript-rendering"
+}

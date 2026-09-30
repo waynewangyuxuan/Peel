@@ -1,0 +1,27 @@
+{
+  "acceptance_ids": [
+    "security-accessibility-performance-review",
+    "evidence-backed-gap-prioritization",
+    "smallest-follow-up-ticket-plan"
+  ],
+  "evidence_id": "evidence-rendering-risk-and-follow-up-plan",
+  "kind": "ticket_evidence",
+  "origin": "agent",
+  "recorded_at": "2026-09-17T06:58:57Z",
+  "refs": [
+    "docs/review/rendering-audit/README.md",
+    "apps/desktop/index.html",
+    "apps/desktop/src/main/main.ts",
+    "apps/desktop/src/renderer/Markdown.tsx",
+    "apps/desktop/src/renderer/Transcript.tsx",
+    "apps/desktop/src/renderer/App.tsx",
+    "packages/codex-app-server/src/reducer.ts",
+    "command:node packages/codex-app-server/scripts/check-installed-schema.mjs#passed-2026-09-16",
+    "command:npm test --workspace @peel/codex-app-server#21-passed-2026-09-16",
+    "command:npm test --workspace @peel/desktop#51-passed-2026-09-16",
+    "command:vh project validate#passed-2026-09-16"
+  ],
+  "schema_version": 1,
+  "summary": "The audit documents the Electron sandbox, CSP, URL and remote-content policies; raw-HTML, data-image, local-path, clipboard, accessibility, bidi, overflow, streaming, and large-document risks; and labels performance claims as source-backed risks pending measurement. It ranks request routing and item-specific deltas above semantic item/media routes, math, and measured optimization, proposes the smallest dependency graph, recommends splitting the unrelated math and Branch work, and defers HTML until a separate evidence-backed product/security decision. Verification passed the installed-schema check, all 21 App Server tests, all 51 Desktop unit tests, and VibeHub project validation with no production renderer change.",
+  "ticket_id": "ticket-audit-codex-rendering-surface"
+}

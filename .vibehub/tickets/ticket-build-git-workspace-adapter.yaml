@@ -44,6 +44,7 @@
   "kind": "ticket",
   "maturity": "firm",
   "outcome": "Peel has a tested GitWorkspaceAdapter that safely creates and describes optional Fork worktrees while keeping failure recoverable and separate from Space topology.",
+  "deliveries": [],
   "provenance_refs": [
     "conversation:2026-08-25-peel-v01-v02-scope"
   ],
@@ -54,6 +55,6 @@
       "type": "depends_on"
     }
   ],
-  "schema_version": 1,
+  "schema_version": 2,
   "ticket_id": "ticket-build-git-workspace-adapter"
 }

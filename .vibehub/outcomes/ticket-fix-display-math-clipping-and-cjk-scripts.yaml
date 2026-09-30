@@ -1,0 +1,18 @@
+{
+  "accepted_acceptance_ids": [
+    "unclipped-display-glyphs",
+    "cjk-script-layout",
+    "math-layout-regression-evidence"
+  ],
+  "closed_at": "2026-09-17T19:14:42Z",
+  "evidence_ids": [
+    "evidence-display-math-production-regression",
+    "evidence-display-math-visual-containment"
+  ],
+  "kind": "ticket_outcome",
+  "schema_version": 1,
+  "status": "successful",
+  "summary": "Independent closeout accepted all three criteria. The production CSS gives display KaTeX scalable vertical ink space while retaining local horizontal scrolling, and narrowly targets only CJK subscript fallback spans with a proportionate Songti-family face and downward offset; no formula-specific markup or source rewrite was introduced. The production Electron regression confirms exact 1440x960 and 1000x720 viewports, measures the whole Latin formula and every non-empty visible text node inside its scroll container, and proves superscript, base, and CJK-subscript center ordering for both reported CJK expressions without page overflow. Six durable screenshots match the current focused-run outputs and visibly show complete Latin glyphs and separated, legible scripts. The prior safe renderer contract remains covered: raw HTML disabled, KaTeX trust false, HTML plus MathML output, readable incomplete streams, source-faithful copy, and code isolation. Fresh independent verification passed 24 App Server, 12 Git workspace, and 64 desktop tests, the full production build, the focused Electron suite 2/2, git diff checking, and VibeHub validation.",
+  "ticket_id": "ticket-fix-display-math-clipping-and-cjk-scripts",
+  "unresolved_acceptance_ids": []
+}

@@ -49,6 +49,7 @@
   "kind": "ticket",
   "maturity": "firm",
   "outcome": "Thread Picker has a measurably fast warm path, searches without stale-result races, and progressively exposes every matching Codex Chat instead of silently stopping at 50.",
+  "deliveries": [],
   "provenance_refs": [
     "conversation:2026-08-26-dogfood-ui-search-feedback",
     "commit:1e9843dad477d34e2000ccda7b463aa3e361f809"
@@ -60,6 +61,6 @@
       "type": "depends_on"
     }
   ],
-  "schema_version": 1,
+  "schema_version": 2,
   "ticket_id": "ticket-optimize-thread-picker-discovery"
 }

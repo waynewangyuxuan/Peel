@@ -50,6 +50,7 @@
   "kind": "ticket",
   "maturity": "firm",
   "outcome": "Peel Focus Chat becomes a first-class readable conversation surface with contained navigation, discoverable long titles, safe full Markdown rendering, and compact human activity hierarchy aligned with the approved Demo.",
+  "deliveries": [],
   "provenance_refs": [
     "conversation:2026-08-26-focus-chat-ui-dogfood"
   ],
@@ -60,6 +61,6 @@
       "type": "depends_on"
     }
   ],
-  "schema_version": 1,
+  "schema_version": 2,
   "ticket_id": "ticket-fix-focus-chat-content-and-navigation"
 }

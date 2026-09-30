@@ -1,0 +1,19 @@
+{
+  "accepted_acceptance_ids": [
+    "exact-desktop-thread-deep-link",
+    "safe-unavailable-app-failure",
+    "open-target-regression-evidence"
+  ],
+  "closed_at": "2026-09-17T18:58:01Z",
+  "evidence_ids": [
+    "evidence-exact-codex-desktop-deep-link",
+    "evidence-open-codex-target-regression",
+    "evidence-open-target-browser-preservation"
+  ],
+  "kind": "ticket_outcome",
+  "schema_version": 1,
+  "status": "successful",
+  "summary": "Independent closeout accepted all three criteria on branch fix/codex-rendering-contract. The installed ChatGPT/Codex app declares the codex protocol and its bundled route uses codex://threads/<threadId>. Peel now validates a selected UUID and dispatches the URL-encoded codex://threads/<id> URI directly through the operating system, with no clipboard or chatgpt.com intermediary. All renderer entry points share guarded dispatch; a rejected handler produces a recoverable install/retry toast while the selected Thread remains in place. Invalid identifiers fail before dispatch. File, editor, worktree, and browser external-link behavior remains unchanged and is covered by unit and production Electron tests. Independent verification passed all 99 repository unit tests, the full production build, VibeHub validation, and the dedicated Electron deep-link/browser/failure test 1/1.",
+  "ticket_id": "ticket-fix-open-in-codex-deep-link",
+  "unresolved_acceptance_ids": []
+}

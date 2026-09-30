@@ -58,6 +58,7 @@
   "kind": "ticket",
   "maturity": "firm",
   "outcome": "Peel lets the user begin a real new Codex Chat immediately, gives existing-Chat discovery a distinct search-only entry, and presents a ChatGPT-familiar Composer with live microphone-level feedback.",
+  "deliveries": [],
   "provenance_refs": [
     "conversation:2026-08-27-new-chat-composer-and-live-voice-feedback"
   ],
@@ -68,6 +69,6 @@
       "type": "depends_on"
     }
   ],
-  "schema_version": 1,
+  "schema_version": 2,
   "ticket_id": "ticket-rework-new-chat-composer-and-voice-feedback"
 }

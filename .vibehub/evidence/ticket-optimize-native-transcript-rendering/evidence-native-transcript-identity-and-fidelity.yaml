@@ -1,0 +1,32 @@
+{
+  "acceptance_ids": [
+    "stable-settled-transcript-identity",
+    "tail-only-focus-invalidation",
+    "focus-fidelity-regression-coverage"
+  ],
+  "evidence_id": "evidence-native-transcript-identity-and-fidelity",
+  "kind": "ticket_evidence",
+  "origin": "agent",
+  "recorded_at": "2026-09-18T00:26:29Z",
+  "refs": [
+    "apps/desktop/src/renderer/thread-snapshot.ts",
+    "apps/desktop/src/renderer/App.tsx",
+    "apps/desktop/src/renderer/Transcript.tsx",
+    "apps/desktop/src/renderer/Markdown.tsx",
+    "apps/desktop/test/thread-snapshot.test.ts",
+    "apps/desktop/test/markdown.test.tsx",
+    "apps/desktop/e2e/math-layout.spec.ts",
+    "apps/desktop/e2e/open-codex.spec.ts",
+    "apps/desktop/e2e/server-request-routing.spec.ts",
+    "apps/desktop/e2e/v01-journey.spec.ts",
+    "command:npm test --workspace @peel/desktop passed 82/82",
+    "command:npm run typecheck --workspace @peel/desktop passed",
+    "command:npm run build --workspace @peel/desktop passed",
+    "command:npm run test --workspace @peel/git-workspace passed 12/12",
+    "command:npx playwright test e2e/math-layout.spec.ts e2e/open-codex.spec.ts e2e/rendering-performance.spec.ts e2e/server-request-routing.spec.ts passed 4/4",
+    "command:npx playwright test e2e/v01-journey.spec.ts reached line 903 then failed on the existing session-resume fixture expectation"
+  ],
+  "schema_version": 1,
+  "summary": "Renderer-boundary reconciliation now preserves referential identity for unchanged settled Turns and ThreadItems while giving the affected live Turn and Item new identity. Memoized Turn, Item, and Markdown views therefore leave completed history untouched, and structural comparison of independent request and notice props invalidates only their owning Turn or thread-level surface. Unit coverage exercises notification reconciliation, baseline replacement, authoritative read refreshes, and request/notice invalidation. Fresh verification passed 82 Desktop tests, Desktop typecheck/build, 25 App Server tests, 12 Git workspace tests, and the production Electron math-layout, exact Open in Codex, server-request-routing, and isolated renderer benchmark cases. The broad v0.1 journey passed Focus, Branch, Markdown, Draft/Scroll, attachment, Voice, streaming, request, scale, and restart assertions before failing at its existing line-903 session-resume fixture expectation; that journey is deliberately not reported as passing.",
+  "ticket_id": "ticket-optimize-native-transcript-rendering"
+}

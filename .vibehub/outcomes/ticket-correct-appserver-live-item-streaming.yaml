@@ -1,0 +1,21 @@
+{
+  "accepted_acceptance_ids": [
+    "item-specific-delta-reduction",
+    "reasoning-channel-fidelity",
+    "authoritative-completion",
+    "live-rendering-behavior",
+    "streaming-contract-evidence"
+  ],
+  "closed_at": "2026-09-17T18:27:20Z",
+  "evidence_ids": [
+    "evidence-item-specific-stream-reduction",
+    "evidence-live-streaming-contract-tests",
+    "evidence-notification-snapshot-live-path"
+  ],
+  "kind": "ticket_outcome",
+  "schema_version": 1,
+  "status": "successful",
+  "summary": "Independent closeout accepted all five criteria. The reducer has schema-aligned, item-scoped handling for every named delta and preserves reasoning summary boundaries apart from raw content; authoritative completion rejects stale, duplicate, mismatched, and post-completion mutation. Reducer-derived snapshots now drive live renderer updates without notification-time thread rereads, while agent, plan, public reasoning summary, and exact command output render safely without scroll jumps. Repository tests passed 24 adapter, 12 git-workspace, and 54 desktop cases. The rebuilt Electron journey passed every in-scope streaming, reasoning-priority, command-exactness, scroll, and at-most-one initial child-read assertion before reaching a documented unrelated later resume-alert failure.",
+  "ticket_id": "ticket-correct-appserver-live-item-streaming",
+  "unresolved_acceptance_ids": []
+}

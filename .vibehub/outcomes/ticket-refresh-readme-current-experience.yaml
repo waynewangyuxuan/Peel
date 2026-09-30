@@ -1,0 +1,19 @@
+{
+  "accepted_acceptance_ids": [
+    "fresh-current-product-captures",
+    "readme-copy-matches-current-build",
+    "durable-legible-assets",
+    "readme-link-and-command-verification"
+  ],
+  "closed_at": "2026-09-18T20:55:23Z",
+  "evidence_ids": [
+    "evidence-readme-current-content-and-links",
+    "evidence-readme-current-product-visuals"
+  ],
+  "kind": "ticket_outcome",
+  "schema_version": 1,
+  "status": "successful",
+  "summary": "Independent closeout accepted all four criteria. Original-detail inspection of both tracked 1600x1000 production Electron captures confirms the current Peel mark and shell, meaningful named Chats, persistent Branch from here actions, explicit Parent navigation, repaired math/CJK layout, six current Overview cards, and no private path, credential, or unrelated user content. The reproducible isolated-fixture capture script writes the repository-relative PNGs, which total 599,257 bytes and are not ignored test artifacts. README and desktop copy preserve the Thread-first real-Fork model and unsigned local dogfood boundary while accurately documenting current startup, diagnostics, Codex 0.154 voice fallback, Open Codex, and launch behavior. Independent verification resolved 10 local links, matched eight commands to package scripts, validated both PNGs, passed git diff checking, and confirmed codex-cli 0.154.0. No acceptance gaps remain.",
+  "ticket_id": "ticket-refresh-readme-current-experience",
+  "unresolved_acceptance_ids": []
+}

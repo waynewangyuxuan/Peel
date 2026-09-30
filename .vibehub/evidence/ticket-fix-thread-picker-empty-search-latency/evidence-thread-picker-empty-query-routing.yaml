@@ -1,0 +1,28 @@
+{
+  "acceptance_ids": [
+    "omit-empty-search-term",
+    "shared-warm-recent-request",
+    "responsive-loading-and-refresh",
+    "empty-search-regression-coverage"
+  ],
+  "evidence_id": "evidence-thread-picker-empty-query-routing",
+  "kind": "ticket_evidence",
+  "origin": "agent",
+  "recorded_at": "2026-09-17T22:59:03Z",
+  "refs": [
+    "apps/desktop/src/main/peel-service.ts",
+    "packages/codex-app-server/test/client.test.ts",
+    "apps/desktop/test/peel-service-search.test.ts",
+    "apps/desktop/test/peel-service-new-chat.test.ts",
+    "apps/desktop/e2e/thread-picker-latency.spec.ts",
+    "apps/desktop/e2e/v01-journey.spec.ts",
+    "command:npm run test --workspace @peel/codex-app-server passed 25 of 25 tests",
+    "command:npm run test --workspace @peel/desktop passed 76 of 76 tests",
+    "command:npm run build --workspace @peel/desktop passed typecheck native renderer main and preload builds",
+    "command:npm run test:e2e --workspace @peel/desktop -- thread-picker-latency.spec.ts passed 1 of 1 in 4.9 seconds",
+    "command:npm run test:e2e --workspace @peel/desktop -- v01-journey.spec.ts reached line 903 after all new Picker assertions then timed out at the unrelated failed-session-resume alert"
+  ],
+  "schema_version": 1,
+  "summary": "PeelService now routes a normalized empty query through client.listThreads with the existing cursor, 30-item limit, updated_at descending sort, cache key, TTL, and in-flight map; only non-empty terms call client.searchThreads. Adapter tests prove ordinary listing omits searchTerm while real search sends it. Service tests prove connection warmup, an opened Picker, concurrent callers, the 15,000ms cache boundary, pagination parameters, and non-empty search remain distinct. The focused production Electron test opens the Picker while a 750ms warm request is pending, confirms the search field and loading state remain interactive, proves exactly one shared request, reopens cached results below 100ms, loads the second page without searchTerm, and sends the exact non-empty term. The full desktop unit suite passed 76/76 and the focused Electron suite passed 1/1; the complete v01 journey passed every new Picker assertion before encountering its previously observed unrelated late failed-resume alert timeout.",
+  "ticket_id": "ticket-fix-thread-picker-empty-search-latency"
+}

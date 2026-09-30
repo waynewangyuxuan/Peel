@@ -1,16 +1,22 @@
-import type { AppServerServerRequest, ThreadListResponse, UserInput } from "@peel/codex-app-server";
+import type { AppServerNotification, AppServerServerRequest, CodexTurn, ThreadListResponse, UserInput } from "@peel/codex-app-server";
 import type { WorkspaceDiffSummary } from "@peel/git-workspace";
 import { useCallback, useEffect, useMemo, useRef, useState, type ReactNode } from "react";
 import { flushSync } from "react-dom";
 
-import { THREAD_SEARCH_CACHE_TTL_MS, type ForkDraft, type PeelState, type Point, type SpaceNode, type SpaceRecord, type ThreadSnapshot } from "../shared/contracts";
-import { emptyState, suggestedChildPosition } from "../shared/state";
+import { THREAD_SEARCH_CACHE_TTL_MS, type CodexNotice, type ForkDraft, type PeelState, type Point, type ServerRequestResponseInput, type SpaceNode, type SpaceRecord, type ThreadSnapshot, type ThreadViewState } from "../shared/contracts";
+import { emptyState, shouldApplyIncomingThreadName, suggestedChildPosition, temporaryTitle } from "../shared/state";
 import { ForkComposer, Transcript } from "./Transcript";
 import { Overview } from "./Overview";
 import { BrandMark, PeelBrand } from "./Brand";
 import { Icon } from "./icons";
 import { clip, itemText, latestCompletedTurn, relativeTime } from "./lib";
+import { openCodexInDesktop } from "./open-codex";
 import { mergeThreadPage, threadMatches } from "./thread-search";
+import { reconcileThreadSnapshot } from "./thread-snapshot";
+import { beginTranscriptUpdate, installTranscriptPerformanceApi, transcriptSnapshotMode } from "./transcript-performance";
+
+const DIAGNOSTIC_WARNING_TTL_MS = 8_000;
+const DIAGNOSTIC_FADE_MS = 600;
 
 export function App(): ReactNode {
   const [state, setState] = useState<PeelState | null>(null);
@@ -19,8 +25,10 @@ export function App(): ReactNode {
   const [connected, setConnected] = useState(false);
   const [connectionError, setConnectionError] = useState<string | null>(null);
   const [threads, setThreads] = useState<Record<string, ThreadSnapshot>>({});
+  const threadsRef = useRef<Record<string, ThreadSnapshot>>({});
   const [diffs, setDiffs] = useState<Record<string, WorkspaceDiffSummary>>({});
-  const [approvals, setApprovals] = useState<AppServerServerRequest[]>([]);
+  const [pendingRequests, setPendingRequests] = useState<AppServerServerRequest[]>([]);
+  const [notices, setNotices] = useState<CodexNotice[]>([]);
   const [forkDraft, setForkDraft] = useState<ForkDraft | null>(null);
   const [forkError, setForkError] = useState<string | null>(null);
   const [forkBusy, setForkBusy] = useState(false);
@@ -28,9 +36,8 @@ export function App(): ReactNode {
   const [showThreadPicker, setShowThreadPicker] = useState(false);
   const [newChatBusy, setNewChatBusy] = useState(false);
   const [diffThreadId, setDiffThreadId] = useState<string | null>(null);
+  const [showDiagnostics, setShowDiagnostics] = useState(false);
   const [toast, setToast] = useState<string | null>(null);
-  const refreshTimers = useRef(new Map<string, number>());
-  const refreshPending = useRef(new Set<string>());
   const highlightTimer = useRef<number | null>(null);
 
   const installState = useCallback((next: PeelState): void => {
@@ -53,17 +60,42 @@ export function App(): ReactNode {
     persist(next, delay);
   }, [persist]);
 
+  const installThreadSnapshot = useCallback((
+    threadId: string,
+    snapshot: ThreadSnapshot,
+    notification: AppServerNotification | null,
+  ): ThreadSnapshot => {
+    const reconciliationStarted = performance.now();
+    const reconciled = reconcileThreadSnapshot(
+      threadsRef.current[threadId],
+      snapshot,
+      notification,
+      transcriptSnapshotMode(),
+    );
+    const reconciliationMs = performance.now() - reconciliationStarted;
+    threadsRef.current = { ...threadsRef.current, [threadId]: reconciled };
+    beginTranscriptUpdate(threadId, snapshot, reconciliationMs, notification?.method ?? "thread/read");
+    setThreads(threadsRef.current);
+    return reconciled;
+  }, []);
+
+  const clearThreads = useCallback((): void => {
+    threadsRef.current = {};
+    setThreads({});
+  }, []);
+
   const readThread = useCallback(async (threadId: string): Promise<ThreadSnapshot> => {
     const snapshot = await window.peel.readThread(threadId);
-    setThreads((current) => ({ ...current, [threadId]: snapshot }));
-    return snapshot;
-  }, []);
+    return installThreadSnapshot(threadId, snapshot, null);
+  }, [installThreadSnapshot]);
 
   useEffect(() => {
     void window.peel.bootstrap().then((bootstrap) => {
       installState(bootstrap.state);
       setConnected(bootstrap.connected);
       setConnectionError(bootstrap.connectionError);
+      setPendingRequests(bootstrap.pendingRequests);
+      setNotices(bootstrap.notices);
     }).catch((error) => {
       installState(emptyState());
       setConnectionError(messageOf(error));
@@ -72,42 +104,35 @@ export function App(): ReactNode {
       setConnected(payload.connected);
       setConnectionError(payload.error);
     });
-    const offNotification = window.peel.onCodexNotification((notification) => {
+    const offNotification = window.peel.onCodexNotification(({ notification, snapshot }) => {
       const params = notification.params as Record<string, unknown>;
       const threadId = typeof params.threadId === "string" ? params.threadId : null;
       if (!threadId) return;
+      if (snapshot) installThreadSnapshot(threadId, snapshot, notification);
       if (notification.method === "thread/name/updated" && typeof params.name === "string") {
         mutate((draft) => {
           for (const space of Object.values(draft.spaces)) {
             const node = space.nodes[threadId];
-            if (!node || node.titleOrigin === "manual") continue;
+            if (!node || !shouldApplyIncomingThreadName(node.titleOrigin, node.title, params.name as string)) continue;
             node.title = params.name as string;
             node.titleOrigin = "automatic";
+            if (space.rootThreadId === threadId && space.nameOrigin === "default") space.name = node.title;
           }
         }, 0);
       }
-      refreshPending.current.add(threadId);
-      const scheduleRefresh = (): void => {
-        if (refreshTimers.current.has(threadId)) return;
-        refreshPending.current.delete(threadId);
-        void readThread(threadId).then((snapshot) => {
-          const current = stateRef.current;
-          if (current.viewMode !== "focus" || current.activeThreadId !== threadId) return;
+      if (notification.method === "turn/completed" && snapshot) {
+        const current = stateRef.current;
+        if (current.viewMode === "focus" && current.activeThreadId === threadId && current.activeSpaceId) {
           const latest = latestCompletedTurn(snapshot.thread);
-          if (!latest || !current.activeSpaceId) return;
-          mutate((draft) => { const node = draft.spaces[current.activeSpaceId!]?.nodes[threadId]; if (node) node.lastViewedTurnId = latest.id; }, 400);
-        }).catch(() => undefined);
-        const timer = window.setTimeout(() => {
-          refreshTimers.current.delete(threadId);
-          if (refreshPending.current.has(threadId)) scheduleRefresh();
-        }, 70);
-        refreshTimers.current.set(threadId, timer);
-      };
-      scheduleRefresh();
+          if (latest) mutate((draft) => {
+            const node = draft.spaces[current.activeSpaceId!]?.nodes[threadId];
+            if (node) node.lastViewedTurnId = latest.id;
+          }, 400);
+        }
+      }
     });
-    const offRequest = window.peel.onServerRequest((request) => {
-      setApprovals((current) => [...current.filter((item) => item.id !== request.id), request]);
-    });
+    const offPendingRequests = window.peel.onPendingRequests(setPendingRequests);
+    const offNotices = window.peel.onNotices(setNotices);
     const offFlush = window.peel.onFlushRequest(async () => {
       if (saveTimer.current !== null) window.clearTimeout(saveTimer.current);
       saveTimer.current = null;
@@ -116,15 +141,37 @@ export function App(): ReactNode {
     return () => {
       offConnection();
       offNotification();
-      offRequest();
+      offPendingRequests();
+      offNotices();
       offFlush();
       if (highlightTimer.current !== null) window.clearTimeout(highlightTimer.current);
     };
-  }, [installState, mutate, readThread]);
+  }, [installState, installThreadSnapshot, mutate]);
 
   const activeSpace = state?.activeSpaceId ? state.spaces[state.activeSpaceId] ?? null : null;
   const activeNode = activeSpace && state?.activeThreadId ? activeSpace.nodes[state.activeThreadId] ?? null : null;
   const activeSnapshot = activeNode ? threads[activeNode.threadId] ?? null : null;
+
+  const openPerformanceThread = useCallback((threadId: string, cold: boolean): void => {
+    const current = stateRef.current;
+    const space = Object.values(current.spaces).find((candidate) => candidate.nodes[threadId]);
+    if (!space) throw new Error(`No Space contains benchmark Thread ${threadId}`);
+    if (cold) {
+      const nextThreads = { ...threadsRef.current };
+      delete nextThreads[threadId];
+      threadsRef.current = nextThreads;
+      setThreads(nextThreads);
+    }
+    const alreadyActive = current.viewMode === "focus" && current.activeThreadId === threadId;
+    mutate((draft) => {
+      draft.activeSpaceId = space.id;
+      draft.activeThreadId = threadId;
+      draft.viewMode = "focus";
+    }, 0);
+    if (alreadyActive) void readThread(threadId);
+  }, [mutate, readThread]);
+
+  useEffect(() => installTranscriptPerformanceApi({ openThread: openPerformanceThread }), [openPerformanceThread]);
 
   const startNewChat = useCallback(async (): Promise<void> => {
     if (!connected || newChatBusy) return;
@@ -132,14 +179,14 @@ export function App(): ReactNode {
     setShowThreadPicker(false);
     try {
       installState(await window.peel.startNewChat(activeNode?.cwd ? { cwd: activeNode.cwd } : {}));
-      setThreads({});
+      clearThreads();
       setForkDraft(null);
     } catch (error) {
       setToast(userFacingError(error, "The new Chat could not be created. Try again."));
     } finally {
       setNewChatBusy(false);
     }
-  }, [activeNode?.cwd, connected, installState, newChatBusy]);
+  }, [activeNode?.cwd, clearThreads, connected, installState, newChatBusy]);
 
   useEffect(() => {
     if (!connected || !activeNode) return;
@@ -187,6 +234,39 @@ export function App(): ReactNode {
     return () => window.removeEventListener("keydown", onKey);
   }, [forkBusy, forkDraft, mutate, startNewChat]);
 
+  const beginFork = useCallback((turnId: string): void => {
+    const current = stateRef.current;
+    const spaceId = current.activeSpaceId;
+    const threadId = current.activeThreadId;
+    const space = spaceId ? current.spaces[spaceId] : null;
+    const node = space && threadId ? space.nodes[threadId] : null;
+    if (!space || !node) return;
+    flushSync(() => {
+      setForkError(null);
+      setForkDraft({
+        pendingForkId: crypto.randomUUID(),
+        parentThreadId: node.threadId,
+        forkedAtTurnId: turnId,
+        createdAt: performance.now(),
+        position: suggestedChildPosition(space, node.threadId),
+        prompt: "",
+        createWorktree: false,
+      });
+    });
+  }, []);
+
+  const openCodex = useCallback(async (node: Pick<SpaceNode, "cwd" | "threadId">): Promise<void> => {
+    const error = await openCodexInDesktop(window.peel.openTarget, node);
+    if (error) setToast(error);
+  }, []);
+  const openActiveCodex = useCallback((): void => {
+    if (activeNode) void openCodex({ cwd: activeNode.cwd, threadId: activeNode.threadId });
+  }, [activeNode?.cwd, activeNode?.threadId, openCodex]);
+  const branchActiveTurn = useCallback((turn: CodexTurn): void => beginFork(turn.id), [beginFork]);
+  const respondServerRequest = useCallback(async (input: ServerRequestResponseInput): Promise<void> => {
+    await window.peel.respondServerRequest(input);
+  }, []);
+
   if (!state) return <div className="launch-screen"><BrandMark className="peel-mark" title="Peel"/><span>Opening Peel…</span></div>;
 
   const selectThread = (threadId: string, focusTurnId?: string): void => {
@@ -207,22 +287,6 @@ export function App(): ReactNode {
       highlightTimer.current = null;
       setHighlightTarget((current) => current?.threadId === threadId && current.turnId === turnId ? null : current);
     }, 1800);
-  };
-
-  const beginFork = (turnId: string): void => {
-    if (!activeSpace || !activeNode) return;
-    flushSync(() => {
-      setForkError(null);
-      setForkDraft({
-        pendingForkId: crypto.randomUUID(),
-        parentThreadId: activeNode.threadId,
-        forkedAtTurnId: turnId,
-        createdAt: performance.now(),
-        position: suggestedChildPosition(activeSpace, activeNode.threadId),
-        prompt: "",
-        createWorktree: false,
-      });
-    });
   };
 
   const commitFork = async (): Promise<void> => {
@@ -265,7 +329,6 @@ export function App(): ReactNode {
       installState(bootstrap.state);
       setForkDraft(null);
       setToast(result.persistenceWarning ? "Fork sent; local state recovered after a temporary save failure" : result.worktreeName ? `Fork created in ${result.worktreeName}` : "Fork created");
-      void readThread(result.threadId);
     } catch (error) {
       setForkError(messageOf(error));
     } finally {
@@ -276,10 +339,21 @@ export function App(): ReactNode {
   const send = async (inputs: UserInput[]): Promise<void> => {
     if (!activeNode) return;
     await window.peel.sendTurn({ threadId: activeNode.threadId, input: inputs, cwd: activeNode.cwd });
-    mutate((draft) => { draft.threadViews[activeNode.threadId] = { draft: "", scrollTop: draft.threadViews[activeNode.threadId]?.scrollTop ?? 0 }; }, 0);
+    const prompt = inputs.find((input) => input.type === "text")?.text;
+    mutate((draft) => {
+      const currentView = draft.threadViews[activeNode.threadId] ?? { draft: "", scrollTop: 0 };
+      draft.threadViews[activeNode.threadId] = { ...currentView, draft: "" };
+      const space = draft.activeSpaceId ? draft.spaces[draft.activeSpaceId] : null;
+      const node = space?.nodes[activeNode.threadId];
+      if (!space || !node || node.titleOrigin !== "temporary" || node.title !== "New Chat" || !prompt?.trim()) return;
+      node.title = temporaryTitle(prompt, "New Chat");
+      if (space.rootThreadId === node.threadId && space.nameOrigin === "default") space.name = node.title;
+      space.updatedAt = Date.now();
+    }, 0);
   };
 
   const currentDraft = activeNode ? state.threadViews[activeNode.threadId]?.draft ?? "" : "";
+  const activeThreadView = activeNode ? state.threadViews[activeNode.threadId] : undefined;
   const renameThread = async (threadId: string, name: string): Promise<void> => {
     if (!activeSpace) return;
     const spaceId = activeSpace.id;
@@ -289,6 +363,8 @@ export function App(): ReactNode {
       if (!node) return;
       node.title = name;
       node.titleOrigin = "manual";
+      const space = draft.spaces[spaceId]!;
+      if (space.rootThreadId === threadId && space.nameOrigin === "default") space.name = name;
     }, 0);
   };
   return <div className={`app ${state.viewMode} ${forkDraft ? "forking" : ""}`}>
@@ -304,7 +380,7 @@ export function App(): ReactNode {
       onSearch={() => setShowThreadPicker(true)}
     />
     <main className="workspace">
-      {!activeSpace || !activeNode ? <Welcome connected={connected} error={connectionError} newChatBusy={newChatBusy} onNewChat={() => void startNewChat()} onSearch={() => setShowThreadPicker(true)} /> : <>
+      {!activeSpace || !activeNode ? <Welcome connected={connected} error={connectionError} newChatBusy={newChatBusy} diagnosticsCount={notices.length} onNewChat={() => void startNewChat()} onSearch={() => setShowThreadPicker(true)} onDiagnostics={() => setShowDiagnostics(true)} /> : <>
         <TopBar
           key={activeNode.threadId}
           space={activeSpace}
@@ -312,7 +388,7 @@ export function App(): ReactNode {
           mode={state.viewMode}
           connected={connected}
           onMode={(mode) => mutate((draft) => { draft.viewMode = mode; }, 0)}
-          onRenameSpace={(name) => mutate((draft) => { const target = draft.spaces[activeSpace.id]; if (target) { target.name = name; target.updatedAt = Date.now(); } }, 0)}
+          onRenameSpace={(name) => mutate((draft) => { const target = draft.spaces[activeSpace.id]; if (target) { target.name = name; target.nameOrigin = "manual"; target.updatedAt = Date.now(); } }, 0)}
           onArchive={() => mutate((draft) => {
             draft.spaces[activeSpace.id]!.archived = true;
             const next = Object.values(draft.spaces).find((space) => !space.archived && space.id !== activeSpace.id);
@@ -321,7 +397,9 @@ export function App(): ReactNode {
           }, 0)}
           onRenameThread={async (name) => await renameThread(activeNode.threadId, name)}
           onDiff={() => setDiffThreadId(activeNode.threadId)}
-          onOpenCodex={() => void window.peel.openTarget({ kind: "codex", cwd: activeNode.cwd, threadId: activeNode.threadId })}
+          onOpenCodex={openActiveCodex}
+          diagnosticsCount={notices.length}
+          onDiagnostics={() => setShowDiagnostics(true)}
         />
         {state.viewMode === "focus" ? <div className="focus-layout">
           <LineageRail space={activeSpace} activeThreadId={activeNode.threadId} threads={threads} onSelect={selectThread} onRename={renameThread}/>
@@ -332,23 +410,26 @@ export function App(): ReactNode {
             node={activeNode}
             diff={diffs[activeNode.threadId] ?? null}
             draft={currentDraft}
-            approvals={approvals.filter((request) => (request.params as Record<string, unknown>).threadId === activeNode.threadId)}
+            requests={pendingRequests.filter((request) => requestThreadId(request) === activeNode.threadId)}
+            notices={notices.filter((notice) => notice.threadId === activeNode.threadId)}
             highlightTurnId={highlightTarget?.threadId === activeNode.threadId ? highlightTarget.turnId : null}
-            restoreScrollTop={state.threadViews[activeNode.threadId]?.scrollTop ?? 0}
+            hasSavedScroll={Boolean(activeThreadView)}
+            restoreScrollTop={activeThreadView?.scrollTop ?? 0}
+            restoreScrollAnchor={activeThreadView?.scrollAnchor ?? null}
             onHighlightScrolled={(turnId) => acknowledgeHighlightScroll(activeNode.threadId, turnId)}
             onDraft={(value) => mutate((draft) => {
               const current = draft.threadViews[activeNode.threadId] ?? { draft: "", scrollTop: 0 };
               draft.threadViews[activeNode.threadId] = { ...current, draft: value };
             })}
-            onScroll={(scrollTop) => mutate((draft) => {
+            onScroll={(view) => mutate((draft) => {
               const current = draft.threadViews[activeNode.threadId] ?? { draft: "", scrollTop: 0 };
-              draft.threadViews[activeNode.threadId] = { ...current, scrollTop };
+              draft.threadViews[activeNode.threadId] = { ...current, ...view } satisfies ThreadViewState;
             }, 600)}
             onSend={send}
-            onBranch={(turn) => beginFork(turn.id)}
-            onApproval={async (input) => { await window.peel.decideApproval(input); setApprovals((all) => all.filter((item) => item.id !== input.id)); }}
+            onBranch={branchActiveTurn}
+            onRequestResponse={respondServerRequest}
             onDiff={() => setDiffThreadId(activeNode.threadId)}
-            onOpenCodex={() => void window.peel.openTarget({ kind: "codex", cwd: activeNode.cwd, threadId: activeNode.threadId })}
+            onOpenCodex={openActiveCodex}
           /> : <ThreadLoading/>}
           {forkDraft && <ForkComposer fork={forkDraft} parentTitle={activeNode.title} parentWorktreeName={activeNode.worktreeName} error={forkError} busy={forkBusy} onChange={setForkDraft} onCancel={() => setForkDraft(null)} onCommit={commitFork}/>}
         </div> : <Overview
@@ -364,14 +445,101 @@ export function App(): ReactNode {
         />}
       </>}
     </main>
+    {notices.some((notice) => notice.threadId === null) && <HostDiagnostics notices={notices.filter((notice) => notice.threadId === null)}/>}
     {showThreadPicker && <ThreadPicker connected={connected} onClose={() => setShowThreadPicker(false)} onStart={async (threadId) => {
       installState(await window.peel.startSpace({ threadId }));
       setShowThreadPicker(false);
-      setThreads({});
+      clearThreads();
     }}/>} 
-    {diffThreadId && activeSpace?.nodes[diffThreadId] && <DiffDrawer node={activeSpace.nodes[diffThreadId]} onClose={() => setDiffThreadId(null)} />}
+    {diffThreadId && activeSpace?.nodes[diffThreadId] && <DiffDrawer node={activeSpace.nodes[diffThreadId]} onClose={() => setDiffThreadId(null)} onOpenCodex={openCodex} />}
+    {showDiagnostics && <DiagnosticsDrawer notices={notices} state={state} onClose={() => setShowDiagnostics(false)}/>}
     {toast && <div className="toast" onAnimationEnd={() => setToast(null)}>{toast}</div>}
   </div>;
+}
+
+function HostDiagnostics({ notices }: { notices: CodexNotice[] }): ReactNode {
+  const [dismissed, setDismissed] = useState<Set<string>>(() => new Set());
+  const [fading, setFading] = useState<Set<string>>(() => new Set());
+
+  useEffect(() => {
+    const timers: number[] = [];
+    const now = Date.now();
+    for (const notice of notices) {
+      if (notice.kind === "error") continue;
+      const key = diagnosticInstanceKey(notice);
+      if (dismissed.has(key)) continue;
+      const age = Math.max(0, now - notice.createdAt);
+      timers.push(window.setTimeout(() => {
+        setFading((current) => new Set(current).add(key));
+      }, Math.max(0, DIAGNOSTIC_WARNING_TTL_MS - DIAGNOSTIC_FADE_MS - age)));
+      timers.push(window.setTimeout(() => {
+        setDismissed((current) => new Set(current).add(key));
+      }, Math.max(0, DIAGNOSTIC_WARNING_TTL_MS - age)));
+    }
+    return () => timers.forEach((timer) => window.clearTimeout(timer));
+  }, [dismissed, notices]);
+
+  const visible = [...notices]
+    .sort((left, right) => left.createdAt - right.createdAt)
+    .filter((notice) => !dismissed.has(diagnosticInstanceKey(notice)))
+    .slice(-3);
+  if (visible.length === 0) return null;
+  return <aside className="host-diagnostics" aria-label="Codex diagnostics">
+    {visible.map((notice) => {
+      const key = diagnosticInstanceKey(notice);
+      return <div key={key} className={`host-diagnostic ${notice.kind} ${fading.has(key) ? "fading" : ""}`} role={notice.kind === "error" ? "alert" : "status"}>
+        <div className="host-diagnostic-heading"><strong>{notice.kind === "error" ? "Codex error" : "Codex notice"}</strong><button className="icon-button" aria-label={`Dismiss ${notice.kind === "error" ? "Codex error" : "Codex notice"}`} onClick={() => setDismissed((current) => new Set(current).add(key))}><Icon name="close" size={13}/></button></div>
+        <span>{notice.message}</span>
+      </div>;
+    })}
+  </aside>;
+}
+
+function DiagnosticsDrawer({ notices, state, onClose }: { notices: CodexNotice[]; state: PeelState; onClose(): void }): ReactNode {
+  const ordered = [...notices].sort((left, right) => right.createdAt - left.createdAt);
+  useEffect(() => {
+    const onKey = (event: globalThis.KeyboardEvent): void => { if (event.key === "Escape") onClose(); };
+    window.addEventListener("keydown", onKey);
+    return () => window.removeEventListener("keydown", onKey);
+  }, [onClose]);
+  return <div className="drawer-backdrop diagnostics-backdrop" onPointerDown={(event) => { if (event.target === event.currentTarget) onClose(); }}>
+    <aside className="diagnostics-drawer" role="dialog" aria-modal="true" aria-label="Codex diagnostics history">
+      <header><div><div className="eyebrow">This session</div><h2>Codex diagnostics</h2><p>Closing a message hides it here in Peel; it does not change the underlying Codex condition.</p></div><button className="icon-button" aria-label="Close Diagnostics" onClick={onClose} autoFocus><Icon name="close"/></button></header>
+      <div className="diagnostics-list">
+        {ordered.length === 0 && <div className="diagnostics-empty">No diagnostics in this session.</div>}
+        {ordered.map((notice) => <article className={`diagnostic-history-item ${notice.kind}`} key={diagnosticInstanceKey(notice)}>
+          <div className="diagnostic-history-meta"><span className={`diagnostic-kind ${notice.kind}`}>{notice.kind === "error" ? "Error" : "Warning"}</span><time dateTime={new Date(notice.createdAt).toISOString()}>{diagnosticTime(notice.createdAt)}</time></div>
+          <p>{notice.message}</p>
+          <footer><span>{diagnosticScope(notice, state)}</span>{notice.turnId && <span>Turn {shortIdentifier(notice.turnId)}</span>}</footer>
+        </article>)}
+      </div>
+      <footer>{ordered.length} session diagnostic{ordered.length === 1 ? "" : "s"} · keeps the latest 50</footer>
+    </aside>
+  </div>;
+}
+
+function diagnosticInstanceKey(notice: CodexNotice): string {
+  return `${notice.id}:${notice.createdAt}`;
+}
+
+function diagnosticTime(createdAt: number): string {
+  return new Intl.DateTimeFormat(undefined, { hour: "numeric", minute: "2-digit", second: "2-digit" }).format(createdAt);
+}
+
+function diagnosticScope(notice: CodexNotice, state: PeelState): string {
+  if (!notice.threadId) return "Global";
+  const node = Object.values(state.spaces).flatMap((space) => Object.values(space.nodes)).find((candidate) => candidate.threadId === notice.threadId);
+  return node ? `${node.title} · ${shortIdentifier(notice.threadId)}` : `Thread ${shortIdentifier(notice.threadId)}`;
+}
+
+function shortIdentifier(value: string): string {
+  return value.length > 16 ? `${value.slice(0, 8)}…${value.slice(-4)}` : value;
+}
+
+function requestThreadId(request: AppServerServerRequest): string | null {
+  const params = request.params as Record<string, unknown>;
+  if (typeof params.threadId === "string") return params.threadId;
+  return typeof params.conversationId === "string" ? params.conversationId : null;
 }
 
 function SpaceSidebar({ state, connected, newChatBusy, onSelect, onNewChat, onSearch }: {
@@ -407,17 +575,19 @@ function SpaceSidebar({ state, connected, newChatBusy, onSelect, onNewChat, onSe
   </aside>;
 }
 
-function TopBar({ space, node, mode, connected, onMode, onRenameSpace, onArchive, onRenameThread, onDiff, onOpenCodex }: {
+function TopBar({ space, node, mode, connected, diagnosticsCount, onMode, onRenameSpace, onArchive, onRenameThread, onDiff, onOpenCodex, onDiagnostics }: {
   space: SpaceRecord;
   node: SpaceNode;
   mode: PeelState["viewMode"];
   connected: boolean;
+  diagnosticsCount: number;
   onMode(mode: PeelState["viewMode"]): void;
   onRenameSpace(name: string): void;
   onArchive(): void;
   onRenameThread(name: string): Promise<void>;
   onDiff(): void;
   onOpenCodex(): void;
+  onDiagnostics(): void;
 }): ReactNode {
   const [editingThread, setEditingThread] = useState(false);
   const [editingSpace, setEditingSpace] = useState(false);
@@ -433,8 +603,9 @@ function TopBar({ space, node, mode, connected, onMode, onRenameSpace, onArchive
     </div>
     <div className="segmented"><button className={mode === "focus" ? "active" : ""} onClick={() => onMode("focus")}><Icon name="chat"/> Focus <kbd>⌘1</kbd></button><button className={mode === "overview" ? "active" : ""} onClick={() => onMode("overview")}><Icon name="map"/> Overview <kbd>⌘2</kbd></button></div>
     <div className="topbar-actions">
+      {diagnosticsCount > 0 && <button className="diagnostics-trigger" aria-label={`Diagnostics history, ${diagnosticsCount} item${diagnosticsCount === 1 ? "" : "s"}`} onClick={onDiagnostics}><Icon name="warning"/><span>Diagnostics</span><b>{diagnosticsCount}</b></button>}
       <button onClick={onDiff}><Icon name="diff"/> Diff</button>
-      <button onClick={onOpenCodex} title="Copy this Thread ID, then open Codex"><Icon name="external"/> Open Codex</button>
+      <button onClick={onOpenCodex} title="Open this Chat in the Codex desktop app"><Icon name="external"/> Open Codex</button>
       <button className="icon-button" onClick={() => setMenu(!menu)}><Icon name="more"/></button>
       {menu && <div className="topbar-menu"><button onClick={() => { setEditingThread(true); setMenu(false); }}>Rename Thread</button><button onClick={() => { setEditingSpace(true); setMenu(false); }}>Rename Space</button><button className="danger" onClick={onArchive}>Archive Space</button></div>}
     </div>
@@ -563,7 +734,7 @@ function ThreadPicker({ connected, onClose, onStart }: { connected: boolean; onC
   </div>;
 }
 
-function DiffDrawer({ node, onClose }: { node: SpaceNode; onClose(): void }): ReactNode {
+function DiffDrawer({ node, onClose, onOpenCodex }: { node: SpaceNode; onClose(): void; onOpenCodex(node: SpaceNode): Promise<void> }): ReactNode {
   const [value, setValue] = useState<{ summary: WorkspaceDiffSummary; patch: string } | null>(null);
   const [error, setError] = useState<string | null>(null);
   useEffect(() => { void window.peel.getDiff(node.cwd).then(setValue).catch((reason) => setError(messageOf(reason))); }, [node.cwd]);
@@ -576,20 +747,22 @@ function DiffDrawer({ node, onClose }: { node: SpaceNode; onClose(): void }): Re
         <div className="diff-summary"><span><strong>{value.summary.changedFileCount}</strong> changed files <span className="additions">+{value.summary.additions}</span><span className="deletions">−{value.summary.deletions}</span></span><small>Compared with <b>{value.summary.baseBranch}</b></small></div>
         <div className="file-list">{value.summary.files.map((file) => <div key={`${file.previousPath}-${file.path}`}><span className={`file-status ${file.status}`}>{file.status[0]?.toUpperCase()}</span><span>{file.previousPath ? `${file.previousPath} → ${file.path}` : file.path}</span><em><b>+{file.additions ?? "–"}</b> <i>−{file.deletions ?? "–"}</i></em></div>)}</div>
         <pre className="diff-patch">{value.patch || "No textual diff. Binary or metadata-only changes may still be listed above."}</pre>
-        <footer><button onClick={() => void window.peel.openTarget({ kind: "worktree", cwd: node.cwd })}><Icon name="folder"/> Open worktree</button><button onClick={() => void window.peel.openTarget({ kind: "codex", cwd: node.cwd, threadId: node.threadId })}><Icon name="external"/> Open in Codex</button><button className="primary-button" onClick={() => void window.peel.openTarget({ kind: "editor", cwd: node.cwd })}>Open in editor</button></footer>
+        <footer><button onClick={() => void window.peel.openTarget({ kind: "worktree", cwd: node.cwd })}><Icon name="folder"/> Open worktree</button><button onClick={() => void onOpenCodex(node)}><Icon name="external"/> Open in Codex</button><button className="primary-button" onClick={() => void window.peel.openTarget({ kind: "editor", cwd: node.cwd })}>Open in editor</button></footer>
       </>}
     </aside>
   </div>;
 }
 
-function Welcome({ connected, error, newChatBusy, onNewChat, onSearch }: {
+function Welcome({ connected, error, newChatBusy, diagnosticsCount, onNewChat, onSearch, onDiagnostics }: {
   connected: boolean;
   error: string | null;
   newChatBusy: boolean;
+  diagnosticsCount: number;
   onNewChat(): void;
   onSearch(): void;
+  onDiagnostics(): void;
 }): ReactNode {
-  return <div className="welcome"><div className="welcome-art"><span/><span/><span/><i/><i/></div><div className="eyebrow">Spatial work for Codex</div><h1>Keep every good direction<br/>within reach.</h1><p>Begin with a fresh Codex Chat now, or find one you already started. Every real Fork stays visible and easy to return to.</p><div className="welcome-actions"><button className="primary-button large" onClick={onNewChat} disabled={!connected || newChatBusy}><Icon name={newChatBusy ? "spinner" : "plus"}/> {newChatBusy ? "Creating…" : "New Chat"}</button><button className="secondary-button large" onClick={onSearch} disabled={!connected}><Icon name="search"/> Search Chats</button></div>{!connected && <div className="connection-error">Codex is unavailable{error ? ` — ${error}` : ""}</div>}<small>⌘N creates immediately · ⌘K searches existing Chats</small></div>;
+  return <div className="welcome"><div className="welcome-art"><span/><span/><span/><i/><i/></div><div className="eyebrow">Spatial work for Codex</div><h1>Keep every good direction<br/>within reach.</h1><p>Begin with a fresh Codex Chat now, or find one you already started. Every real Fork stays visible and easy to return to.</p><div className="welcome-actions"><button className="primary-button large" onClick={onNewChat} disabled={!connected || newChatBusy}><Icon name={newChatBusy ? "spinner" : "plus"}/> {newChatBusy ? "Creating…" : "New Chat"}</button><button className="secondary-button large" onClick={onSearch} disabled={!connected}><Icon name="search"/> Search Chats</button></div>{!connected && <div className="connection-error">Codex is unavailable{error ? ` — ${error}` : ""}</div>}{diagnosticsCount > 0 && <button className="welcome-diagnostics" onClick={onDiagnostics}><Icon name="warning" size={13}/> Review {diagnosticsCount} Codex diagnostic{diagnosticsCount === 1 ? "" : "s"}</button>}<small>⌘N creates immediately · ⌘K searches existing Chats</small></div>;
 }
 
 function ThreadLoading(): ReactNode {

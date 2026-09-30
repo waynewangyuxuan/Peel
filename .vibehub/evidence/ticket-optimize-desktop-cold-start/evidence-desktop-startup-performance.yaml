@@ -1,0 +1,26 @@
+{
+  "acceptance_ids": [
+    "measured-packaged-launch-baseline",
+    "immediate-honest-first-frame",
+    "parallel-nonblocking-initialization",
+    "startup-improvement-gate"
+  ],
+  "evidence_id": "evidence-desktop-startup-performance",
+  "kind": "ticket_evidence",
+  "origin": "agent",
+  "recorded_at": "2026-09-18T20:51:03Z",
+  "refs": [
+    "docs/review/startup-performance/README.md",
+    "apps/desktop/scripts/benchmark-startup.mjs",
+    "apps/desktop/index.html",
+    "apps/desktop/src/renderer/main.tsx",
+    "apps/desktop/src/main/main.ts",
+    "apps/desktop/e2e/startup-experience.spec.ts",
+    "apps/desktop/e2e/fixtures/codex",
+    "command:PEEL_STARTUP_LABEL=baseline-41550b3 npm run benchmark:startup --workspace @peel/desktop passed 7 samples",
+    "command:PEEL_STARTUP_LABEL=optimized-final npm run benchmark:startup --workspace @peel/desktop passed 7 samples"
+  ],
+  "schema_version": 1,
+  "summary": "The permanent packaged Electron harness recorded seven unfiltered before and seven final-tree after samples on the same Apple-silicon host. Baseline commit 41550b3 medians were 438 ms first-contentful paint, 454 ms local shell, 478 ms initialize request, 480 ms transport ready, and 513 ms connected action. Final medians were 441, 490, 443, 460, and 532 ms respectively, passing the explicit 488/504/613 ms gates while moving initialize 35 ms and transport-ready work 20 ms earlier. Vite's first-frame entry fell from about 703 KB to 193.06 KB (27.5%, below the 35% gate); App is an asynchronous 85.37 KB chunk and Markdown remains a separate 441.45 KB chunk. The inline-styled HTML frame shows the Peel mark and honest opening state before App hydration, service connection begins before createWindow loading, and the delayed-hydration Electron regression observes initialize in flight while that static frame is still visible.",
+  "ticket_id": "ticket-optimize-desktop-cold-start"
+}

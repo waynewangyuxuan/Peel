@@ -3,7 +3,7 @@ import { EventEmitter } from "node:events";
 import test from "node:test";
 
 import { AppServerClient } from "../src/client.js";
-import type { AppServerMethod, RequestId } from "../src/protocol.js";
+import { serverRequestRoute, STABLE_SERVER_REQUEST_METHODS, type AppServerMethod, type RequestId } from "../src/protocol.js";
 import type { AppServerTransport } from "../src/transport.js";
 import { item, thread, turn } from "./fixtures.js";
 
@@ -42,6 +42,7 @@ test("typed list/search/read/turn/name calls preserve Codex-owned thread identit
   transport.results.set("thread/name/set", {});
   const client = new AppServerClient(transport as unknown as AppServerTransport);
 
+  assert.equal((await client.listThreads({ limit: 30 })).data[0]?.id, "root");
   assert.equal((await client.searchThreads("root")).data[0]?.id, "root");
   assert.equal((await client.readThread("root")).id, "root");
   assert.equal(
@@ -51,9 +52,11 @@ test("typed list/search/read/turn/name calls preserve Codex-owned thread identit
   await client.setThreadName("root", "Named root");
   assert.deepEqual(
     transport.calls.map((call) => call.method),
-    ["thread/list", "thread/read", "thread/resume", "turn/start", "thread/name/set"],
+    ["thread/list", "thread/list", "thread/read", "thread/resume", "turn/start", "thread/name/set"],
   );
-  assert.deepEqual(transport.calls[0]?.params, { searchTerm: "root" });
+  assert.deepEqual(transport.calls[0]?.params, { limit: 30 });
+  assert.equal(Object.hasOwn(transport.calls[0]?.params as object, "searchTerm"), false);
+  assert.deepEqual(transport.calls[1]?.params, { searchTerm: "root" });
   assert.equal(client.reducer.getThread("root")?.thread.id, "root");
 });
 
@@ -102,12 +105,31 @@ test("stream/status events reduce state and approvals use method-specific respon
   client.approveFileChange(2, "decline");
   client.grantPermissions(3, { network: true }, "turn", true);
   client.answerUserInput(4, { question: ["answer"] });
+  client.respondMcpElicitation(5, "accept", { project: "Peel" });
   assert.deepEqual(transport.responses, [
     { id: 1, result: { decision: "acceptForSession" } },
     { id: 2, result: { decision: "decline" } },
     { id: 3, result: { permissions: { network: true }, scope: "turn", strictAutoReview: true } },
-    { id: 4, result: { answers: { question: ["answer"] } } },
+    { id: 4, result: { answers: { question: { answers: ["answer"] } } } },
+    { id: 5, result: { action: "accept", content: { project: "Peel" }, _meta: null } },
   ]);
+});
+
+test("all ten generated stable server requests have one explicit route", () => {
+  assert.equal(STABLE_SERVER_REQUEST_METHODS.length, 10);
+  assert.deepEqual(STABLE_SERVER_REQUEST_METHODS.map(serverRequestRoute), [
+    "command-approval",
+    "file-change-approval",
+    "user-input",
+    "mcp-elicitation",
+    "permissions",
+    "unsupported-dynamic-tool",
+    "unsupported-auth-refresh",
+    "unsupported-attestation",
+    "unsupported-legacy-file-approval",
+    "unsupported-legacy-command-approval",
+  ]);
+  assert.equal(serverRequestRoute("future/request"), "unsupported-unknown");
 });
 
 test("ready after interruption resumes loaded threads before rebuilding instead of keeping a shadow transcript", async () => {

@@ -1,0 +1,42 @@
+{
+  "context_id": "constraint-focus-math-typesetting",
+  "detail": "真实 Codex 回复包含 display math 与 LaTeX 命令时，Focus 当前把方括号、\\mathrm、\\frac、\\sqrt 等控制符直接显示为普通文本。安全 Markdown fidelity 必须扩展到常见 inline/display math，并保持 raw HTML 禁用、流式内容可读、公式周围正文可选择复制。",
+  "evidence": [
+    {
+      "note": "截图显示 Attention 公式的 LaTeX 控制符和 display delimiters 被原样展示。",
+      "ref": "conversation:2026-09-16-live-dogfood-chat-performance-and-focus-affordances#image-1-math"
+    },
+    {
+      "note": "当前 ReactMarkdown 仅启用 remarkGfm 与 remarkBreaks，没有 math AST 或安全公式 renderer。",
+      "ref": "apps/desktop/src/renderer/Markdown.tsx"
+    }
+  ],
+  "kind": "context",
+  "relations": [
+    {
+      "target_context_id": "contract-focus-chat-fidelity",
+      "type": "relates_to"
+    },
+    {
+      "target_context_id": "constraint-focus-chat-interaction-quality",
+      "type": "relates_to"
+    }
+  ],
+  "schema_version": 1,
+  "source": {
+    "captured_at": "2026-09-17T05:44:26Z",
+    "quote": "这个渲染的bug 记录一下",
+    "ref": "conversation:2026-09-16-live-dogfood-chat-performance-and-focus-affordances"
+  },
+  "state": "active",
+  "summary": "Focus Chat 中的常见 LaTeX 数学表达式必须排版为公式而不是泄漏控制符",
+  "tags": [
+    "dogfood",
+    "focus",
+    "markdown",
+    "latex",
+    "math",
+    "rendering"
+  ],
+  "type": "constraint"
+}

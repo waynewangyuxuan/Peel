@@ -1,0 +1,20 @@
+{
+  "accepted_acceptance_ids": [
+    "new-chat-default-title-transition",
+    "manual-space-name-precedence",
+    "title-origin-persistence",
+    "legacy-new-chat-repair",
+    "naming-regression-evidence"
+  ],
+  "closed_at": "2026-09-17T21:18:19Z",
+  "evidence_ids": [
+    "evidence-space-name-provenance-and-lifecycle",
+    "evidence-space-title-production-regression"
+  ],
+  "kind": "ticket_outcome",
+  "schema_version": 1,
+  "status": "successful",
+  "summary": "Independent closeout accepted all five criteria. SpaceRecord now persists explicit default/manual name provenance: a directly created Chat begins as default-owned, follows its Root's deterministic temporary, automatic, notification-driven, and manual title lifecycle, and stops following permanently once the user explicitly renames the Space. Space renaming remains a local state mutation and never invokes Codex thread naming, while Root and Fork thread renames still use thread/name/set. State normalization and merge logic preserve manual precedence through stale saves, switching, and restart; field-less legacy state treats only the exact New Chat label as the old generated default, repairs it from a useful Root title, and preserves every other label. Unit coverage and the production Electron journey exercise direct creation, both sides of the automatic-title race, manual Root and Fork names, notification synchronization, two restart boundaries, legacy persistence, and sidebar rendering. Three durable screenshots visibly confirm default following, manual protection, and selective legacy repair. Fresh independent verification passed 24 App Server, 12 Git workspace, and 68 desktop tests, the full production build, focused Electron tests 3/3, git diff checking, and VibeHub validation. The broader v0.1 journey's later known resume-alert failure was not counted as passing and is outside this naming Ticket.",
+  "ticket_id": "ticket-fix-new-chat-space-title-lifecycle",
+  "unresolved_acceptance_ids": []
+}

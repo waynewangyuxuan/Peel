@@ -1,0 +1,12 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<svg xmlns="http://www.w3.org/2000/svg" width="1024" height="1024" viewBox="0 0 1024 1024">
+  <rect x="32" y="32" width="960" height="960" rx="224" fill="#f2f0e9" stroke="#d8d5cc" stroke-width="4"/>
+  <svg x="40" y="105" width="800" height="800" viewBox="0 0 120 120">
+    <defs>
+      <clipPath id="phase-lower"><path d="M0 86 120 56V120H0Z"/></clipPath>
+      <clipPath id="phase-upper"><path d="M0 0H120V49L0 79Z"/></clipPath>
+    </defs>
+    <path d="M28 105V48C28 28 42 16 63 16H70C91 16 104 29 104 49C104 70 90 82 69 82H50V105H28ZM50 38V62H69C78 62 83 58 83 50C83 42 78 38 69 38H50Z" fill="#171716" fill-rule="evenodd" clip-rule="evenodd" clip-path="url(#phase-lower)"/>
+    <path d="M28 105V48C28 28 42 16 63 16H70C91 16 104 29 104 49C104 70 90 82 69 82H50V105H28ZM50 38V62H69C78 62 83 58 83 50C83 42 78 38 69 38H50Z" fill="#171716" fill-rule="evenodd" clip-rule="evenodd" clip-path="url(#phase-upper)" transform="translate(7 0)"/>
+  </svg>
+</svg>

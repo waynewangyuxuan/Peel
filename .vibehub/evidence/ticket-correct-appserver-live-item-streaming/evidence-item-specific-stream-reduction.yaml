@@ -1,0 +1,20 @@
+{
+  "acceptance_ids": [
+    "item-specific-delta-reduction",
+    "reasoning-channel-fidelity",
+    "authoritative-completion",
+    "live-rendering-behavior"
+  ],
+  "evidence_id": "evidence-item-specific-stream-reduction",
+  "kind": "ticket_evidence",
+  "origin": "agent",
+  "recorded_at": "2026-09-17T18:16:29Z",
+  "refs": [
+    "packages/codex-app-server/src/reducer.ts",
+    "apps/desktop/src/renderer/Transcript.tsx",
+    "apps/desktop/src/renderer/lib.ts"
+  ],
+  "schema_version": 1,
+  "summary": "The reducer now routes agent, plan, reasoning summary/raw, command output, and deprecated file-change output deltas into item-specific provisional state; reasoning section indexes remain separate, mismatched/stale/post-completion events are rejected, and authoritative item or turn completion clears provisional channels. Focus renders plan and reasoning through safe Markdown and command output through the exact technical-text path, including fallback from empty text to completed summary/output fields.",
+  "ticket_id": "ticket-correct-appserver-live-item-streaming"
+}

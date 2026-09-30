@@ -87,9 +87,15 @@ function mergeRendererState(current: PeelState, incoming: PeelState): PeelState 
         ...(keepPriorTitle ? {} : { title: nextNode.title, titleOrigin: nextNode.titleOrigin }),
       };
     }
+    const keepPriorSpaceName = previous.nameOrigin === "manual" && nextSpace.nameOrigin === "default";
+    const nameOrigin = keepPriorSpaceName ? "manual" : nextSpace.nameOrigin;
+    const name = nameOrigin === "default"
+      ? nodes[nextSpace.rootThreadId]?.title ?? nextSpace.name
+      : keepPriorSpaceName ? previous.name : nextSpace.name;
     spaces[spaceId] = {
       ...previous,
-      name: nextSpace.name,
+      name,
+      nameOrigin,
       archived: nextSpace.archived,
       updatedAt: Math.max(previous.updatedAt, nextSpace.updatedAt),
       nodes,

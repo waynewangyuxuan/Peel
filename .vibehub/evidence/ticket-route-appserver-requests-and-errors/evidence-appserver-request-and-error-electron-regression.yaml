@@ -1,0 +1,29 @@
+{
+  "acceptance_ids": [
+    "complete-request-dispatch",
+    "exact-turn-request-placement",
+    "resolved-request-cleanup",
+    "visible-errors-and-warnings",
+    "request-contract-evidence"
+  ],
+  "evidence_id": "evidence-appserver-request-and-error-electron-regression",
+  "kind": "ticket_evidence",
+  "origin": "agent",
+  "recorded_at": "2026-09-17T21:39:28Z",
+  "refs": [
+    "apps/desktop/src/renderer/ServerRequestCard.tsx",
+    "apps/desktop/src/renderer/Transcript.tsx",
+    "apps/desktop/src/renderer/App.tsx",
+    "apps/desktop/src/renderer/styles.css",
+    "apps/desktop/test/server-request-card.test.tsx",
+    "apps/desktop/e2e/server-request-routing.spec.ts",
+    "apps/desktop/e2e/fixtures/codex",
+    "command:npm run build",
+    "command:npx playwright test e2e/server-request-routing.spec.ts",
+    "command:npx playwright test e2e/server-request-routing.spec.ts e2e/open-codex.spec.ts e2e/math-layout.spec.ts e2e/space-title.spec.ts",
+    "command:git diff --check"
+  ],
+  "schema_version": 1,
+  "summary": "The production renderer now places every Thread/Turn-scoped request inside the exact producing Turn, while nullable-Turn MCP requests use the owning Thread and host requests never fall into the active transcript. Method-specific keyboard-native cards distinguish command, terminal-input, network, file, question/option/secret input, permission subset, typed/generic MCP form, and safe HTTPS elicitation modes. Permission cards show only counts instead of unrestricted paths, and unsupported dynamic/auth/attestation material is never rendered. The Electron regression emits every stable ServerRequest method plus a duplicate, policy amendment variants, and an externally resolved request; it verifies eight simultaneous interactive cards remain inside the producing Turn at a 1000x720 window, exercises exact response envelopes, proves duplicate and external cleanup, and confirms all unsupported methods return typed errors. Retryable error notifications render in their exact Turn, failed Turn detail remains after authoritative completion, Thread warnings remain in the correct conversation, and path-free global configuration diagnostics render outside Transcript. The focused production suite passes 4/4 for request routing, Open Codex, math, and Space titles. The broader v0.1 journey again reached its known unrelated late failed-resume alert assertion after exercising legacy command approval paths; that pre-existing failure is not counted as passing evidence for this Ticket.",
+  "ticket_id": "ticket-route-appserver-requests-and-errors"
+}

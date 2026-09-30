@@ -1,0 +1,27 @@
+{
+  "acceptance_ids": [
+    "startup-regression-coverage"
+  ],
+  "evidence_id": "evidence-desktop-startup-regressions",
+  "kind": "ticket_evidence",
+  "origin": "agent",
+  "recorded_at": "2026-09-18T20:51:03Z",
+  "refs": [
+    "apps/desktop/e2e/startup-experience.spec.ts",
+    "apps/desktop/e2e/math-layout.spec.ts",
+    "apps/desktop/e2e/overview-thread-entry.spec.ts",
+    "apps/desktop/e2e/diagnostics-lifecycle.spec.ts",
+    "apps/desktop/e2e/native-app-identity.spec.ts",
+    "apps/desktop/src/renderer/Overview.tsx",
+    "apps/desktop/scripts/verify-package.mjs",
+    "command:npm run test:e2e --workspace @peel/desktop -- e2e/startup-experience.spec.ts e2e/math-layout.spec.ts e2e/overview-thread-entry.spec.ts e2e/diagnostics-lifecycle.spec.ts e2e/native-app-identity.spec.ts passed 5/5",
+    "command:npm run verify:package --workspace @peel/desktop passed",
+    "command:npm run typecheck --workspace @peel/desktop passed",
+    "command:npm run test --workspace @peel/desktop passed 91/91",
+    "command:npm test passed 25 App Server, 12 Git workspace, and 91 Desktop tests",
+    "command:npm run build passed"
+  ],
+  "schema_version": 1,
+  "summary": "The new production Electron regression passes delayed initialization, branded pre-React visibility, connection failure, and disabled-then-enabled connected actions. Final focused Electron verification passed 5/5 for startup, math/CJK layout, native app identity, exact Overview Parent/ordinary entry, and dismissible diagnostic history. An initial focused run exposed that the existing post-drag suppression frame could swallow an immediately invoked explicit Open button; explicit keyboard/button activation now bypasses only that drag-click guard while ordinary card clicks remain protected, and the isolated test plus final 5/5 suite pass. Package verification launches the exact final bundle twice and confirms Peel identity, native icon and Speech helper, privacy strings, and restart Draft restoration. Desktop typecheck, 91/91 tests, full repository build, and the earlier 25 App Server plus 12 Git workspace tests passed; the unrelated user-owned package-lock change remained untouched.",
+  "ticket_id": "ticket-optimize-desktop-cold-start"
+}

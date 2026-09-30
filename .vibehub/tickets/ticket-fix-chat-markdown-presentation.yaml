@@ -51,6 +51,7 @@
   "kind": "ticket",
   "maturity": "firm",
   "outcome": "Every human-readable Chat message is presented as a polished, safe CommonMark/GFM document instead of leaking Markdown control syntax, including real Codex payloads and incomplete streaming states.",
+  "deliveries": [],
   "provenance_refs": [
     "conversation:2026-08-26-chat-markdown-source-markers",
     "/private/tmp/peel-live-markdown.png",
@@ -63,6 +64,6 @@
       "type": "depends_on"
     }
   ],
-  "schema_version": 1,
+  "schema_version": 2,
   "ticket_id": "ticket-fix-chat-markdown-presentation"
 }

@@ -1,0 +1,22 @@
+{
+  "acceptance_ids": [
+    "safe-math-typesetting",
+    "streaming-and-copy-fidelity",
+    "math-regression-evidence"
+  ],
+  "evidence_id": "evidence-focus-math-regression",
+  "kind": "ticket_evidence",
+  "origin": "agent",
+  "recorded_at": "2026-09-17T18:40:01Z",
+  "refs": [
+    "apps/desktop/test/markdown.test.tsx",
+    "apps/desktop/e2e/fixtures/codex",
+    "apps/desktop/e2e/v01-journey.spec.ts",
+    "command:npm run typecheck --workspace @peel/desktop",
+    "command:npm test --workspace @peel/desktop -- --run test/markdown.test.tsx",
+    "command:npm run test:e2e --workspace @peel/desktop -- e2e/v01-journey.spec.ts"
+  ],
+  "schema_version": 1,
+  "summary": "Desktop typecheck and all 57 desktop tests pass. Unit coverage includes inline and display math, the reported Attention expression with math commands, MathML and TeX annotation semantics, incomplete streaming source, fenced-code isolation, disabled trusted HTML commands, raw-script rejection, and the existing Markdown/technical routes. The rebuilt Electron journey passed the new Attention MathML, source annotation, local overflow and page containment assertions plus existing Focus Markdown, code, Activity, Branch, streaming, scroll and Approval paths; it later timed out only in an unrelated existing persist-failure Fork setup at line 686. A first attempt stopped earlier on the known 250 ms New Chat timing flake at 253.5 ms.",
+  "ticket_id": "ticket-fix-focus-math-and-branch-affordance"
+}

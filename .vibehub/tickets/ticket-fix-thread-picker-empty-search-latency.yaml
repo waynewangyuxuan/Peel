@@ -1,0 +1,60 @@
+{
+  "acceptance": [
+    {
+      "acceptance_id": "omit-empty-search-term",
+      "criterion": "Every first-page or paginated recent-Chat request whose normalized query is empty calls thread/list without a searchTerm field; a non-empty normalized query continues to send that exact term, and cursor, limit, sort key, and sort direction remain unchanged."
+    },
+    {
+      "acceptance_id": "shared-warm-recent-request",
+      "criterion": "Connection warmup and a Picker opened before warmup settles share one ordinary recent-list in-flight request and cache key; opening after warmup settles renders the cached first page within 100ms without issuing another request."
+    },
+    {
+      "acceptance_id": "responsive-loading-and-refresh",
+      "criterion": "If the ordinary live request is still pending, the Picker remains interactive, preserves any provisional results, and communicates non-blocking loading or refresh state without hiding the search field, blanking a usable page, or delaying the desktop shell."
+    },
+    {
+      "acceptance_id": "empty-search-regression-coverage",
+      "criterion": "Automated adapter/service and Electron coverage distinguishes an omitted searchTerm from an explicit empty value, proves in-flight and warm-cache reuse for the empty Picker query, and retains non-empty search, pagination, de-duplication, late-response rejection, close/reopen, and selection behavior from the completed discovery Ticket."
+    },
+    {
+      "acceptance_id": "live-codex-latency-evidence",
+      "criterion": "A read-only installed-Codex verification records transport-ready-to-request timing and ordinary recent-list completion, confirms no explicit-empty searchTerm is emitted, and reports warm Picker first-content latency separately from server latency so renderer and App Server time are not conflated."
+    }
+  ],
+  "constraints": [
+    "Do not persist or index Codex-owned transcript content to hide server latency.",
+    "Do not remove cursor pagination, the 15,000ms response-cache boundary, provisional matching, or stale-response guards from the accepted Thread Picker contract.",
+    "Do not attribute remaining App Server list latency to renderer performance without separate measurement.",
+    "Keep empty-query recent listing and non-empty authoritative search behavior explicit at the adapter boundary."
+  ],
+  "context": "Live Codex 0.154 timing found that ordinary first-page thread/list completes in about 1.76 seconds while the same request with searchTerm set to the empty string takes about 15.8 seconds. PeelService trims the query but always calls client.searchThreads(term), and its connection warmup explicitly calls searchThreads({ term: \"\" }); the adapter therefore serializes searchTerm: \"\". This regresses the completed warm-cache Ticket in real dogfood even though delayed fixtures passed. The correction should preserve the existing cursor, cache, provisional-result, and race-safety contract while distinguishing an absent empty query from a real non-empty search.",
+  "context_refs": [
+    {
+      "purpose": "Provides the accepted warm cache, pagination, provisional-result, and race-safety baseline that this regression must preserve.",
+      "ref": ".vibehub/outcomes/ticket-optimize-thread-picker-discovery.yaml"
+    },
+    {
+      "purpose": "Defines the human dogfood expectation that cached and provisional Picker results feel immediate.",
+      "ref": ".vibehub/rooms/product/intent-fast-scalable-thread-discovery.yaml"
+    },
+    {
+      "purpose": "Owns normalization, request keys, warmup, in-flight sharing, and the current explicit-empty call.",
+      "ref": "apps/desktop/src/main/peel-service.ts"
+    },
+    {
+      "purpose": "Owns the distinction between ordinary thread/list and searchThreads serialization.",
+      "ref": "packages/codex-app-server/src/client.ts"
+    }
+  ],
+  "deliveries": [],
+  "kind": "ticket",
+  "maturity": "firm",
+  "outcome": "Thread Picker recent-Chat discovery uses the fast ordinary thread/list path for an empty query, reuses the same warm in-flight page, and never turns an omitted search into the App Server's much slower explicit-empty search path.",
+  "provenance_refs": [
+    "conversation:2026-09-17-live-performance-investigation",
+    "live-codex:0.154.0-thread-list-ordinary-1759ms-explicit-empty-15832ms"
+  ],
+  "relations": [],
+  "schema_version": 2,
+  "ticket_id": "ticket-fix-thread-picker-empty-search-latency"
+}

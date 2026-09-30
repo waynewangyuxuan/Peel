@@ -1,0 +1,25 @@
+{
+  "acceptance_ids": [
+    "comparable-performance-measurement",
+    "measured-long-transcript-techniques",
+    "renderer-adoption-decision"
+  ],
+  "evidence_id": "evidence-streamdown-performance-and-decision",
+  "kind": "ticket_evidence",
+  "origin": "agent",
+  "recorded_at": "2026-09-17T23:20:04Z",
+  "refs": [
+    "apps/desktop/src/renderer/RenderingBenchmark.tsx",
+    "apps/desktop/e2e/rendering-performance.spec.ts",
+    "apps/desktop/package.json",
+    "package-lock.json",
+    "docs/review/rendering-performance/README.md",
+    "command:npm run benchmark:rendering --workspace @peel/desktop passed 1/1 in production Electron",
+    "command:npm test --workspace @peel/desktop passed 76/76",
+    "command:npm run typecheck --workspace @peel/desktop passed",
+    "command:npm run build:renderer --workspace @peel/desktop produced ordinary entry 704.05 kB/212.97 kB gzip and isolated candidate 359.19 kB/112.09 kB gzip"
+  ],
+  "schema_version": 1,
+  "summary": "The repeatable production Electron A/B harness separates thread reads (explicitly 0 in the isolated route), corpus construction/reducer work, and render-through-paint time, and records cold/warm first content, 10/100/500 mounts, session switch, long tasks, 36-frame streaming cadence, DOM nodes, precise heap delta/post-unmount heap, and stable-row render counts. In the representative passing run, current versus candidate was 41.6/25.8ms cold, 15.8/16.0ms warm, 174.8/182.9ms for 500 Turns, 150.8/175.5ms for a 10-to-500 switch, 9,311/9,977 DOM descendants, about 4.0/11.1MB mount heap delta, 608.4/599.1ms for 36 stream updates, and 24.9/17.7ms p99 frame interval. Stable memoized row objects produced zero historical and exactly 36 tail rerenders. The checked-in decision defers Streamdown and assistant-ui runtime adoption because the candidate does not materially beat the current renderer at transcript scale, adds a 112.09kB-gzip optional chunk and 136 installed packages, and pulls an 88MB Mermaid install tree despite Mermaid being unused. Apache-2.0 licensing is acceptable and security/correctness passed, so this is defer rather than reject. Native stable Turn identity, tail-only invalidation, settled Markdown/math memoization, and a 200k readable fallback are recommended; bounded backfill and content-visibility need real Focus evidence; Shiki and naive full virtualization are rejected for now. No Streamdown production implementation Ticket is justified.",
+  "ticket_id": "ticket-evaluate-streamdown-rendering-runtime"
+}
