@@ -1,5 +1,6 @@
 import { Children, Fragment, isValidElement, memo, useEffect, useRef, useState, type ReactNode } from "react";
 import rehypeKatex from "rehype-katex";
+import rehypeRaw from "rehype-raw";
 import ReactMarkdown, { defaultUrlTransform, type Components, type UrlTransform } from "react-markdown";
 import remarkBreaks from "remark-breaks";
 import remarkGfm from "remark-gfm";
@@ -7,6 +8,7 @@ import remarkMath from "remark-math";
 import "katex/dist/katex.min.css";
 
 import { Icon } from "./icons";
+import { rehypeSafeStaticHtml } from "./safe-html";
 import { recordMarkdownRender, transcriptSnapshotMode } from "./transcript-performance";
 
 export const MARKDOWN_PLAIN_TEXT_LIMIT = 200_000;
@@ -52,8 +54,8 @@ function MarkdownContentView({ text, streaming = false, className = "", performa
   return <div className={["markdown-body", className].filter(Boolean).join(" ")}>
     <ReactMarkdown
       remarkPlugins={[remarkGfm, remarkMath, remarkBreaks]}
-      rehypePlugins={[[rehypeKatex, { output: "htmlAndMathml", strict: "warn", throwOnError: false, trust: false }]]}
-      skipHtml
+      // Allowlist before KaTeX so generated math HTML is not stripped.
+      rehypePlugins={[rehypeRaw, rehypeSafeStaticHtml, [rehypeKatex, { output: "htmlAndMathml", strict: "warn", throwOnError: false, trust: false }]]}
       components={components}
       urlTransform={safeUrlTransform}
     >{renderedText}</ReactMarkdown>

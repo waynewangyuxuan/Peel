@@ -189,6 +189,47 @@ q_{\text{苹果}}^{(1)}\cdot k_{\text{外卖}}^{(1)}
     expect(html).not.toContain("src=\"https://example.com/diagram.png\"");
   });
 
+  it("renders a safe static HTML subset and strips hostile markup", () => {
+    const staticHtml = renderToStaticMarkup(<MarkdownContent text={"<h2>Result</h2><p><strong>Static HTML</strong></p>"}/>);
+    expect(staticHtml).toContain("<h2>");
+    expect(staticHtml).toContain("Result");
+    expect(staticHtml).toContain("<strong>Static HTML</strong>");
+
+    const scriptHtml = renderToStaticMarkup(<MarkdownContent text={"<script>window.__peelUnsafe = true</script>"}/>);
+    expect(scriptHtml).not.toContain("<script");
+    expect(scriptHtml).not.toContain("window.__peelUnsafe");
+
+    const iframeHtml = renderToStaticMarkup(<MarkdownContent text={"<iframe src=\"https://evil.example\"></iframe>"}/>);
+    expect(iframeHtml).not.toContain("<iframe");
+    expect(iframeHtml).not.toContain("evil.example");
+
+    const anchorHtml = renderToStaticMarkup(<MarkdownContent text={"<a href=\"javascript:alert(1)\" onclick=\"alert(1)\" style=\"color:red\">x</a>"}/>);
+    expect(anchorHtml).not.toContain("javascript:");
+    expect(anchorHtml).not.toContain("onclick");
+    expect(anchorHtml).not.toContain("style=");
+    expect(anchorHtml).toContain(">x</a>");
+
+    const brokenScheme = renderToStaticMarkup(<MarkdownContent text={"<a href=\"java\nscript:alert(1)\">x</a><div>kept</div><input type=\"text\" value=\"secret\"><input type=\"checkbox\" checked>"}/>);
+    expect(brokenScheme).not.toContain("script:");
+    expect(brokenScheme).toContain("kept");
+    expect(brokenScheme).not.toContain("secret");
+    expect(brokenScheme).not.toContain("type=\"text\"");
+    expect(brokenScheme).toContain("type=\"checkbox\"");
+    expect(brokenScheme).toContain("disabled");
+
+    const remoteImg = renderToStaticMarkup(<MarkdownContent text={"<img src=\"https://example.com/x.png\" alt=\"remote\">"}/>);
+    expect(remoteImg).not.toContain("src=\"https://example.com/x.png\"");
+    expect(remoteImg).toContain("markdown-image-link");
+
+    const dataImg = renderToStaticMarkup(<MarkdownContent text={"<img src=\"data:image/png;base64,iVBORw0KGgo=\" alt=\"ok\">"}/>);
+    expect(dataImg).toContain("src=\"data:image/png;base64,iVBORw0KGgo=\"");
+    expect(dataImg).toContain("<img");
+
+    const mathHtml = renderToStaticMarkup(<MarkdownContent text={String.raw`Inline \(x^2\).`}/>);
+    expect(mathHtml).toContain("class=\"katex\"");
+    expect(mathHtml).toContain("<math");
+  });
+
   it.each([
     ["unfinished emphasis", "**Planning a direction", "<strong>Planning a direction</strong>"],
     ["unfinished inline code", "Use `npm test", "<code>npm test</code>"],
