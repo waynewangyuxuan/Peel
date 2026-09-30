@@ -1,6 +1,6 @@
 import type { AppServerServerRequest, CodexThread, CodexTurn, ReducedThread, ThreadItem, UserInput } from "@peel/codex-app-server";
 import type { WorkspaceDiffSummary } from "@peel/git-workspace";
-import { memo, startTransition, useCallback, useEffect, useLayoutEffect, useMemo, useRef, useState, type ChangeEvent, type KeyboardEvent, type ReactNode } from "react";
+import { Fragment, memo, startTransition, useCallback, useEffect, useLayoutEffect, useMemo, useRef, useState, type ChangeEvent, type KeyboardEvent, type ReactNode } from "react";
 
 import type { CodexNotice, ForkDraft, ServerRequestResponseInput, SpaceNode } from "../shared/contracts";
 import { Icon } from "./icons";
@@ -10,6 +10,7 @@ import { HighlightedCode, MarkdownContent } from "./Markdown";
 import { voiceFailurePresentation, type VoiceFailurePresentation } from "./voice-error";
 import { requestTurnId, ServerRequestCard } from "./ServerRequestCard";
 import { commitTranscriptUpdates, recordItemRender, recordTranscriptBackfill, recordTranscriptRange, recordTurnRender, transcriptSnapshotMode } from "./transcript-performance";
+import { canFoldSteps, isFoldableStep } from "./transcript-steps";
 import {
   TRANSCRIPT_BACKFILL_THRESHOLD_PX,
   appendTranscriptRange,
@@ -612,15 +613,33 @@ function TurnView({ turn, reduced, highlighted, requests, notices, onBranch, onO
     streamedReasoningSummarySections: [],
   }));
   const branch = useCallback(() => onBranch(turn), [onBranch, turn]);
+  const types = items.map(({ item }) => item.type);
+  const foldable = canFoldSteps(types);
+  const [stepsFolded, setStepsFolded] = useState(false);
+  let foldPlaced = false;
   return <section className={`turn ${highlighted ? "highlighted" : ""}`} data-turn-id={turn.id}>
-    {items.map(({ item, streamedText, streamedReasoningContent, completed }) => <MemoizedItemView
-      key={item.id}
-      item={item}
-      streamedText={streamedText}
-      streamedReasoningContent={streamedReasoningContent}
-      streaming={!completed}
-      onOpenCodex={onOpenCodex}
-    />) }
+    {items.map(({ item, streamedText, streamedReasoningContent, completed }) => {
+      const step = isFoldableStep(item.type);
+      if (foldable && stepsFolded && step) {
+        if (foldPlaced) return null;
+        foldPlaced = true;
+        return <StepFold key="step-fold" count={types.filter(isFoldableStep).length} folded onToggle={() => setStepsFolded(false)}/>;
+      }
+      const fold = foldable && step && !foldPlaced
+        ? <StepFold key="step-fold" count={types.filter(isFoldableStep).length} folded={false} onToggle={() => setStepsFolded(true)}/>
+        : null;
+      if (fold) foldPlaced = true;
+      return <Fragment key={item.id}>
+        {fold}
+        <MemoizedItemView
+          item={item}
+          streamedText={streamedText}
+          streamedReasoningContent={streamedReasoningContent}
+          streaming={!completed}
+          onOpenCodex={onOpenCodex}
+        />
+      </Fragment>;
+    })}
     {notices.map((notice) => <NoticeCard key={notice.id} notice={notice}/>)}
     {turn.error !== null && turn.error !== undefined && <TurnErrorDetail error={turn.error}/>}
     {requests.map((request) => <ServerRequestCard key={String(request.id)} request={request} onRespond={onRequestResponse}/>)}
@@ -724,6 +743,13 @@ function ActivityDisclosure({ icon, label, state, defaultOpen = false, kind = "s
     </summary>
     <div className="activity-body">{children}</div>
   </details>;
+}
+
+function StepFold({ count, folded, onToggle }: { count: number; folded: boolean; onToggle(): void }): ReactNode {
+  return <button type="button" className="step-fold" onClick={onToggle} aria-expanded={!folded}>
+    <Icon name="chevron" size={12}/>
+    {folded ? `Show ${count} steps` : "Fold steps"}
+  </button>;
 }
 
 function activityState(item: ThreadItem, streaming: boolean): ActivityState {

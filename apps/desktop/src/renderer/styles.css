@@ -188,6 +188,10 @@ kbd { margin-left: auto; border: 0; color: var(--faint); font-size: 10px; font-f
 .markdown-table-wrap th { background: color-mix(in srgb, var(--panel) 72%, var(--paper)); font-weight: 650; color: #4f4f4b; }
 .stream-caret { display: inline-block; margin-left: 2px; color: var(--accent); font-size: .82em; }
 .code-block, .activity-item pre, .request-card pre, .diff-patch { font-family: ui-monospace, SFMono-Regular, Menlo, Consolas, monospace; white-space: pre-wrap; overflow-wrap: anywhere; }
+.chat-visualization { display: block; width: 100%; min-height: 240px; margin: 16px 0; border: 1px solid var(--line); border-radius: 12px; background: var(--paper); }
+.step-fold { display: inline-flex; align-items: center; gap: 5px; min-height: 28px; margin: 8px 0; padding: 2px 8px 2px 2px; border: 0; border-radius: 6px; background: transparent; color: #777772; font-size: 11px; }
+.step-fold:hover { color: var(--ink); background: color-mix(in srgb, var(--panel) 70%, transparent); }
+.step-fold[aria-expanded="true"] svg { transform: rotate(90deg); }
 .markdown-code { margin: 17px 0; overflow: hidden; border: 1px solid #353533; border-radius: 11px; background: #20201e; color: #e8e8e3; box-shadow: 0 1px 2px rgba(0,0,0,.08); }
 .markdown-code-header { display: flex; align-items: center; justify-content: space-between; min-height: 34px; padding: 0 8px 0 13px; border-bottom: 1px solid rgba(255,255,255,.1); background: #292927; color: #aaa9a3; font-family: ui-monospace, SFMono-Regular, Menlo, Consolas, monospace; font-size: 9.5px; }
 .copy-code { display: inline-flex; align-items: center; gap: 5px; min-height: 27px; padding: 4px 6px; border: 0; border-radius: 6px; background: transparent; color: #d4d3cd; font: inherit; transition: color 100ms ease, background-color 100ms ease, transform 80ms var(--ease-out); }

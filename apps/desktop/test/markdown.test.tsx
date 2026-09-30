@@ -337,4 +337,34 @@ q_{\text{苹果}}^{(1)}\cdot k_{\text{外卖}}^{(1)}
     expect(patchTokens.map((token) => token.value).join("")).toBe(patch);
     expect(patchTokens.map((token) => token.kind)).toEqual(["meta", "deletion", "addition"]);
   });
+
+  it("embeds a visualize fence as a local frame and leaves other code blocks alone", () => {
+    const path = "/Users/waynewang/Peel/apps/desktop/.visualizations/attention-explainer.html";
+    const html = renderToStaticMarkup(<MarkdownContent text={`Before\n\n\`\`\`visualize\n${JSON.stringify({ path })}\n\`\`\`\n\nAfter`}/>);
+    expect(html).toContain("class=\"chat-visualization\"");
+    expect(html).toContain("sandbox=\"allow-scripts\"");
+    expect(html).toContain(encodeURIComponent(path));
+    expect(html).toContain("Before");
+    expect(html).toContain("After");
+    expect(html).not.toContain("Copy code");
+
+    const code = renderToStaticMarkup(<MarkdownContent text={"```js\nconst n = 1;\n```"}/>);
+    expect(code).toContain("Copy code");
+    expect(code).not.toContain("chat-visualization");
+
+    const sameLine = renderToStaticMarkup(<MarkdownContent text={`\`\`\`visualize${JSON.stringify({ path })}\n\`\`\``}/>);
+    expect(sameLine).toContain("class=\"chat-visualization\"");
+    expect(sameLine).toContain(encodeURIComponent(path));
+
+    const inline = renderToStaticMarkup(<MarkdownContent text={`看这里 \`visualize${JSON.stringify({ path })}\` 就好。`}/>);
+    expect(inline).toContain("class=\"chat-visualization\"");
+    expect(inline).toContain("看这里");
+
+    const sentinel = renderToStaticMarkup(<MarkdownContent text={`点矩阵左侧的词。\n\n\uE200visualize\uE202${JSON.stringify({ path })}\uE201\n\n读图时。`}/>);
+    expect(sentinel).toContain("class=\"chat-visualization\"");
+    expect(sentinel).toContain(encodeURIComponent(path));
+    expect(sentinel).toContain("点矩阵左侧的词。");
+    expect(sentinel).toContain("读图时。");
+    expect(sentinel).not.toContain("visualize{");
+  });
 });

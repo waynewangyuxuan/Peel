@@ -1,4 +1,4 @@
-import { app, BrowserWindow, clipboard, ipcMain, nativeTheme, session, shell } from "electron";
+import { app, BrowserWindow, clipboard, ipcMain, nativeTheme, protocol, session, shell } from "electron";
 import { existsSync } from "node:fs";
 import { dirname, join } from "node:path";
 import { fileURLToPath } from "node:url";
@@ -18,7 +18,9 @@ import { IPC } from "../shared/contracts";
 import { APP_DISPLAY_NAME, nativeAppIconPath } from "./app-identity";
 import { openTarget } from "./open-target";
 import { PeelService } from "./peel-service";
+import { readVisualizationFile } from "./visualization-file";
 import { VoiceService } from "./voice-service";
+import { VISUALIZATION_SCHEME, visualizationDocument } from "../shared/visualization";
 
 const currentDirectory = dirname(fileURLToPath(import.meta.url));
 const configuredUserDataPath = process.env.PEEL_USER_DATA_PATH || argumentValue("--peel-user-data-path");
@@ -29,6 +31,9 @@ const configuredTranscriptBenchmark = process.env.PEEL_NATIVE_TRANSCRIPT_BENCHMA
 const configuredStartupHydrationDelay = process.env.PEEL_STARTUP_TEST_HYDRATION_DELAY_MS;
 const configuredTmpdir = argumentValue("--peel-test-tmpdir");
 const quitAfterVoiceVerification = process.argv.includes("--peel-test-quit-after-voice");
+protocol.registerSchemesAsPrivileged([
+  { scheme: VISUALIZATION_SCHEME, privileges: { standard: true, secure: true, supportFetchAPI: true, corsEnabled: false } },
+]);
 app.setName(APP_DISPLAY_NAME);
 if (process.env.PEEL_RENDERING_BENCHMARK === "1" || configuredTranscriptBenchmark) app.commandLine.appendSwitch("enable-precise-memory-info");
 if (configuredUserDataPath) app.setPath("userData", configuredUserDataPath);
@@ -163,6 +168,19 @@ function registerIpc(peel: PeelService, voice: VoiceService): void {
 }
 
 app.whenReady().then(async () => {
+  protocol.handle(VISUALIZATION_SCHEME, async (request) => {
+    try {
+      const filePath = new URL(request.url).searchParams.get("path") ?? "";
+      const html = visualizationDocument(await readVisualizationFile(filePath));
+      return new Response(html, { headers: visualizationHeaders() });
+    } catch (error) {
+      const message = error instanceof Error ? error.message : "Visualization unavailable.";
+      return new Response(`<!doctype html><p>${escapeHtml(message)}</p>`, {
+        status: 404,
+        headers: { "Content-Type": "text/html; charset=utf-8" },
+      });
+    }
+  });
   if (process.platform === "darwin") app.dock?.setIcon(appIconPath());
   session.defaultSession.setPermissionRequestHandler((_webContents, permission, callback) => {
     callback(permission === "media");
@@ -200,3 +218,14 @@ app.on("before-quit", (event) => {
 app.on("window-all-closed", () => {
   if (process.platform !== "darwin") app.quit();
 });
+
+function visualizationHeaders(): Headers {
+  return new Headers({
+    "Content-Type": "text/html; charset=utf-8",
+    "Content-Security-Policy": "default-src 'none'; script-src 'unsafe-inline'; style-src 'unsafe-inline'; img-src data:;",
+  });
+}
+
+function escapeHtml(value: string): string {
+  return value.replace(/[&<>"']/g, (character) => ({ "&": "&amp;", "<": "&lt;", ">": "&gt;", "\"": "&quot;", "'": "&#39;" })[character] ?? character);
+}

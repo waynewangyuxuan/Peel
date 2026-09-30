@@ -7,6 +7,7 @@ import remarkGfm from "remark-gfm";
 import remarkMath from "remark-math";
 import "katex/dist/katex.min.css";
 
+import { expandVisualizeReferences, visualizationFrameUrl, visualizationReference } from "../shared/visualization";
 import { Icon } from "./icons";
 import { rehypeSafeStaticHtml } from "./safe-html";
 import { recordMarkdownRender, transcriptSnapshotMode } from "./transcript-performance";
@@ -26,10 +27,16 @@ const components: Components = {
       ? <a href={safeSource} target="_blank" rel="noreferrer noopener">{alt || "Open image"}</a>
       : alt || "Unavailable image"}</span>;
   },
+  code({ className, children }): ReactNode {
+    const path = visualizationReference(languageFromClass(className), reactText(children));
+    if (path) return <ChatVisualization path={path}/>;
+    return <code className={typeof className === "string" ? className : undefined}>{children}</code>;
+  },
   pre({ node: _node, children }): ReactNode {
-    const child = Children.only(children);
+    const child = Children.toArray(children).find(isValidElement);
+    if (isValidElement(child) && child.type === ChatVisualization) return child;
     const childClass = isValidElement<{ className?: string }>(child) ? child.props.className ?? "" : "";
-    const language = childClass.match(/(?:^|\s)language-([^\s]+)/)?.[1] ?? "plain text";
+    const language = languageFromClass(childClass) || "plain text";
     return <CodeBlock code={reactText(child)} language={language}>{child}</CodeBlock>;
   },
   table({ node: _node, children, ...props }): ReactNode {
@@ -50,7 +57,7 @@ function MarkdownContentView({ text, streaming = false, className = "", performa
   if (text.length >= MARKDOWN_PLAIN_TEXT_LIMIT) return <div className={["markdown-body", className].filter(Boolean).join(" ")}>
     <pre className="markdown-oversized-fallback" data-rendering-fallback="oversized">{text}</pre>
   </div>;
-  const renderedText = normalizeMathDelimiters(streaming ? projectStreamingMarkdown(text) : text);
+  const renderedText = expandVisualizeReferences(normalizeMathDelimiters(streaming ? projectStreamingMarkdown(text) : text));
   return <div className={["markdown-body", className].filter(Boolean).join(" ")}>
     <ReactMarkdown
       remarkPlugins={[remarkGfm, remarkMath, remarkBreaks]}
@@ -110,7 +117,18 @@ export function projectStreamingMarkdown(text: string): string {
   return projected;
 }
 
+function languageFromClass(className: unknown): string {
+  const value = Array.isArray(className) ? className.join(" ") : typeof className === "string" ? className : "";
+  return value.match(/(?:^|\s)language-([^\s]+)/)?.[1] ?? "";
+}
+
 function CodeBlock({ code, language }: { code: string; language: string; children?: ReactNode }): ReactNode {
+  const path = visualizationReference(language, code);
+  if (path) return <ChatVisualization path={path}/>;
+  return <CopyableCodeBlock code={code} language={language}/>;
+}
+
+function CopyableCodeBlock({ code, language }: { code: string; language: string }): ReactNode {
   const [copied, setCopied] = useState(false);
   const resetTimer = useRef<number | null>(null);
   useEffect(() => () => { if (resetTimer.current !== null) window.clearTimeout(resetTimer.current); }, []);
@@ -124,6 +142,31 @@ function CodeBlock({ code, language }: { code: string; language: string; childre
     <div className="markdown-code-header"><span>{language}</span><button className="copy-code" onClick={() => void copy()}><Icon name={copied ? "check" : "copy"} size={12}/>{copied ? "Copied" : "Copy code"}</button></div>
     <pre className="code-block"><code><HighlightedCode code={code} language={language}/></code></pre>
   </div>;
+}
+
+function ChatVisualization({ path }: { path: string }): ReactNode {
+  const frame = useRef<HTMLIFrameElement | null>(null);
+  const [height, setHeight] = useState(480);
+  useEffect(() => {
+    const onMessage = (event: MessageEvent): void => {
+      if (event.source !== frame.current?.contentWindow) return;
+      const data = event.data as { source?: unknown; height?: unknown };
+      if (data?.source !== "peel-viz" || typeof data.height !== "number" || !Number.isFinite(data.height)) return;
+      setHeight(Math.min(1400, Math.max(240, Math.ceil(data.height))));
+    };
+    window.addEventListener("message", onMessage);
+    return () => window.removeEventListener("message", onMessage);
+  }, []);
+  return <iframe
+    ref={frame}
+    className="chat-visualization"
+    title="Visualization"
+    sandbox="allow-scripts"
+    referrerPolicy="no-referrer"
+    scrolling="no"
+    style={{ height }}
+    src={visualizationFrameUrl(path)}
+  />;
 }
 
 export function HighlightedCode({ code, language }: { code: string; language: string }): ReactNode {
