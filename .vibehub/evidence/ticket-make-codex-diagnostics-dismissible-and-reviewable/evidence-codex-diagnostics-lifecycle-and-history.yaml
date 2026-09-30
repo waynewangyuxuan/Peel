@@ -5,6 +5,30 @@
     "dedupe-and-recurrence-semantics",
     "diagnostics-lifecycle-regression"
   ],
+  "acceptance_revisions": [
+    {
+      "acceptance_id": "transient-dismissible-diagnostics",
+      "identity": "sha256:f3a31e8d539e271f218d0dbb5ce22a40de4b47fee16958a1461998688fc77585",
+      "revision": 1
+    },
+    {
+      "acceptance_id": "session-history-with-context",
+      "identity": "sha256:7763729c09911a18b778385e2cbd787550b477bd6d82212daac6e8b8dbe2e042",
+      "revision": 1
+    },
+    {
+      "acceptance_id": "dedupe-and-recurrence-semantics",
+      "identity": "sha256:d038897986528047a84a08bcf0558a5b64d3156de83cd5bdd0d4fa3d6e1b1a62",
+      "revision": 1
+    },
+    {
+      "acceptance_id": "diagnostics-lifecycle-regression",
+      "identity": "sha256:da01291fb552c6e88913bb60948766e828aaf51e7383803144c16cf93a8c3ccf",
+      "revision": 1
+    }
+  ],
+  "binding_origin": "reconstructed",
+  "binding_state": "bound",
   "evidence_id": "evidence-codex-diagnostics-lifecycle-and-history",
   "kind": "ticket_evidence",
   "origin": "agent",
@@ -23,7 +47,7 @@
     "command:npm run build --workspace @peel/desktop",
     "command:git diff --check"
   ],
-  "schema_version": 1,
+  "schema_version": 2,
   "summary": "Global Codex diagnostics now expose keyboard-accessible close controls; warnings stay readable, fade at eight seconds, and then leave the workspace, while errors remain until explicitly dismissed. Top Bar and empty-workspace entries open a session-only Diagnostics drawer containing newest-first timestamps, severity, sanitized message, Global or Thread title/identifier scope, and optional Turn context; closing or fading a toast leaves its history intact and the drawer explains that dismissal does not repair Codex. Main-process recurrence refreshes a diagnostic's monotonic timestamp and recency without duplicate growth, with a latest-50 bound. The focused production-Electron lifecycle regression passed 1/1 against config, current pagination deprecation, Thread warning/error, and global error fixtures, verifying explicit close, timeout, sticky error, history retention/order/scope, Escape close, and no private path. The request-routing Electron regression passed and all 91 desktop unit tests passed, including recurrence, sanitization, and 50-item retention.",
   "ticket_id": "ticket-make-codex-diagnostics-dismissible-and-reviewable"
 }

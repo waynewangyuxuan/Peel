@@ -1,22 +1,35 @@
 {
   "acceptance": [
     {
+      "acceptance_id": "durable-legible-assets",
+      "criterion": "Both screenshots render from a clean GitHub checkout through repository-relative links, remain legible at original detail and normal README width, use reasonably sized PNG assets, and are not references to ignored test output or absolute local paths.",
+      "identity": "sha256:6f349691ebad21aee75f9259c8df7ab6f66a0a719d9ecca84f3c21228a1bb300",
+      "revision": 1,
+      "state": "active"
+    },
+    {
       "acceptance_id": "fresh-current-product-captures",
-      "criterion": "Tracked repository-relative Focus and Overview screenshots are regenerated from the current production Electron app at a readable desktop viewport, visibly use the current branded shell, named Chats, Branch from here affordance, Parent navigation where applicable, and current Overview cards without exposing local private paths, credentials, or unrelated user data."
+      "criterion": "Tracked repository-relative Focus and Overview screenshots are regenerated from the current production Electron app at a readable desktop viewport, visibly use the current branded shell, named Chats, Branch from here affordance, Parent navigation where applicable, and current Overview cards without exposing local private paths, credentials, or unrelated user data.",
+      "identity": "sha256:49521e5cd1534d9eea5ad816e89d737e76f83140d9d819867cc24817a26d8557",
+      "revision": 1,
+      "state": "active"
     },
     {
       "acceptance_id": "readme-copy-matches-current-build",
-      "criterion": "README product, capability, status, and launch copy is checked against the current implementation and successful Outcomes; stale version/runtime claims are corrected without claiming signing, notarization, public distribution, arbitrary graph editing, Git management, or unsupported Codex capabilities."
-    },
-    {
-      "acceptance_id": "durable-legible-assets",
-      "criterion": "Both screenshots render from a clean GitHub checkout through repository-relative links, remain legible at original detail and normal README width, use reasonably sized PNG assets, and are not references to ignored test output or absolute local paths."
+      "criterion": "README product, capability, status, and launch copy is checked against the current implementation and successful Outcomes; stale version/runtime claims are corrected without claiming signing, notarization, public distribution, arbitrary graph editing, Git management, or unsupported Codex capabilities.",
+      "identity": "sha256:0bde63db0089f4f47ce980760c785bed924a3a7b067a6fe810d6876835c47960",
+      "revision": 1,
+      "state": "active"
     },
     {
       "acceptance_id": "readme-link-and-command-verification",
-      "criterion": "An automated local check resolves every README image and repository link and verifies that documented install, build, test, package, launch, and output-path commands match package scripts and desktop documentation."
+      "criterion": "An automated local check resolves every README image and repository link and verifies that documented install, build, test, package, launch, and output-path commands match package scripts and desktop documentation.",
+      "identity": "sha256:e3c8aec6e9618abc6f761964e5405df23d078e2f065413d299acfff5f8e71838",
+      "revision": 1,
+      "state": "active"
     }
   ],
+  "active_contract_revision": 1,
   "constraints": [
     "Use real current Peel UI captures, not generated mockups or edited conceptual art.",
     "Do not turn the README into a changelog, internal ticket inventory, or replacement PRD.",
@@ -27,19 +40,19 @@
   "context_refs": [
     {
       "purpose": "Provides the accepted README structure, factual boundary, and durable-asset standard being refreshed.",
-      "ref": ".vibehub/outcomes/ticket-publish-project-readme.yaml"
+      "ref": ".vibehub/outcomes/ticket-publish-project-readme/contract-v1.yaml"
     },
     {
       "purpose": "Provides the accepted visual hierarchy and production-shell baseline.",
-      "ref": ".vibehub/outcomes/ticket-reset-shell-material-hierarchy.yaml"
+      "ref": ".vibehub/outcomes/ticket-reset-shell-material-hierarchy/contract-v1.yaml"
     },
     {
       "purpose": "Provides the newest visible graph-entry and explicit Parent-navigation behavior that the README should no longer contradict.",
-      "ref": ".vibehub/outcomes/ticket-make-overview-thread-entry-unambiguous.yaml"
+      "ref": ".vibehub/outcomes/ticket-make-overview-thread-entry-unambiguous/contract-v1.yaml"
     },
     {
       "purpose": "Provides the newest visible diagnostic lifecycle and history behavior that the README should no longer contradict.",
-      "ref": ".vibehub/outcomes/ticket-make-codex-diagnostics-dismissible-and-reviewable.yaml"
+      "ref": ".vibehub/outcomes/ticket-make-codex-diagnostics-dismissible-and-reviewable/contract-v1.yaml"
     },
     {
       "purpose": "Current repository entry point and existing screenshot placement.",
@@ -50,6 +63,34 @@
       "ref": "apps/desktop/README.md"
     }
   ],
+  "contract_revisions": [
+    {
+      "acceptance_revisions": [
+        {
+          "acceptance_id": "durable-legible-assets",
+          "identity": "sha256:6f349691ebad21aee75f9259c8df7ab6f66a0a719d9ecca84f3c21228a1bb300",
+          "revision": 1
+        },
+        {
+          "acceptance_id": "fresh-current-product-captures",
+          "identity": "sha256:49521e5cd1534d9eea5ad816e89d737e76f83140d9d819867cc24817a26d8557",
+          "revision": 1
+        },
+        {
+          "acceptance_id": "readme-copy-matches-current-build",
+          "identity": "sha256:0bde63db0089f4f47ce980760c785bed924a3a7b067a6fe810d6876835c47960",
+          "revision": 1
+        },
+        {
+          "acceptance_id": "readme-link-and-command-verification",
+          "identity": "sha256:e3c8aec6e9618abc6f761964e5405df23d078e2f065413d299acfff5f8e71838",
+          "revision": 1
+        }
+      ],
+      "identity": "sha256:7f81073fb1a0c47348fdbcafa0e6ea35983505aa9e33d6afcc86bfc2f1d967da",
+      "revision": 1
+    }
+  ],
   "deliveries": [],
   "kind": "ticket",
   "maturity": "firm",
@@ -58,6 +99,7 @@
     "conversation:2026-09-18-refresh-readme-and-startup-experience"
   ],
   "relations": [],
-  "schema_version": 2,
+  "revision_state": "bound",
+  "schema_version": 3,
   "ticket_id": "ticket-refresh-readme-current-experience"
 }

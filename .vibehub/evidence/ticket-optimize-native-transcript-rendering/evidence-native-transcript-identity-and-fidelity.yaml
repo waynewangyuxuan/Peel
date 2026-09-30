@@ -4,6 +4,25 @@
     "tail-only-focus-invalidation",
     "focus-fidelity-regression-coverage"
   ],
+  "acceptance_revisions": [
+    {
+      "acceptance_id": "stable-settled-transcript-identity",
+      "identity": "sha256:be1b0bed1cad1d0826a556a604fd68352450147a0a02dc6d549602619ba100a3",
+      "revision": 1
+    },
+    {
+      "acceptance_id": "tail-only-focus-invalidation",
+      "identity": "sha256:94581342887e4c4fe7eb89d592a8edfc2e219d1aa0f484ad793380dad957e622",
+      "revision": 1
+    },
+    {
+      "acceptance_id": "focus-fidelity-regression-coverage",
+      "identity": "sha256:22df7ee737e3f24e349332be789df689e67ec8c377668275dab3224005872e2b",
+      "revision": 1
+    }
+  ],
+  "binding_origin": "reconstructed",
+  "binding_state": "bound",
   "evidence_id": "evidence-native-transcript-identity-and-fidelity",
   "kind": "ticket_evidence",
   "origin": "agent",
@@ -26,7 +45,7 @@
     "command:npx playwright test e2e/math-layout.spec.ts e2e/open-codex.spec.ts e2e/rendering-performance.spec.ts e2e/server-request-routing.spec.ts passed 4/4",
     "command:npx playwright test e2e/v01-journey.spec.ts reached line 903 then failed on the existing session-resume fixture expectation"
   ],
-  "schema_version": 1,
+  "schema_version": 2,
   "summary": "Renderer-boundary reconciliation now preserves referential identity for unchanged settled Turns and ThreadItems while giving the affected live Turn and Item new identity. Memoized Turn, Item, and Markdown views therefore leave completed history untouched, and structural comparison of independent request and notice props invalidates only their owning Turn or thread-level surface. Unit coverage exercises notification reconciliation, baseline replacement, authoritative read refreshes, and request/notice invalidation. Fresh verification passed 82 Desktop tests, Desktop typecheck/build, 25 App Server tests, 12 Git workspace tests, and the production Electron math-layout, exact Open in Codex, server-request-routing, and isolated renderer benchmark cases. The broad v0.1 journey passed Focus, Branch, Markdown, Draft/Scroll, attachment, Voice, streaming, request, scale, and restart assertions before failing at its existing line-903 session-resume fixture expectation; that journey is deliberately not reported as passing.",
   "ticket_id": "ticket-optimize-native-transcript-rendering"
 }

@@ -4,6 +4,25 @@
     "sidebar-craft",
     "verified-preview"
   ],
+  "acceptance_revisions": [
+    {
+      "acceptance_id": "phase-brand",
+      "identity": "sha256:c3555aa80de6a71f3d2f2855d26a8cd626002a50007b2c566c83f776f1aaa822",
+      "revision": 1
+    },
+    {
+      "acceptance_id": "sidebar-craft",
+      "identity": "sha256:d4a44aec4f2576da4654d99f4973a282738e8d1eccc44915f6828ab805cdca3f",
+      "revision": 1
+    },
+    {
+      "acceptance_id": "verified-preview",
+      "identity": "sha256:5a42f1c0b8a46cca785c86d5f76e092bf0ea11737c713def95a14f482cbe1dfb",
+      "revision": 1
+    }
+  ],
+  "binding_origin": "reconstructed",
+  "binding_state": "bound",
   "evidence_id": "sidebar-polish-independent-closeout",
   "kind": "ticket_evidence",
   "origin": "agent",
@@ -19,7 +38,7 @@
     "docs/review/sidebar-polish/sidebar-narrow.png",
     "conversation:2026-09-07-sidebar-independent-closeout"
   ],
-  "schema_version": 1,
+  "schema_version": 2,
   "summary": "Independent closeout read the exact Ticket and all Evidence, App/polish diff, complete Brand component, inherited sizing/focus/reduced-motion rules, and sidebar Electron test. Byte comparison confirms Brand.tsx exactly matches the previously accepted main-worktree component. Canonical paths, unique useId clip references, named/decorative semantics and inline-only branding are correct. Independently inspected retained normal/narrow screenshots: Phase logo is legible, selected row and neutral material hierarchy are clear, long labels truncate, and entry controls remain unobstructed. The 30-Space test directly measures 196/178px rails, 43px drag strip, bounded list scroll and stationary brand, ellipsis/title, Tab focus, Enter selection/aria-current, Search/New Chat and increased contrast. Larger requested 1440x960 capture is constrained by macOS to1440x949 as documented; the stricter1000x720 viewport and flex sizing corroborate the intended vertical behavior. Retained Electron last-run record reports passed with no failed tests. Executor build/unit/geometry checks and unchanged isolated successful full-journey retry are recorded in primary Evidence; inspected changes do not touch draft recovery, state schemas, Overview, packaging or shortcut handlers. No broad suite was rerun without a new concern. No material findings or unresolved criteria.",
   "ticket_id": "ticket-polish-space-sidebar"
 }

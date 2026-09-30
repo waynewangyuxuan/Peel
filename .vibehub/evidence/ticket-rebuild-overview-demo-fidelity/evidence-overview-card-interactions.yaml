@@ -3,6 +3,20 @@
     "demo-card-anatomy",
     "overview-interaction-craft"
   ],
+  "acceptance_revisions": [
+    {
+      "acceptance_id": "demo-card-anatomy",
+      "identity": "sha256:be8b045497436feed1d2207b9b516d0ff37e46b9c88099d549ffed94fd7544c9",
+      "revision": 1
+    },
+    {
+      "acceptance_id": "overview-interaction-craft",
+      "identity": "sha256:f641c95774b424fbcbddd30b2af588a1db7ff3e8b7681eb5f561780201f1f7d6",
+      "revision": 1
+    }
+  ],
+  "binding_origin": "reconstructed",
+  "binding_state": "bound",
   "evidence_id": "evidence-overview-card-interactions",
   "kind": "ticket_evidence",
   "origin": "agent",
@@ -17,7 +31,7 @@
     "apps/desktop/test-results/ui-overview-2.png generated and directly inspected from production Electron",
     "apps/desktop/test-results/ui-overview-6.png generated and directly inspected from production Electron"
   ],
-  "schema_version": 1,
+  "schema_version": 2,
   "summary": "The exact production card component now uses the Demo's 294x205 high-density hierarchy: Space Root or Forked Thread kicker, full title disclosure, deterministic Idle/Running/Needs approval/New result/Failed states without losing simultaneous approval and unseen-result facts, exact root or Branched-from provenance, separate Latest user and Latest result actions, turn/time facts, and optional full-title Worktree/diff and Subagent pills. Pointer card-open, exact-turn facts, provenance return, rename, drag, pan, pointer-centered zoom, Fit, and targeted Diff are preserved; a dedicated keyboard open control avoids nested-button semantics, fine-pointer hover lifts only the card surface, drag cancels hover lift, mode switching has no decorative entrance delay, press feedback is immediate, and the global reduced-motion rule still collapses transitions.",
   "ticket_id": "ticket-rebuild-overview-demo-fidelity"
 }

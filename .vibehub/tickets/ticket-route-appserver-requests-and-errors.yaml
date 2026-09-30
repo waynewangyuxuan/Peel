@@ -2,25 +2,41 @@
   "acceptance": [
     {
       "acceptance_id": "complete-request-dispatch",
-      "criterion": "All 10 stable generated ServerRequest methods are exhaustively classified. V2 command and file approvals retain correct decisions; requestUserInput, permissions, and MCP elicitation receive method-specific accessible UI and response shapes; dynamic tool, auth refresh, attestation, and legacy requests are either supported through an explicit host capability or rejected promptly with a typed deterministic unsupported response, never silently left pending."
+      "criterion": "All 10 stable generated ServerRequest methods are exhaustively classified. V2 command and file approvals retain correct decisions; requestUserInput, permissions, and MCP elicitation receive method-specific accessible UI and response shapes; dynamic tool, auth refresh, attestation, and legacy requests are either supported through an explicit host capability or rejected promptly with a typed deterministic unsupported response, never silently left pending.",
+      "identity": "sha256:86c95e7e9253297d901c8fb49fa693941719dfa986bd3eb513c55e96b0d10b6f",
+      "revision": 1,
+      "state": "active"
     },
     {
       "acceptance_id": "exact-turn-request-placement",
-      "criterion": "Thread- and Turn-scoped requests render beside the exact producing Turn with human labels, method-appropriate detail, keyboard operation, available decisions, and narrow-window containment; requests without Thread identity use an explicit host-level surface or deterministic non-UI handler rather than the active Transcript."
-    },
-    {
-      "acceptance_id": "resolved-request-cleanup",
-      "criterion": "serverRequest/resolved removes the matching pending request even when resolution, timeout, interruption, cleanup, or another client occurs outside Peel's local button handler; duplicate and late resolution notifications are idempotent."
-    },
-    {
-      "acceptance_id": "visible-errors-and-warnings",
-      "criterion": "Top-level error and user-actionable warning notifications with Thread/Turn identity render safe readable detail and retry state in the correct conversation without inventing ThreadItems; failed Turn error detail remains available after completion, while global diagnostic notifications do not masquerade as conversation content."
+      "criterion": "Thread- and Turn-scoped requests render beside the exact producing Turn with human labels, method-appropriate detail, keyboard operation, available decisions, and narrow-window containment; requests without Thread identity use an explicit host-level surface or deterministic non-UI handler rather than the active Transcript.",
+      "identity": "sha256:b56c5d5ed73c213185892979959b18f4cf431021405ea4a752ce1737eca83c02",
+      "revision": 1,
+      "state": "active"
     },
     {
       "acceptance_id": "request-contract-evidence",
-      "criterion": "Generated-schema-backed adapter, IPC, renderer, and Electron tests cover all 10 request methods, every supported response shape, deterministic rejection paths, exact-Turn association, server-side resolution cleanup, reconnect/duplicate behavior, error retry states, warning visibility, and retention of existing command/file approval journeys."
+      "criterion": "Generated-schema-backed adapter, IPC, renderer, and Electron tests cover all 10 request methods, every supported response shape, deterministic rejection paths, exact-Turn association, server-side resolution cleanup, reconnect/duplicate behavior, error retry states, warning visibility, and retention of existing command/file approval journeys.",
+      "identity": "sha256:9c3595ba58087021af373bab77f6c2111f294adf2a051765a2301d1cbdefa292",
+      "revision": 1,
+      "state": "active"
+    },
+    {
+      "acceptance_id": "resolved-request-cleanup",
+      "criterion": "serverRequest/resolved removes the matching pending request even when resolution, timeout, interruption, cleanup, or another client occurs outside Peel's local button handler; duplicate and late resolution notifications are idempotent.",
+      "identity": "sha256:5f5cfa8b21da66f359661df69978a3ecde0f3a6e792a0b74d70ea2de957e4181",
+      "revision": 1,
+      "state": "active"
+    },
+    {
+      "acceptance_id": "visible-errors-and-warnings",
+      "criterion": "Top-level error and user-actionable warning notifications with Thread/Turn identity render safe readable detail and retry state in the correct conversation without inventing ThreadItems; failed Turn error detail remains available after completion, while global diagnostic notifications do not masquerade as conversation content.",
+      "identity": "sha256:7e6cb6a20c6802de89fca2b77740bebc30c9930fd93a5a8a7e9a51de546c87ca",
+      "revision": 1,
+      "state": "active"
     }
   ],
+  "active_contract_revision": 1,
   "constraints": [
     "Use the installed stable ServerRequest and ServerNotification unions as exhaustive protocol authority; experimental behavior stays capability-gated.",
     "Never answer one request method with another method's response schema.",
@@ -31,7 +47,7 @@
   "context_refs": [
     {
       "purpose": "Provides the independently accepted request, error, and cleanup gaps.",
-      "ref": ".vibehub/outcomes/ticket-audit-codex-rendering-surface.yaml"
+      "ref": ".vibehub/outcomes/ticket-audit-codex-rendering-surface/contract-v1.yaml"
     },
     {
       "purpose": "Provides the full 10-method request matrix and notification routes.",
@@ -40,6 +56,39 @@
     {
       "purpose": "Requires approvals and failures inside their producing Thread with safe fallback.",
       "ref": ".vibehub/rooms/product/contract-focus-chat-fidelity.yaml"
+    }
+  ],
+  "contract_revisions": [
+    {
+      "acceptance_revisions": [
+        {
+          "acceptance_id": "complete-request-dispatch",
+          "identity": "sha256:86c95e7e9253297d901c8fb49fa693941719dfa986bd3eb513c55e96b0d10b6f",
+          "revision": 1
+        },
+        {
+          "acceptance_id": "exact-turn-request-placement",
+          "identity": "sha256:b56c5d5ed73c213185892979959b18f4cf431021405ea4a752ce1737eca83c02",
+          "revision": 1
+        },
+        {
+          "acceptance_id": "request-contract-evidence",
+          "identity": "sha256:9c3595ba58087021af373bab77f6c2111f294adf2a051765a2301d1cbdefa292",
+          "revision": 1
+        },
+        {
+          "acceptance_id": "resolved-request-cleanup",
+          "identity": "sha256:5f5cfa8b21da66f359661df69978a3ecde0f3a6e792a0b74d70ea2de957e4181",
+          "revision": 1
+        },
+        {
+          "acceptance_id": "visible-errors-and-warnings",
+          "identity": "sha256:7e6cb6a20c6802de89fca2b77740bebc30c9930fd93a5a8a7e9a51de546c87ca",
+          "revision": 1
+        }
+      ],
+      "identity": "sha256:282bbe403803b4cdc5082d6fde386c246c857b523d7dd1bd82ff84547b43b7cf",
+      "revision": 1
     }
   ],
   "deliveries": [],
@@ -56,6 +105,7 @@
     "packages/codex-app-server/src/protocol.ts"
   ],
   "relations": [],
-  "schema_version": 2,
+  "revision_state": "bound",
+  "schema_version": 3,
   "ticket_id": "ticket-route-appserver-requests-and-errors"
 }

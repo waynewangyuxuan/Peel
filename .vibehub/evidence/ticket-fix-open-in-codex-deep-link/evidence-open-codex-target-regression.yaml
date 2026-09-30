@@ -4,6 +4,25 @@
     "safe-unavailable-app-failure",
     "open-target-regression-evidence"
   ],
+  "acceptance_revisions": [
+    {
+      "acceptance_id": "exact-desktop-thread-deep-link",
+      "identity": "sha256:dfbe6f7863dd9a92c59510b143b5b5283a486a46140951868177b2281c45250b",
+      "revision": 1
+    },
+    {
+      "acceptance_id": "safe-unavailable-app-failure",
+      "identity": "sha256:5b08adcd8d39a64df9275f6f5366589c065412c840c2f3b7bc0e80c2ca67b962",
+      "revision": 1
+    },
+    {
+      "acceptance_id": "open-target-regression-evidence",
+      "identity": "sha256:10ab6e1f520ffeba7d52a6860ff61046382a7d81ec6f00d0176ed10b06de4d5c",
+      "revision": 1
+    }
+  ],
+  "binding_origin": "reconstructed",
+  "binding_state": "bound",
   "evidence_id": "evidence-open-codex-target-regression",
   "kind": "ticket_evidence",
   "origin": "agent",
@@ -17,7 +36,7 @@
     "command:npx playwright test e2e/open-codex.spec.ts",
     "command:npm run test:e2e --workspace @peel/desktop"
   ],
-  "schema_version": 1,
+  "schema_version": 2,
   "summary": "All 99 repository unit tests pass (24 App Server, 12 Git workspace, 63 desktop), desktop typecheck and production build pass, and the dedicated Electron test intercepts shell.openExternal to prove a real Open Codex button emits the exact codex://threads/<UUID> URL. The same Electron test forces a missing protocol handler, verifies the in-app recovery toast, and confirms the selected Thread remains visible. The broader three-test Electron suite launched successfully: semantic geometry passed, while only pre-existing unrelated high-contrast sidebar and failed-resume timing assertions failed.",
   "ticket_id": "ticket-fix-open-in-codex-deep-link"
 }

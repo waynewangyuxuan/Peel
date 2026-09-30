@@ -4,6 +4,25 @@
     "measured-long-transcript-techniques",
     "renderer-adoption-decision"
   ],
+  "acceptance_revisions": [
+    {
+      "acceptance_id": "comparable-performance-measurement",
+      "identity": "sha256:b70c8a5cca6f0fdccb3fc408c8f97ee2eb01337fb73802cebec681ca94989ddb",
+      "revision": 1
+    },
+    {
+      "acceptance_id": "measured-long-transcript-techniques",
+      "identity": "sha256:756d977ea5ba0a17951befe452005fb0af20a6790ad52ae21b718bddb2646131",
+      "revision": 1
+    },
+    {
+      "acceptance_id": "renderer-adoption-decision",
+      "identity": "sha256:97071a32adeb3bc826b3bd25fbc020cc511c3fad5424d987d1508e3c3cd17f85",
+      "revision": 1
+    }
+  ],
+  "binding_origin": "reconstructed",
+  "binding_state": "bound",
   "evidence_id": "evidence-streamdown-performance-and-decision",
   "kind": "ticket_evidence",
   "origin": "agent",
@@ -19,7 +38,7 @@
     "command:npm run typecheck --workspace @peel/desktop passed",
     "command:npm run build:renderer --workspace @peel/desktop produced ordinary entry 704.05 kB/212.97 kB gzip and isolated candidate 359.19 kB/112.09 kB gzip"
   ],
-  "schema_version": 1,
+  "schema_version": 2,
   "summary": "The repeatable production Electron A/B harness separates thread reads (explicitly 0 in the isolated route), corpus construction/reducer work, and render-through-paint time, and records cold/warm first content, 10/100/500 mounts, session switch, long tasks, 36-frame streaming cadence, DOM nodes, precise heap delta/post-unmount heap, and stable-row render counts. In the representative passing run, current versus candidate was 41.6/25.8ms cold, 15.8/16.0ms warm, 174.8/182.9ms for 500 Turns, 150.8/175.5ms for a 10-to-500 switch, 9,311/9,977 DOM descendants, about 4.0/11.1MB mount heap delta, 608.4/599.1ms for 36 stream updates, and 24.9/17.7ms p99 frame interval. Stable memoized row objects produced zero historical and exactly 36 tail rerenders. The checked-in decision defers Streamdown and assistant-ui runtime adoption because the candidate does not materially beat the current renderer at transcript scale, adds a 112.09kB-gzip optional chunk and 136 installed packages, and pulls an 88MB Mermaid install tree despite Mermaid being unused. Apache-2.0 licensing is acceptable and security/correctness passed, so this is defer rather than reject. Native stable Turn identity, tail-only invalidation, settled Markdown/math memoization, and a 200k readable fallback are recommended; bounded backfill and content-visibility need real Focus evidence; Shiki and naive full virtualization are rejected for now. No Streamdown production implementation Ticket is justified.",
   "ticket_id": "ticket-evaluate-streamdown-rendering-runtime"
 }

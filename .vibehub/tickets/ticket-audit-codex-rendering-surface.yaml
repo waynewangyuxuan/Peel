@@ -2,29 +2,48 @@
   "acceptance": [
     {
       "acceptance_id": "authoritative-content-inventory",
-      "criterion": "A checked-in audit inventories the current official App Server ThreadItem, item-specific delta including reasoning summary boundaries, complete stable ServerRequest, and relevant notification contracts; compares them with the installed Codex 0.154 stable and experimental generated schema; and records content-free representative key/type shapes from locally stored completed items with all scalar values and dynamic keys removed. It explicitly distinguishes wire authority from persisted observation and protocol types from Markdown, HTML, math, media, and link syntax inside text."
-    },
-    {
-      "acceptance_id": "renderer-route-matrix",
-      "criterion": "The audit maps every installed ThreadItem variant, all stable ServerRequest methods, the full stable ServerNotification union by current routing class, and all supported or observed content shapes to Peel's exact transport, reducer, renderer, fallback, streaming, completion, pending-request cleanup, and automated-coverage behavior. It includes user inputs, phases, plans, reasoning boundaries, commands, file changes, function/MCP/dynamic/collaboration tools, web search, images, review, compaction, approvals, user prompts, permissions, elicitation, auth/attestation/legacy requests, errors, warnings, attachments, and unknown future items without claiming invisible host requests become UI cards."
-    },
-    {
-      "acceptance_id": "prose-format-and-media-matrix",
-      "criterion": "The audit evaluates completed and streaming prose fidelity for CommonMark/GFM, raw HTML, inline/display math, code highlighting/copy, tables, blockquotes, nested/task lists, links and citations, local/data/blob/remote images, audio/file references, very long and bidi/CJK text, and malformed or partial syntax, stating current behavior and the desired safe boundary for each."
-    },
-    {
-      "acceptance_id": "security-accessibility-performance-review",
-      "criterion": "The audit covers renderer sandbox assumptions, sanitization and URL policy, script/event/style injection, remote-content privacy, local-file disclosure, clipboard behavior, keyboard and screen-reader semantics, selection/copy fidelity, overflow/layout containment, streaming stability, and performance risks from large documents or expensive extensions."
+      "criterion": "A checked-in audit inventories the current official App Server ThreadItem, item-specific delta including reasoning summary boundaries, complete stable ServerRequest, and relevant notification contracts; compares them with the installed Codex 0.154 stable and experimental generated schema; and records content-free representative key/type shapes from locally stored completed items with all scalar values and dynamic keys removed. It explicitly distinguishes wire authority from persisted observation and protocol types from Markdown, HTML, math, media, and link syntax inside text.",
+      "identity": "sha256:aa0ed048b2c4c0aeb9b96fea313058557ef773cb7b38433b6ab1b6e2cdfe811d",
+      "revision": 1,
+      "state": "active"
     },
     {
       "acceptance_id": "evidence-backed-gap-prioritization",
-      "criterion": "Every identified gap is backed by official documentation, generated schema, source inspection, a deterministic fixture, or a clearly labeled and sanitized real-payload observation; gaps are ranked by user impact, contract risk, security risk, and implementation coupling, with unsupported speculation explicitly excluded."
+      "criterion": "Every identified gap is backed by official documentation, generated schema, source inspection, a deterministic fixture, or a clearly labeled and sanitized real-payload observation; gaps are ranked by user impact, contract risk, security risk, and implementation coupling, with unsupported speculation explicitly excluded.",
+      "identity": "sha256:141142cfbb971f879c977981ddbf730926cce5f41604c5c4454b55f65c7ed54a",
+      "revision": 1,
+      "state": "active"
+    },
+    {
+      "acceptance_id": "prose-format-and-media-matrix",
+      "criterion": "The audit evaluates completed and streaming prose fidelity for CommonMark/GFM, raw HTML, inline/display math, code highlighting/copy, tables, blockquotes, nested/task lists, links and citations, local/data/blob/remote images, audio/file references, very long and bidi/CJK text, and malformed or partial syntax, stating current behavior and the desired safe boundary for each.",
+      "identity": "sha256:8cf8bf2b82960ea5d8fab8724c7a308864675f5d336a5aefe0f9abec6b7f4a2d",
+      "revision": 1,
+      "state": "active"
+    },
+    {
+      "acceptance_id": "renderer-route-matrix",
+      "criterion": "The audit maps every installed ThreadItem variant, all stable ServerRequest methods, the full stable ServerNotification union by current routing class, and all supported or observed content shapes to Peel's exact transport, reducer, renderer, fallback, streaming, completion, pending-request cleanup, and automated-coverage behavior. It includes user inputs, phases, plans, reasoning boundaries, commands, file changes, function/MCP/dynamic/collaboration tools, web search, images, review, compaction, approvals, user prompts, permissions, elicitation, auth/attestation/legacy requests, errors, warnings, attachments, and unknown future items without claiming invisible host requests become UI cards.",
+      "identity": "sha256:211ff8af5519a8cdf734744fddebf32640b8f6c7708c80c51a978d8d19c95afd",
+      "revision": 1,
+      "state": "active"
+    },
+    {
+      "acceptance_id": "security-accessibility-performance-review",
+      "criterion": "The audit covers renderer sandbox assumptions, sanitization and URL policy, script/event/style injection, remote-content privacy, local-file disclosure, clipboard behavior, keyboard and screen-reader semantics, selection/copy fidelity, overflow/layout containment, streaming stability, and performance risks from large documents or expensive extensions.",
+      "identity": "sha256:779dac3ae176566e6a255116b014e480d1521d63d917d888b3b6d849aee8b671",
+      "revision": 1,
+      "state": "active"
     },
     {
       "acceptance_id": "smallest-follow-up-ticket-plan",
-      "criterion": "The audit recommends the smallest independently schedulable follow-up Ticket graph, identifies which existing rendering Ticket should be retained, revised, split, or superseded, and records open product decisions separately from implementation choices; no renderer behavior is changed by this audit Ticket."
+      "criterion": "The audit recommends the smallest independently schedulable follow-up Ticket graph, identifies which existing rendering Ticket should be retained, revised, split, or superseded, and records open product decisions separately from implementation choices; no renderer behavior is changed by this audit Ticket.",
+      "identity": "sha256:99ca543305e54b54218e3024e85b3591667eba96c74b1fcafb056c62546c5e7c",
+      "revision": 1,
+      "state": "active"
     }
   ],
+  "active_contract_revision": 1,
   "constraints": [
     "Treat the official App Server documentation and the exact installed generated schema as protocol authority; do not infer a native HTML item from model prose or another OpenAI API.",
     "Do not enable raw HTML, add renderer dependencies, or change production rendering while executing the audit.",
@@ -52,7 +71,45 @@
     },
     {
       "purpose": "Provides the accepted current Markdown, technical-output, streaming, and safety baseline.",
-      "ref": ".vibehub/outcomes/ticket-rebuild-chat-reading-surface.yaml"
+      "ref": ".vibehub/outcomes/ticket-rebuild-chat-reading-surface/contract-v1.yaml"
+    }
+  ],
+  "contract_revisions": [
+    {
+      "acceptance_revisions": [
+        {
+          "acceptance_id": "authoritative-content-inventory",
+          "identity": "sha256:aa0ed048b2c4c0aeb9b96fea313058557ef773cb7b38433b6ab1b6e2cdfe811d",
+          "revision": 1
+        },
+        {
+          "acceptance_id": "evidence-backed-gap-prioritization",
+          "identity": "sha256:141142cfbb971f879c977981ddbf730926cce5f41604c5c4454b55f65c7ed54a",
+          "revision": 1
+        },
+        {
+          "acceptance_id": "prose-format-and-media-matrix",
+          "identity": "sha256:8cf8bf2b82960ea5d8fab8724c7a308864675f5d336a5aefe0f9abec6b7f4a2d",
+          "revision": 1
+        },
+        {
+          "acceptance_id": "renderer-route-matrix",
+          "identity": "sha256:211ff8af5519a8cdf734744fddebf32640b8f6c7708c80c51a978d8d19c95afd",
+          "revision": 1
+        },
+        {
+          "acceptance_id": "security-accessibility-performance-review",
+          "identity": "sha256:779dac3ae176566e6a255116b014e480d1521d63d917d888b3b6d849aee8b671",
+          "revision": 1
+        },
+        {
+          "acceptance_id": "smallest-follow-up-ticket-plan",
+          "identity": "sha256:99ca543305e54b54218e3024e85b3591667eba96c74b1fcafb056c62546c5e7c",
+          "revision": 1
+        }
+      ],
+      "identity": "sha256:05c3ba4e5bb3a5c735e06a51b5cab8f0ded7428397fbe14652551b98a616771a",
+      "revision": 1
     }
   ],
   "deliveries": [],
@@ -76,6 +133,7 @@
     "packages/codex-app-server/test/fixtures.ts"
   ],
   "relations": [],
-  "schema_version": 2,
+  "revision_state": "bound",
+  "schema_version": 3,
   "ticket_id": "ticket-audit-codex-rendering-surface"
 }

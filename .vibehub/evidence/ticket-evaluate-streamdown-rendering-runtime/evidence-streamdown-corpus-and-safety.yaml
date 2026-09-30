@@ -4,6 +4,25 @@
     "safe-streamdown-prototype",
     "peel-semantics-compatibility"
   ],
+  "acceptance_revisions": [
+    {
+      "acceptance_id": "production-shaped-renderer-corpus",
+      "identity": "sha256:aded047e710d47c528c8ed89fafe024a558bfe99cd4b3ee0ab4da8d4bfae3129",
+      "revision": 1
+    },
+    {
+      "acceptance_id": "safe-streamdown-prototype",
+      "identity": "sha256:b579eb10b227ebd12d060e07698caff2066b0d2966bb4e0b51ce3084e7abae06",
+      "revision": 1
+    },
+    {
+      "acceptance_id": "peel-semantics-compatibility",
+      "identity": "sha256:4bfa2189d0abffbf8fef9a9ef188f0555ae9eda3506fb809e4d842bbf11ac042",
+      "revision": 1
+    }
+  ],
+  "binding_origin": "reconstructed",
+  "binding_state": "bound",
   "evidence_id": "evidence-streamdown-corpus-and-safety",
   "kind": "ticket_evidence",
   "origin": "agent",
@@ -18,7 +37,7 @@
     "command:npm run benchmark:rendering --workspace @peel/desktop passed 1/1 production Electron comparison",
     "command:npx playwright test e2e/math-layout.spec.ts --config playwright.config.ts passed 1/1"
   ],
-  "schema_version": 1,
+  "schema_version": 2,
   "summary": "A checked-in eight-section corpus and synthetic 10/100/500-Turn generator exercise complete and partial Markdown, both reported CJK/math formulas, prose structures, hardened links, citation-shaped content, short/diff/160-line code, unsafe HTML, remote and embedded images, bidi/CJK, malformed input, large technical output, and a response over 200,000 characters. The isolated Streamdown 2.5.0 adapter normalizes Codex math, enables math/CJK plugins, keeps raw HTML disabled, converts remote Markdown images to click-only links, restores only strict base64 image data, hardens links, provides local code overflow and exact copy, bounds over-200k content with readable selectable text, and catches message-local renderer failures. Production Electron assertions passed: 8 corpus cases, 3 unclipped semantic KaTeX blocks, exact visible/copied code, zero remote image fetches, no script or handler execution, no page overflow, readable partial input, safe link attributes, embedded image preservation, size fallback, and error fallback. The prototype remains behind a benchmark-only dynamic route and never enters Transcript, so Codex Thread/Turn/ThreadItem, approvals, requests, Activity, attachments, unknown items, Branch anchors, Draft, Scroll, Space, and lineage remain Peel-owned and authoritative. The existing normal-Focus math geometry test also passed at screen-safe normal and narrow viewports.",
   "ticket_id": "ticket-evaluate-streamdown-rendering-runtime"
 }

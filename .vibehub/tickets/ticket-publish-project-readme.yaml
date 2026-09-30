@@ -2,25 +2,41 @@
   "acceptance": [
     {
       "acceptance_id": "clear-product-entry",
-      "criterion": "The opening section names Peel, states the product thesis and primary user problem in plain language, and explains Space, Focus, Overview, and real Codex Forks without requiring graph, Git, VibeHub, or internal architecture vocabulary."
+      "criterion": "The opening section names Peel, states the product thesis and primary user problem in plain language, and explains Space, Focus, Overview, and real Codex Forks without requiring graph, Git, VibeHub, or internal architecture vocabulary.",
+      "identity": "sha256:ee5695b48588b52bb9e378ec93ad0442ea75dfeec0ee71920500a1fff3141d73",
+      "revision": 1,
+      "state": "active"
     },
     {
       "acceptance_id": "durable-current-visuals",
-      "criterion": "The README includes tracked, repository-relative current screenshots for both the Focus conversation surface and the spatial Overview; the images render from a GitHub checkout and are not references to ignored test output or local absolute paths."
+      "criterion": "The README includes tracked, repository-relative current screenshots for both the Focus conversation surface and the spatial Overview; the images render from a GitHub checkout and are not references to ignored test output or local absolute paths.",
+      "identity": "sha256:1ec5d940b9317a7647af6113f645093418cb75dd06dc7f08864896be1bd147bc",
+      "revision": 1,
+      "state": "active"
     },
     {
       "acceptance_id": "honest-capabilities-and-boundaries",
-      "criterion": "The README accurately distinguishes shipped v0.1 capabilities, explicit non-goals, and v0.2 direction; it preserves the Thread-first single-root real-Fork model, Codex/Peel source-of-truth boundary, main-based Diff semantics, editable no-auto-send Voice behavior, current Codex Realtime authentication fallback, and local unsigned dogfood status without implying unsupported Project, graph-editing, Git-management, or distribution features."
-    },
-    {
-      "acceptance_id": "reproducible-local-start",
-      "criterion": "A new contributor can identify macOS, Node 22+, Codex CLI/App Server, Git, and Apple Command Line Tools requirements and follow repository-accurate install, development, test, package, launch, and package-verification commands, including the exact output app path."
+      "criterion": "The README accurately distinguishes shipped v0.1 capabilities, explicit non-goals, and v0.2 direction; it preserves the Thread-first single-root real-Fork model, Codex/Peel source-of-truth boundary, main-based Diff semantics, editable no-auto-send Voice behavior, current Codex Realtime authentication fallback, and local unsigned dogfood status without implying unsupported Project, graph-editing, Git-management, or distribution features.",
+      "identity": "sha256:d475829ec176355bb05a32bc98d2676f6efa9b0be7daa0c0f78159525022e163",
+      "revision": 1,
+      "state": "active"
     },
     {
       "acceptance_id": "maintainable-repository-guide",
-      "criterion": "The README provides a compact repository map and links to the preserved PRD, runnable Demo source, desktop and adapter documentation, while avoiding duplicated low-level package documentation; every referenced repository path exists and Markdown/image links pass an automated local check."
+      "criterion": "The README provides a compact repository map and links to the preserved PRD, runnable Demo source, desktop and adapter documentation, while avoiding duplicated low-level package documentation; every referenced repository path exists and Markdown/image links pass an automated local check.",
+      "identity": "sha256:aaa4af31ac460f71f345082589126eec54961ae41008cb821f3cae2c1d479c08",
+      "revision": 1,
+      "state": "active"
+    },
+    {
+      "acceptance_id": "reproducible-local-start",
+      "criterion": "A new contributor can identify macOS, Node 22+, Codex CLI/App Server, Git, and Apple Command Line Tools requirements and follow repository-accurate install, development, test, package, launch, and package-verification commands, including the exact output app path.",
+      "identity": "sha256:d6384e8a408af632a7913e3db972e729b797487b738e463c460a659948ee6149",
+      "revision": 1,
+      "state": "active"
     }
   ],
+  "active_contract_revision": 1,
   "constraints": [
     "Write a project entry point, not a replacement PRD or generated feature inventory.",
     "Do not claim public release readiness, signing, notarization, Codex Project support, arbitrary graph editing, Git management, or server-backed Realtime voice on the current runtime.",
@@ -68,17 +84,50 @@
     },
     {
       "purpose": "Provides the latest independently verified UI and package baseline.",
-      "ref": ".vibehub/outcomes/ticket-reset-shell-material-hierarchy.yaml"
+      "ref": ".vibehub/outcomes/ticket-reset-shell-material-hierarchy/contract-v1.yaml"
     },
     {
       "purpose": "Provides the authoritative current local development and packaging commands.",
       "ref": "apps/desktop/README.md"
     }
   ],
+  "contract_revisions": [
+    {
+      "acceptance_revisions": [
+        {
+          "acceptance_id": "clear-product-entry",
+          "identity": "sha256:ee5695b48588b52bb9e378ec93ad0442ea75dfeec0ee71920500a1fff3141d73",
+          "revision": 1
+        },
+        {
+          "acceptance_id": "durable-current-visuals",
+          "identity": "sha256:1ec5d940b9317a7647af6113f645093418cb75dd06dc7f08864896be1bd147bc",
+          "revision": 1
+        },
+        {
+          "acceptance_id": "honest-capabilities-and-boundaries",
+          "identity": "sha256:d475829ec176355bb05a32bc98d2676f6efa9b0be7daa0c0f78159525022e163",
+          "revision": 1
+        },
+        {
+          "acceptance_id": "maintainable-repository-guide",
+          "identity": "sha256:aaa4af31ac460f71f345082589126eec54961ae41008cb821f3cae2c1d479c08",
+          "revision": 1
+        },
+        {
+          "acceptance_id": "reproducible-local-start",
+          "identity": "sha256:d6384e8a408af632a7913e3db972e729b797487b738e463c460a659948ee6149",
+          "revision": 1
+        }
+      ],
+      "identity": "sha256:05fb79f6ab48f8cb5b180038f8114ff8840e3fd35a6b7407667b5294d869e950",
+      "revision": 1
+    }
+  ],
+  "deliveries": [],
   "kind": "ticket",
   "maturity": "firm",
   "outcome": "The Peel repository has a polished root README that lets a new user understand the product, see the current interface, run the macOS dogfood build, and distinguish shipped v0.1 behavior from boundaries and future work without reading internal specifications.",
-  "deliveries": [],
   "provenance_refs": [
     "conversation:2026-08-28-create-root-readme"
   ],
@@ -89,6 +138,7 @@
       "type": "depends_on"
     }
   ],
-  "schema_version": 2,
+  "revision_state": "bound",
+  "schema_version": 3,
   "ticket_id": "ticket-publish-project-readme"
 }

@@ -3,6 +3,20 @@
     "warm-cache-and-deduplication",
     "responsive-warm-and-provisional-search"
   ],
+  "acceptance_revisions": [
+    {
+      "acceptance_id": "warm-cache-and-deduplication",
+      "identity": "sha256:002f7ba74dc2665ad0fba9c4fc0d40454943c780a3c0eb6c1d64746e05e499be",
+      "revision": 1
+    },
+    {
+      "acceptance_id": "responsive-warm-and-provisional-search",
+      "identity": "sha256:8e3cc6880b0238ae84a707f72eb5417ae46ea95f2d83bf2362c0920816393894",
+      "revision": 1
+    }
+  ],
+  "binding_origin": "reconstructed",
+  "binding_state": "bound",
   "evidence_id": "evidence-thread-picker-cache-latency",
   "kind": "ticket_evidence",
   "origin": "agent",
@@ -15,7 +29,7 @@
     "apps/desktop/e2e/fixtures/codex",
     "apps/desktop/e2e/v01-journey.spec.ts"
   ],
-  "schema_version": 1,
+  "schema_version": 2,
   "summary": "The service warms the recent first page after connection without delaying bootstrap, keys cache and in-flight work by exact normalized term plus cursor, shares concurrent identical requests, and expires completed pages at the exact 15,000ms boundary. With the fixture delaying thread/list by 750ms, the Electron journey measures a warmed Picker open under 100ms with no new request, a matching provisional result under 100ms while authoritative search continues, and an identical repeated query under 100ms without another App Server request.",
   "ticket_id": "ticket-optimize-thread-picker-discovery"
 }

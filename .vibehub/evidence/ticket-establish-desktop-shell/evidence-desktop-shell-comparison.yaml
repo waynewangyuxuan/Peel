@@ -2,6 +2,15 @@
   "acceptance_ids": [
     "compare-candidates"
   ],
+  "acceptance_revisions": [
+    {
+      "acceptance_id": "compare-candidates",
+      "identity": "sha256:6f0eaf7650e8c50a168eeb98e50548a3874c0c866909fb6a16860e164c8cb7cc",
+      "revision": 1
+    }
+  ],
+  "binding_origin": "reconstructed",
+  "binding_state": "bound",
   "evidence_id": "evidence-desktop-shell-comparison",
   "kind": "ticket_evidence",
   "origin": "agent",
@@ -14,7 +23,7 @@
     "https://v2.tauri.app/security/capabilities/",
     "https://developer.apple.com/documentation/speech/sfspeechrecognizer"
   ],
-  "schema_version": 1,
+  "schema_version": 2,
   "summary": "ADR-0001 compares Electron 44, Tauri 2, and native SwiftUI plus WKWebView across every required dimension, using primary framework documentation, local runtime measurements, and Peel-specific delivery constraints.",
   "ticket_id": "ticket-establish-desktop-shell"
 }

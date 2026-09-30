@@ -1,18 +1,28 @@
 {
   "acceptance": [
     {
-      "acceptance_id": "unclipped-display-glyphs",
-      "criterion": "The exact reported Q_h=XW_h^Q, K_h=XW_h^K, V_h=XW_h^V display expression renders every base, subscript, superscript, comma, and italic overhang fully inside its scroll container at normal and narrow supported Focus widths, with horizontal containment but no vertical clipping."
-    },
-    {
       "acceptance_id": "cjk-script-layout",
-      "criterion": "The exact reported 苹果/外卖 and 外卖/公司 display expressions render CJK subscripts visibly below their q/k bases, superscripts visibly above, with no glyph collision or false same-baseline reading; CJK fallback type remains legible and proportionate to Latin math scripts."
+      "criterion": "The exact reported 苹果/外卖 and 外卖/公司 display expressions render CJK subscripts visibly below their q/k bases, superscripts visibly above, with no glyph collision or false same-baseline reading; CJK fallback type remains legible and proportionate to Latin math scripts.",
+      "identity": "sha256:385ef9824a4989d8f106f326a9913390d3d0aabfcad13079bfd757cb1e539a60",
+      "revision": 1,
+      "state": "active"
     },
     {
       "acceptance_id": "math-layout-regression-evidence",
-      "criterion": "Automated DOM-geometry and screenshot evidence renders the exact formulas through Peel's production Markdown and CSS path, proves formula glyph bounds are contained and CJK base/subscript/superscript boxes are separated at normal and narrow widths, and retains existing safe parsing, MathML accessibility, streaming, copy, code isolation, and page-width regression tests."
+      "criterion": "Automated DOM-geometry and screenshot evidence renders the exact formulas through Peel's production Markdown and CSS path, proves formula glyph bounds are contained and CJK base/subscript/superscript boxes are separated at normal and narrow widths, and retains existing safe parsing, MathML accessibility, streaming, copy, code isolation, and page-width regression tests.",
+      "identity": "sha256:bcc41ddf4b34220445e7004d3f1f979da470e8c89b2340d837ad09939852f578",
+      "revision": 1,
+      "state": "active"
+    },
+    {
+      "acceptance_id": "unclipped-display-glyphs",
+      "criterion": "The exact reported Q_h=XW_h^Q, K_h=XW_h^K, V_h=XW_h^V display expression renders every base, subscript, superscript, comma, and italic overhang fully inside its scroll container at normal and narrow supported Focus widths, with horizontal containment but no vertical clipping.",
+      "identity": "sha256:af032dbedf8f878a2dbef539cc846047ed31378fb69de77f6037163dfd4adcf7",
+      "revision": 1,
+      "state": "active"
     }
   ],
+  "active_contract_revision": 1,
   "constraints": [
     "Keep raw HTML disabled, KaTeX trust false, and the existing accessible HTML plus MathML output.",
     "Do not replace semantic TeX scripts with screenshot-like hard-coded markup or formula-specific string rewrites.",
@@ -26,7 +36,7 @@
     },
     {
       "purpose": "Provides the accepted KaTeX baseline and safety/streaming behaviors this follow-up must not regress.",
-      "ref": ".vibehub/outcomes/ticket-fix-focus-math-and-branch-affordance.yaml"
+      "ref": ".vibehub/outcomes/ticket-fix-focus-math-and-branch-affordance/contract-v1.yaml"
     },
     {
       "purpose": "Owns the production remark-math and rehype-katex rendering path.",
@@ -35,6 +45,29 @@
     {
       "purpose": "Owns the current display overflow and KaTeX presentation rules causing the reported layout failures.",
       "ref": "apps/desktop/src/renderer/styles.css"
+    }
+  ],
+  "contract_revisions": [
+    {
+      "acceptance_revisions": [
+        {
+          "acceptance_id": "cjk-script-layout",
+          "identity": "sha256:385ef9824a4989d8f106f326a9913390d3d0aabfcad13079bfd757cb1e539a60",
+          "revision": 1
+        },
+        {
+          "acceptance_id": "math-layout-regression-evidence",
+          "identity": "sha256:bcc41ddf4b34220445e7004d3f1f979da470e8c89b2340d837ad09939852f578",
+          "revision": 1
+        },
+        {
+          "acceptance_id": "unclipped-display-glyphs",
+          "identity": "sha256:af032dbedf8f878a2dbef539cc846047ed31378fb69de77f6037163dfd4adcf7",
+          "revision": 1
+        }
+      ],
+      "identity": "sha256:814d840a081bfa91bf65d18c5f13d83828e78b754733fc662860683b2338bba4",
+      "revision": 1
     }
   ],
   "deliveries": [],
@@ -47,6 +80,7 @@
     "local-session:01a0adcc-b7ba-79f1-b30e-a396f29afcb1"
   ],
   "relations": [],
-  "schema_version": 2,
+  "revision_state": "bound",
+  "schema_version": 3,
   "ticket_id": "ticket-fix-display-math-clipping-and-cjk-scripts"
 }

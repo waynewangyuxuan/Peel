@@ -2,6 +2,15 @@
   "acceptance_ids": [
     "visual-regression-set"
   ],
+  "acceptance_revisions": [
+    {
+      "acceptance_id": "visual-regression-set",
+      "identity": "sha256:7c24f3769d5a9fb0b8c0c83dafa603935cc6b867bac5f198a1073d2ed0242d00",
+      "revision": 1
+    }
+  ],
+  "binding_origin": "reconstructed",
+  "binding_state": "bound",
   "evidence_id": "evidence-ui-visual-regression-and-package",
   "kind": "ticket_evidence",
   "origin": "agent",
@@ -16,7 +25,7 @@
     "command:npm run verify:package --workspace @peel/desktop",
     "command:npm run verify:live-codex --workspace @peel/desktop"
   ],
-  "schema_version": 1,
+  "schema_version": 2,
   "summary": "The stable visual set contains Welcome, Thread Picker, Focus with real Activity/error fallbacks, Local Fork Draft, two-node Overview, Voice recording/transcribing/failure states, 50-node Fit, restored long Focus and the live Diff drawer. Screenshots that follow modal, Fork, Overview, and Focus entrance motion are emitted only after that motion settles; the Voice frames are captured while each explicit state is stable. This prevents transition frames from masquerading as reference UI. The set was visually inspected alongside a 1440x960 headless render of the preserved Demo HTML. Verification passes all 42 repository tests, the full build, one 34.9-second Electron product journey, a rebuilt package with restoredDraft and nativeVoiceHelper true, and a read-only local Codex smoke with 30 initial Threads, a real nextCursor and 60 after Load more.",
   "ticket_id": "ticket-deliver-v01-ui-polish"
 }

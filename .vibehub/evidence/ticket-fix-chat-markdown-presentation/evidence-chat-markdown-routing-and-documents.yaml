@@ -3,6 +3,20 @@
     "all-prose-markdown-routing",
     "commonmark-gfm-document-fidelity"
   ],
+  "acceptance_revisions": [
+    {
+      "acceptance_id": "all-prose-markdown-routing",
+      "identity": "sha256:71008555a78aad643070891063a0df2a0fa606cddec503a4a9cf8e3c8f56e187",
+      "revision": 1
+    },
+    {
+      "acceptance_id": "commonmark-gfm-document-fidelity",
+      "identity": "sha256:394b0114a1f4d3136288dd9948b1b9c56d87aeaab47d4b3e3eb75fd94f22fda6",
+      "revision": 1
+    }
+  ],
+  "binding_origin": "reconstructed",
+  "binding_state": "bound",
   "evidence_id": "evidence-chat-markdown-routing-and-documents",
   "kind": "ticket_evidence",
   "origin": "agent",
@@ -15,7 +29,7 @@
     "apps/desktop/test/markdown.test.tsx",
     "apps/desktop/e2e/fixtures/codex"
   ],
-  "schema_version": 1,
+  "schema_version": 2,
   "summary": "One safe MarkdownContent route now presents user messages, agent messages, Reasoning prose, Subagent prose, and error prose while Command output and file facts retain explicit preformatted treatment. The renderer covers CommonMark/GFM headings through h6, breaks, emphasis, strikethrough, nested quotes and lists, tasks, rules, safe links and bounded image policy, inline/fenced code with language, and bounded tables. Raw HTML remains disabled, default URL sanitization rejects javascript URLs, remote Markdown images become explicit outbound links, and data/blob images remain locally renderable. Unit and Electron fixtures include a minimal redacted shape copied from the inspected live Codex Thread: three ordinary leading > paragraphs become blockquote DOM, the pipe table becomes table DOM, and no literal quote control line remains.",
   "ticket_id": "ticket-fix-chat-markdown-presentation"
 }

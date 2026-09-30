@@ -1,18 +1,28 @@
 {
   "acceptance": [
     {
-      "acceptance_id": "single-persistent-branch-action",
-      "criterion": "A completed Turn renders exactly one keyboard-accessible button labeled Branch from here at the Turn footer. The circular PeelHandle and its drag preview are absent from the DOM and stylesheet, and the footer action is visible without hover or focus at supported desktop widths."
-    },
-    {
       "acceptance_id": "branch-behavior-preserved",
-      "criterion": "Pointer and keyboard activation open the same cancellable local Fork Draft anchored to the exact completed Turn, preserve the no-durable-state-before-First-Send contract, and behave correctly for long responses, multiple Turns, and narrow supported windows."
+      "criterion": "Pointer and keyboard activation open the same cancellable local Fork Draft anchored to the exact completed Turn, preserve the no-durable-state-before-First-Send contract, and behave correctly for long responses, multiple Turns, and narrow supported windows.",
+      "identity": "sha256:119d221ac27faa18023f8c85255b008e88d8d8f7f7b0a238a209be20546be969",
+      "revision": 1,
+      "state": "active"
     },
     {
       "acceptance_id": "branch-regression-evidence",
-      "criterion": "Unit and production Electron evidence proves persistent visibility, absence of the duplicate circular handle, exact-Turn Fork Draft creation, cancellation and First Send behavior, keyboard activation, and retention of existing Focus scroll, Draft, Approval, and Overview journeys."
+      "criterion": "Unit and production Electron evidence proves persistent visibility, absence of the duplicate circular handle, exact-Turn Fork Draft creation, cancellation and First Send behavior, keyboard activation, and retention of existing Focus scroll, Draft, Approval, and Overview journeys.",
+      "identity": "sha256:390d4c53d1d22b7f8241c651d5eb52a0fc098ff2f5ed2cd85453e3c7d747b3f3",
+      "revision": 1,
+      "state": "active"
+    },
+    {
+      "acceptance_id": "single-persistent-branch-action",
+      "criterion": "A completed Turn renders exactly one keyboard-accessible button labeled Branch from here at the Turn footer. The circular PeelHandle and its drag preview are absent from the DOM and stylesheet, and the footer action is visible without hover or focus at supported desktop widths.",
+      "identity": "sha256:d431e2db6c6938a560670cd2543ed45c3ec1b0ac0e752a555b635228c2998f82",
+      "revision": 1,
+      "state": "active"
     }
   ],
+  "active_contract_revision": 1,
   "constraints": [
     "Keep Branch from here visually clear but subordinate to conversation content; do not introduce another gesture-only or duplicate control.",
     "Preserve the exact completed-Turn anchor and existing Fork lifecycle semantics.",
@@ -30,7 +40,30 @@
     },
     {
       "purpose": "Provides the independently accepted split recommendation.",
-      "ref": ".vibehub/outcomes/ticket-audit-codex-rendering-surface.yaml"
+      "ref": ".vibehub/outcomes/ticket-audit-codex-rendering-surface/contract-v1.yaml"
+    }
+  ],
+  "contract_revisions": [
+    {
+      "acceptance_revisions": [
+        {
+          "acceptance_id": "branch-behavior-preserved",
+          "identity": "sha256:119d221ac27faa18023f8c85255b008e88d8d8f7f7b0a238a209be20546be969",
+          "revision": 1
+        },
+        {
+          "acceptance_id": "branch-regression-evidence",
+          "identity": "sha256:390d4c53d1d22b7f8241c651d5eb52a0fc098ff2f5ed2cd85453e3c7d747b3f3",
+          "revision": 1
+        },
+        {
+          "acceptance_id": "single-persistent-branch-action",
+          "identity": "sha256:d431e2db6c6938a560670cd2543ed45c3ec1b0ac0e752a555b635228c2998f82",
+          "revision": 1
+        }
+      ],
+      "identity": "sha256:00b90da0989a6cc657227914f60e9867be4b8f9437cfe5733e38ce8c810eb214",
+      "revision": 1
     }
   ],
   "deliveries": [],
@@ -44,6 +77,7 @@
     "apps/desktop/src/renderer/styles.css"
   ],
   "relations": [],
-  "schema_version": 2,
+  "revision_state": "bound",
+  "schema_version": 3,
   "ticket_id": "ticket-fix-turn-branch-affordance"
 }

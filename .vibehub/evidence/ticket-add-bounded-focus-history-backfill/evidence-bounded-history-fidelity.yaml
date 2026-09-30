@@ -5,6 +5,30 @@
     "history-restoration-and-restart-fidelity",
     "selection-and-image-anchor-stability"
   ],
+  "acceptance_revisions": [
+    {
+      "acceptance_id": "anchor-aware-initial-range",
+      "identity": "sha256:75ed1cc131b828381e8308b7357aaec2a7741b133ce73881ef8378d353c3a591",
+      "revision": 1
+    },
+    {
+      "acceptance_id": "stable-incremental-history-prepend",
+      "identity": "sha256:ebdb10f0e0a69e6ceed139bb2c60a649d9ab7dc47d4ffe821f608d1e4f2c2417",
+      "revision": 1
+    },
+    {
+      "acceptance_id": "history-restoration-and-restart-fidelity",
+      "identity": "sha256:e440a6ab9f145c0080faa8a48695c16d612bae14b879e21cfd89525ee45013a4",
+      "revision": 1
+    },
+    {
+      "acceptance_id": "selection-and-image-anchor-stability",
+      "identity": "sha256:7a3067be83d23160320020b0b316f2339bae8768ebe26137e9d28a1964080eae",
+      "revision": 1
+    }
+  ],
+  "binding_origin": "reconstructed",
+  "binding_state": "bound",
   "evidence_id": "evidence-bounded-history-fidelity",
   "kind": "ticket_evidence",
   "origin": "agent",
@@ -27,7 +51,7 @@
     "command:npm run test:e2e --workspace @peel/desktop -- e2e/math-layout.spec.ts e2e/open-codex.spec.ts e2e/rendering-performance.spec.ts e2e/server-request-routing.spec.ts --reporter=dot passed 4/4",
     "command:npm run test:e2e --workspace @peel/desktop -- e2e/v01-journey.spec.ts --reporter=dot reached line 903 after the covered fidelity assertions, then failed on the existing session-resume fixture expectation"
   ],
-  "schema_version": 1,
+  "schema_version": 2,
   "summary": "The production bounded-history E2E proves ordinary 32-Turn live-tail entry, exact saved Turn-anchor entry, and exact highlighted Branched-from Parent entry. Scheduled one-Turn React transitions restore all 500 authoritative Turn IDs on a separate fidelity fixture whose history distributes prose, code, math/CJK, reasoning, command, file-change, subagent Activity, error, unknown-item, data image, and remote-image cases. Browser Long Tasks observation records no task at or above 50 ms during the full backfill, every settled anchor delta is at most one CSS pixel, and full history retains exact selectable first-to-last text and Branch actions. A cross-Turn active selection remains exact through prepend. Data and blob images remain width-bounded and settle within one pixel; remote media stays click-only. Turn 211 restores within one pixel after a Thread switch and after fully closing and relaunching Electron. Unit tests cover range choice, anchor normalization/persistence, and data/blob/remote URL policy. The broad v0.1 journey completed its Focus, Branch, Draft/Scroll, attachment, Voice, streaming, request, scale, and restart checks before the known unrelated line-903 session-resume fixture expectation failed; it is not reported as passing.",
   "ticket_id": "ticket-add-bounded-focus-history-backfill"
 }

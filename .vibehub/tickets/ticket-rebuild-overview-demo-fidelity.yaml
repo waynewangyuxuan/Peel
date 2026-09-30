@@ -2,25 +2,41 @@
   "acceptance": [
     {
       "acceptance_id": "demo-canvas-composition",
-      "criterion": "At 1440x960 and 1000x720, Overview uses the preserved Demo's full-canvas composition: no separate full-width toolbar band, a restrained floating identity/count control and floating zoom controls sit over the canvas, and the grid fades into the background. New Spaces and legacy Spaces still at the exact untouched root=(0,0), camera=(0,0,.86) sentinel receive one balanced initial Camera without moving Nodes; any non-sentinel persisted Camera remains unchanged, while explicit Fit makes representative 2-node and 6-node graphs occupy a deliberate readable field rather than clinging to the top-left above a mostly empty viewport."
+      "criterion": "At 1440x960 and 1000x720, Overview uses the preserved Demo's full-canvas composition: no separate full-width toolbar band, a restrained floating identity/count control and floating zoom controls sit over the canvas, and the grid fades into the background. New Spaces and legacy Spaces still at the exact untouched root=(0,0), camera=(0,0,.86) sentinel receive one balanced initial Camera without moving Nodes; any non-sentinel persisted Camera remains unchanged, while explicit Fit makes representative 2-node and 6-node graphs occupy a deliberate readable field rather than clinging to the top-left above a mostly empty viewport.",
+      "identity": "sha256:2bb33789c5db2f038687f8c741b4f4c2c11d71bd67e9b059f2a1a7e3dce7cf38",
+      "revision": 1,
+      "state": "active"
     },
     {
       "acceptance_id": "demo-card-anatomy",
-      "criterion": "At 100% zoom every durable Thread card closely follows the Demo's 294px-wide, approximately 205px-min-height high-density anatomy and visual hierarchy: Root/Forked Thread kicker, readable title, explicit deterministic status, Branched-from/Fork snippet provenance, separate Latest user and Latest result facts, last-active time, turn count, and optional Worktree, changed-file, and Subagent pills; long content clamps cleanly without turning the card into tiny undifferentiated rows."
-    },
-    {
-      "acceptance_id": "spatial-hierarchy-and-edges",
-      "criterion": "Fork edges attach to the true card geometry, remain low contrast by default, and strengthen along the active path; Root, parent, child, sibling, and current Thread are visually recognizable from structure and state rather than arbitrary color, while existing persisted positions and Fork topology remain authoritative."
+      "criterion": "At 100% zoom every durable Thread card closely follows the Demo's 294px-wide, approximately 205px-min-height high-density anatomy and visual hierarchy: Root/Forked Thread kicker, readable title, explicit deterministic status, Branched-from/Fork snippet provenance, separate Latest user and Latest result facts, last-active time, turn count, and optional Worktree, changed-file, and Subagent pills; long content clamps cleanly without turning the card into tiny undifferentiated rows.",
+      "identity": "sha256:be8b045497436feed1d2207b9b516d0ff37e46b9c88099d549ffed94fd7544c9",
+      "revision": 1,
+      "state": "active"
     },
     {
       "acceptance_id": "overview-interaction-craft",
-      "criterion": "Card open, exact-snippet return, rename, pan, zoom-at-pointer, Fit, drag, and Diff/worktree affordances remain keyboard and pointer usable; press and fine-pointer hover feedback is immediate and restrained, repeated Focus/Overview switching is not delayed by decorative motion, dragging does not fight hover transforms, and reduced-motion behavior is preserved."
+      "criterion": "Card open, exact-snippet return, rename, pan, zoom-at-pointer, Fit, drag, and Diff/worktree affordances remain keyboard and pointer usable; press and fine-pointer hover feedback is immediate and restrained, repeated Focus/Overview switching is not delayed by decorative motion, dragging does not fight hover transforms, and reduced-motion behavior is preserved.",
+      "identity": "sha256:f641c95774b424fbcbddd30b2af588a1db7ff3e8b7681eb5f561780201f1f7d6",
+      "revision": 1,
+      "state": "active"
     },
     {
       "acceptance_id": "overview-visual-and-scale-regression",
-      "criterion": "Production Electron evidence includes directly inspected settled screenshots for the preserved Demo Overview, Peel's 2-node Overview, a deterministic 6-node branching Overview, and the 50-node Fit state; automated assertions retain all nodes and real edges, zero unexpected position changes, readable deterministic card fields, narrow-window containment, and successful re-entry to Focus without regressing the delivered Focus, Fork, Voice, Diff, approval, streaming, or restart journey."
+      "criterion": "Production Electron evidence includes directly inspected settled screenshots for the preserved Demo Overview, Peel's 2-node Overview, a deterministic 6-node branching Overview, and the 50-node Fit state; automated assertions retain all nodes and real edges, zero unexpected position changes, readable deterministic card fields, narrow-window containment, and successful re-entry to Focus without regressing the delivered Focus, Fork, Voice, Diff, approval, streaming, or restart journey.",
+      "identity": "sha256:95bb883253a22a74521a76f0001c7dc62eb78f2c49a1df325229ff4019a64cfe",
+      "revision": 1,
+      "state": "active"
+    },
+    {
+      "acceptance_id": "spatial-hierarchy-and-edges",
+      "criterion": "Fork edges attach to the true card geometry, remain low contrast by default, and strengthen along the active path; Root, parent, child, sibling, and current Thread are visually recognizable from structure and state rather than arbitrary color, while existing persisted positions and Fork topology remain authoritative.",
+      "identity": "sha256:709c86ab8b8a799a9893fb227a57d08d5658f626372a8d2c4cc313ca5fd06091",
+      "revision": 1,
+      "state": "active"
     }
   ],
+  "active_contract_revision": 1,
   "constraints": [
     "The preserved Demo HTML is the visual and interaction authority; do not run a new direction exercise or introduce a competing graph/dashboard style.",
     "Overview uses only deterministic Codex and Peel-owned topology/view facts; do not add AI-inferred conclusions, decisions, priorities, arbitrary edges, or branch-type colors.",
@@ -48,10 +64,43 @@
       "ref": "docs/product/source/peel-demo-v0-original.html"
     }
   ],
+  "contract_revisions": [
+    {
+      "acceptance_revisions": [
+        {
+          "acceptance_id": "demo-canvas-composition",
+          "identity": "sha256:2bb33789c5db2f038687f8c741b4f4c2c11d71bd67e9b059f2a1a7e3dce7cf38",
+          "revision": 1
+        },
+        {
+          "acceptance_id": "demo-card-anatomy",
+          "identity": "sha256:be8b045497436feed1d2207b9b516d0ff37e46b9c88099d549ffed94fd7544c9",
+          "revision": 1
+        },
+        {
+          "acceptance_id": "overview-interaction-craft",
+          "identity": "sha256:f641c95774b424fbcbddd30b2af588a1db7ff3e8b7681eb5f561780201f1f7d6",
+          "revision": 1
+        },
+        {
+          "acceptance_id": "overview-visual-and-scale-regression",
+          "identity": "sha256:95bb883253a22a74521a76f0001c7dc62eb78f2c49a1df325229ff4019a64cfe",
+          "revision": 1
+        },
+        {
+          "acceptance_id": "spatial-hierarchy-and-edges",
+          "identity": "sha256:709c86ab8b8a799a9893fb227a57d08d5658f626372a8d2c4cc313ca5fd06091",
+          "revision": 1
+        }
+      ],
+      "identity": "sha256:9c28d6b8432e0618f96a8c194f36ff2b7f32de3df0d57ad2dda8eb4b911b3dcd",
+      "revision": 1
+    }
+  ],
+  "deliveries": [],
   "kind": "ticket",
   "maturity": "firm",
   "outcome": "Peel Overview becomes a deliberate, high-density spatial workspace that is recognizably faithful to the preserved Demo in composition, card hierarchy, edges, states, and interaction quality while retaining real deterministic data and stable large-Space behavior.",
-  "deliveries": [],
   "provenance_refs": [
     "conversation:2026-08-26-overview-seriously-unacceptable",
     ".vibehub/outcomes/ticket-deliver-v01-ui-polish.yaml"
@@ -63,6 +112,7 @@
       "type": "depends_on"
     }
   ],
-  "schema_version": 2,
+  "revision_state": "bound",
+  "schema_version": 3,
   "ticket_id": "ticket-rebuild-overview-demo-fidelity"
 }

@@ -1,30 +1,49 @@
 {
   "acceptance": [
     {
-      "acceptance_id": "content-first-shell-hierarchy",
-      "criterion": "At 1440x960 and 1000x720, Focus makes the conversation the dominant surface: Spaces and Lineage remain legible and fully usable but visually recessive, the current Space/Thread identity remains discoverable without horizontal scrolling, and the top bar no longer presents every secondary action as an equally weighted boxed control."
-    },
-    {
-      "acceptance_id": "coherent-material-and-geometry",
-      "criterion": "The renderer uses one documented visual token system for canvas, navigation, selection, elevated surfaces, borders, shadows, radii, typography, and icons; resting controls are predominantly unboxed, persistent pills are limited to states that need containment, and no core surface invents a competing component geometry."
+      "acceptance_id": "calm-activity-and-progressive-actions",
+      "criterion": "Completed Reasoning, Command, File Change, Subagent, Turn, Diff, and navigation actions preserve all information and accessible names while using secondary integrated presentation; hover, focus, active, running, approval, result, and failure states reveal the minimum additional chrome needed for the current action.",
+      "identity": "sha256:a123f53d4d5bbd1b4b095de7bf2768207f49f8f21b2272b2965a9010c04b1ea5",
+      "revision": 1,
+      "state": "active"
     },
     {
       "acceptance_id": "chat-and-composer-proportion",
-      "criterion": "Short user messages shrink to their content within a safe maximum width, the empty Composer rests at no more than 82 CSS pixels high before transient error or Voice content, attachment/dictation/send remain clear and keyboard-complete, and recording, transcription, sending, disabled, error, and preserved-Draft states remain immediately legible without raw intermediate UI."
+      "criterion": "Short user messages shrink to their content within a safe maximum width, the empty Composer rests at no more than 82 CSS pixels high before transient error or Voice content, attachment/dictation/send remain clear and keyboard-complete, and recording, transcription, sending, disabled, error, and preserved-Draft states remain immediately legible without raw intermediate UI.",
+      "identity": "sha256:8068ff45261f4be883438b370d08e576c704cc5f7dcac90ac4be1a2d6b4bee0a",
+      "revision": 1,
+      "state": "active"
     },
     {
-      "acceptance_id": "calm-activity-and-progressive-actions",
-      "criterion": "Completed Reasoning, Command, File Change, Subagent, Turn, Diff, and navigation actions preserve all information and accessible names while using secondary integrated presentation; hover, focus, active, running, approval, result, and failure states reveal the minimum additional chrome needed for the current action."
+      "acceptance_id": "coherent-material-and-geometry",
+      "criterion": "The renderer uses one documented visual token system for canvas, navigation, selection, elevated surfaces, borders, shadows, radii, typography, and icons; resting controls are predominantly unboxed, persistent pills are limited to states that need containment, and no core surface invents a competing component geometry.",
+      "identity": "sha256:b8ca184ebf79a49a303e83985455d52a01143b8f190a328c8193062d1c3ab708",
+      "revision": 1,
+      "state": "active"
     },
     {
-      "acceptance_id": "overview-material-continuity",
-      "criterion": "Overview retains deterministic cards, real edges, drag, pan, zoom, Fit, Focus return, and 30–50 Node readability while sharing the reset shell's typography, material, icon, and selection language; the canvas remains spatially distinct without reverting to a generic card dashboard."
+      "acceptance_id": "content-first-shell-hierarchy",
+      "criterion": "At 1440x960 and 1000x720, Focus makes the conversation the dominant surface: Spaces and Lineage remain legible and fully usable but visually recessive, the current Space/Thread identity remains discoverable without horizontal scrolling, and the top bar no longer presents every secondary action as an equally weighted boxed control.",
+      "identity": "sha256:9a372d896f3ea0b4bb69103a7e1326c3d0d968b31b7ce07601cd08f4bb35b2c3",
+      "revision": 1,
+      "state": "active"
     },
     {
       "acceptance_id": "motion-accessibility-and-regression-proof",
-      "criterion": "Frequent navigation and keyboard actions respond immediately without decorative entrance animation, press feedback and occasional drawer/modal transitions remain interruptible and under 300ms, reduced-motion behavior stays legible, all repository tests and the packaged Electron journey pass, and fresh wide/narrow Focus plus 2/6/50-node Overview screenshots receive direct visual review."
+      "criterion": "Frequent navigation and keyboard actions respond immediately without decorative entrance animation, press feedback and occasional drawer/modal transitions remain interruptible and under 300ms, reduced-motion behavior stays legible, all repository tests and the packaged Electron journey pass, and fresh wide/narrow Focus plus 2/6/50-node Overview screenshots receive direct visual review.",
+      "identity": "sha256:7452efe26d3272ea4d0935befaf7fbdb6955470ae882d0413267c9c4de319a61",
+      "revision": 1,
+      "state": "active"
+    },
+    {
+      "acceptance_id": "overview-material-continuity",
+      "criterion": "Overview retains deterministic cards, real edges, drag, pan, zoom, Fit, Focus return, and 30–50 Node readability while sharing the reset shell's typography, material, icon, and selection language; the canvas remains spatially distinct without reverting to a generic card dashboard.",
+      "identity": "sha256:4ab4723a6da74c39ba579bba7163141ebb32bd108ba0a4447dd250189a4a7b8d",
+      "revision": 1,
+      "state": "active"
     }
   ],
+  "active_contract_revision": 1,
   "constraints": [
     "The preserved original Demo remains the information-architecture and spatial interaction authority; this reset refines material, density, hierarchy, and micro-interaction rather than introducing a new product skin.",
     "ChatGPT/Codex conventions guide content dominance and control restraint, but Peel must retain its own Spaces, persistent Lineage, Peel gesture, and deterministic Overview identity.",
@@ -60,21 +79,59 @@
     },
     {
       "purpose": "Preserves the latest verified Chat typography, Markdown, code, Activity, and responsive reading behavior.",
-      "ref": ".vibehub/outcomes/ticket-rebuild-chat-reading-surface.yaml"
+      "ref": ".vibehub/outcomes/ticket-rebuild-chat-reading-surface/contract-v1.yaml"
     },
     {
       "purpose": "Preserves deterministic Overview topology, 2/6/50-node layout, and interaction fidelity.",
-      "ref": ".vibehub/outcomes/ticket-rebuild-overview-demo-fidelity.yaml"
+      "ref": ".vibehub/outcomes/ticket-rebuild-overview-demo-fidelity/contract-v1.yaml"
     },
     {
       "purpose": "Preserves the real new-Chat entry, Composer keyboard semantics, and live PCM-driven Voice feedback.",
-      "ref": ".vibehub/outcomes/ticket-rework-new-chat-composer-and-voice-feedback.yaml"
+      "ref": ".vibehub/outcomes/ticket-rework-new-chat-composer-and-voice-feedback/contract-v1.yaml"
     }
   ],
+  "contract_revisions": [
+    {
+      "acceptance_revisions": [
+        {
+          "acceptance_id": "calm-activity-and-progressive-actions",
+          "identity": "sha256:a123f53d4d5bbd1b4b095de7bf2768207f49f8f21b2272b2965a9010c04b1ea5",
+          "revision": 1
+        },
+        {
+          "acceptance_id": "chat-and-composer-proportion",
+          "identity": "sha256:8068ff45261f4be883438b370d08e576c704cc5f7dcac90ac4be1a2d6b4bee0a",
+          "revision": 1
+        },
+        {
+          "acceptance_id": "coherent-material-and-geometry",
+          "identity": "sha256:b8ca184ebf79a49a303e83985455d52a01143b8f190a328c8193062d1c3ab708",
+          "revision": 1
+        },
+        {
+          "acceptance_id": "content-first-shell-hierarchy",
+          "identity": "sha256:9a372d896f3ea0b4bb69103a7e1326c3d0d968b31b7ce07601cd08f4bb35b2c3",
+          "revision": 1
+        },
+        {
+          "acceptance_id": "motion-accessibility-and-regression-proof",
+          "identity": "sha256:7452efe26d3272ea4d0935befaf7fbdb6955470ae882d0413267c9c4de319a61",
+          "revision": 1
+        },
+        {
+          "acceptance_id": "overview-material-continuity",
+          "identity": "sha256:4ab4723a6da74c39ba579bba7163141ebb32bd108ba0a4447dd250189a4a7b8d",
+          "revision": 1
+        }
+      ],
+      "identity": "sha256:53a3b6ea480fc340bb2d419988ff3c024fd606a2d4f44ba7a08eb186cca2c334",
+      "revision": 1
+    }
+  ],
+  "deliveries": [],
   "kind": "ticket",
   "maturity": "firm",
   "outcome": "Peel's Focus, shared chrome, and Overview feel like one calm native Codex workspace rather than a stack of rounded SaaS components, while preserving the Demo's spatial information architecture and every shipped workflow.",
-  "deliveries": [],
   "provenance_refs": [
     "conversation:2026-08-27-shell-plasticity-diagnosis-and-reset",
     "apps/desktop/test-results/ui-focus-activity.png",
@@ -97,6 +154,7 @@
       "type": "depends_on"
     }
   ],
-  "schema_version": 2,
+  "revision_state": "bound",
+  "schema_version": 3,
   "ticket_id": "ticket-reset-shell-material-hierarchy"
 }

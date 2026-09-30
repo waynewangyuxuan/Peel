@@ -4,6 +4,25 @@
     "runtime-preflight-before-capture",
     "no-api-key-or-secret-boundary"
   ],
+  "acceptance_revisions": [
+    {
+      "acceptance_id": "experimental-realtime-capability",
+      "identity": "sha256:048057e64d1ef8b6db3e8a5516ec2646b65e02beca54b80bf94bbbf8dbcb3ca1",
+      "revision": 1
+    },
+    {
+      "acceptance_id": "runtime-preflight-before-capture",
+      "identity": "sha256:0390f0119659de6275e93b29f437fe46471caec5fbe1ca84e5549034261e62a2",
+      "revision": 1
+    },
+    {
+      "acceptance_id": "no-api-key-or-secret-boundary",
+      "identity": "sha256:82a29693ea9d60493913ddce39f9360b6d311ba1608d36aa61230da761b13bf4",
+      "revision": 1
+    }
+  ],
+  "binding_origin": "reconstructed",
+  "binding_state": "bound",
   "evidence_id": "evidence-realtime-capability-and-auth-boundary",
   "kind": "ticket_evidence",
   "origin": "agent",
@@ -17,7 +36,7 @@
     "command:npm run test:realtime --workspace @peel/codex-app-server",
     ".vibehub/rooms/product/constraint-codex-realtime-chatgpt-auth-gap.yaml"
   ],
-  "schema_version": 1,
-  "summary": "The adapter enables realtime_conversation only for Peel's owned App Server child process, requires the complete three-method and five-notification schema, and retains stable-method fallback when the method is absent or unavailable. Begin Dictation performs a matching Thread runtime preflight before opening microphone capture and selects codex-realtime only after thread/realtime/started; typed error, closed, timeout, unsupported Thread, thrown start request, or missing method selects native-fallback without exposing raw protocol copy, and every ambiguous start path now makes a best-effort stop before fallback. The live installed-Codex probe passed against 0.149.0 and accurately recorded schema compatibility plus the current ChatGPT/SIWC runtime rejection `realtime conversation requires API key auth`, zero created Turns, and zero Turn events. Transport environment tests and implementation inspection confirm Peel neither inherits nor introduces OPENAI_API_KEY or renderer credentials."
-  ,"ticket_id": "ticket-integrate-codex-realtime-dictation"
+  "schema_version": 2,
+  "summary": "The adapter enables realtime_conversation only for Peel's owned App Server child process, requires the complete three-method and five-notification schema, and retains stable-method fallback when the method is absent or unavailable. Begin Dictation performs a matching Thread runtime preflight before opening microphone capture and selects codex-realtime only after thread/realtime/started; typed error, closed, timeout, unsupported Thread, thrown start request, or missing method selects native-fallback without exposing raw protocol copy, and every ambiguous start path now makes a best-effort stop before fallback. The live installed-Codex probe passed against 0.149.0 and accurately recorded schema compatibility plus the current ChatGPT/SIWC runtime rejection `realtime conversation requires API key auth`, zero created Turns, and zero Turn events. Transport environment tests and implementation inspection confirm Peel neither inherits nor introduces OPENAI_API_KEY or renderer credentials.",
+  "ticket_id": "ticket-integrate-codex-realtime-dictation"
 }

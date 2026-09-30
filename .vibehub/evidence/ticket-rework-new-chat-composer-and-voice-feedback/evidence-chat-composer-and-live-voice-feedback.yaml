@@ -3,6 +3,20 @@
     "chat-like-composer",
     "live-voice-level-feedback"
   ],
+  "acceptance_revisions": [
+    {
+      "acceptance_id": "chat-like-composer",
+      "identity": "sha256:770dda6c08b7a5bb8e4f9a03698e098cbac79a898a0bd6389e47c57a1002b9f9",
+      "revision": 1
+    },
+    {
+      "acceptance_id": "live-voice-level-feedback",
+      "identity": "sha256:3aaa6ea5e79a0c16fdb75fdac0a2fe1d453a2303b894e1dd24f8a26f0390c416",
+      "revision": 1
+    }
+  ],
+  "binding_origin": "reconstructed",
+  "binding_state": "bound",
   "evidence_id": "evidence-chat-composer-and-live-voice-feedback",
   "kind": "ticket_evidence",
   "origin": "agent",
@@ -17,7 +31,7 @@
     "screenshot:apps/desktop/test-results/ui-voice-recording.png",
     "screenshot:apps/desktop/test-results/ui-voice-transcribing.png"
   ],
-  "schema_version": 1,
+  "schema_version": 2,
   "summary": "The Focus Composer now auto-grows, sends with Enter, preserves Shift+Enter newlines, uses an explicit circular up-arrow stateful Send action, and retains per-Thread Drafts. Dictation measures real analyser PCM, maps perceptual loudness into a continuously updated compact waveform and elapsed state, then appends Apple Speech text without auto-send or Draft loss.",
   "ticket_id": "ticket-rework-new-chat-composer-and-voice-feedback"
 }

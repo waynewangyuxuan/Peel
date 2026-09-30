@@ -6,6 +6,35 @@
     "legacy-new-chat-repair",
     "naming-regression-evidence"
   ],
+  "acceptance_revisions": [
+    {
+      "acceptance_id": "new-chat-default-title-transition",
+      "identity": "sha256:05f9d573293df900fc2ef54405b4e4867a18ca238b7038a177365a580a5b16fa",
+      "revision": 1
+    },
+    {
+      "acceptance_id": "manual-space-name-precedence",
+      "identity": "sha256:82d62ffd9f90299e8353f3cee6cc6234e978e7f9d2f43e63fee33819be6ffbd3",
+      "revision": 1
+    },
+    {
+      "acceptance_id": "title-origin-persistence",
+      "identity": "sha256:43e553d67358cb3e876dedc348b6098dc218e32eb43dd075569037ce3770b6bd",
+      "revision": 1
+    },
+    {
+      "acceptance_id": "legacy-new-chat-repair",
+      "identity": "sha256:a6ae06f686a9327be20823ef2014cf349c89c3d9327d10a346fffb6c54875998",
+      "revision": 1
+    },
+    {
+      "acceptance_id": "naming-regression-evidence",
+      "identity": "sha256:79eb380fe50f86dea292b85332cd0f40660fae6389abbe19d2e1d9ee3e4547d9",
+      "revision": 1
+    }
+  ],
+  "binding_origin": "reconstructed",
+  "binding_state": "bound",
   "evidence_id": "evidence-space-title-production-regression",
   "kind": "ticket_evidence",
   "origin": "agent",
@@ -22,7 +51,7 @@
     "command:npx playwright test e2e/open-codex.spec.ts e2e/math-layout.spec.ts e2e/space-title.spec.ts",
     "command:git diff --check"
   ],
-  "schema_version": 1,
+  "schema_version": 2,
   "summary": "The production Electron Space-title journey creates real empty Chats, proves immediate first-prompt and delayed automatic sidebar transitions, protects manual Space names made both before and after completion, verifies manual Root and Fork names still dispatch thread/name/set without changing a protected Space, and restarts the same profile to prove provenance persistence. It then loads field-less legacy state, visibly repairs only New Chat, preserves a custom legacy label, persists both inferred origins, and verifies them through another full restart. Three durable screenshots show the default-following, manual-protection, and legacy-repair states. All repository tests pass (24 App Server, 12 Git workspace, 68 desktop), the full production build passes, git diff checking passes, and the focused Open-in-Codex, math, and Space-title Electron suite passes 3/3.",
   "ticket_id": "ticket-fix-new-chat-space-title-lifecycle"
 }

@@ -3,6 +3,20 @@
     "fresh-current-product-captures",
     "durable-legible-assets"
   ],
+  "acceptance_revisions": [
+    {
+      "acceptance_id": "fresh-current-product-captures",
+      "identity": "sha256:49521e5cd1534d9eea5ad816e89d737e76f83140d9d819867cc24817a26d8557",
+      "revision": 1
+    },
+    {
+      "acceptance_id": "durable-legible-assets",
+      "identity": "sha256:6f349691ebad21aee75f9259c8df7ab6f66a0a719d9ecca84f3c21228a1bb300",
+      "revision": 1
+    }
+  ],
+  "binding_origin": "reconstructed",
+  "binding_state": "bound",
   "evidence_id": "evidence-readme-current-product-visuals",
   "kind": "ticket_evidence",
   "origin": "agent",
@@ -15,7 +29,7 @@
     "inspection:original-detail docs/assets/peel-focus.png",
     "inspection:original-detail docs/assets/peel-overview.png"
   ],
-  "schema_version": 1,
+  "schema_version": 2,
   "summary": "The tracked Focus and Overview PNGs were regenerated from the current packaged production Electron app using an isolated six-Thread fixture with no user data, private path, credential, or host diagnostic. Direct original/high-detail inspection confirms the 1600x1000 Focus image visibly contains the branded shell, meaningful named Chats, repaired Latin/CJK math layout, explicit Branched from Parent return, and persistent Branch from here actions. The 1600x1000 Overview image shows six named cards, real Fork edges, distinct active state, and visible Parent buttons. Both repository-relative assets are readable at README scale and total 599,257 bytes. The checked-in capture script makes the source and viewport reproducible rather than relying on an edited mockup.",
   "ticket_id": "ticket-refresh-readme-current-experience"
 }

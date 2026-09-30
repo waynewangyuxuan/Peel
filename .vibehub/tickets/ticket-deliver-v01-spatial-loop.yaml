@@ -1,46 +1,77 @@
 {
   "acceptance": [
     {
-      "acceptance_id": "thread-first-entry",
-      "criterion": "The desktop app lists/searches existing Codex Threads, opens one in normal Focus Chat, and creates a Space whose only Root is that Thread without requiring or displaying Codex Project membership."
+      "acceptance_id": "automated-v01-journeys",
+      "criterion": "Automated tests cover Start Space, Focus streaming/approval, Draft cancel, successful Current/New Worktree First Send, each recoverable failure stage, exact Parent return, microphone permission and transcription failure at the native boundary, Voice editing/no-auto-send, Rename precedence, status/new-result, Diff, packaged restart restoration, and unsupported optional capabilities.",
+      "identity": "sha256:d7583761e661d8038e9ee9ed97bb3588b1fa0f49d5bfff1098f690bd4a307eec",
+      "revision": 1,
+      "state": "active"
     },
     {
       "acceptance_id": "focus-fidelity",
-      "criterion": "Focus renders the supported Codex transcript/item stream, Markdown/code, commands, file changes, approvals, errors, Activity, attachments, Composer, unknown-item fallback, and Open in Codex while preserving selection, scroll behavior, per-Thread Draft, and per-Thread Scroll across switching and restart."
+      "criterion": "Focus renders the supported Codex transcript/item stream, Markdown/code, commands, file changes, approvals, errors, Activity, attachments, Composer, unknown-item fallback, and Open in Codex while preserving selection, scroll behavior, per-Thread Draft, and per-Thread Scroll across switching and restart.",
+      "identity": "sha256:7cbb2fd73e4f6f8a1e16d7ee6cf6034bb15db482750a8e4f84286434662a674b",
+      "revision": 1,
+      "state": "active"
     },
     {
       "acceptance_id": "fork-first-send",
-      "criterion": "Branch from here and Peel create the same local Fork Draft from a completed Turn within 150ms; Escape leaves no durable Thread/worktree; First Send uses exact lastTurnId, optional Current/New Worktree, and never loses Prompt across Worktree, Fork, or First Turn failures."
+      "criterion": "Branch from here and Peel create the same local Fork Draft from a completed Turn within 150ms; Escape leaves no durable Thread/worktree; First Send uses exact lastTurnId, optional Current/New Worktree, and never loses Prompt across Worktree, Fork, or First Turn failures.",
+      "identity": "sha256:8cf5db881965199c610a59ce5784687af2cf10594896d4bed3bde0814a0da65a",
+      "revision": 1,
+      "state": "active"
     },
     {
       "acceptance_id": "lineage-return",
-      "criterion": "Every non-Root node has exactly one Parent and accurate forkedAtTurnId; Branched from returns to and highlights the exact Parent Turn, and returning to the Child restores its prior Scroll and Draft."
-    },
-    {
-      "acceptance_id": "overview-and-layout",
-      "criterion": "Overview contains no Transcript or Composer, renders only the deterministic Card fields and real Fork Edges, allows Focus re-entry and Card drag, persists Node/Camera positions, and never moves existing nodes when a Child is added."
-    },
-    {
-      "acceptance_id": "real-voice-dictation",
-      "criterion": "The packaged desktop app captures real microphone audio and transcribes it into the current editable Thread Draft without auto-send; microphone denial, capture interruption, and transcription failure are recoverable and never erase or replace the existing Draft. A test-only fake text insertion cannot satisfy this criterion."
+      "criterion": "Every non-Root node has exactly one Parent and accurate forkedAtTurnId; Branched from returns to and highlights the exact Parent Turn, and returning to the Child restores its prior Scroll and Draft.",
+      "identity": "sha256:b6f7f1d8a6602b0e9dd85e19bbfaf86347b09c0a85947b654d5eccf725b72721",
+      "revision": 1,
+      "state": "active"
     },
     {
       "acceptance_id": "naming-and-attention",
-      "criterion": "Temporary/generated/manual title lifecycle syncs through Codex and never overwrites manual names; Running/Needs approval/New result/Failed and folded Subagent indicators follow their deterministic contracts."
+      "criterion": "Temporary/generated/manual title lifecycle syncs through Codex and never overwrites manual names; Running/Needs approval/New result/Failed and folded Subagent indicators follow their deterministic contracts.",
+      "identity": "sha256:62c15a5cb7eca385b015c3a68e2de405f0df261f2b42f1ddae5b21148d2c47a7",
+      "revision": 1,
+      "state": "active"
     },
     {
-      "acceptance_id": "worktree-diff",
-      "criterion": "Git-backed Forks can select Current or New Worktree before First Send; Worktree name and changed files appear as metadata; the lightweight Diff surface works and exits back to the prior mode without exposing prohibited Git-management workflows."
+      "acceptance_id": "overview-and-layout",
+      "criterion": "Overview contains no Transcript or Composer, renders only the deterministic Card fields and real Fork Edges, allows Focus re-entry and Card drag, persists Node/Camera positions, and never moves existing nodes when a Child is added.",
+      "identity": "sha256:34d6143caa95bb13e7b3303db2836fa87f6bf0911580d901c6a03a4febbc06e2",
+      "revision": 1,
+      "state": "active"
     },
     {
       "acceptance_id": "packaged-desktop-lifecycle",
-      "criterion": "A production package builds from a clean checkout, launches outside the development server, owns App Server start/handshake/reconnect/shutdown, connects to local Codex, and restores Peel-owned Space membership, Drafts, Scroll, Node positions, and Camera position after a full application restart."
+      "criterion": "A production package builds from a clean checkout, launches outside the development server, owns App Server start/handshake/reconnect/shutdown, connects to local Codex, and restores Peel-owned Space membership, Drafts, Scroll, Node positions, and Camera position after a full application restart.",
+      "identity": "sha256:3b2611eb3e57c538f935d291eee42e0e7963a29bbafad83ceb9f6ee96efa94d4",
+      "revision": 1,
+      "state": "active"
     },
     {
-      "acceptance_id": "automated-v01-journeys",
-      "criterion": "Automated tests cover Start Space, Focus streaming/approval, Draft cancel, successful Current/New Worktree First Send, each recoverable failure stage, exact Parent return, microphone permission and transcription failure at the native boundary, Voice editing/no-auto-send, Rename precedence, status/new-result, Diff, packaged restart restoration, and unsupported optional capabilities."
+      "acceptance_id": "real-voice-dictation",
+      "criterion": "The packaged desktop app captures real microphone audio and transcribes it into the current editable Thread Draft without auto-send; microphone denial, capture interruption, and transcription failure are recoverable and never erase or replace the existing Draft. A test-only fake text insertion cannot satisfy this criterion.",
+      "identity": "sha256:865628896f2b8bbb099cbe0e05b501709de9e0c0fc9d9a7613e65af8c2295cb5",
+      "revision": 1,
+      "state": "active"
+    },
+    {
+      "acceptance_id": "thread-first-entry",
+      "criterion": "The desktop app lists/searches existing Codex Threads, opens one in normal Focus Chat, and creates a Space whose only Root is that Thread without requiring or displaying Codex Project membership.",
+      "identity": "sha256:284ef5f0a63adb00e0c73314a06b38cfa5cbe8509b6d22b5e6d40116c9386df3",
+      "revision": 1,
+      "state": "active"
+    },
+    {
+      "acceptance_id": "worktree-diff",
+      "criterion": "Git-backed Forks can select Current or New Worktree before First Send; Worktree name and changed files appear as metadata; the lightweight Diff surface works and exits back to the prior mode without exposing prohibited Git-management workflows.",
+      "identity": "sha256:1ddac6520cbb2a931a9b8fbdaec4d7638cf73789535350dee9eb832a2312ea7d",
+      "revision": 1,
+      "state": "active"
     }
   ],
+  "active_contract_revision": 1,
   "constraints": [
     "Implement the active Thread-first model; do not reintroduce Project-first navigation, Add to Space, Forest, arbitrary Edge, or Cross-project graph from the historical Demo/PRD.",
     "Codex owns conversation and execution facts; Peel owns only Space and view metadata.",
@@ -103,10 +134,68 @@
       "ref": "docs/product/source/spatial-thread-workspace-prd-v0-original.md"
     }
   ],
+  "contract_revisions": [
+    {
+      "acceptance_revisions": [
+        {
+          "acceptance_id": "automated-v01-journeys",
+          "identity": "sha256:d7583761e661d8038e9ee9ed97bb3588b1fa0f49d5bfff1098f690bd4a307eec",
+          "revision": 1
+        },
+        {
+          "acceptance_id": "focus-fidelity",
+          "identity": "sha256:7cbb2fd73e4f6f8a1e16d7ee6cf6034bb15db482750a8e4f84286434662a674b",
+          "revision": 1
+        },
+        {
+          "acceptance_id": "fork-first-send",
+          "identity": "sha256:8cf5db881965199c610a59ce5784687af2cf10594896d4bed3bde0814a0da65a",
+          "revision": 1
+        },
+        {
+          "acceptance_id": "lineage-return",
+          "identity": "sha256:b6f7f1d8a6602b0e9dd85e19bbfaf86347b09c0a85947b654d5eccf725b72721",
+          "revision": 1
+        },
+        {
+          "acceptance_id": "naming-and-attention",
+          "identity": "sha256:62c15a5cb7eca385b015c3a68e2de405f0df261f2b42f1ddae5b21148d2c47a7",
+          "revision": 1
+        },
+        {
+          "acceptance_id": "overview-and-layout",
+          "identity": "sha256:34d6143caa95bb13e7b3303db2836fa87f6bf0911580d901c6a03a4febbc06e2",
+          "revision": 1
+        },
+        {
+          "acceptance_id": "packaged-desktop-lifecycle",
+          "identity": "sha256:3b2611eb3e57c538f935d291eee42e0e7963a29bbafad83ceb9f6ee96efa94d4",
+          "revision": 1
+        },
+        {
+          "acceptance_id": "real-voice-dictation",
+          "identity": "sha256:865628896f2b8bbb099cbe0e05b501709de9e0c0fc9d9a7613e65af8c2295cb5",
+          "revision": 1
+        },
+        {
+          "acceptance_id": "thread-first-entry",
+          "identity": "sha256:284ef5f0a63adb00e0c73314a06b38cfa5cbe8509b6d22b5e6d40116c9386df3",
+          "revision": 1
+        },
+        {
+          "acceptance_id": "worktree-diff",
+          "identity": "sha256:1ddac6520cbb2a931a9b8fbdaec4d7638cf73789535350dee9eb832a2312ea7d",
+          "revision": 1
+        }
+      ],
+      "identity": "sha256:460c2f405cd2caa74e65ed29da6a5341838de0ab8235cf97a188cc6dccf752a7",
+      "revision": 1
+    }
+  ],
+  "deliveries": [],
   "kind": "ticket",
   "maturity": "firm",
   "outcome": "A packaged Peel v0.1 desktop build delivers the complete real-Codex Spatial Fork loop from existing Thread discovery through Focus, Fork Draft, First Send, Overview, return, Voice, Worktree, Diff, naming, attention, and restoration.",
-  "deliveries": [],
   "provenance_refs": [
     "conversation:2026-08-25-plan-peel-v01-v02",
     "commit:0630dc68d2c8858e799fc6433e6f1c081c9e6bda"
@@ -123,6 +212,7 @@
       "type": "depends_on"
     }
   ],
-  "schema_version": 2,
+  "revision_state": "bound",
+  "schema_version": 3,
   "ticket_id": "ticket-deliver-v01-spatial-loop"
 }

@@ -1,26 +1,42 @@
 {
   "acceptance": [
     {
-      "acceptance_id": "detect-git-context",
-      "criterion": "The adapter detects whether a Thread cwd is Git-backed, resolves main repository versus linked worktree roots, and returns current branch/worktree identity without modifying the repository."
-    },
-    {
       "acceptance_id": "create-worktree-safely",
-      "criterion": "Given a validated Git repository and requested Fork identity, the adapter creates a uniquely named branch/worktree at an explicit path, reports the resulting cwd, and never targets a broad or unresolved directory."
+      "criterion": "Given a validated Git repository and requested Fork identity, the adapter creates a uniquely named branch/worktree at an explicit path, reports the resulting cwd, and never targets a broad or unresolved directory.",
+      "identity": "sha256:fa8e7e5b0d2b0082a27d51e95d149ad1a2714eac8eda6c9ebbdfd184017b8f16",
+      "revision": 1,
+      "state": "active"
     },
     {
-      "acceptance_id": "recover-partial-failure",
-      "criterion": "Every failure stage returns a structured recoverable error and either leaves no new branch/worktree or reports the exact recoverable artifact; callers can Retry or choose Current Workspace without losing the pending Fork Prompt."
+      "acceptance_id": "detect-git-context",
+      "criterion": "The adapter detects whether a Thread cwd is Git-backed, resolves main repository versus linked worktree roots, and returns current branch/worktree identity without modifying the repository.",
+      "identity": "sha256:498317ac5ffa9f28eb6a83ee3b14247baa33f0f134916ea55b2c2e1f530001e2",
+      "revision": 1,
+      "state": "active"
     },
     {
       "acceptance_id": "diff-and-open-facts",
-      "criterion": "The adapter provides changed-file counts, file/addition/deletion summaries, diff retrieval, and explicit open-in-worktree/editor/Codex targets without implementing commit, push, PR, branch graph, or multi-worktree comparison workflows."
+      "criterion": "The adapter provides changed-file counts, file/addition/deletion summaries, diff retrieval, and explicit open-in-worktree/editor/Codex targets without implementing commit, push, PR, branch graph, or multi-worktree comparison workflows.",
+      "identity": "sha256:7c52708c3f9a0c00a083b93b56449c977cef66969c7a2d446a557eaca96614ad",
+      "revision": 1,
+      "state": "active"
+    },
+    {
+      "acceptance_id": "recover-partial-failure",
+      "criterion": "Every failure stage returns a structured recoverable error and either leaves no new branch/worktree or reports the exact recoverable artifact; callers can Retry or choose Current Workspace without losing the pending Fork Prompt.",
+      "identity": "sha256:b27d0aede294fa75f6423f55418b7d8f7b49a1e1a3d0f191477b17d0dc7b1642",
+      "revision": 1,
+      "state": "active"
     },
     {
       "acceptance_id": "temporary-repo-tests",
-      "criterion": "Automated tests in disposable repositories cover main checkout, linked worktree, dirty state, naming collision, invalid repository, creation failure, and cleanup/reporting behavior."
+      "criterion": "Automated tests in disposable repositories cover main checkout, linked worktree, dirty state, naming collision, invalid repository, creation failure, and cleanup/reporting behavior.",
+      "identity": "sha256:e850aa17b2f0da7d9cd6c973cec2f86c8111e03d847123cf67cc4bfdf2ee84d6",
+      "revision": 1,
+      "state": "active"
     }
   ],
+  "active_contract_revision": 1,
   "constraints": [
     "Worktree is Thread metadata and never creates a second graph or Fork Edge.",
     "No destructive cleanup may run against an unresolved or user-owned broad path.",
@@ -41,10 +57,43 @@
       "ref": ".vibehub/rooms/product/decision-app-server-adapter-architecture.yaml"
     }
   ],
+  "contract_revisions": [
+    {
+      "acceptance_revisions": [
+        {
+          "acceptance_id": "create-worktree-safely",
+          "identity": "sha256:fa8e7e5b0d2b0082a27d51e95d149ad1a2714eac8eda6c9ebbdfd184017b8f16",
+          "revision": 1
+        },
+        {
+          "acceptance_id": "detect-git-context",
+          "identity": "sha256:498317ac5ffa9f28eb6a83ee3b14247baa33f0f134916ea55b2c2e1f530001e2",
+          "revision": 1
+        },
+        {
+          "acceptance_id": "diff-and-open-facts",
+          "identity": "sha256:7c52708c3f9a0c00a083b93b56449c977cef66969c7a2d446a557eaca96614ad",
+          "revision": 1
+        },
+        {
+          "acceptance_id": "recover-partial-failure",
+          "identity": "sha256:b27d0aede294fa75f6423f55418b7d8f7b49a1e1a3d0f191477b17d0dc7b1642",
+          "revision": 1
+        },
+        {
+          "acceptance_id": "temporary-repo-tests",
+          "identity": "sha256:e850aa17b2f0da7d9cd6c973cec2f86c8111e03d847123cf67cc4bfdf2ee84d6",
+          "revision": 1
+        }
+      ],
+      "identity": "sha256:dd9a78fea356f8fde6aeef4b645dc37d366d3d1ea17d9faa49bfae15a63eeaa4",
+      "revision": 1
+    }
+  ],
+  "deliveries": [],
   "kind": "ticket",
   "maturity": "firm",
   "outcome": "Peel has a tested GitWorkspaceAdapter that safely creates and describes optional Fork worktrees while keeping failure recoverable and separate from Space topology.",
-  "deliveries": [],
   "provenance_refs": [
     "conversation:2026-08-25-peel-v01-v02-scope"
   ],
@@ -55,6 +104,7 @@
       "type": "depends_on"
     }
   ],
-  "schema_version": 2,
+  "revision_state": "bound",
+  "schema_version": 3,
   "ticket_id": "ticket-build-git-workspace-adapter"
 }

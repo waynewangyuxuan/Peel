@@ -2,17 +2,27 @@
   "acceptance": [
     {
       "acceptance_id": "compare-candidates",
-      "criterion": "A checked-in technical proposal compares at least Electron, Tauri, and any materially better candidate against App Server stdio process ownership, macOS packaging, microphone/dictation, local Git/worktree access, web-UI fidelity, accessibility, update model, testability, and security boundary."
+      "criterion": "A checked-in technical proposal compares at least Electron, Tauri, and any materially better candidate against App Server stdio process ownership, macOS packaging, microphone/dictation, local Git/worktree access, web-UI fidelity, accessibility, update model, testability, and security boundary.",
+      "identity": "sha256:6f0eaf7650e8c50a168eeb98e50548a3874c0c866909fb6a16860e164c8cb7cc",
+      "revision": 1,
+      "state": "active"
     },
     {
       "acceptance_id": "prove-top-candidate",
-      "criterion": "A minimal disposable spike for the leading candidate launches a desktop window using the preserved Demo or equivalent local surface and proves a child process can complete the App Server initialize/initialized handshake without embedding secrets or requiring Project APIs."
+      "criterion": "A minimal disposable spike for the leading candidate launches a desktop window using the preserved Demo or equivalent local surface and proves a child process can complete the App Server initialize/initialized handshake without embedding secrets or requiring Project APIs.",
+      "identity": "sha256:de177f7ec8bf78c67989e440f110ed993ab69d48c2d1ac1654bffbddd9c9bcc8",
+      "revision": 1,
+      "state": "active"
     },
     {
       "acceptance_id": "select-and-record-architecture",
-      "criterion": "One shell is selected and recorded in a checked-in architecture ADR outside the Product Room, with rationale, rejected alternatives, migration cost, and process/module boundaries for AppServerTransport, ThreadClient, EventReducer, GitWorkspaceAdapter, UI state persistence, and native voice integration."
+      "criterion": "One shell is selected and recorded in a checked-in architecture ADR outside the Product Room, with rationale, rejected alternatives, migration cost, and process/module boundaries for AppServerTransport, ThreadClient, EventReducer, GitWorkspaceAdapter, UI state persistence, and native voice integration.",
+      "identity": "sha256:9d364df7df0c2d34890815ef18a9e9058b3311b6dda3a68481a48b9585a526d5",
+      "revision": 1,
+      "state": "active"
     }
   ],
+  "active_contract_revision": 1,
   "constraints": [
     "Do not change the Thread-first, single-root Fork Tree product model to fit a framework.",
     "Reuse the preserved Demo as interaction evidence, not as production architecture.",
@@ -42,16 +52,40 @@
       "ref": "docs/product/source/peel-demo-v0-original.html"
     }
   ],
+  "contract_revisions": [
+    {
+      "acceptance_revisions": [
+        {
+          "acceptance_id": "compare-candidates",
+          "identity": "sha256:6f0eaf7650e8c50a168eeb98e50548a3874c0c866909fb6a16860e164c8cb7cc",
+          "revision": 1
+        },
+        {
+          "acceptance_id": "prove-top-candidate",
+          "identity": "sha256:de177f7ec8bf78c67989e440f110ed993ab69d48c2d1ac1654bffbddd9c9bcc8",
+          "revision": 1
+        },
+        {
+          "acceptance_id": "select-and-record-architecture",
+          "identity": "sha256:9d364df7df0c2d34890815ef18a9e9058b3311b6dda3a68481a48b9585a526d5",
+          "revision": 1
+        }
+      ],
+      "identity": "sha256:692e364dadd9ce27627aa0c86cdf9a884f86f11a1635fae75c0c6c79e9607fca",
+      "revision": 1
+    }
+  ],
+  "deliveries": [],
   "kind": "ticket",
   "maturity": "firm",
   "outcome": "Peel has an evidence-backed, checked-in desktop-shell architecture decision that proves how it will host the existing web prototype while owning local Codex App Server, voice, persistence, and Git integration.",
-  "deliveries": [],
   "provenance_refs": [
     "conversation:2026-08-25-plan-peel-v01-v02",
     "commit:0630dc68d2c8858e799fc6433e6f1c081c9e6bda",
     "https://learn.chatgpt.com/docs/app-server"
   ],
   "relations": [],
-  "schema_version": 2,
+  "revision_state": "bound",
+  "schema_version": 3,
   "ticket_id": "ticket-establish-desktop-shell"
 }

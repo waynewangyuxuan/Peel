@@ -1,27 +1,43 @@
 {
   "acceptance": [
     {
-      "acceptance_id": "stress-space",
-      "criterion": "A deterministic 30–50 Node fixture proves the graph remains intact, nodes remain locatable and focusable, existing positions never change unexpectedly, and long Transcript/code/Streaming/Approval/Activity states do not break the shell."
-    },
-    {
-      "acceptance_id": "reliability-gates",
-      "criterion": "Independent evidence verifies Draft loss rate 0 across tested failures, exact Fork Edge/lastTurnId agreement, Node unexpected movement 0, manual title precedence, restart restoration, and safe New Worktree failure behavior."
-    },
-    {
       "acceptance_id": "entry-and-recovery-ux",
-      "criterion": "An evaluator unfamiliar with the implementation can go from an existing Thread to a real Fork in under 30 seconds without Node/Edge/Graph/Git terminology, and can recover from each induced First Send failure without losing input."
+      "criterion": "An evaluator unfamiliar with the implementation can go from an existing Thread to a real Fork in under 30 seconds without Node/Edge/Graph/Git terminology, and can recover from each induced First Send failure without losing input.",
+      "identity": "sha256:2cf3ee39c9c7fff7b6313f128474f81c92ffd5b85ff6db9ff1ad39097767de3e",
+      "revision": 1,
+      "state": "active"
     },
     {
       "acceptance_id": "human-spatial-utility",
       "authority": "human",
-      "criterion": "Wayne dogfoods a Space with at least two Forks and explicitly confirms that Tree or Overview helped him identify, return to, and continue at least one non-current Branch; feedback and any release-blocking mismatch are recorded as human-origin evidence."
+      "criterion": "Wayne dogfoods a Space with at least two Forks and explicitly confirms that Tree or Overview helped him identify, return to, and continue at least one non-current Branch; feedback and any release-blocking mismatch are recorded as human-origin evidence.",
+      "identity": "sha256:f152ea67839f61faa526e5bef3a03939687e47af4727c513e47bf5303ed43bdd",
+      "revision": 1,
+      "state": "active"
+    },
+    {
+      "acceptance_id": "reliability-gates",
+      "criterion": "Independent evidence verifies Draft loss rate 0 across tested failures, exact Fork Edge/lastTurnId agreement, Node unexpected movement 0, manual title precedence, restart restoration, and safe New Worktree failure behavior.",
+      "identity": "sha256:84c027a6202833406f2fa6878bfbc6844dc34a19c81cb51927c6c34254ee9841",
+      "revision": 1,
+      "state": "active"
     },
     {
       "acceptance_id": "shape-guardrail-review",
-      "criterion": "A product-shape review finds no generic graph editing, Project-first topology, execution dashboard, unmarked AI interpretation, unstable layout, or missing Open in Codex escape hatch in the release candidate."
+      "criterion": "A product-shape review finds no generic graph editing, Project-first topology, execution dashboard, unmarked AI interpretation, unstable layout, or missing Open in Codex escape hatch in the release candidate.",
+      "identity": "sha256:e6b434b5db267a1cf8996b6d574b50bd95598279b9e297b3c83079176e0117a3",
+      "revision": 1,
+      "state": "active"
+    },
+    {
+      "acceptance_id": "stress-space",
+      "criterion": "A deterministic 30–50 Node fixture proves the graph remains intact, nodes remain locatable and focusable, existing positions never change unexpectedly, and long Transcript/code/Streaming/Approval/Activity states do not break the shell.",
+      "identity": "sha256:8b1a63aed1f56fccb9020610b4d693fb6091a8845a382065e6e2c7c6462e93f6",
+      "revision": 1,
+      "state": "active"
     }
   ],
+  "active_contract_revision": 1,
   "constraints": [
     "Do not accept the Ticket from screenshots or implementation summaries alone; exercise real state transitions and failure paths.",
     "Human authority applies only to the spatial-utility dogfood judgment; mechanical criteria remain independently checkable.",
@@ -46,10 +62,43 @@
       "ref": ".vibehub/rooms/product/note-demo-visual-interaction-baseline.yaml"
     }
   ],
+  "contract_revisions": [
+    {
+      "acceptance_revisions": [
+        {
+          "acceptance_id": "entry-and-recovery-ux",
+          "identity": "sha256:2cf3ee39c9c7fff7b6313f128474f81c92ffd5b85ff6db9ff1ad39097767de3e",
+          "revision": 1
+        },
+        {
+          "acceptance_id": "human-spatial-utility",
+          "identity": "sha256:f152ea67839f61faa526e5bef3a03939687e47af4727c513e47bf5303ed43bdd",
+          "revision": 1
+        },
+        {
+          "acceptance_id": "reliability-gates",
+          "identity": "sha256:84c027a6202833406f2fa6878bfbc6844dc34a19c81cb51927c6c34254ee9841",
+          "revision": 1
+        },
+        {
+          "acceptance_id": "shape-guardrail-review",
+          "identity": "sha256:e6b434b5db267a1cf8996b6d574b50bd95598279b9e297b3c83079176e0117a3",
+          "revision": 1
+        },
+        {
+          "acceptance_id": "stress-space",
+          "identity": "sha256:8b1a63aed1f56fccb9020610b4d693fb6091a8845a382065e6e2c7c6462e93f6",
+          "revision": 1
+        }
+      ],
+      "identity": "sha256:5a4491a4e9bd8677ee94cf7b4d2f4e7b2e72c28ccd4f40cfb640da78be7ffb65",
+      "revision": 1
+    }
+  ],
+  "deliveries": [],
   "kind": "ticket",
   "maturity": "firm",
   "outcome": "Peel v0.1 is independently verified as a reliable spatial-return product rather than merely a functional Codex client or attractive graph.",
-  "deliveries": [],
   "provenance_refs": [
     "conversation:2026-08-25-plan-peel-v01-v02"
   ],
@@ -60,6 +109,7 @@
       "type": "depends_on"
     }
   ],
-  "schema_version": 2,
+  "revision_state": "bound",
+  "schema_version": 3,
   "ticket_id": "ticket-validate-v01-dogfood"
 }

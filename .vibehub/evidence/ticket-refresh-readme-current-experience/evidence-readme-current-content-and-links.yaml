@@ -3,6 +3,20 @@
     "readme-copy-matches-current-build",
     "readme-link-and-command-verification"
   ],
+  "acceptance_revisions": [
+    {
+      "acceptance_id": "readme-copy-matches-current-build",
+      "identity": "sha256:0bde63db0089f4f47ce980760c785bed924a3a7b067a6fe810d6876835c47960",
+      "revision": 1
+    },
+    {
+      "acceptance_id": "readme-link-and-command-verification",
+      "identity": "sha256:e3c8aec6e9618abc6f761964e5405df23d078e2f065413d299acfff5f8e71838",
+      "revision": 1
+    }
+  ],
+  "binding_origin": "reconstructed",
+  "binding_state": "bound",
   "evidence_id": "evidence-readme-current-content-and-links",
   "kind": "ticket_evidence",
   "origin": "agent",
@@ -17,7 +31,7 @@
     "command:npm run verify:readme --workspace @peel/desktop passed 10 links 8 commands 2 images",
     "command:git diff --check passed"
   ],
-  "schema_version": 1,
+  "schema_version": 2,
   "summary": "The root and desktop READMEs now describe persistent Branch from here, precise Parent return, repaired math, session-only diagnostics, the branded parallel startup path, current Codex 0.154 Realtime fallback, the direct declared codex:// desktop route, and a no-rebuild reopen command without changing the local unsigned dogfood or product-boundary claims. The automated README verifier resolved all 10 local documentation/image links, matched eight documented commands to package scripts, validated both PNG signatures and exact 1600x1000 dimensions, and enforced the 750 KB combined asset bound. The current CLI reports codex-cli 0.154.0; README verification, git diff checking, desktop typecheck, 91 tests, package verification, and focused Electron tests pass.",
   "ticket_id": "ticket-refresh-readme-current-experience"
 }

@@ -5,6 +5,30 @@
     "parallel-nonblocking-initialization",
     "startup-improvement-gate"
   ],
+  "acceptance_revisions": [
+    {
+      "acceptance_id": "measured-packaged-launch-baseline",
+      "identity": "sha256:bc35d3b2c7995eeab53b2e1d618f633baac27d1baadc2d224fdcab1d2921e794",
+      "revision": 1
+    },
+    {
+      "acceptance_id": "immediate-honest-first-frame",
+      "identity": "sha256:1c5b945431060ab584c3d1d0e6b059ca50da820eaa8e6e021c74cc4d429072fd",
+      "revision": 1
+    },
+    {
+      "acceptance_id": "parallel-nonblocking-initialization",
+      "identity": "sha256:f79d22870fcf1e409fd83ef0de79e16079ce4e090a0e8feafb1fbe19a15be638",
+      "revision": 1
+    },
+    {
+      "acceptance_id": "startup-improvement-gate",
+      "identity": "sha256:712e9359325bcc373a663ee0cdcf109ebda0a55cefcd4db06ce02f258457bffa",
+      "revision": 1
+    }
+  ],
+  "binding_origin": "reconstructed",
+  "binding_state": "bound",
   "evidence_id": "evidence-desktop-startup-performance",
   "kind": "ticket_evidence",
   "origin": "agent",
@@ -20,7 +44,7 @@
     "command:PEEL_STARTUP_LABEL=baseline-41550b3 npm run benchmark:startup --workspace @peel/desktop passed 7 samples",
     "command:PEEL_STARTUP_LABEL=optimized-final npm run benchmark:startup --workspace @peel/desktop passed 7 samples"
   ],
-  "schema_version": 1,
+  "schema_version": 2,
   "summary": "The permanent packaged Electron harness recorded seven unfiltered before and seven final-tree after samples on the same Apple-silicon host. Baseline commit 41550b3 medians were 438 ms first-contentful paint, 454 ms local shell, 478 ms initialize request, 480 ms transport ready, and 513 ms connected action. Final medians were 441, 490, 443, 460, and 532 ms respectively, passing the explicit 488/504/613 ms gates while moving initialize 35 ms and transport-ready work 20 ms earlier. Vite's first-frame entry fell from about 703 KB to 193.06 KB (27.5%, below the 35% gate); App is an asynchronous 85.37 KB chunk and Markdown remains a separate 441.45 KB chunk. The inline-styled HTML frame shows the Peel mark and honest opening state before App hydration, service connection begins before createWindow loading, and the delayed-hydration Electron regression observes initialize in flight while that static frame is still visible.",
   "ticket_id": "ticket-optimize-desktop-cold-start"
 }

@@ -1,26 +1,42 @@
 {
   "acceptance": [
     {
-      "acceptance_id": "coherent-chat-content-system",
-      "criterion": "Assistant, user, Reasoning, Subagent, error, command, file-change, diff, and unknown supported item routes use an intentional shared content system: prose routes render safe CommonMark/GFM; genuinely verbatim facts retain semantic technical surfaces. Headings, paragraphs, emphasis, nested lists, blockquotes, task lists, links, images, horizontal rules, inline/fenced code, and tables have coherent typography, spacing, selection, overflow, and compact-width behavior with no visible source markers or unprocessed JSON."
+      "acceptance_id": "chatgpt-like-conversation-rhythm",
+      "criterion": "At 1440x960 and 1000x720, the assistant response reads as one calm continuous surface with a deliberate readable measure, balanced bilingual typography, and no heavy per-Turn separators or nested-card clutter. User messages remain compact and distinct; Activity is subordinate but legible; completed low-value technical activity collapses quietly. The result preserves the Demo shell while matching familiar ChatGPT hierarchy rather than introducing a document-editor theme.",
+      "identity": "sha256:6482399f25b886026d7aeb0ca07bab4d092696aad1f0d0a4c7629a7423b688f0",
+      "revision": 1,
+      "state": "active"
     },
     {
-      "acceptance_id": "chatgpt-like-conversation-rhythm",
-      "criterion": "At 1440x960 and 1000x720, the assistant response reads as one calm continuous surface with a deliberate readable measure, balanced bilingual typography, and no heavy per-Turn separators or nested-card clutter. User messages remain compact and distinct; Activity is subordinate but legible; completed low-value technical activity collapses quietly. The result preserves the Demo shell while matching familiar ChatGPT hierarchy rather than introducing a document-editor theme."
+      "acceptance_id": "coherent-chat-content-system",
+      "criterion": "Assistant, user, Reasoning, Subagent, error, command, file-change, diff, and unknown supported item routes use an intentional shared content system: prose routes render safe CommonMark/GFM; genuinely verbatim facts retain semantic technical surfaces. Headings, paragraphs, emphasis, nested lists, blockquotes, task lists, links, images, horizontal rules, inline/fenced code, and tables have coherent typography, spacing, selection, overflow, and compact-width behavior with no visible source markers or unprocessed JSON.",
+      "identity": "sha256:70b4b16b49709aef5e981892880132a960add287dea3d5277c50d2e8361b5664",
+      "revision": 1,
+      "state": "active"
     },
     {
       "acceptance_id": "finished-code-and-technical-activity",
-      "criterion": "Fenced code has syntax highlighting, language identity, safe horizontal scrolling, selection, and immediate keyboard/pointer Copy feedback; inline code remains readable in prose. Commands, output, file changes, failures, and diffs present concise summaries and expandable detail with readable wrapping/scrolling instead of an undifferentiated raw pre block, while preserving exact technical text on demand."
-    },
-    {
-      "acceptance_id": "stable-streaming-and-interaction",
-      "criterion": "Representative incomplete emphasis, links, lists, blockquotes, fenced code, tables, and mixed Chinese/English content stream without exposed control syntax, layout jumps, lost selection, or forced scroll changes, then resolve to the final semantic structure without mutating authoritative message text. Frequent keyboard, streaming, and Activity interactions do not wait on decorative animation; motion is interruptible, targeted, under 300ms where used, and respects reduced motion."
+      "criterion": "Fenced code has syntax highlighting, language identity, safe horizontal scrolling, selection, and immediate keyboard/pointer Copy feedback; inline code remains readable in prose. Commands, output, file changes, failures, and diffs present concise summaries and expandable detail with readable wrapping/scrolling instead of an undifferentiated raw pre block, while preserving exact technical text on demand.",
+      "identity": "sha256:eeee0281d2ca30ea624e4e660bb0fada50b559f90dd99628ed298b329352ecb5",
+      "revision": 1,
+      "state": "active"
     },
     {
       "acceptance_id": "realistic-visual-regression-proof",
-      "criterion": "A realistic long bilingual and technical Codex fixture covers quotes, nested lists, GFM tables, long code, command success/failure, file change, Reasoning, Subagent prose, streaming fragments, unsafe content, and unknown items. Automated semantic/accessibility tests, complete repository tests/build/package, and directly inspected Electron screenshots at normal and compact widths prove the complete Focus journey and preserve Picker, Overview, Fork, Voice, Approval, Diff, Draft, scroll, recovery, and restart behavior."
+      "criterion": "A realistic long bilingual and technical Codex fixture covers quotes, nested lists, GFM tables, long code, command success/failure, file change, Reasoning, Subagent prose, streaming fragments, unsafe content, and unknown items. Automated semantic/accessibility tests, complete repository tests/build/package, and directly inspected Electron screenshots at normal and compact widths prove the complete Focus journey and preserve Picker, Overview, Fork, Voice, Approval, Diff, Draft, scroll, recovery, and restart behavior.",
+      "identity": "sha256:2cfe2d5464a95ec80fe64126377289f81cca7f9ccfba9922f012c54e4496da05",
+      "revision": 1,
+      "state": "active"
+    },
+    {
+      "acceptance_id": "stable-streaming-and-interaction",
+      "criterion": "Representative incomplete emphasis, links, lists, blockquotes, fenced code, tables, and mixed Chinese/English content stream without exposed control syntax, layout jumps, lost selection, or forced scroll changes, then resolve to the final semantic structure without mutating authoritative message text. Frequent keyboard, streaming, and Activity interactions do not wait on decorative animation; motion is interruptible, targeted, under 300ms where used, and respects reduced motion.",
+      "identity": "sha256:b8a4bf8bc0a813ca80c86e419e73f7c015e7ea6bc0130364bb3ec928c706784e",
+      "revision": 1,
+      "state": "active"
     }
   ],
+  "active_contract_revision": 1,
   "constraints": [
     "The preserved original Demo remains the shell and material authority; ChatGPT conventions guide conversation hierarchy and Markdown craft rather than creating a competing skin.",
     "The authoritative Codex message string is never rewritten or persisted differently; incomplete-state repair stays render-only.",
@@ -48,13 +64,46 @@
     },
     {
       "purpose": "Preserves the existing parser safety, supported syntax, streaming projection, and regression baseline while raising presentation quality.",
-      "ref": ".vibehub/outcomes/ticket-fix-chat-markdown-presentation.yaml"
+      "ref": ".vibehub/outcomes/ticket-fix-chat-markdown-presentation/contract-v1.yaml"
     }
   ],
+  "contract_revisions": [
+    {
+      "acceptance_revisions": [
+        {
+          "acceptance_id": "chatgpt-like-conversation-rhythm",
+          "identity": "sha256:6482399f25b886026d7aeb0ca07bab4d092696aad1f0d0a4c7629a7423b688f0",
+          "revision": 1
+        },
+        {
+          "acceptance_id": "coherent-chat-content-system",
+          "identity": "sha256:70b4b16b49709aef5e981892880132a960add287dea3d5277c50d2e8361b5664",
+          "revision": 1
+        },
+        {
+          "acceptance_id": "finished-code-and-technical-activity",
+          "identity": "sha256:eeee0281d2ca30ea624e4e660bb0fada50b559f90dd99628ed298b329352ecb5",
+          "revision": 1
+        },
+        {
+          "acceptance_id": "realistic-visual-regression-proof",
+          "identity": "sha256:2cfe2d5464a95ec80fe64126377289f81cca7f9ccfba9922f012c54e4496da05",
+          "revision": 1
+        },
+        {
+          "acceptance_id": "stable-streaming-and-interaction",
+          "identity": "sha256:b8a4bf8bc0a813ca80c86e419e73f7c015e7ea6bc0130364bb3ec928c706784e",
+          "revision": 1
+        }
+      ],
+      "identity": "sha256:c43952e455f94f8f0daa3141e5fa65dacf726f463ed7b83b27bc9ca61fd57871",
+      "revision": 1
+    }
+  ],
+  "deliveries": [],
   "kind": "ticket",
   "maturity": "firm",
   "outcome": "Focus Chat becomes a polished ChatGPT-like reading surface in which Markdown, code, reasoning, command activity, and streaming content always appear intentionally rendered rather than raw or mechanically boxed.",
-  "deliveries": [],
   "provenance_refs": [
     "conversation:2026-08-27-chatgpt-like-markdown-and-content-presentation"
   ],
@@ -65,6 +114,7 @@
       "type": "depends_on"
     }
   ],
-  "schema_version": 2,
+  "revision_state": "bound",
+  "schema_version": 3,
   "ticket_id": "ticket-rebuild-chat-reading-surface"
 }

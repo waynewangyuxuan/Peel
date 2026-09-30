@@ -4,6 +4,25 @@
     "evidence-backed-gap-prioritization",
     "smallest-follow-up-ticket-plan"
   ],
+  "acceptance_revisions": [
+    {
+      "acceptance_id": "security-accessibility-performance-review",
+      "identity": "sha256:779dac3ae176566e6a255116b014e480d1521d63d917d888b3b6d849aee8b671",
+      "revision": 1
+    },
+    {
+      "acceptance_id": "evidence-backed-gap-prioritization",
+      "identity": "sha256:141142cfbb971f879c977981ddbf730926cce5f41604c5c4454b55f65c7ed54a",
+      "revision": 1
+    },
+    {
+      "acceptance_id": "smallest-follow-up-ticket-plan",
+      "identity": "sha256:99ca543305e54b54218e3024e85b3591667eba96c74b1fcafb056c62546c5e7c",
+      "revision": 1
+    }
+  ],
+  "binding_origin": "reconstructed",
+  "binding_state": "bound",
   "evidence_id": "evidence-rendering-risk-and-follow-up-plan",
   "kind": "ticket_evidence",
   "origin": "agent",
@@ -21,7 +40,7 @@
     "command:npm test --workspace @peel/desktop#51-passed-2026-09-16",
     "command:vh project validate#passed-2026-09-16"
   ],
-  "schema_version": 1,
+  "schema_version": 2,
   "summary": "The audit documents the Electron sandbox, CSP, URL and remote-content policies; raw-HTML, data-image, local-path, clipboard, accessibility, bidi, overflow, streaming, and large-document risks; and labels performance claims as source-backed risks pending measurement. It ranks request routing and item-specific deltas above semantic item/media routes, math, and measured optimization, proposes the smallest dependency graph, recommends splitting the unrelated math and Branch work, and defers HTML until a separate evidence-backed product/security decision. Verification passed the installed-schema check, all 21 App Server tests, all 51 Desktop unit tests, and VibeHub project validation with no production renderer change.",
   "ticket_id": "ticket-audit-codex-rendering-surface"
 }

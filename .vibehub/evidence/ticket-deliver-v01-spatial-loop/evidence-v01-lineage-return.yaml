@@ -2,6 +2,15 @@
   "acceptance_ids": [
     "lineage-return"
   ],
+  "acceptance_revisions": [
+    {
+      "acceptance_id": "lineage-return",
+      "identity": "sha256:b6f7f1d8a6602b0e9dd85e19bbfaf86347b09c0a85947b654d5eccf725b72721",
+      "revision": 1
+    }
+  ],
+  "binding_origin": "reconstructed",
+  "binding_state": "bound",
   "evidence_id": "evidence-v01-lineage-return",
   "kind": "ticket_evidence",
   "origin": "agent",
@@ -14,7 +23,7 @@
     "apps/desktop/e2e/v01-journey.spec.ts",
     "apps/desktop/test/state.test.ts"
   ],
-  "schema_version": 1,
+  "schema_version": 2,
   "summary": "First Send persists parentThreadId, Child Thread ID, exact forkedAtTurnId, createdAt, cwd, and collision-free stable position as one rooted tree; validation rejects extra roots and cycles. Branched from selects, highlights, and visibly scrolls the exact Parent Turn before the highlight lifecycle can complete; explicit Turn focus wins over the Parent's saved Scroll even when the target is a long off-screen Turn and an async read completes afterward. The adversarial return journey also re-enters the Child while a delayed Parent read is outstanding and proves the Child's distinct Draft and Scroll survive without cross-Thread overwrite.",
   "ticket_id": "ticket-deliver-v01-spatial-loop"
 }

@@ -4,6 +4,25 @@
     "backfill-live-tail-responsiveness",
     "history-restoration-and-restart-fidelity"
   ],
+  "acceptance_revisions": [
+    {
+      "acceptance_id": "stable-incremental-history-prepend",
+      "identity": "sha256:ebdb10f0e0a69e6ceed139bb2c60a649d9ab7dc47d4ffe821f608d1e4f2c2417",
+      "revision": 1
+    },
+    {
+      "acceptance_id": "backfill-live-tail-responsiveness",
+      "identity": "sha256:d03c19ac10f5a5857d6e13aabeb488847242cd2360bc226ca7758a834b7ca791",
+      "revision": 1
+    },
+    {
+      "acceptance_id": "history-restoration-and-restart-fidelity",
+      "identity": "sha256:e440a6ab9f145c0080faa8a48695c16d612bae14b879e21cfd89525ee45013a4",
+      "revision": 1
+    }
+  ],
+  "binding_origin": "reconstructed",
+  "binding_state": "bound",
   "evidence_id": "evidence-bounded-live-interactions",
   "kind": "ticket_evidence",
   "origin": "agent",
@@ -18,7 +37,7 @@
     "command:npm run typecheck --workspace @peel/desktop passed",
     "command:git diff --check passed"
   ],
-  "schema_version": 1,
+  "schema_version": 2,
   "summary": "Fresh production Electron coverage closes the interaction-specific acceptance gaps. While the one-Turn backfill scheduler was actively restoring a 500-Turn Thread, the test edited the Composer, copied code, opened and cancelled Branch from here, dispatched an exact codex://threads/<UUID> Open in Codex deep link through a stubbed Electron shell, sent a live Turn that produced all stable request routes, accepted its command approval, observed its Codex error notice, and added then removed an image attachment. Restoration still reached all 501 authoritative Turns with zero browser long tasks and at most one CSS pixel anchor movement. After full backfill, an early completed Turn still opened its exact Branch draft. The refreshed production A/B benchmark explicitly asserted in all seven optimized streaming samples that the live Turn stayed visible, scrolling away from the bottom was preserved, returning to the bottom resumed follow behavior, exactly 36 deltas were processed, settled historical Turn/Markdown rerenders stayed zero, and streaming long-task time stayed zero.",
   "ticket_id": "ticket-add-bounded-focus-history-backfill"
 }

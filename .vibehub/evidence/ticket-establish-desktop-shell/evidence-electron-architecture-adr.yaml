@@ -2,6 +2,15 @@
   "acceptance_ids": [
     "select-and-record-architecture"
   ],
+  "acceptance_revisions": [
+    {
+      "acceptance_id": "select-and-record-architecture",
+      "identity": "sha256:9d364df7df0c2d34890815ef18a9e9058b3311b6dda3a68481a48b9585a526d5",
+      "revision": 1
+    }
+  ],
+  "binding_origin": "reconstructed",
+  "binding_state": "bound",
   "evidence_id": "evidence-electron-architecture-adr",
   "kind": "ticket_evidence",
   "origin": "agent",
@@ -11,7 +20,7 @@
     ".vibehub/rooms/product/decision-app-server-adapter-architecture.yaml",
     ".vibehub/rooms/product/constraint-app-server-capability-gating.yaml"
   ],
-  "schema_version": 1,
+  "schema_version": 2,
   "summary": "ADR-0001 selects Electron outside the Product Room and records rationale, rejected alternatives, migration costs, shell portability, and explicit boundaries for AppServerTransport, ThreadClient, EventReducer, GitWorkspaceAdapter, PeelStateStore, renderer IPC, and VoiceTranscriptionAdapter.",
   "ticket_id": "ticket-establish-desktop-shell"
 }

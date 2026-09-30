@@ -1,30 +1,49 @@
 {
   "acceptance": [
     {
-      "acceptance_id": "resume-before-turn",
-      "criterion": "The App Server client distinguishes read-only thread/read from a loaded session and guarantees thread/resume before the first turn/start for a stored Thread; new and forked Threads do not pay an unnecessary resume, reconnect or thread/closed invalidates loaded state, and concurrent sends cannot issue duplicate resume requests."
-    },
-    {
-      "acceptance_id": "session-recovery-regression",
-      "criterion": "An automated App Server fixture that rejects turn/start for an unreadied stored Thread reproduces the dogfood failure and then proves Peel resumes exactly once, starts exactly one Turn, continues receiving events, and can send again after a simulated reconnect/unload without duplicating a user Turn."
-    },
-    {
-      "acceptance_id": "send-failure-draft-safety",
-      "criterion": "If resume or turn/start still fails because Codex truly cannot recover the Thread, Focus shows a concise actionable Composer error instead of an Electron `Error invoking remote method`/raw RPC message; the exact text and attachments remain editable and a retry remains possible."
-    },
-    {
       "acceptance_id": "independent-voice-launch",
-      "criterion": "The production package contains the microphone and Speech Recognition usage declarations and native helper, and a packaged Peel opened independently through macOS LaunchServices completes one real Apple Speech transcription of a known spoken phrase into the current editable Thread Draft. Existing Draft text remains present, no turn/start is emitted, and captured macOS evidence attributes the privacy request to com.peel.desktop rather than Codex/ChatGPT; a fake helper or text insertion cannot satisfy this criterion."
-    },
-    {
-      "acceptance_id": "voice-failure-clarity",
-      "criterion": "The native Voice boundary records both exit code and termination signal; privacy termination, permission denial, capture interruption, timeout, and recognition failure produce specific recoverable Composer messages, never auto-send, and never erase or replace the existing per-Thread Draft."
+      "criterion": "The production package contains the microphone and Speech Recognition usage declarations and native helper, and a packaged Peel opened independently through macOS LaunchServices completes one real Apple Speech transcription of a known spoken phrase into the current editable Thread Draft. Existing Draft text remains present, no turn/start is emitted, and captured macOS evidence attributes the privacy request to com.peel.desktop rather than Codex/ChatGPT; a fake helper or text insertion cannot satisfy this criterion.",
+      "identity": "sha256:7baf1a9454f20ed1995c565bafcf4d8558f194cf26ce84b3a45522f3d02ee7eb",
+      "revision": 1,
+      "state": "active"
     },
     {
       "acceptance_id": "integrated-verification",
-      "criterion": "Repository tests and build pass, the packaged-app verification exercises independent-launch prerequisites, and a production Electron journey retains Picker, Focus, Markdown, Overview, Fork, Voice editing/no-auto-send, Approval, Diff, Draft persistence, and restart behavior."
+      "criterion": "Repository tests and build pass, the packaged-app verification exercises independent-launch prerequisites, and a production Electron journey retains Picker, Focus, Markdown, Overview, Fork, Voice editing/no-auto-send, Approval, Diff, Draft persistence, and restart behavior.",
+      "identity": "sha256:bfa04279f32beed6658f19ac4c8348af4c44bb739595e2acc0fdb23268133c57",
+      "revision": 1,
+      "state": "active"
+    },
+    {
+      "acceptance_id": "resume-before-turn",
+      "criterion": "The App Server client distinguishes read-only thread/read from a loaded session and guarantees thread/resume before the first turn/start for a stored Thread; new and forked Threads do not pay an unnecessary resume, reconnect or thread/closed invalidates loaded state, and concurrent sends cannot issue duplicate resume requests.",
+      "identity": "sha256:21ff77a08b2a05270d15fae50f7bdefc37d260863e678e6cb6f9d50329e91f0d",
+      "revision": 1,
+      "state": "active"
+    },
+    {
+      "acceptance_id": "send-failure-draft-safety",
+      "criterion": "If resume or turn/start still fails because Codex truly cannot recover the Thread, Focus shows a concise actionable Composer error instead of an Electron `Error invoking remote method`/raw RPC message; the exact text and attachments remain editable and a retry remains possible.",
+      "identity": "sha256:1854bbcf2a4bcf08a822d2dda3b6c279bedcaca956c9baddc0094ee898620283",
+      "revision": 1,
+      "state": "active"
+    },
+    {
+      "acceptance_id": "session-recovery-regression",
+      "criterion": "An automated App Server fixture that rejects turn/start for an unreadied stored Thread reproduces the dogfood failure and then proves Peel resumes exactly once, starts exactly one Turn, continues receiving events, and can send again after a simulated reconnect/unload without duplicating a user Turn.",
+      "identity": "sha256:2ffd30723aadda52a1635155fe6de7f3d684b5688513b4fa8ca271000e985d08",
+      "revision": 1,
+      "state": "active"
+    },
+    {
+      "acceptance_id": "voice-failure-clarity",
+      "criterion": "The native Voice boundary records both exit code and termination signal; privacy termination, permission denial, capture interruption, timeout, and recognition failure produce specific recoverable Composer messages, never auto-send, and never erase or replace the existing per-Thread Draft.",
+      "identity": "sha256:6ca609f90372b0f2ea32eeed34a8fdf700d753eccba8afc10849a13383a5b616",
+      "revision": 1,
+      "state": "active"
     }
   ],
+  "active_contract_revision": 1,
   "constraints": [
     "Codex remains the Source of Truth for Thread and Transcript; do not copy rollout history into Peel or rebind a missing Thread by fuzzy title.",
     "A failed send must never clear the Composer Draft or attachments, and an automatic retry is allowed only when the failed RPC cannot have created a Turn.",
@@ -55,10 +74,48 @@
       "ref": ".vibehub/rooms/product/contract-v01-core-spatial-fork-loop.yaml"
     }
   ],
+  "contract_revisions": [
+    {
+      "acceptance_revisions": [
+        {
+          "acceptance_id": "independent-voice-launch",
+          "identity": "sha256:7baf1a9454f20ed1995c565bafcf4d8558f194cf26ce84b3a45522f3d02ee7eb",
+          "revision": 1
+        },
+        {
+          "acceptance_id": "integrated-verification",
+          "identity": "sha256:bfa04279f32beed6658f19ac4c8348af4c44bb739595e2acc0fdb23268133c57",
+          "revision": 1
+        },
+        {
+          "acceptance_id": "resume-before-turn",
+          "identity": "sha256:21ff77a08b2a05270d15fae50f7bdefc37d260863e678e6cb6f9d50329e91f0d",
+          "revision": 1
+        },
+        {
+          "acceptance_id": "send-failure-draft-safety",
+          "identity": "sha256:1854bbcf2a4bcf08a822d2dda3b6c279bedcaca956c9baddc0094ee898620283",
+          "revision": 1
+        },
+        {
+          "acceptance_id": "session-recovery-regression",
+          "identity": "sha256:2ffd30723aadda52a1635155fe6de7f3d684b5688513b4fa8ca271000e985d08",
+          "revision": 1
+        },
+        {
+          "acceptance_id": "voice-failure-clarity",
+          "identity": "sha256:6ca609f90372b0f2ea32eeed34a8fdf700d753eccba8afc10849a13383a5b616",
+          "revision": 1
+        }
+      ],
+      "identity": "sha256:7d5f43dbf657aa151c09b3dbe030c061fea0d1bc84842deff8296e13c95abe85",
+      "revision": 1
+    }
+  ],
+  "deliveries": [],
   "kind": "ticket",
   "maturity": "firm",
   "outcome": "Peel reliably continues stored Codex Chats and performs recoverable Voice Dictation from the independently launched packaged app, without raw IPC/server failures or Draft loss.",
-  "deliveries": [],
   "provenance_refs": [
     "conversation:2026-08-27-send-and-voice-dogfood-failure",
     "https://learn.chatgpt.com/docs/app-server",
@@ -72,6 +129,7 @@
       "type": "depends_on"
     }
   ],
-  "schema_version": 2,
+  "revision_state": "bound",
+  "schema_version": 3,
   "ticket_id": "ticket-fix-session-resume-and-voice-launch"
 }

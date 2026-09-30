@@ -2,6 +2,15 @@
   "acceptance_ids": [
     "voice-error-regression-proof"
   ],
+  "acceptance_revisions": [
+    {
+      "acceptance_id": "voice-error-regression-proof",
+      "identity": "sha256:976a3ce5b898e21a4ecb8c6da616a719c22a397e7cfcd5422db6595c2b8f847d",
+      "revision": 1
+    }
+  ],
+  "binding_origin": "reconstructed",
+  "binding_state": "bound",
   "evidence_id": "evidence-voice-no-speech-regression-verification",
   "kind": "ticket_evidence",
   "origin": "agent",
@@ -14,7 +23,7 @@
     "command:npm run verify:package --workspace @peel/desktop returned ok=true, restoredDraft=true, nativeVoiceHelper=true",
     "command:npm run verify:real-voice --workspace @peel/desktop returned ok=true with recognized Peel voice check text, zero errors, zero turn/start, and TCC responsibility owned by Peel"
   ],
-  "schema_version": 1,
+  "schema_version": 2,
   "summary": "The exact no-speech rejection passes through the production Electron renderer/main/helper boundary in the full journey, all 68 repository tests pass, the desktop production build and packaged lifecycle pass, and real Apple Speech still appends recognized text to the existing Draft with zero automatic Turns or errors.",
   "ticket_id": "ticket-fix-voice-no-speech-recovery"
 }

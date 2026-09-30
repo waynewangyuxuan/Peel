@@ -2,6 +2,15 @@
   "acceptance_ids": [
     "thread-first-entry"
   ],
+  "acceptance_revisions": [
+    {
+      "acceptance_id": "thread-first-entry",
+      "identity": "sha256:284ef5f0a63adb00e0c73314a06b38cfa5cbe8509b6d22b5e6d40116c9386df3",
+      "revision": 1
+    }
+  ],
+  "binding_origin": "reconstructed",
+  "binding_state": "bound",
   "evidence_id": "evidence-v01-thread-first-entry",
   "kind": "ticket_evidence",
   "origin": "agent",
@@ -14,7 +23,7 @@
     "apps/desktop/test/state.test.ts",
     "command:npm run verify:live-codex --workspace @peel/desktop"
   ],
-  "schema_version": 1,
+  "schema_version": 2,
   "summary": "The packaged desktop client connects to the local Codex App Server, lists and searches real existing Threads, reads the selected Thread into Focus, and creates a new Space containing exactly that one Root. The persisted domain model has no Project field, validation rejects Forest/cycle shapes, and the live read-only check listed 50 local Codex Threads.",
   "ticket_id": "ticket-deliver-v01-spatial-loop"
 }

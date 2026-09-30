@@ -2,17 +2,27 @@
   "acceptance": [
     {
       "acceptance_id": "exact-desktop-thread-deep-link",
-      "criterion": "For a valid selected Codex thread ID, Open in Codex invokes the registered codex://threads/<URL-encoded-thread-id> deep link and the installed Codex desktop app opens that exact conversation; Peel never routes this action through https://chatgpt.com/codex."
-    },
-    {
-      "acceptance_id": "safe-unavailable-app-failure",
-      "criterion": "If the operating system cannot open the Codex deep link, Peel keeps the current conversation and presents a recoverable human-readable error without navigating to a download page, swallowing the rejection, or losing the thread ID."
+      "criterion": "For a valid selected Codex thread ID, Open in Codex invokes the registered codex://threads/<URL-encoded-thread-id> deep link and the installed Codex desktop app opens that exact conversation; Peel never routes this action through https://chatgpt.com/codex.",
+      "identity": "sha256:dfbe6f7863dd9a92c59510b143b5b5283a486a46140951868177b2281c45250b",
+      "revision": 1,
+      "state": "active"
     },
     {
       "acceptance_id": "open-target-regression-evidence",
-      "criterion": "Automated main-process and renderer or Electron coverage proves exact URL construction, special-character encoding or invalid-input handling, successful dispatch, rejected dispatch feedback, and preservation of existing browser, file, and editor OpenTarget behavior."
+      "criterion": "Automated main-process and renderer or Electron coverage proves exact URL construction, special-character encoding or invalid-input handling, successful dispatch, rejected dispatch feedback, and preservation of existing browser, file, and editor OpenTarget behavior.",
+      "identity": "sha256:10ab6e1f520ffeba7d52a6860ff61046382a7d81ec6f00d0176ed10b06de4d5c",
+      "revision": 1,
+      "state": "active"
+    },
+    {
+      "acceptance_id": "safe-unavailable-app-failure",
+      "criterion": "If the operating system cannot open the Codex deep link, Peel keeps the current conversation and presents a recoverable human-readable error without navigating to a download page, swallowing the rejection, or losing the thread ID.",
+      "identity": "sha256:5b08adcd8d39a64df9275f6f5366589c065412c840c2f3b7bc0e80c2ca67b962",
+      "revision": 1,
+      "state": "active"
     }
   ],
+  "active_contract_revision": 1,
   "constraints": [
     "Use the installed app's registered codex protocol; do not hard-code an application bundle path or require a browser intermediary.",
     "Do not expose the raw thread ID in a remote web URL or silently copy it as a substitute for opening the exact conversation.",
@@ -37,6 +47,29 @@
       "ref": "apps/desktop/src/renderer/App.tsx"
     }
   ],
+  "contract_revisions": [
+    {
+      "acceptance_revisions": [
+        {
+          "acceptance_id": "exact-desktop-thread-deep-link",
+          "identity": "sha256:dfbe6f7863dd9a92c59510b143b5b5283a486a46140951868177b2281c45250b",
+          "revision": 1
+        },
+        {
+          "acceptance_id": "open-target-regression-evidence",
+          "identity": "sha256:10ab6e1f520ffeba7d52a6860ff61046382a7d81ec6f00d0176ed10b06de4d5c",
+          "revision": 1
+        },
+        {
+          "acceptance_id": "safe-unavailable-app-failure",
+          "identity": "sha256:5b08adcd8d39a64df9275f6f5366589c065412c840c2f3b7bc0e80c2ca67b962",
+          "revision": 1
+        }
+      ],
+      "identity": "sha256:dbe1e9ecbfe5011a5e69eab109bf05788f602eb0176843d409ab5517c6a9104d",
+      "revision": 1
+    }
+  ],
   "deliveries": [],
   "kind": "ticket",
   "maturity": "firm",
@@ -47,6 +80,7 @@
     "local-app:/Applications/ChatGPT.app/Contents/Resources/app.asar#codex-threads-route-parser"
   ],
   "relations": [],
-  "schema_version": 2,
+  "revision_state": "bound",
+  "schema_version": 3,
   "ticket_id": "ticket-fix-open-in-codex-deep-link"
 }

@@ -1,30 +1,49 @@
 {
   "acceptance": [
     {
-      "acceptance_id": "production-shaped-renderer-corpus",
-      "criterion": "A checked-in content-safe corpus exercises the current and candidate renderers with completed and partial streaming Markdown, the two reported math/CJK layouts, headings, nested/task lists, tables, blockquotes, links, citations, fenced and very long code, unsafe and remote media, bidi/CJK prose, malformed syntax, a 200,000-character response, large technical output, and synthetic 10/100/500-Turn transcripts."
-    },
-    {
       "acceptance_id": "comparable-performance-measurement",
-      "criterion": "A repeatable production-build Electron harness reports current-versus-candidate cold and warm first content, Markdown work, React commit or paint, long tasks, frame cadence during a long streamed response, session switch, DOM node count, and heap or retained-object evidence for the 10/100/500-Turn corpus; results distinguish thread-read time from reducer and renderer time."
-    },
-    {
-      "acceptance_id": "safe-streamdown-prototype",
-      "criterion": "An isolated Streamdown prototype preserves readable incomplete streams, semantic/selectable completed math, exact code and copy text, local horizontal overflow, safe links, click-only remote media, and current raw-HTML and untrusted-content protections; parser or plugin failure degrades only the affected message to readable text rather than blanking Focus."
-    },
-    {
-      "acceptance_id": "peel-semantics-compatibility",
-      "criterion": "The prototype or integration analysis demonstrates that Codex Thread, Turn, and ThreadItem remain authoritative; approvals, requests, commands, file changes, Activity, attachments, unknown fallback, exact completed-Turn Branch from here, saved Draft, and saved Scroll stay in Peel-owned components or adapters without lossy conversion to a generic chat-message model."
+      "criterion": "A repeatable production-build Electron harness reports current-versus-candidate cold and warm first content, Markdown work, React commit or paint, long tasks, frame cadence during a long streamed response, session switch, DOM node count, and heap or retained-object evidence for the 10/100/500-Turn corpus; results distinguish thread-read time from reducer and renderer time.",
+      "identity": "sha256:b70c8a5cca6f0fdccb3fc408c8f97ee2eb01337fb73802cebec681ca94989ddb",
+      "revision": 1,
+      "state": "active"
     },
     {
       "acceptance_id": "measured-long-transcript-techniques",
-      "criterion": "At least stable row identity and tail-only streaming invalidation are measured; render-cost first paint with bounded transition backfill, memoized Markdown/math blocks, lazy heavy syntax support, content visibility for settled history, and size-based readable fallback are each adopted, rejected, or deferred with evidence. Naive full virtualization is not selected without scroll, selection, image, exact-Turn navigation, and prepend-anchor evidence."
+      "criterion": "At least stable row identity and tail-only streaming invalidation are measured; render-cost first paint with bounded transition backfill, memoized Markdown/math blocks, lazy heavy syntax support, content visibility for settled history, and size-based readable fallback are each adopted, rejected, or deferred with evidence. Naive full virtualization is not selected without scroll, selection, image, exact-Turn navigation, and prepend-anchor evidence.",
+      "identity": "sha256:756d977ea5ba0a17951befe452005fb0af20a6790ad52ae21b718bddb2646131",
+      "revision": 1,
+      "state": "active"
+    },
+    {
+      "acceptance_id": "peel-semantics-compatibility",
+      "criterion": "The prototype or integration analysis demonstrates that Codex Thread, Turn, and ThreadItem remain authoritative; approvals, requests, commands, file changes, Activity, attachments, unknown fallback, exact completed-Turn Branch from here, saved Draft, and saved Scroll stay in Peel-owned components or adapters without lossy conversion to a generic chat-message model.",
+      "identity": "sha256:4bfa2189d0abffbf8fef9a9ef188f0555ae9eda3506fb809e4d842bbf11ac042",
+      "revision": 1,
+      "state": "active"
+    },
+    {
+      "acceptance_id": "production-shaped-renderer-corpus",
+      "criterion": "A checked-in content-safe corpus exercises the current and candidate renderers with completed and partial streaming Markdown, the two reported math/CJK layouts, headings, nested/task lists, tables, blockquotes, links, citations, fenced and very long code, unsafe and remote media, bidi/CJK prose, malformed syntax, a 200,000-character response, large technical output, and synthetic 10/100/500-Turn transcripts.",
+      "identity": "sha256:aded047e710d47c528c8ed89fafe024a558bfe99cd4b3ee0ab4da8d4bfae3129",
+      "revision": 1,
+      "state": "active"
     },
     {
       "acceptance_id": "renderer-adoption-decision",
-      "criterion": "A checked-in decision recommends adopt, defer, or reject Streamdown and separately recommends whether assistant-ui runtime deserves later evaluation, citing correctness, security, accessibility, dependency maintenance/license, bundle cost, and measured performance; it names the smallest production implementation Ticket if adoption is justified."
+      "criterion": "A checked-in decision recommends adopt, defer, or reject Streamdown and separately recommends whether assistant-ui runtime deserves later evaluation, citing correctness, security, accessibility, dependency maintenance/license, bundle cost, and measured performance; it names the smallest production implementation Ticket if adoption is justified.",
+      "identity": "sha256:97071a32adeb3bc826b3bd25fbc020cc511c3fad5424d987d1508e3c3cd17f85",
+      "revision": 1,
+      "state": "active"
+    },
+    {
+      "acceptance_id": "safe-streamdown-prototype",
+      "criterion": "An isolated Streamdown prototype preserves readable incomplete streams, semantic/selectable completed math, exact code and copy text, local horizontal overflow, safe links, click-only remote media, and current raw-HTML and untrusted-content protections; parser or plugin failure degrades only the affected message to readable text rather than blanking Focus.",
+      "identity": "sha256:b579eb10b227ebd12d060e07698caff2066b0d2966bb4e0b51ce3084e7abae06",
+      "revision": 1,
+      "state": "active"
     }
   ],
+  "active_contract_revision": 1,
   "constraints": [
     "Do not perform a broad assistant-ui migration in this Ticket; Streamdown is evaluated independently behind Peel's existing renderer boundary.",
     "Do not enable arbitrary raw HTML, script, iframe, forms, event handlers, remote embeds, or untrusted style in the transcript.",
@@ -36,7 +55,7 @@
   "context_refs": [
     {
       "purpose": "Provides the accepted protocol, safety, format, and performance-risk audit baseline.",
-      "ref": ".vibehub/outcomes/ticket-audit-codex-rendering-surface.yaml"
+      "ref": ".vibehub/outcomes/ticket-audit-codex-rendering-surface/contract-v1.yaml"
     },
     {
       "purpose": "Defines the measurement-first P2 boundary and required 10/100/500-Turn evidence.",
@@ -52,7 +71,7 @@
     },
     {
       "purpose": "Provides the accepted production geometry and CJK math regression baseline.",
-      "ref": ".vibehub/outcomes/ticket-fix-display-math-clipping-and-cjk-scripts.yaml"
+      "ref": ".vibehub/outcomes/ticket-fix-display-math-clipping-and-cjk-scripts/contract-v1.yaml"
     },
     {
       "purpose": "Owns the current ReactMarkdown, streaming projection, KaTeX, URL, image, code, and copy behavior under comparison.",
@@ -61,6 +80,44 @@
     {
       "purpose": "Owns Turn grouping, semantic item surfaces, Branch placement, scrolling, and current transcript traversal.",
       "ref": "apps/desktop/src/renderer/Transcript.tsx"
+    }
+  ],
+  "contract_revisions": [
+    {
+      "acceptance_revisions": [
+        {
+          "acceptance_id": "comparable-performance-measurement",
+          "identity": "sha256:b70c8a5cca6f0fdccb3fc408c8f97ee2eb01337fb73802cebec681ca94989ddb",
+          "revision": 1
+        },
+        {
+          "acceptance_id": "measured-long-transcript-techniques",
+          "identity": "sha256:756d977ea5ba0a17951befe452005fb0af20a6790ad52ae21b718bddb2646131",
+          "revision": 1
+        },
+        {
+          "acceptance_id": "peel-semantics-compatibility",
+          "identity": "sha256:4bfa2189d0abffbf8fef9a9ef188f0555ae9eda3506fb809e4d842bbf11ac042",
+          "revision": 1
+        },
+        {
+          "acceptance_id": "production-shaped-renderer-corpus",
+          "identity": "sha256:aded047e710d47c528c8ed89fafe024a558bfe99cd4b3ee0ab4da8d4bfae3129",
+          "revision": 1
+        },
+        {
+          "acceptance_id": "renderer-adoption-decision",
+          "identity": "sha256:97071a32adeb3bc826b3bd25fbc020cc511c3fad5424d987d1508e3c3cd17f85",
+          "revision": 1
+        },
+        {
+          "acceptance_id": "safe-streamdown-prototype",
+          "identity": "sha256:b579eb10b227ebd12d060e07698caff2066b0d2966bb4e0b51ce3084e7abae06",
+          "revision": 1
+        }
+      ],
+      "identity": "sha256:0faa26291adf66afe824c69353077341bcc20799d0e5f1199245c8a258e53930",
+      "revision": 1
     }
   ],
   "deliveries": [],
@@ -75,6 +132,7 @@
     "https://github.com/assistant-ui/skills/blob/main/assistant-ui/skills/markdown/references/streamdown.md"
   ],
   "relations": [],
-  "schema_version": 2,
+  "revision_state": "bound",
+  "schema_version": 3,
   "ticket_id": "ticket-evaluate-streamdown-rendering-runtime"
 }

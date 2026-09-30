@@ -3,6 +3,20 @@
     "demo-canvas-composition",
     "spatial-hierarchy-and-edges"
   ],
+  "acceptance_revisions": [
+    {
+      "acceptance_id": "demo-canvas-composition",
+      "identity": "sha256:2bb33789c5db2f038687f8c741b4f4c2c11d71bd67e9b059f2a1a7e3dce7cf38",
+      "revision": 1
+    },
+    {
+      "acceptance_id": "spatial-hierarchy-and-edges",
+      "identity": "sha256:709c86ab8b8a799a9893fb227a57d08d5658f626372a8d2c4cc313ca5fd06091",
+      "revision": 1
+    }
+  ],
+  "binding_origin": "reconstructed",
+  "binding_state": "bound",
   "evidence_id": "evidence-overview-demo-composition",
   "kind": "ticket_evidence",
   "origin": "agent",
@@ -19,7 +33,7 @@
     "apps/desktop/test-results/ui-overview-6.png generated and directly inspected from production Electron",
     "apps/desktop/test-results/ui-overview-6-narrow.png generated and directly inspected from production Electron"
   ],
-  "schema_version": 1,
+  "schema_version": 2,
   "summary": "The production Overview now occupies the complete mode surface with floating identity and zoom controls over a restrained fading grid instead of a full-width toolbar band. The exact untouched root/camera sentinel receives one balanced initial Fit camera, while persisted non-sentinel camera and every node position remain authoritative. Real parent-child geometry produces low-contrast curves and the active or hovered ancestor path receives stronger edges. The Electron journey proves the initial two-node graph is centered at 100% with no node movement, then builds and directly inspects the preserved Demo's representative six-node root/parent/child/sibling/deep-branch composition at both 1440x960 and 1000x720; Fit contains every card and control at both widths.",
   "ticket_id": "ticket-rebuild-overview-demo-fidelity"
 }

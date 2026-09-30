@@ -3,6 +3,20 @@
     "chat-and-composer-proportion",
     "motion-accessibility-and-regression-proof"
   ],
+  "acceptance_revisions": [
+    {
+      "acceptance_id": "chat-and-composer-proportion",
+      "identity": "sha256:8068ff45261f4be883438b370d08e576c704cc5f7dcac90ac4be1a2d6b4bee0a",
+      "revision": 1
+    },
+    {
+      "acceptance_id": "motion-accessibility-and-regression-proof",
+      "identity": "sha256:7452efe26d3272ea4d0935befaf7fbdb6955470ae882d0413267c9c4de319a61",
+      "revision": 1
+    }
+  ],
+  "binding_origin": "reconstructed",
+  "binding_state": "bound",
   "evidence_id": "chat-composer-regression-verification",
   "kind": "ticket_evidence",
   "origin": "agent",
@@ -19,7 +33,7 @@
     "verification:electron-v01-journey-passed-2026-08-27",
     "verification:packaged-app-ok-restored-draft-and-native-voice-helper-2026-08-27"
   ],
-  "schema_version": 1,
+  "schema_version": 2,
   "summary": "The complete Electron journey asserts the empty Composer is at most 82 CSS pixels, a short user message occupies under half of the transcript width, Markdown never leaks raw quote or emphasis markers, keyboard send and Shift+Enter remain intact, and recording, live 17-bar PCM level feedback, transcription, no-speech notice, permission failure, transport failure, draft preservation, and restart recovery all remain legible. AudioContext is explicitly resumed after the async Codex dictation handshake. All 79 repository tests, the repository build, the complete Electron journey, production packaging, and packaged-app verification pass.",
   "ticket_id": "ticket-reset-shell-material-hierarchy"
 }

@@ -3,6 +3,20 @@
     "demo-visual-alignment",
     "production-state-polish"
   ],
+  "acceptance_revisions": [
+    {
+      "acceptance_id": "demo-visual-alignment",
+      "identity": "sha256:7742e606a4c2c2f740d6af54acd723c959c0e06c6574b4f8fba76ea3e9047b68",
+      "revision": 1
+    },
+    {
+      "acceptance_id": "production-state-polish",
+      "identity": "sha256:510539728605d42180a52312493141ba71bc4a517af6ed00c5be054c58f926a4",
+      "revision": 1
+    }
+  ],
+  "binding_origin": "reconstructed",
+  "binding_state": "bound",
   "evidence_id": "evidence-demo-aligned-visual-system",
   "kind": "ticket_evidence",
   "origin": "agent",
@@ -16,7 +30,7 @@
     "apps/desktop/src/main/main.ts",
     "command:npm run test:e2e --workspace @peel/desktop regenerates ui-welcome.png, ui-thread-picker.png, ui-focus.png, ui-fork-draft.png, ui-overview.png, ui-voice-recording.png, ui-voice-transcribing.png, ui-voice-error.png, and ui-diff.png"
   ],
-  "schema_version": 1,
+  "schema_version": 2,
   "summary": "Production now uses the preserved Demo's exact neutral workbench family instead of the drifted orange/warm/serif direction: #e9e9e6 page, white and #f7f7f5 surfaces, #20201f/#232322 ink, restrained semantic status colors, 226px Space rail, 248px lineage rail, 58px header, 760px Chat width, compact sans hierarchy, Demo-derived borders/radii/shadows, pill Composer, low-contrast graph grid and 294px Overview cards. Welcome, warmed 30-result Picker, full-fidelity Focus, Local Fork Draft, two-node Overview, Voice recording/transcribing/failure states and the real Diff drawer were rendered at the 1440px production viewport and visually inspected against the original runnable Demo after entrance animations settled. Real Approval, Command, File Change, Subagent, error, unsupported-item, Voice, Worktree and Picker loading/search/pagination states all reuse those tokens plus explicit hover, focus, pressed, busy, disabled and error treatments.",
   "ticket_id": "ticket-deliver-v01-ui-polish"
 }

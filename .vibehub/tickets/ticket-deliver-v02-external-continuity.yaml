@@ -1,18 +1,28 @@
 {
   "acceptance": [
     {
-      "acceptance_id": "refine-from-live-capabilities",
-      "criterion": "After v0.1 validation, the installed App Server schema, live adapter evidence, and observed external-Desktop behavior are re-read; this same Ticket is rewritten as Firm with independently checkable acceptance for only the continuity behaviors the server can actually support."
+      "acceptance_id": "preserve-honesty-boundary",
+      "criterion": "The refined plan never fabricates Parent or forkedAtTurnId, never infers lineage from title/content similarity, never imports unrelated or merely co-Project Threads, and specifies visible uncertainty or deliberate non-support wherever exact lineage cannot be verified.",
+      "identity": "sha256:939d534b9ff7f83c95dea0eb2d2a984a6b0c7da1c3aecaa4186a5df9316fa45e",
+      "revision": 1,
+      "state": "active"
     },
     {
-      "acceptance_id": "preserve-honesty-boundary",
-      "criterion": "The refined plan never fabricates Parent or forkedAtTurnId, never infers lineage from title/content similarity, never imports unrelated or merely co-Project Threads, and specifies visible uncertainty or deliberate non-support wherever exact lineage cannot be verified."
+      "acceptance_id": "refine-from-live-capabilities",
+      "criterion": "After v0.1 validation, the installed App Server schema, live adapter evidence, and observed external-Desktop behavior are re-read; this same Ticket is rewritten as Firm with independently checkable acceptance for only the continuity behaviors the server can actually support.",
+      "identity": "sha256:b37d087a434a2a677470538bc1721adc9dbf584c4a30b6d83b56147a9b002a78",
+      "revision": 1,
+      "state": "active"
     },
     {
       "acceptance_id": "retain-continuity-direction",
-      "criterion": "The refined outcome covers external metadata/reconnect reconstruction and, only where Parent plus exact Turn anchor are verifiable, external Fork discovery; it includes duplicate prevention, stale-cache recovery, pure-Thread fallback, and protection of Peel-owned spatial metadata."
+      "criterion": "The refined outcome covers external metadata/reconnect reconstruction and, only where Parent plus exact Turn anchor are verifiable, external Fork discovery; it includes duplicate prevention, stale-cache recovery, pure-Thread fallback, and protection of Peel-owned spatial metadata.",
+      "identity": "sha256:de438a5a5aaead15f92a839324fe5d47008d11ff83980f56a32ecdabe047453e",
+      "revision": 1,
+      "state": "active"
     }
   ],
+  "active_contract_revision": 1,
   "constraints": [
     "Do not fabricate forkedAtTurnId or infer lineage from title/content similarity.",
     "Do not automatically import a Project's Chats or add unrelated Threads to a Space.",
@@ -37,10 +47,33 @@
       "ref": ".vibehub/rooms/product/decision-single-root-fork-tree.yaml"
     }
   ],
+  "contract_revisions": [
+    {
+      "acceptance_revisions": [
+        {
+          "acceptance_id": "preserve-honesty-boundary",
+          "identity": "sha256:939d534b9ff7f83c95dea0eb2d2a984a6b0c7da1c3aecaa4186a5df9316fa45e",
+          "revision": 1
+        },
+        {
+          "acceptance_id": "refine-from-live-capabilities",
+          "identity": "sha256:b37d087a434a2a677470538bc1721adc9dbf584c4a30b6d83b56147a9b002a78",
+          "revision": 1
+        },
+        {
+          "acceptance_id": "retain-continuity-direction",
+          "identity": "sha256:de438a5a5aaead15f92a839324fe5d47008d11ff83980f56a32ecdabe047453e",
+          "revision": 1
+        }
+      ],
+      "identity": "sha256:a77ca8dedccd8d0fa40565fa4201a4f25e74660e8117dfea151b8b156b338b82",
+      "revision": 1
+    }
+  ],
+  "deliveries": [],
   "kind": "ticket",
   "maturity": "draft",
   "outcome": "After v0.1 live evidence resolves App Server capability uncertainty, Peel has a firm, executable External Continuity contract for safely reconciling supported native-Codex changes without duplicate nodes, invented lineage, or shadow conversation state.",
-  "deliveries": [],
   "provenance_refs": [
     "conversation:2026-08-25-plan-peel-v01-v02",
     "https://learn.chatgpt.com/docs/app-server"
@@ -52,6 +85,7 @@
       "type": "depends_on"
     }
   ],
-  "schema_version": 2,
+  "revision_state": "bound",
+  "schema_version": 3,
   "ticket_id": "ticket-deliver-v02-external-continuity"
 }

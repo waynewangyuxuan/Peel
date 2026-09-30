@@ -3,6 +3,20 @@
     "worktree-starts-from-main",
     "temporary-repository-proof"
   ],
+  "acceptance_revisions": [
+    {
+      "acceptance_id": "worktree-starts-from-main",
+      "identity": "sha256:1d80872e9611ad7d4f11e86552c40393c7e4e45ae4a46b51cbb10879da4477b6",
+      "revision": 1
+    },
+    {
+      "acceptance_id": "temporary-repository-proof",
+      "identity": "sha256:f653ae51afdb45d024df89fdb8cd613a67fe5b5d3e371e2e449d731c583176c6",
+      "revision": 1
+    }
+  ],
+  "binding_origin": "reconstructed",
+  "binding_state": "bound",
   "evidence_id": "evidence-main-worktree-ancestry-and-safety",
   "kind": "ticket_evidence",
   "origin": "agent",
@@ -15,7 +29,7 @@
     "command:npm test --workspace @peel/git-workspace passes 12/12",
     "command:npm test passes 44/44 repository tests"
   ],
-  "schema_version": 1,
+  "schema_version": 2,
   "summary": "When createWorktree omits baseRef it now resolves refs/heads/main to a validated commit and persists that actual ref in retryWith. The divergent-branch disposable test proves the new peel/from-main branch equals the main commit rather than the Ticket commit, while the current checkout, pre-existing refs, main ref, and local Git config remain unchanged. The same test invokes Diff from the created linked Worktree. Missing-main tests prove both Diff and omitted-base creation fail without creating artifacts. The 12-test Git package suite also retains invalid-base, partial failure, path containment, NUL-safe tab filename, and recovery coverage.",
   "ticket_id": "ticket-fix-main-git-baseline"
 }

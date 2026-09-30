@@ -5,6 +5,30 @@
     "title-origin-persistence",
     "legacy-new-chat-repair"
   ],
+  "acceptance_revisions": [
+    {
+      "acceptance_id": "new-chat-default-title-transition",
+      "identity": "sha256:05f9d573293df900fc2ef54405b4e4867a18ca238b7038a177365a580a5b16fa",
+      "revision": 1
+    },
+    {
+      "acceptance_id": "manual-space-name-precedence",
+      "identity": "sha256:82d62ffd9f90299e8353f3cee6cc6234e978e7f9d2f43e63fee33819be6ffbd3",
+      "revision": 1
+    },
+    {
+      "acceptance_id": "title-origin-persistence",
+      "identity": "sha256:43e553d67358cb3e876dedc348b6098dc218e32eb43dd075569037ce3770b6bd",
+      "revision": 1
+    },
+    {
+      "acceptance_id": "legacy-new-chat-repair",
+      "identity": "sha256:a6ae06f686a9327be20823ef2014cf349c89c3d9327d10a346fffb6c54875998",
+      "revision": 1
+    }
+  ],
+  "binding_origin": "reconstructed",
+  "binding_state": "bound",
   "evidence_id": "evidence-space-name-provenance-and-lifecycle",
   "kind": "ticket_evidence",
   "origin": "agent",
@@ -19,7 +43,7 @@
     "apps/desktop/test/state-store.test.ts",
     "apps/desktop/test/peel-service-new-chat.test.ts"
   ],
-  "schema_version": 1,
+  "schema_version": 2,
   "summary": "SpaceRecord now persists an explicit default/manual name origin. Directly created and imported Spaces begin default-owned; the first text prompt immediately gives the Root and default-owned Space the same deterministic temporary title, and completed automatic or later manual Root naming continues that synchronization. An explicit Space rename switches provenance to manual, after which automatic, manual, and notification-driven Root changes cannot overwrite it. StateStore merge derives every default-owned name from the winning merged Root title so stale renderer saves cannot roll it back, while a prior manual Space beats stale default state. Legacy normalization treats only an exact New Chat label as the former generated default, repairs it from a useful Root title, and preserves every other legacy label as manual.",
   "ticket_id": "ticket-fix-new-chat-space-title-lifecycle"
 }

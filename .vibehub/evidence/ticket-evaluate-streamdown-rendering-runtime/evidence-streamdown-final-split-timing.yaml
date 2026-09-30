@@ -4,6 +4,25 @@
     "measured-long-transcript-techniques",
     "renderer-adoption-decision"
   ],
+  "acceptance_revisions": [
+    {
+      "acceptance_id": "comparable-performance-measurement",
+      "identity": "sha256:b70c8a5cca6f0fdccb3fc408c8f97ee2eb01337fb73802cebec681ca94989ddb",
+      "revision": 1
+    },
+    {
+      "acceptance_id": "measured-long-transcript-techniques",
+      "identity": "sha256:756d977ea5ba0a17951befe452005fb0af20a6790ad52ae21b718bddb2646131",
+      "revision": 1
+    },
+    {
+      "acceptance_id": "renderer-adoption-decision",
+      "identity": "sha256:97071a32adeb3bc826b3bd25fbc020cc511c3fad5424d987d1508e3c3cd17f85",
+      "revision": 1
+    }
+  ],
+  "binding_origin": "reconstructed",
+  "binding_state": "bound",
   "evidence_id": "evidence-streamdown-final-split-timing",
   "kind": "ticket_evidence",
   "origin": "agent",
@@ -16,7 +35,7 @@
     "command:npm run build:renderer --workspace @peel/desktop produced ordinary entry 704.05 kB/212.97 kB gzip and candidate 359.33 kB/112.14 kB gzip",
     "command:npm run benchmark:rendering --workspace @peel/desktop passed 1/1 after split timing instrumentation"
   ],
-  "schema_version": 1,
+  "schema_version": 2,
   "summary": "Final production-Electron verification separates corpus construction, Markdown/render work through a React layout-effect commit marker, and the remaining post-commit two-animation-frame paint interval. Current versus Streamdown at 500 Turns measured 132.3/161.6ms through Markdown and commit and 174.9/201.2ms through paint; the 10-to-500 switch was 158.5/194.0ms. Streamdown therefore remained slower on transcript-scale work while its 36-update stream retained the steadier p99 frame interval, 16.8ms versus 25.4ms, with effectively tied total stream time, 599.5ms versus 609.0ms. Correctness, tail-only invalidation, heap/DOM, long-task, reducer, zero-thread-read, and fallback assertions all passed. The stronger split timing preserves the defer decision.",
   "ticket_id": "ticket-evaluate-streamdown-rendering-runtime"
 }

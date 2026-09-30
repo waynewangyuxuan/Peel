@@ -3,6 +3,20 @@
     "cursor-pagination",
     "picker-feedback-and-accessibility"
   ],
+  "acceptance_revisions": [
+    {
+      "acceptance_id": "cursor-pagination",
+      "identity": "sha256:ae49ac0d4827f504dfa72a635831fc19647c359e9351f197831f778ce8b3ad27",
+      "revision": 1
+    },
+    {
+      "acceptance_id": "picker-feedback-and-accessibility",
+      "identity": "sha256:553989ce8a605fb45773b312214d9ae2e6adaa310562df05e454a4c92fad2289",
+      "revision": 1
+    }
+  ],
+  "binding_origin": "reconstructed",
+  "binding_state": "bound",
   "evidence_id": "evidence-thread-picker-cursor-pagination",
   "kind": "ticket_evidence",
   "origin": "agent",
@@ -15,7 +29,7 @@
     "apps/desktop/e2e/v01-journey.spec.ts",
     "command:npm run verify:live-codex --workspace @peel/desktop"
   ],
-  "schema_version": 1,
+  "schema_version": 2,
   "summary": "Thread discovery now passes normalized term plus the App Server cursor through typed IPC, requests 30 items per page, de-duplicates repeated boundary Threads while appending, and renders explicit loading, count, Load more, exhaustion, empty, and recoverable-error feedback without replacing the search input. The rebuilt packaged app connected read-only to the local Codex App Server, returned 30 Threads with a real nextCursor, and exposed 60 after one Load more instead of silently ending at 50.",
   "ticket_id": "ticket-optimize-thread-picker-discovery"
 }

@@ -1,26 +1,42 @@
 {
   "acceptance": [
     {
-      "acceptance_id": "schema-aligned-paginated-adapter",
-      "criterion": "Generated installed-schema-backed protocol types and client methods cover thread/turns/list and thread/items/list cursors, sort direction, item-view semantics, response ordering, and capability fallback; ordinary read, resume, and fork paths request metadata-only responses where supported instead of deprecated full-history hydration."
-    },
-    {
-      "acceptance_id": "bounded-initial-and-backfill-reads",
-      "criterion": "Focus initially requests a bounded newest history page, exposes deterministic older-history backfill through protocol cursors, deduplicates page boundaries, and preserves the user's visual anchor while loading older Turns or full Items on demand."
-    },
-    {
       "acceptance_id": "authoritative-transcript-fidelity",
-      "criterion": "Pagination preserves exact Turn and Item order, stable IDs, completion/status/error state, Branch lastTurnId anchors, approvals and notices, live reducer deltas, Draft/Scroll restoration, text selection, math/code rendering, and reconnect reconciliation with Codex remaining the sole transcript authority."
-    },
-    {
-      "acceptance_id": "warning-and-performance-proof",
-      "criterion": "Production Electron evidence against the installed Codex runtime shows no full-history hydration deprecation warning on ordinary open/resume/fork, proves bounded initial payload and DOM growth for 10/100/500-Turn fixtures, and shows optimized median first-content timing is no greater than baseline plus the larger of 10% of baseline or 50 ms."
+      "criterion": "Pagination preserves exact Turn and Item order, stable IDs, completion/status/error state, Branch lastTurnId anchors, approvals and notices, live reducer deltas, Draft/Scroll restoration, text selection, math/code rendering, and reconnect reconciliation with Codex remaining the sole transcript authority.",
+      "identity": "sha256:f9f6fd5c64049ba613ba3f8ba99386c8c54eb92597afb51b630c86ce76896a3c",
+      "revision": 1,
+      "state": "active"
     },
     {
       "acceptance_id": "backward-capability-fallback",
-      "criterion": "When paginated history methods are unavailable, Peel follows an explicit capability-gated fallback with one scoped diagnostic and retains usable exact history; it never silently returns an empty or partial transcript as complete."
+      "criterion": "When paginated history methods are unavailable, Peel follows an explicit capability-gated fallback with one scoped diagnostic and retains usable exact history; it never silently returns an empty or partial transcript as complete.",
+      "identity": "sha256:5590058cbeb5161ca5e7db1eba1fac2fa09610ed707451e2766ee9ea04e07c88",
+      "revision": 1,
+      "state": "active"
+    },
+    {
+      "acceptance_id": "bounded-initial-and-backfill-reads",
+      "criterion": "Focus initially requests a bounded newest history page, exposes deterministic older-history backfill through protocol cursors, deduplicates page boundaries, and preserves the user's visual anchor while loading older Turns or full Items on demand.",
+      "identity": "sha256:bc7b2504db60cbfc7ca987aca05a6392f851c41974db65e2e334fddc03cb85d9",
+      "revision": 1,
+      "state": "active"
+    },
+    {
+      "acceptance_id": "schema-aligned-paginated-adapter",
+      "criterion": "Generated installed-schema-backed protocol types and client methods cover thread/turns/list and thread/items/list cursors, sort direction, item-view semantics, response ordering, and capability fallback; ordinary read, resume, and fork paths request metadata-only responses where supported instead of deprecated full-history hydration.",
+      "identity": "sha256:9ecadf22615b7648bc2058fdfafb097ca787f4e6d09266f7cae88f6e46d84157",
+      "revision": 1,
+      "state": "active"
+    },
+    {
+      "acceptance_id": "warning-and-performance-proof",
+      "criterion": "Production Electron evidence against the installed Codex runtime shows no full-history hydration deprecation warning on ordinary open/resume/fork, proves bounded initial payload and DOM growth for 10/100/500-Turn fixtures, and shows optimized median first-content timing is no greater than baseline plus the larger of 10% of baseline or 50 ms.",
+      "identity": "sha256:ccc71b2a9579414615c061c441b10070d5f1c9882040667e6b5ac4b3b77b0896",
+      "revision": 1,
+      "state": "active"
     }
   ],
+  "active_contract_revision": 1,
   "constraints": [
     "Codex App Server remains the sole authority for Threads, Turns, Items, lifecycle, and fork anchors.",
     "Do not infer missing history, fabricate pagination completion, or store a shadow transcript in Peel state.",
@@ -31,15 +47,15 @@
   "context_refs": [
     {
       "purpose": "Provides the accepted stable-row identity, pipeline measurements, and no-shadow-transcript boundary.",
-      "ref": ".vibehub/outcomes/ticket-optimize-native-transcript-rendering.yaml"
+      "ref": ".vibehub/outcomes/ticket-optimize-native-transcript-rendering/contract-v1.yaml"
     },
     {
       "purpose": "Provides the accepted renderer-side bounded history and visual-anchor behavior that protocol pagination should feed.",
-      "ref": ".vibehub/outcomes/ticket-add-bounded-focus-history-backfill.yaml"
+      "ref": ".vibehub/outcomes/ticket-add-bounded-focus-history-backfill/contract-v1.yaml"
     },
     {
       "purpose": "Provides current diagnostic scoping and exact request/error placement behavior.",
-      "ref": ".vibehub/outcomes/ticket-route-appserver-requests-and-errors.yaml"
+      "ref": ".vibehub/outcomes/ticket-route-appserver-requests-and-errors/contract-v1.yaml"
     },
     {
       "purpose": "Owns current full thread/read, resume, fork, reducer rebuild, and reconnect loading behavior.",
@@ -70,6 +86,39 @@
       "ref": "apps/desktop/src/main/peel-service.ts"
     }
   ],
+  "contract_revisions": [
+    {
+      "acceptance_revisions": [
+        {
+          "acceptance_id": "authoritative-transcript-fidelity",
+          "identity": "sha256:f9f6fd5c64049ba613ba3f8ba99386c8c54eb92597afb51b630c86ce76896a3c",
+          "revision": 1
+        },
+        {
+          "acceptance_id": "backward-capability-fallback",
+          "identity": "sha256:5590058cbeb5161ca5e7db1eba1fac2fa09610ed707451e2766ee9ea04e07c88",
+          "revision": 1
+        },
+        {
+          "acceptance_id": "bounded-initial-and-backfill-reads",
+          "identity": "sha256:bc7b2504db60cbfc7ca987aca05a6392f851c41974db65e2e334fddc03cb85d9",
+          "revision": 1
+        },
+        {
+          "acceptance_id": "schema-aligned-paginated-adapter",
+          "identity": "sha256:9ecadf22615b7648bc2058fdfafb097ca787f4e6d09266f7cae88f6e46d84157",
+          "revision": 1
+        },
+        {
+          "acceptance_id": "warning-and-performance-proof",
+          "identity": "sha256:ccc71b2a9579414615c061c441b10070d5f1c9882040667e6b5ac4b3b77b0896",
+          "revision": 1
+        }
+      ],
+      "identity": "sha256:1031eaf70ab1c62328299c00e945c8285af4b621850a83277be4eb96e972661b",
+      "revision": 1
+    }
+  ],
   "deliveries": [],
   "kind": "ticket",
   "maturity": "firm",
@@ -79,6 +128,7 @@
     "local-schema:codex-app-server-0.154.0"
   ],
   "relations": [],
-  "schema_version": 2,
+  "revision_state": "bound",
+  "schema_version": 3,
   "ticket_id": "ticket-migrate-thread-history-to-paginated-reads"
 }

@@ -1,26 +1,42 @@
 {
   "acceptance": [
     {
-      "acceptance_id": "resolve-main-separately",
-      "criterion": "The adapter resolves local refs/heads/main independently from the active branch, never checks out, switches, rewrites, or treats the current Ticket branch as the default baseline, and returns an explicit recoverable error when main is unavailable instead of falling back to HEAD."
-    },
-    {
       "acceptance_id": "diff-against-main",
-      "criterion": "Diff summary, full patch, and per-file patch compare the working tree to the merge base of main and current HEAD, so committed Ticket-branch changes plus staged, unstaged, renamed, binary, and untracked changes are represented; the returned Diff facts identify main as the comparison base."
+      "criterion": "Diff summary, full patch, and per-file patch compare the working tree to the merge base of main and current HEAD, so committed Ticket-branch changes plus staged, unstaged, renamed, binary, and untracked changes are represented; the returned Diff facts identify main as the comparison base.",
+      "identity": "sha256:02121534fcc4ca38dc1d30b971c18fdf2a4f58a0d3b5eb56d87ee17ec67e5ea9",
+      "revision": 1,
+      "state": "active"
     },
     {
-      "acceptance_id": "worktree-starts-from-main",
-      "criterion": "When baseRef is omitted, New Worktree creation resolves and starts from the current local main commit even when called from a different branch or linked worktree; an explicit internal baseRef remains validated and retry facts preserve the actual selected base."
+      "acceptance_id": "resolve-main-separately",
+      "criterion": "The adapter resolves local refs/heads/main independently from the active branch, never checks out, switches, rewrites, or treats the current Ticket branch as the default baseline, and returns an explicit recoverable error when main is unavailable instead of falling back to HEAD.",
+      "identity": "sha256:f71ca4eb72a264cc5dc5ce0119749f023a6981a1e898a3a3208834738311d4b2",
+      "revision": 1,
+      "state": "active"
     },
     {
       "acceptance_id": "surface-and-safety-regression",
-      "criterion": "The desktop Diff surface visibly states that it is compared with main, and existing path containment, NUL-safe filenames, untracked content, failure recovery, Worktree metadata, and prohibited Git-management boundaries remain intact."
+      "criterion": "The desktop Diff surface visibly states that it is compared with main, and existing path containment, NUL-safe filenames, untracked content, failure recovery, Worktree metadata, and prohibited Git-management boundaries remain intact.",
+      "identity": "sha256:92abf09a06d039e76a6cc123506a7ade7e3136ea19ee5bb68c65fe01020f3d01",
+      "revision": 1,
+      "state": "active"
     },
     {
       "acceptance_id": "temporary-repository-proof",
-      "criterion": "Disposable-repository tests exercise a main branch plus a divergent Ticket branch and a linked-worktree invocation; prove committed/staged/unstaged/renamed/binary/untracked Diff coverage; prove default Worktree ancestry from main rather than the Ticket branch; prove missing-main failure for both Diff and omitted-base Worktree creation; and prove that only the explicitly requested new Worktree branch/worktree artifacts are created while pre-existing refs, current checkout, main, and Git config remain unchanged."
+      "criterion": "Disposable-repository tests exercise a main branch plus a divergent Ticket branch and a linked-worktree invocation; prove committed/staged/unstaged/renamed/binary/untracked Diff coverage; prove default Worktree ancestry from main rather than the Ticket branch; prove missing-main failure for both Diff and omitted-base Worktree creation; and prove that only the explicitly requested new Worktree branch/worktree artifacts are created while pre-existing refs, current checkout, main, and Git config remain unchanged.",
+      "identity": "sha256:f653ae51afdb45d024df89fdb8cd613a67fe5b5d3e371e2e449d731c583176c6",
+      "revision": 1,
+      "state": "active"
+    },
+    {
+      "acceptance_id": "worktree-starts-from-main",
+      "criterion": "When baseRef is omitted, New Worktree creation resolves and starts from the current local main commit even when called from a different branch or linked worktree; an explicit internal baseRef remains validated and retry facts preserve the actual selected base.",
+      "identity": "sha256:1d80872e9611ad7d4f11e86552c40393c7e4e45ae4a46b51cbb10879da4477b6",
+      "revision": 1,
+      "state": "active"
     }
   ],
+  "active_contract_revision": 1,
   "constraints": [
     "Do not run checkout, switch, reset, branch-default mutation, remote fetch, or other repository-changing commands to resolve the baseline; only the explicitly requested New Worktree branch/worktree creation may mutate Git state.",
     "Use the local main ref; missing main is an explicit recoverable state and never an excuse to alias the active HEAD.",
@@ -38,10 +54,43 @@
       "ref": ".vibehub/rooms/product/contract-worktree-and-diff-boundary.yaml"
     }
   ],
+  "contract_revisions": [
+    {
+      "acceptance_revisions": [
+        {
+          "acceptance_id": "diff-against-main",
+          "identity": "sha256:02121534fcc4ca38dc1d30b971c18fdf2a4f58a0d3b5eb56d87ee17ec67e5ea9",
+          "revision": 1
+        },
+        {
+          "acceptance_id": "resolve-main-separately",
+          "identity": "sha256:f71ca4eb72a264cc5dc5ce0119749f023a6981a1e898a3a3208834738311d4b2",
+          "revision": 1
+        },
+        {
+          "acceptance_id": "surface-and-safety-regression",
+          "identity": "sha256:92abf09a06d039e76a6cc123506a7ade7e3136ea19ee5bb68c65fe01020f3d01",
+          "revision": 1
+        },
+        {
+          "acceptance_id": "temporary-repository-proof",
+          "identity": "sha256:f653ae51afdb45d024df89fdb8cd613a67fe5b5d3e371e2e449d731c583176c6",
+          "revision": 1
+        },
+        {
+          "acceptance_id": "worktree-starts-from-main",
+          "identity": "sha256:1d80872e9611ad7d4f11e86552c40393c7e4e45ae4a46b51cbb10879da4477b6",
+          "revision": 1
+        }
+      ],
+      "identity": "sha256:32f614902d837a84088453e05fd1a96397843562d4bb5d198409bb14c22c1bdf",
+      "revision": 1
+    }
+  ],
+  "deliveries": [],
   "kind": "ticket",
   "maturity": "firm",
   "outcome": "Peel treats local main as the immutable default Git baseline for lightweight Diff and New Worktree creation, independently of the active Ticket branch.",
-  "deliveries": [],
   "provenance_refs": [
     "conversation:2026-08-26-main-diff-baseline-correction"
   ],
@@ -57,6 +106,7 @@
       "type": "depends_on"
     }
   ],
-  "schema_version": 2,
+  "revision_state": "bound",
+  "schema_version": 3,
   "ticket_id": "ticket-fix-main-git-baseline"
 }

@@ -3,6 +3,20 @@
     "retain-product-contracts",
     "scale-and-layout-integrity"
   ],
+  "acceptance_revisions": [
+    {
+      "acceptance_id": "retain-product-contracts",
+      "identity": "sha256:ebf6cdf12439c9cc2d04753cf6cc6b1267b1bfc7ec21f39e7575c0f2bee18793",
+      "revision": 1
+    },
+    {
+      "acceptance_id": "scale-and-layout-integrity",
+      "identity": "sha256:0bda888b5b77ee3fa00c1b56d8135da3bdca109aa89ef7c63048c83599f48162",
+      "revision": 1
+    }
+  ],
+  "binding_origin": "reconstructed",
+  "binding_state": "bound",
   "evidence_id": "evidence-ui-contract-and-scale-integrity",
   "kind": "ticket_evidence",
   "origin": "agent",
@@ -16,7 +30,7 @@
     "command:npm run test:e2e --workspace @peel/desktop",
     "command:npm run verify:package --workspace @peel/desktop"
   ],
-  "schema_version": 1,
+  "schema_version": 2,
   "summary": "The visual pass changes only shell presentation and accessible close labels; the complete Thread-first/Fork/Voice/Worktree/Diff behavior journey remains intact. The Electron journey still proves selectable full-fidelity Transcript, horizontal long-code scrolling, exact lineage return, Draft/Scroll persistence, both Fork entrances, First Send recovery, Voice edit/no-auto-send, deterministic Overview facts, Rename precedence, Approval and failure states, real Diff, package restart and native Voice helper. A 50-node Overview after restart and Fit retains all 50 cards and 49 edges without overlap or clipping and can open a late node. A 1000x720 production-window assertion opens Fork Draft and proves no global page scroll while the overlay, footer and Create & send action remain inside the viewport; the 560px Diff drawer and floating Composer remain contained.",
   "ticket_id": "ticket-deliver-v01-ui-polish"
 }

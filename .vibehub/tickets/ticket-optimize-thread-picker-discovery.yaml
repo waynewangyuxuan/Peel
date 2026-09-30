@@ -2,29 +2,48 @@
   "acceptance": [
     {
       "acceptance_id": "cursor-pagination",
-      "criterion": "The desktop IPC and service accept normalized term plus cursor, request 30 items per page, preserve App Server nextCursor, append de-duplicated pages, expose an explicit Load more action while another page exists, and show an honest end state instead of a fixed 50-item ceiling."
-    },
-    {
-      "acceptance_id": "warm-cache-and-deduplication",
-      "criterion": "After Codex connects, the recent-Chat first page is warmed without delaying bootstrap; identical term-plus-cursor responses are cached for exactly 15,000ms, and concurrent identical queries share one App Server request."
-    },
-    {
-      "acceptance_id": "responsive-warm-and-provisional-search",
-      "criterion": "With an automated App Server fixture delaying thread/list by 750ms, a completed warm page reopens in the Picker within 100ms with no additional request; typing a term shows matching warm-page Chats provisionally within 100ms while the authoritative server search continues, and repeating a completed identical query within the 15,000ms TTL resolves within 100ms with no additional request."
-    },
-    {
-      "acceptance_id": "search-race-safety",
-      "criterion": "Rapid typing, clearing, closing, reopening, and Load more cannot allow a late response for an older term or cursor to replace or append into the current result set; current results remain usable while refresh feedback is non-blocking."
-    },
-    {
-      "acceptance_id": "picker-feedback-and-accessibility",
-      "criterion": "Cold loading, background search, page loading, result count, more-results availability, exhaustion, empty state, and recoverable errors are distinguishable without hiding the search field or trapping keyboard focus."
+      "criterion": "The desktop IPC and service accept normalized term plus cursor, request 30 items per page, preserve App Server nextCursor, append de-duplicated pages, expose an explicit Load more action while another page exists, and show an honest end state instead of a fixed 50-item ceiling.",
+      "identity": "sha256:ae49ac0d4827f504dfa72a635831fc19647c359e9351f197831f778ce8b3ad27",
+      "revision": 1,
+      "state": "active"
     },
     {
       "acceptance_id": "discovery-regression-coverage",
-      "criterion": "Automated tests exercise more than 50 available Threads, cursor propagation, de-duplication, warm/in-flight cache behavior, delayed out-of-order searches, Load more, and selection of a result beyond the first page while preserving the existing Thread-first Start Space flow."
+      "criterion": "Automated tests exercise more than 50 available Threads, cursor propagation, de-duplication, warm/in-flight cache behavior, delayed out-of-order searches, Load more, and selection of a result beyond the first page while preserving the existing Thread-first Start Space flow.",
+      "identity": "sha256:02f7e19c428e5457df1b0f710e0f0b50021b9c58d505b4de07f703a5d6f6eae3",
+      "revision": 1,
+      "state": "active"
+    },
+    {
+      "acceptance_id": "picker-feedback-and-accessibility",
+      "criterion": "Cold loading, background search, page loading, result count, more-results availability, exhaustion, empty state, and recoverable errors are distinguishable without hiding the search field or trapping keyboard focus.",
+      "identity": "sha256:553989ce8a605fb45773b312214d9ae2e6adaa310562df05e454a4c92fad2289",
+      "revision": 1,
+      "state": "active"
+    },
+    {
+      "acceptance_id": "responsive-warm-and-provisional-search",
+      "criterion": "With an automated App Server fixture delaying thread/list by 750ms, a completed warm page reopens in the Picker within 100ms with no additional request; typing a term shows matching warm-page Chats provisionally within 100ms while the authoritative server search continues, and repeating a completed identical query within the 15,000ms TTL resolves within 100ms with no additional request.",
+      "identity": "sha256:8e3cc6880b0238ae84a707f72eb5417ae46ea95f2d83bf2362c0920816393894",
+      "revision": 1,
+      "state": "active"
+    },
+    {
+      "acceptance_id": "search-race-safety",
+      "criterion": "Rapid typing, clearing, closing, reopening, and Load more cannot allow a late response for an older term or cursor to replace or append into the current result set; current results remain usable while refresh feedback is non-blocking.",
+      "identity": "sha256:db83fe5c7374701e350396efb1d0ce097fc92f6dc246dac329a5c4c43a7c1754",
+      "revision": 1,
+      "state": "active"
+    },
+    {
+      "acceptance_id": "warm-cache-and-deduplication",
+      "criterion": "After Codex connects, the recent-Chat first page is warmed without delaying bootstrap; identical term-plus-cursor responses are cached for exactly 15,000ms, and concurrent identical queries share one App Server request.",
+      "identity": "sha256:002f7ba74dc2665ad0fba9c4fc0d40454943c780a3c0eb6c1d64746e05e499be",
+      "revision": 1,
+      "state": "active"
     }
   ],
+  "active_contract_revision": 1,
   "constraints": [
     "Do not preload full Transcripts or copy Codex-owned conversation state into a Peel search index.",
     "Do not conflate Codex Chat discovery with v0.2 search inside an existing Space.",
@@ -46,10 +65,48 @@
       "ref": ".vibehub/rooms/product/contract-source-of-truth-ownership.yaml"
     }
   ],
+  "contract_revisions": [
+    {
+      "acceptance_revisions": [
+        {
+          "acceptance_id": "cursor-pagination",
+          "identity": "sha256:ae49ac0d4827f504dfa72a635831fc19647c359e9351f197831f778ce8b3ad27",
+          "revision": 1
+        },
+        {
+          "acceptance_id": "discovery-regression-coverage",
+          "identity": "sha256:02f7e19c428e5457df1b0f710e0f0b50021b9c58d505b4de07f703a5d6f6eae3",
+          "revision": 1
+        },
+        {
+          "acceptance_id": "picker-feedback-and-accessibility",
+          "identity": "sha256:553989ce8a605fb45773b312214d9ae2e6adaa310562df05e454a4c92fad2289",
+          "revision": 1
+        },
+        {
+          "acceptance_id": "responsive-warm-and-provisional-search",
+          "identity": "sha256:8e3cc6880b0238ae84a707f72eb5417ae46ea95f2d83bf2362c0920816393894",
+          "revision": 1
+        },
+        {
+          "acceptance_id": "search-race-safety",
+          "identity": "sha256:db83fe5c7374701e350396efb1d0ce097fc92f6dc246dac329a5c4c43a7c1754",
+          "revision": 1
+        },
+        {
+          "acceptance_id": "warm-cache-and-deduplication",
+          "identity": "sha256:002f7ba74dc2665ad0fba9c4fc0d40454943c780a3c0eb6c1d64746e05e499be",
+          "revision": 1
+        }
+      ],
+      "identity": "sha256:48615653e4bfcca0ecb1dfcb3574bb49e40da58ec1ce2dece0e39a707dfb9558",
+      "revision": 1
+    }
+  ],
+  "deliveries": [],
   "kind": "ticket",
   "maturity": "firm",
   "outcome": "Thread Picker has a measurably fast warm path, searches without stale-result races, and progressively exposes every matching Codex Chat instead of silently stopping at 50.",
-  "deliveries": [],
   "provenance_refs": [
     "conversation:2026-08-26-dogfood-ui-search-feedback",
     "commit:1e9843dad477d34e2000ccda7b463aa3e361f809"
@@ -61,6 +118,7 @@
       "type": "depends_on"
     }
   ],
-  "schema_version": 2,
+  "revision_state": "bound",
+  "schema_version": 3,
   "ticket_id": "ticket-optimize-thread-picker-discovery"
 }

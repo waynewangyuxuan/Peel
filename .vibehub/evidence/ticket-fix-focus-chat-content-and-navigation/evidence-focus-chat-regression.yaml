@@ -2,6 +2,15 @@
   "acceptance_ids": [
     "visual-behavior-regression"
   ],
+  "acceptance_revisions": [
+    {
+      "acceptance_id": "visual-behavior-regression",
+      "identity": "sha256:990c99255b8a6ec2fdb6c7deb5d47b8a21f626def7b94719ef0ecf209826e89d",
+      "revision": 1
+    }
+  ],
+  "binding_origin": "reconstructed",
+  "binding_state": "bound",
   "evidence_id": "evidence-focus-chat-regression",
   "kind": "ticket_evidence",
   "origin": "agent",
@@ -16,7 +25,7 @@
     "apps/desktop/e2e/v01-journey.spec.ts",
     "apps/desktop/scripts/verify-package.mjs"
   ],
-  "schema_version": 1,
+  "schema_version": 2,
   "summary": "The expanded production journey exercises the long-title rail at both supported widths, full title disclosure, safe semantic GFM, parsed Reasoning, compact activity/failure disclosure, selectable content and long horizontal code before continuing through the existing Picker, Focus, Fork, Voice, Approval, Rename, scroll restoration, 50-node Overview, Diff, failure recovery, and restart path. All 46 repository tests pass, the complete native/renderer/main build passes, the Electron journey passes, a fresh arm64 package is produced, and the packaged-app smoke confirms full-restart Draft restoration plus the native Voice helper.",
   "ticket_id": "ticket-fix-focus-chat-content-and-navigation"
 }

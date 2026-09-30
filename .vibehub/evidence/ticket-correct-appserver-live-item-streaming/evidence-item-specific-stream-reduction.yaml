@@ -5,6 +5,30 @@
     "authoritative-completion",
     "live-rendering-behavior"
   ],
+  "acceptance_revisions": [
+    {
+      "acceptance_id": "item-specific-delta-reduction",
+      "identity": "sha256:8db7ccdecc9ce4efde5a5504632934d510d190c6df824ff599f06f8d8422603c",
+      "revision": 1
+    },
+    {
+      "acceptance_id": "reasoning-channel-fidelity",
+      "identity": "sha256:533f77eaacbbf0ec66cc861c65b7a9ec41b83853014fa5dd0014bffaf4ca8747",
+      "revision": 1
+    },
+    {
+      "acceptance_id": "authoritative-completion",
+      "identity": "sha256:6c17e16f88d1464a04abf67325509d1a95974ecbbef3455761e5a9d1c489059c",
+      "revision": 1
+    },
+    {
+      "acceptance_id": "live-rendering-behavior",
+      "identity": "sha256:ab82d2b4b833d50b664a8fdd2d6ab9fa260239ffa4ac99dff3eb78f947688116",
+      "revision": 1
+    }
+  ],
+  "binding_origin": "reconstructed",
+  "binding_state": "bound",
   "evidence_id": "evidence-item-specific-stream-reduction",
   "kind": "ticket_evidence",
   "origin": "agent",
@@ -14,7 +38,7 @@
     "apps/desktop/src/renderer/Transcript.tsx",
     "apps/desktop/src/renderer/lib.ts"
   ],
-  "schema_version": 1,
+  "schema_version": 2,
   "summary": "The reducer now routes agent, plan, reasoning summary/raw, command output, and deprecated file-change output deltas into item-specific provisional state; reasoning section indexes remain separate, mismatched/stale/post-completion events are rejected, and authoritative item or turn completion clears provisional channels. Focus renders plan and reasoning through safe Markdown and command output through the exact technical-text path, including fallback from empty text to completed summary/output fields.",
   "ticket_id": "ticket-correct-appserver-live-item-streaming"
 }

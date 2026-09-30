@@ -2,25 +2,41 @@
   "acceptance": [
     {
       "acceptance_id": "demo-visual-alignment",
-      "criterion": "At the same 1440px desktop viewport and equivalent product states, Welcome, Thread Picker, Focus, Fork Draft, Overview and Diff visibly share the preserved Demo's neutral workbench language: layout proportions, restrained palette, typography hierarchy, spacing rhythm, border/radius/shadow material, icon weight, density and 220–420ms Focus/Overview motion are implemented from the Demo rather than from a new visual direction."
+      "criterion": "At the same 1440px desktop viewport and equivalent product states, Welcome, Thread Picker, Focus, Fork Draft, Overview and Diff visibly share the preserved Demo's neutral workbench language: layout proportions, restrained palette, typography hierarchy, spacing rhythm, border/radius/shadow material, icon weight, density and 220–420ms Focus/Overview motion are implemented from the Demo rather than from a new visual direction.",
+      "identity": "sha256:7742e606a4c2c2f740d6af54acd723c959c0e06c6574b4f8fba76ea3e9047b68",
+      "revision": 1,
+      "state": "active"
     },
     {
       "acceptance_id": "production-state-polish",
-      "criterion": "Real Transcript, Streaming, Approval, Command, File Change, Subagent, Voice, Worktree, recoverable-error and Thread Picker cold/warm/search/pagination states use the same Demo-derived visual system with deliberate hover, focus, pressed, loading, disabled, error and empty treatments; no delivered state looks like a raw implementation fallback."
+      "criterion": "Real Transcript, Streaming, Approval, Command, File Change, Subagent, Voice, Worktree, recoverable-error and Thread Picker cold/warm/search/pagination states use the same Demo-derived visual system with deliberate hover, focus, pressed, loading, disabled, error and empty treatments; no delivered state looks like a raw implementation fallback.",
+      "identity": "sha256:510539728605d42180a52312493141ba71bc4a517af6ed00c5be054c58f926a4",
+      "revision": 1,
+      "state": "active"
     },
     {
       "acceptance_id": "retain-product-contracts",
-      "criterion": "The visual implementation preserves Thread-first entry, screen-space Focus fidelity, deterministic Overview, exact Fork lineage, recoverable First Send, Voice Draft safety, Worktree/Diff boundaries, persisted view state and keyboard-visible accessibility while removing obsolete Project-first visual content."
+      "criterion": "The visual implementation preserves Thread-first entry, screen-space Focus fidelity, deterministic Overview, exact Fork lineage, recoverable First Send, Voice Draft safety, Worktree/Diff boundaries, persisted view state and keyboard-visible accessibility while removing obsolete Project-first visual content.",
+      "identity": "sha256:ebf6cdf12439c9cc2d04753cf6cc6b1267b1bfc7ec21f39e7575c0f2bee18793",
+      "revision": 1,
+      "state": "active"
     },
     {
       "acceptance_id": "scale-and-layout-integrity",
-      "criterion": "Representative 30–50 Node Overview, long Transcript/code, narrow desktop window and drawer/open-overlay states retain readable hierarchy with no clipped primary action, accidental overlap or global page scroll; production adaptations remain recognizably within the Demo direction."
+      "criterion": "Representative 30–50 Node Overview, long Transcript/code, narrow desktop window and drawer/open-overlay states retain readable hierarchy with no clipped primary action, accidental overlap or global page scroll; production adaptations remain recognizably within the Demo direction.",
+      "identity": "sha256:0bda888b5b77ee3fa00c1b56d8135da3bdca109aa89ef7c63048c83599f48162",
+      "revision": 1,
+      "state": "active"
     },
     {
       "acceptance_id": "visual-regression-set",
-      "criterion": "Checked-in or test-produced reference screenshots cover equivalent Demo and production states for Welcome/Picker, Focus, Fork Draft, Overview, Diff, Voice/error and scale; automated interaction coverage and a final rendered review verify that the polish did not regress the v0.1 behavior contract."
+      "criterion": "Checked-in or test-produced reference screenshots cover equivalent Demo and production states for Welcome/Picker, Focus, Fork Draft, Overview, Diff, Voice/error and scale; automated interaction coverage and a final rendered review verify that the polish did not regress the v0.1 behavior contract.",
+      "identity": "sha256:7c24f3769d5a9fb0b8c0c83dafa603935cc6b867bac5f198a1073d2ed0242d00",
+      "revision": 1,
+      "state": "active"
     }
   ],
+  "active_contract_revision": 1,
   "constraints": [
     "Do not trade full-fidelity Transcript readability or deterministic Overview facts for decorative novelty.",
     "Do not reintroduce Project-first navigation, arbitrary graph editing or semantic AI interpretation.",
@@ -49,10 +65,43 @@
       "ref": ".vibehub/rooms/product/contract-v01-core-spatial-fork-loop.yaml"
     }
   ],
+  "contract_revisions": [
+    {
+      "acceptance_revisions": [
+        {
+          "acceptance_id": "demo-visual-alignment",
+          "identity": "sha256:7742e606a4c2c2f740d6af54acd723c959c0e06c6574b4f8fba76ea3e9047b68",
+          "revision": 1
+        },
+        {
+          "acceptance_id": "production-state-polish",
+          "identity": "sha256:510539728605d42180a52312493141ba71bc4a517af6ed00c5be054c58f926a4",
+          "revision": 1
+        },
+        {
+          "acceptance_id": "retain-product-contracts",
+          "identity": "sha256:ebf6cdf12439c9cc2d04753cf6cc6b1267b1bfc7ec21f39e7575c0f2bee18793",
+          "revision": 1
+        },
+        {
+          "acceptance_id": "scale-and-layout-integrity",
+          "identity": "sha256:0bda888b5b77ee3fa00c1b56d8135da3bdca109aa89ef7c63048c83599f48162",
+          "revision": 1
+        },
+        {
+          "acceptance_id": "visual-regression-set",
+          "identity": "sha256:7c24f3769d5a9fb0b8c0c83dafa603935cc6b867bac5f198a1073d2ed0242d00",
+          "revision": 1
+        }
+      ],
+      "identity": "sha256:5a32ae73ffc8c646ea2c3bd8816240a6ee0e29b62ca9a00214fe12990b9ff00b",
+      "revision": 1
+    }
+  ],
+  "deliveries": [],
   "kind": "ticket",
   "maturity": "firm",
   "outcome": "Peel's complete production desktop surface is visibly aligned with the preserved Demo and feels deliberately finished without regressing the real v0.1 behavior contract.",
-  "deliveries": [],
   "provenance_refs": [
     "conversation:2026-08-26-dogfood-ui-search-feedback",
     "conversation:2026-08-26-demo-is-ui-direction"
@@ -64,6 +113,7 @@
       "type": "depends_on"
     }
   ],
-  "schema_version": 2,
+  "revision_state": "bound",
+  "schema_version": 3,
   "ticket_id": "ticket-deliver-v01-ui-polish"
 }

@@ -2,6 +2,15 @@
   "acceptance_ids": [
     "create-worktree-safely"
   ],
+  "acceptance_revisions": [
+    {
+      "acceptance_id": "create-worktree-safely",
+      "identity": "sha256:fa8e7e5b0d2b0082a27d51e95d149ad1a2714eac8eda6c9ebbdfd184017b8f16",
+      "revision": 1
+    }
+  ],
+  "binding_origin": "reconstructed",
+  "binding_state": "bound",
   "evidence_id": "evidence-safe-worktree-creation",
   "kind": "ticket_evidence",
   "origin": "agent",
@@ -11,7 +20,7 @@
     "packages/git-workspace/test/adapter.test.ts",
     "packages/git-workspace/README.md"
   ],
-  "schema_version": 1,
+  "schema_version": 2,
   "summary": "createWorktree requires a validated Git context and existing absolute target parent, rejects filesystem/home/repository roots and unresolved parents, resolves the requested base through rev-parse --verify --end-of-options to a commit ID, allocates a checked unique peel/<slug> branch plus direct-child path, and performs one argument-array git worktree add. Collision tests create peel/same-fork and peel/same-fork-2 at distinct explicit paths.",
   "ticket_id": "ticket-build-git-workspace-adapter"
 }
