@@ -1,0 +1,35 @@
+{
+  "context_id": "constraint-first-prompt-owns-temporary-title",
+  "detail": "While a thread title is still temporary, only the first prompt may set it. A second send before that turn completes must leave the pending first prompt in place. An incoming Codex name may replace New Chat, or shorten that same first prompt. It must not replace the first prompt with an unrelated later name. A manual title stays protected by the existing title contract.",
+  "evidence": [
+    {
+      "note": "Incoming names apply only while the title is temporary, and only when they match New Chat or the current first-prompt title.",
+      "ref": "apps/desktop/src/shared/state.ts"
+    },
+    {
+      "note": "The automatic title stays on the first prompt if one is already pending for that thread.",
+      "ref": "apps/desktop/src/main/peel-service.ts"
+    }
+  ],
+  "kind": "context",
+  "relations": [
+    {
+      "target_context_id": "contract-thread-title-lifecycle",
+      "type": "depends_on"
+    }
+  ],
+  "schema_version": 1,
+  "source": {
+    "captured_at": "2026-09-30T07:50:00Z",
+    "quote": "我这个thread 这里，其实用了第二个对话，来作为title",
+    "ref": "conversation:2026-09-29-focus-html-and-visualize"
+  },
+  "state": "active",
+  "summary": "A later prompt must not replace the first prompt's temporary title",
+  "tags": [
+    "thread-title",
+    "naming",
+    "first-prompt"
+  ],
+  "type": "constraint"
+}

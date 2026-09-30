@@ -1,0 +1,31 @@
+{
+  "context_id": "decision-new-chat-home-without-workspace",
+  "detail": "When New Chat has no workspace to copy, Peel starts the Codex thread in the user's home directory. It must not inherit the directory Electron was launched from. When a thread is already open, the next New Chat still copies that thread's workspace.",
+  "evidence": [
+    {
+      "note": "startNewChat passes the given workspace, or the home directory when that workspace is absent.",
+      "ref": "apps/desktop/src/main/peel-service.ts"
+    }
+  ],
+  "kind": "context",
+  "relations": [
+    {
+      "target_context_id": "contract-thread-title-lifecycle",
+      "type": "relates_to"
+    }
+  ],
+  "schema_version": 1,
+  "source": {
+    "captured_at": "2026-09-30T07:50:00Z",
+    "quote": "你这个default 的 workspace怎么在 /Users/waynewang/Peel/apps/desktop，就是当我们起一个new chat的时候，这很奇怪。",
+    "ref": "conversation:2026-09-29-focus-html-and-visualize"
+  },
+  "state": "active",
+  "summary": "A new chat with no selected workspace uses the home directory",
+  "tags": [
+    "new-chat",
+    "workspace",
+    "cwd"
+  ],
+  "type": "decision"
+}
