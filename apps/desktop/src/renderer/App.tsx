@@ -4,7 +4,7 @@ import { useCallback, useEffect, useMemo, useRef, useState, type ReactNode } fro
 import { flushSync } from "react-dom";
 
 import { THREAD_SEARCH_CACHE_TTL_MS, type CodexNotice, type ForkDraft, type PeelState, type Point, type ServerRequestResponseInput, type SpaceNode, type SpaceRecord, type ThreadSnapshot, type ThreadViewState } from "../shared/contracts";
-import { emptyState, suggestedChildPosition, temporaryTitle } from "../shared/state";
+import { emptyState, shouldApplyIncomingThreadName, suggestedChildPosition, temporaryTitle } from "../shared/state";
 import { ForkComposer, Transcript } from "./Transcript";
 import { Overview } from "./Overview";
 import { BrandMark, PeelBrand } from "./Brand";
@@ -113,7 +113,7 @@ export function App(): ReactNode {
         mutate((draft) => {
           for (const space of Object.values(draft.spaces)) {
             const node = space.nodes[threadId];
-            if (!node || node.titleOrigin === "manual") continue;
+            if (!node || !shouldApplyIncomingThreadName(node.titleOrigin, node.title, params.name as string)) continue;
             node.title = params.name as string;
             node.titleOrigin = "automatic";
             if (space.rootThreadId === threadId && space.nameOrigin === "default") space.name = node.title;
@@ -345,7 +345,7 @@ export function App(): ReactNode {
       draft.threadViews[activeNode.threadId] = { ...currentView, draft: "" };
       const space = draft.activeSpaceId ? draft.spaces[draft.activeSpaceId] : null;
       const node = space?.nodes[activeNode.threadId];
-      if (!space || !node || node.titleOrigin !== "temporary" || !prompt?.trim()) return;
+      if (!space || !node || node.titleOrigin !== "temporary" || node.title !== "New Chat" || !prompt?.trim()) return;
       node.title = temporaryTitle(prompt, "New Chat");
       if (space.rootThreadId === node.threadId && space.nameOrigin === "default") space.name = node.title;
       space.updatedAt = Date.now();

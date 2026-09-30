@@ -1,6 +1,7 @@
-import { mkdir, realpath } from "node:fs/promises";
-import { isAbsolute, join, relative, sep } from "node:path";
 import { EventEmitter } from "node:events";
+import { mkdir, realpath } from "node:fs/promises";
+import { homedir } from "node:os";
+import { isAbsolute, join, relative, sep } from "node:path";
 
 import {
   AppServerClient,
@@ -191,7 +192,8 @@ export class PeelService extends EventEmitter {
 
   async startNewChat(input: StartNewChatInput): Promise<PeelState> {
     this.#requireConnection();
-    const response = await this.client.startThread(input.cwd ? { cwd: input.cwd } : {});
+    const cwd = input.cwd?.trim() || homedir();
+    const response = await this.client.startThread({ cwd });
     this.#invalidateThreadCache();
     const space = createSpace(response.thread);
     try {
@@ -255,7 +257,7 @@ export class PeelService extends EventEmitter {
     const space = Object.values(state.spaces).find((candidate) => candidate.nodes[input.threadId]);
     const node = space?.nodes[input.threadId];
     const prompt = input.input.find((candidate) => candidate.type === "text")?.text;
-    if (node?.titleOrigin === "temporary" && prompt?.trim()) {
+    if (node?.titleOrigin === "temporary" && prompt?.trim() && !this.#automaticTitles.has(input.threadId)) {
       this.#automaticTitles.set(input.threadId, { prompt, firstTurnId: turnId });
       const title = temporaryTitle(prompt, "New Chat");
       try {

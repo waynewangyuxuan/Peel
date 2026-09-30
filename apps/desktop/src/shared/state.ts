@@ -1,4 +1,4 @@
-import type { PeelState, Point, SpaceNode, SpaceRecord, ThreadViewState } from "./contracts";
+import type { PeelState, Point, SpaceNode, SpaceRecord, ThreadViewState, TitleOrigin } from "./contracts";
 
 const CARD_WIDTH = 294;
 const CARD_HEIGHT = 205;
@@ -20,6 +20,14 @@ export function temporaryTitle(prompt: string, fallback = "New direction"): stri
   const normalized = prompt.replace(/\s+/g, " ").trim();
   if (!normalized) return fallback;
   return normalized.length > 34 ? `${normalized.slice(0, 33).trimEnd()}…` : normalized;
+}
+
+export function shouldApplyIncomingThreadName(origin: TitleOrigin, currentTitle: string, incomingName: string): boolean {
+  if (origin !== "temporary") return false;
+  if (currentTitle === "New Chat") return true;
+  const incoming = incomingName.replace(/…$/, "").trim();
+  if (!incoming) return false;
+  return currentTitle === incomingName || currentTitle.startsWith(incoming);
 }
 
 export function automaticTitle(prompt: string): string {

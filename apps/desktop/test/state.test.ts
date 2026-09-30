@@ -1,6 +1,17 @@
 import { describe, expect, it } from "vitest";
 
-import { automaticTitle, createSpace, emptyState, normalizeState, suggestedChildPosition, temporaryTitle } from "../src/shared/state";
+import { automaticTitle, createSpace, emptyState, normalizeState, shouldApplyIncomingThreadName, suggestedChildPosition, temporaryTitle } from "../src/shared/state";
+
+describe("incoming thread names", () => {
+  it("keeps the first prompt when a later Codex name arrives", () => {
+    const first = temporaryTitle("Explain attention in one concrete sentence", "New Chat");
+    expect(shouldApplyIncomingThreadName("temporary", "New Chat", "Codex draft")).toBe(true);
+    expect(shouldApplyIncomingThreadName("temporary", first, automaticTitle("Explain attention in one concrete sentence"))).toBe(true);
+    expect(shouldApplyIncomingThreadName("temporary", first, "能给一点比较厚的visual帮我理解吗")).toBe(false);
+    expect(shouldApplyIncomingThreadName("automatic", first, "能给一点比较厚的visual帮我理解吗")).toBe(false);
+    expect(shouldApplyIncomingThreadName("manual", first, "Renamed by me")).toBe(false);
+  });
+});
 
 describe("Peel state model", () => {
   it("creates exactly one root from an existing Thread without Project coupling", () => {

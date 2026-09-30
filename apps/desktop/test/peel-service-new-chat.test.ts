@@ -1,6 +1,6 @@
 import type { CodexThread, ThreadListResponse } from "@peel/codex-app-server";
 import { mkdtemp, rm, writeFile } from "node:fs/promises";
-import { tmpdir } from "node:os";
+import { homedir, tmpdir } from "node:os";
 import { join } from "node:path";
 import { afterEach, describe, expect, it, vi } from "vitest";
 
@@ -59,6 +59,11 @@ describe("PeelService new Chat entry", () => {
     const state = await service.startNewChat({ cwd: "/repo/current" });
 
     expect(start).toHaveBeenCalledWith({ cwd: "/repo/current" });
+
+    const homeThread = emptyThread("home-thread", homedir());
+    start.mockResolvedValueOnce({ thread: homeThread } as never);
+    await service.startNewChat({});
+    expect(start).toHaveBeenLastCalledWith({ cwd: homedir() });
     expect(list).toHaveBeenCalledTimes(1);
     expect(state.activeThreadId).toBe(thread.id);
     expect(state.activeSpaceId).not.toBeNull();
@@ -94,7 +99,7 @@ describe("PeelService new Chat entry", () => {
     const thread = emptyThread("fresh-title-thread", "/repo/current");
     vi.spyOn(service.client, "listThreads").mockResolvedValue(noThreads());
     vi.spyOn(service.client, "startThread").mockResolvedValue({ thread } as never);
-    vi.spyOn(service.client, "startTurn").mockResolvedValue("turn-first");
+    const startTurn = vi.spyOn(service.client, "startTurn").mockResolvedValueOnce("turn-first").mockResolvedValueOnce("turn-second");
     const setThreadName = vi.spyOn(service.client, "setThreadName").mockResolvedValue(undefined);
     service.transport.emit("ready", {});
     const created = await service.startNewChat({ cwd: thread.cwd });
@@ -106,6 +111,11 @@ describe("PeelService new Chat entry", () => {
     expect(stored.nodes[thread.id]).toMatchObject({ title: temporaryTitle(prompt, "New Chat"), titleOrigin: "temporary" });
     expect(stored).toMatchObject({ name: temporaryTitle(prompt, "New Chat"), nameOrigin: "default" });
 
+    await service.sendTurn({ threadId: thread.id, cwd: thread.cwd, input: [{ type: "text", text: "Second question should not become the title", text_elements: [] }] });
+    expect(startTurn).toHaveBeenCalledTimes(2);
+    stored = (await service.bootstrap()).state.spaces[spaceId]!;
+    expect(stored.nodes[thread.id]).toMatchObject({ title: temporaryTitle(prompt, "New Chat"), titleOrigin: "temporary" });
+
     service.client.emit("notification", { method: "turn/completed", params: { threadId: thread.id, turn: { id: "turn-first" } } } as never);
     await vi.waitFor(async () => {
       stored = (await service.bootstrap()).state.spaces[spaceId]!;
@@ -113,6 +123,10 @@ describe("PeelService new Chat entry", () => {
       expect(stored.name).toBe(automaticTitle(prompt));
     });
     expect(setThreadName).toHaveBeenCalledWith(thread.id, automaticTitle(prompt));
+
+    service.client.emit("notification", { method: "turn/completed", params: { threadId: thread.id, turn: { id: "turn-second" } } } as never);
+    stored = (await service.bootstrap()).state.spaces[spaceId]!;
+    expect(stored.nodes[thread.id]?.title).toBe(automaticTitle(prompt));
 
     await service.setThreadName(thread.id, "Manual Root title", spaceId);
     stored = (await service.bootstrap()).state.spaces[spaceId]!;
