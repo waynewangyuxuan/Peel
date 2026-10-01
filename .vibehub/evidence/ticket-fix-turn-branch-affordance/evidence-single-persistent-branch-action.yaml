@@ -3,6 +3,20 @@
     "single-persistent-branch-action",
     "branch-behavior-preserved"
   ],
+  "acceptance_revisions": [
+    {
+      "acceptance_id": "single-persistent-branch-action",
+      "identity": "sha256:d431e2db6c6938a560670cd2543ed45c3ec1b0ac0e752a555b635228c2998f82",
+      "revision": 1
+    },
+    {
+      "acceptance_id": "branch-behavior-preserved",
+      "identity": "sha256:119d221ac27faa18023f8c85255b008e88d8d8f7f7b0a238a209be20546be969",
+      "revision": 1
+    }
+  ],
+  "binding_origin": "reconstructed",
+  "binding_state": "bound",
   "evidence_id": "evidence-single-persistent-branch-action",
   "kind": "ticket_evidence",
   "origin": "agent",
@@ -11,7 +25,7 @@
     "apps/desktop/src/renderer/Transcript.tsx",
     "apps/desktop/src/renderer/styles.css"
   ],
-  "schema_version": 1,
+  "schema_version": 2,
   "summary": "Completed Turns now render one native Branch from here footer button through TurnActions. The circular PeelHandle component, pointer gesture state, drag preview, and all related CSS are removed. The footer no longer depends on hover/focus opacity and the button has a restrained persistent border and panel background; the existing onBranch callback and exact Turn binding remain unchanged.",
   "ticket_id": "ticket-fix-turn-branch-affordance"
 }

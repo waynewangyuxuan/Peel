@@ -1,26 +1,42 @@
 {
   "acceptance": [
     {
-      "acceptance_id": "refresh-capability-audit",
-      "criterion": "The installed Codex App Server schema and official documentation are re-audited for Project association, Thread projectId, inheritance behavior, stability, and fallback, with stable versus experimental facts clearly separated."
-    },
-    {
-      "acceptance_id": "test-inheritance-if-available",
-      "criterion": "If the capability is available, a disposable experiment verifies whether a Fork can inherit Project instructions, sources, and workspace roots through the server without Peel copying them; unavailable capability is recorded as an honest result rather than a failure."
-    },
-    {
       "acceptance_id": "evaluate-user-value",
-      "criterion": "The recommendation uses v0.1 dogfood evidence to identify a concrete user problem Project inheritance would solve and explains why pure Thread mode is or is not insufficient."
+      "criterion": "The recommendation uses v0.1 dogfood evidence to identify a concrete user problem Project inheritance would solve and explains why pure Thread mode is or is not insufficient.",
+      "identity": "sha256:f98c12e1cb1096c44e00052c39a09a3d3cb2fdc87259eafb910a931e292627d9",
+      "revision": 1,
+      "state": "active"
     },
     {
       "acceptance_id": "preserve-domain-model",
-      "criterion": "The recommendation guarantees that moving a Chat into/out of Project never rewrites Space Root, membership, or Fork topology and that no-Project operation remains fully supported."
+      "criterion": "The recommendation guarantees that moving a Chat into/out of Project never rewrites Space Root, membership, or Fork topology and that no-Project operation remains fully supported.",
+      "identity": "sha256:8fb323972986f77d05f876bf353e6c00feeaffd1dfbd29612dc8b0a2a1688020",
+      "revision": 1,
+      "state": "active"
     },
     {
       "acceptance_id": "recommend-next-action",
-      "criterion": "A checked-in conclusion recommends implement, defer, or reject with evidence, risks, capability gates, and the smallest follow-up Ticket boundary if implementation is justified."
+      "criterion": "A checked-in conclusion recommends implement, defer, or reject with evidence, risks, capability gates, and the smallest follow-up Ticket boundary if implementation is justified.",
+      "identity": "sha256:8873962b9648333f8c34f838f58dbd1a07a20d2d40fe624d061fdcd56a7de7e8",
+      "revision": 1,
+      "state": "active"
+    },
+    {
+      "acceptance_id": "refresh-capability-audit",
+      "criterion": "The installed Codex App Server schema and official documentation are re-audited for Project association, Thread projectId, inheritance behavior, stability, and fallback, with stable versus experimental facts clearly separated.",
+      "identity": "sha256:e85eefbe1b860aac2662afdda8bca557f25bd309e3a64e767713fd7d9ac2489e",
+      "revision": 1,
+      "state": "active"
+    },
+    {
+      "acceptance_id": "test-inheritance-if-available",
+      "criterion": "If the capability is available, a disposable experiment verifies whether a Fork can inherit Project instructions, sources, and workspace roots through the server without Peel copying them; unavailable capability is recorded as an honest result rather than a failure.",
+      "identity": "sha256:c7d6c45d1104ec51d780a069888ce1d66fa68e6a9bc47d123fa14e81dfed85cd",
+      "revision": 1,
+      "state": "active"
     }
   ],
+  "active_contract_revision": 1,
   "constraints": [
     "Do not implement Project UI or topology in this evaluation Ticket.",
     "Project remains an optional Context Overlay, never a mandatory Space parent.",
@@ -45,10 +61,43 @@
       "ref": ".vibehub/rooms/product/contract-v02-scale-continuity-context.yaml"
     }
   ],
+  "contract_revisions": [
+    {
+      "acceptance_revisions": [
+        {
+          "acceptance_id": "evaluate-user-value",
+          "identity": "sha256:f98c12e1cb1096c44e00052c39a09a3d3cb2fdc87259eafb910a931e292627d9",
+          "revision": 1
+        },
+        {
+          "acceptance_id": "preserve-domain-model",
+          "identity": "sha256:8fb323972986f77d05f876bf353e6c00feeaffd1dfbd29612dc8b0a2a1688020",
+          "revision": 1
+        },
+        {
+          "acceptance_id": "recommend-next-action",
+          "identity": "sha256:8873962b9648333f8c34f838f58dbd1a07a20d2d40fe624d061fdcd56a7de7e8",
+          "revision": 1
+        },
+        {
+          "acceptance_id": "refresh-capability-audit",
+          "identity": "sha256:e85eefbe1b860aac2662afdda8bca557f25bd309e3a64e767713fd7d9ac2489e",
+          "revision": 1
+        },
+        {
+          "acceptance_id": "test-inheritance-if-available",
+          "identity": "sha256:c7d6c45d1104ec51d780a069888ce1d66fa68e6a9bc47d123fa14e81dfed85cd",
+          "revision": 1
+        }
+      ],
+      "identity": "sha256:9c947e839091fb6ad6d270d761a8f3dc7c528fdb002a284b1ecf9fb706806fb0",
+      "revision": 1
+    }
+  ],
+  "deliveries": [],
   "kind": "ticket",
   "maturity": "firm",
   "outcome": "A capability- and dogfood-backed recommendation determines whether optional Codex Project context inheritance should enter Peel after v0.1, without implementing Project-first topology.",
-  "deliveries": [],
   "provenance_refs": [
     "conversation:2026-08-25-peel-v01-v02-scope",
     "local-schema:codex-app-server-0.149.0"
@@ -60,6 +109,7 @@
       "type": "depends_on"
     }
   ],
-  "schema_version": 2,
+  "revision_state": "bound",
+  "schema_version": 3,
   "ticket_id": "ticket-evaluate-v02-project-inheritance"
 }

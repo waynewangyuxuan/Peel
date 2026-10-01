@@ -1,0 +1,36 @@
+{
+  "context_id": "decision-codex-visualize-isolated-frame",
+  "detail": "Codex does not emit a visualize code fence. The agent message wraps the widget as U+E200, the word visualize, U+E202, a JSON object with a path, and U+E201. Peel opens that path only when the resolved file is HTML inside a .visualizations directory. The page runs in its own frame so its script can draw and accept clicks. That script does not run in the Peel page. Files outside .visualizations are refused.",
+  "evidence": [
+    {
+      "note": "Recognizes the private-use visualize sentinel and turns it into a frame URL.",
+      "ref": "apps/desktop/src/shared/visualization.ts"
+    },
+    {
+      "note": "Reads only a real HTML file whose resolved path stays inside .visualizations.",
+      "ref": "apps/desktop/src/main/visualization-file.ts"
+    }
+  ],
+  "kind": "context",
+  "relations": [
+    {
+      "target_context_id": "decision-focus-static-html-subset",
+      "type": "relates_to"
+    }
+  ],
+  "schema_version": 1,
+  "source": {
+    "captured_at": "2026-09-30T07:50:00Z",
+    "quote": "这是我想能够直接在chat 里展示的html。",
+    "ref": "conversation:2026-09-29-focus-html-and-visualize"
+  },
+  "state": "active",
+  "summary": "A Codex visualize marker opens its local HTML file in an isolated frame",
+  "tags": [
+    "visualize",
+    "html",
+    "focus-chat",
+    "codex"
+  ],
+  "type": "decision"
+}

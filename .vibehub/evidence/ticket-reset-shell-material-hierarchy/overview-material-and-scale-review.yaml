@@ -3,6 +3,20 @@
     "overview-material-continuity",
     "motion-accessibility-and-regression-proof"
   ],
+  "acceptance_revisions": [
+    {
+      "acceptance_id": "overview-material-continuity",
+      "identity": "sha256:4ab4723a6da74c39ba579bba7163141ebb32bd108ba0a4447dd250189a4a7b8d",
+      "revision": 1
+    },
+    {
+      "acceptance_id": "motion-accessibility-and-regression-proof",
+      "identity": "sha256:7452efe26d3272ea4d0935befaf7fbdb6955470ae882d0413267c9c4de319a61",
+      "revision": 1
+    }
+  ],
+  "binding_origin": "reconstructed",
+  "binding_state": "bound",
   "evidence_id": "overview-material-and-scale-review",
   "kind": "ticket_evidence",
   "origin": "agent",
@@ -17,7 +31,7 @@
     "apps/desktop/test-results/overview-50.png",
     "apps/desktop/e2e/v01-journey.spec.ts:overview-2-6-50-and-raw-markdown-assertions"
   ],
-  "schema_version": 1,
+  "schema_version": 2,
   "summary": "Direct review of fresh 2-node, 6-node, and 50-node Overview screenshots confirms deterministic cards and real edges remain spatially distinct while sharing the calmer shell typography, borders, shadows, radii, selection, and status language. The Electron journey re-verifies automatic first fit without topology mutation, card readability, pan, zoom, Fit, drag, rename, provenance, latest-turn navigation, Focus return, narrow layout, and 50-node containment. Overview summaries are now presentation-safe plain text, so streamed emphasis and other Markdown syntax no longer appear as unfinished source tokens.",
   "ticket_id": "ticket-reset-shell-material-hierarchy"
 }

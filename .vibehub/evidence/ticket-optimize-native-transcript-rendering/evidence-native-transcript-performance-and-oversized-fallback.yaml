@@ -3,6 +3,20 @@
     "oversized-message-readable-fallback",
     "production-focus-performance-evidence"
   ],
+  "acceptance_revisions": [
+    {
+      "acceptance_id": "oversized-message-readable-fallback",
+      "identity": "sha256:2bdce9ab0b2562032a23ce18c5e432d1006f4d55bc6bdbe284f22c81e50ef7ec",
+      "revision": 1
+    },
+    {
+      "acceptance_id": "production-focus-performance-evidence",
+      "identity": "sha256:fe208d1f72d40289d1e5872fcdb574ea5d3debce2a23bd3641e2db88c261b978",
+      "revision": 1
+    }
+  ],
+  "binding_origin": "reconstructed",
+  "binding_state": "bound",
   "evidence_id": "evidence-native-transcript-performance-and-oversized-fallback",
   "kind": "ticket_evidence",
   "origin": "agent",
@@ -19,7 +33,7 @@
     "command:npm run benchmark:transcript --workspace @peel/desktop passed 1/1 in production Electron",
     "command:npm run build --workspace @peel/desktop passed"
   ],
-  "schema_version": 1,
+  "schema_version": 2,
   "summary": "The production Electron A/B harness exercises the ordinary App to Focus to Transcript to MarkdownContent route with two warmups and seven measured samples per mode. For 100 settled Turns plus 36 live-tail deltas, optimized median reconciliation plus React render/commit fell from 36.25 ms to 1.50 ms (95.9%), with zero historical Turn renders, zero historical Markdown renders, exactly 36 deltas, and no streaming long tasks. Optimized cold 10/100/500 first-content and through-paint medians were 11.2/28.4, 65.4/70.0, and 289.8/309.0 ms; the 10-to-500 warm switch was 264.4/284.7 ms. Every comparison stayed within the greater-of-10%-or-5-ms regression limit. The harness separately records App Server read, snapshot construction, IPC, reconciliation, React commit, two-frame paint, long tasks, DOM, and heap diagnostics. The exact 200,086-character oversized fixture rendered as selectable inert plain text with local overflow, zero interpreted HTML elements, and zero remote images.",
   "ticket_id": "ticket-optimize-native-transcript-rendering"
 }

@@ -1,30 +1,49 @@
 {
   "acceptance": [
     {
-      "acceptance_id": "immediate-real-new-chat",
-      "criterion": "From the sidebar and empty-state primary action, New Chat invokes Codex thread/start directly, creates and persists one new Peel Space whose only Root is that real empty Codex Thread, opens its editable Focus Composer, and does not issue thread/list or search before the new Chat is usable. The active Thread cwd is reused when available and App Server defaults are used when no active cwd exists."
+      "acceptance_id": "chat-like-composer",
+      "criterion": "Focus uses one visually coherent Demo-aligned Composer with a ChatGPT-familiar circular up-arrow Send action, clear disabled/sending feedback, Enter-to-send and Shift+Enter-for-newline behavior, attachment and dictation affordances, preserved editable Drafts, and no raw intermediate UI state. Frequent keyboard actions do not wait on decorative animation.",
+      "identity": "sha256:770dda6c08b7a5bb8e4f9a03698e098cbac79a898a0bd6389e47c57a1002b9f9",
+      "revision": 1,
+      "state": "active"
     },
     {
       "acceptance_id": "distinct-entry-semantics",
-      "criterion": "The permanent navigation exposes exactly one plus control for New Chat and one separately labeled search-icon control for finding existing Codex Chats; the duplicate New Space plus/button is removed. Keyboard and empty-state entry points preserve the same distinction, and the existing picker is only entered through the search action."
+      "criterion": "The permanent navigation exposes exactly one plus control for New Chat and one separately labeled search-icon control for finding existing Codex Chats; the duplicate New Space plus/button is removed. Keyboard and empty-state entry points preserve the same distinction, and the existing picker is only entered through the search action.",
+      "identity": "sha256:4694dc93ea67bc478a9c3b0cf7e2b5b97df3e92f0ec5295674aee3041362de20",
+      "revision": 1,
+      "state": "active"
     },
     {
-      "acceptance_id": "new-chat-failure-safety",
-      "criterion": "If thread/start or Peel persistence fails, no phantom Space is shown, existing Spaces and Drafts remain unchanged, the creation control becomes usable again, and a concise human-readable recovery message is visible without raw IPC/server wrapper text."
-    },
-    {
-      "acceptance_id": "chat-like-composer",
-      "criterion": "Focus uses one visually coherent Demo-aligned Composer with a ChatGPT-familiar circular up-arrow Send action, clear disabled/sending feedback, Enter-to-send and Shift+Enter-for-newline behavior, attachment and dictation affordances, preserved editable Drafts, and no raw intermediate UI state. Frequent keyboard actions do not wait on decorative animation."
-    },
-    {
-      "acceptance_id": "live-voice-level-feedback",
-      "criterion": "During real microphone capture the Composer displays a continuous compact waveform and elapsed recording state driven by measured microphone PCM amplitude rather than a fake looping animation; louder input produces visibly stronger bars, Stop transitions to transcription, and interruption/failure leaves the existing editable Draft intact. Reduced-motion mode preserves legible level feedback without decorative movement."
+      "acceptance_id": "immediate-real-new-chat",
+      "criterion": "From the sidebar and empty-state primary action, New Chat invokes Codex thread/start directly, creates and persists one new Peel Space whose only Root is that real empty Codex Thread, opens its editable Focus Composer, and does not issue thread/list or search before the new Chat is usable. The active Thread cwd is reused when available and App Server defaults are used when no active cwd exists.",
+      "identity": "sha256:6ff6e700ed3bc3b2e0ccdcfb5c8a5316a0294d0b48a204620d4717ce5ec3b321",
+      "revision": 1,
+      "state": "active"
     },
     {
       "acceptance_id": "integrated-ui-verification",
-      "criterion": "Automated adapter/service, renderer audio, and production Electron journey tests prove direct thread/start without discovery, entry-action uniqueness, keyboard sending, microphone-level response, Draft safety, and existing-Chat search regression coverage. A clean build/package passes and current-state screenshots at welcome, new empty Chat, recording, and Composer states are reviewed against the preserved Demo."
+      "criterion": "Automated adapter/service, renderer audio, and production Electron journey tests prove direct thread/start without discovery, entry-action uniqueness, keyboard sending, microphone-level response, Draft safety, and existing-Chat search regression coverage. A clean build/package passes and current-state screenshots at welcome, new empty Chat, recording, and Composer states are reviewed against the preserved Demo.",
+      "identity": "sha256:6701269de76c498c0237d8b24c64d3ff64ce48828d7f9ae46183259d31ebe0bc",
+      "revision": 1,
+      "state": "active"
+    },
+    {
+      "acceptance_id": "live-voice-level-feedback",
+      "criterion": "During real microphone capture the Composer displays a continuous compact waveform and elapsed recording state driven by measured microphone PCM amplitude rather than a fake looping animation; louder input produces visibly stronger bars, Stop transitions to transcription, and interruption/failure leaves the existing editable Draft intact. Reduced-motion mode preserves legible level feedback without decorative movement.",
+      "identity": "sha256:3aaa6ea5e79a0c16fdb75fdac0a2fe1d453a2303b894e1dd24f8a26f0390c416",
+      "revision": 1,
+      "state": "active"
+    },
+    {
+      "acceptance_id": "new-chat-failure-safety",
+      "criterion": "If thread/start or Peel persistence fails, no phantom Space is shown, existing Spaces and Drafts remain unchanged, the creation control becomes usable again, and a concise human-readable recovery message is visible without raw IPC/server wrapper text.",
+      "identity": "sha256:ecb8073526fcbefcd5513c11900f84b98aba39378ee6bbc6ada1c41e961eb11d",
+      "revision": 1,
+      "state": "active"
     }
   ],
+  "active_contract_revision": 1,
   "constraints": [
     "The preserved original Demo remains the visual authority; ChatGPT conventions guide affordance hierarchy and Composer behavior, not a new product skin.",
     "A newly created Chat is a real Codex Thread and a new single-Root Space; it is not a local placeholder and does not join an existing Space without a real Fork.",
@@ -55,10 +74,48 @@
       "ref": "docs/product/source/peel-demo-v0-original.html"
     }
   ],
+  "contract_revisions": [
+    {
+      "acceptance_revisions": [
+        {
+          "acceptance_id": "chat-like-composer",
+          "identity": "sha256:770dda6c08b7a5bb8e4f9a03698e098cbac79a898a0bd6389e47c57a1002b9f9",
+          "revision": 1
+        },
+        {
+          "acceptance_id": "distinct-entry-semantics",
+          "identity": "sha256:4694dc93ea67bc478a9c3b0cf7e2b5b97df3e92f0ec5295674aee3041362de20",
+          "revision": 1
+        },
+        {
+          "acceptance_id": "immediate-real-new-chat",
+          "identity": "sha256:6ff6e700ed3bc3b2e0ccdcfb5c8a5316a0294d0b48a204620d4717ce5ec3b321",
+          "revision": 1
+        },
+        {
+          "acceptance_id": "integrated-ui-verification",
+          "identity": "sha256:6701269de76c498c0237d8b24c64d3ff64ce48828d7f9ae46183259d31ebe0bc",
+          "revision": 1
+        },
+        {
+          "acceptance_id": "live-voice-level-feedback",
+          "identity": "sha256:3aaa6ea5e79a0c16fdb75fdac0a2fe1d453a2303b894e1dd24f8a26f0390c416",
+          "revision": 1
+        },
+        {
+          "acceptance_id": "new-chat-failure-safety",
+          "identity": "sha256:ecb8073526fcbefcd5513c11900f84b98aba39378ee6bbc6ada1c41e961eb11d",
+          "revision": 1
+        }
+      ],
+      "identity": "sha256:d136e8a24db8b20d9ff236e643dea0a485d1d2577a1649f53fd18359e6d00a50",
+      "revision": 1
+    }
+  ],
+  "deliveries": [],
   "kind": "ticket",
   "maturity": "firm",
   "outcome": "Peel lets the user begin a real new Codex Chat immediately, gives existing-Chat discovery a distinct search-only entry, and presents a ChatGPT-familiar Composer with live microphone-level feedback.",
-  "deliveries": [],
   "provenance_refs": [
     "conversation:2026-08-27-new-chat-composer-and-live-voice-feedback"
   ],
@@ -69,6 +126,7 @@
       "type": "depends_on"
     }
   ],
-  "schema_version": 2,
+  "revision_state": "bound",
+  "schema_version": 3,
   "ticket_id": "ticket-rework-new-chat-composer-and-voice-feedback"
 }

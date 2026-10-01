@@ -1,0 +1,36 @@
+{
+  "context_id": "decision-fold-activity-steps-after-five",
+  "detail": "When a turn contains more than five reasoning or tool steps, Focus shows a control that can fold those steps. User messages and the agent answer stay in place. Five or fewer steps do not show the control. The control starts open. The user folds it.",
+  "evidence": [
+    {
+      "note": "The fold is offered only after the step count passes five.",
+      "ref": "apps/desktop/src/renderer/transcript-steps.ts"
+    },
+    {
+      "note": "The control sits with the steps and leaves the user and agent messages visible.",
+      "ref": "apps/desktop/src/renderer/Transcript.tsx"
+    }
+  ],
+  "kind": "context",
+  "relations": [
+    {
+      "target_context_id": "contract-focus-chat-fidelity",
+      "type": "relates_to"
+    }
+  ],
+  "schema_version": 1,
+  "source": {
+    "captured_at": "2026-09-30T07:50:00Z",
+    "quote": "如果reasonnign tool call这些step 超过5个，会自动有一个可以folder 这些的选项",
+    "ref": "conversation:2026-09-29-focus-html-and-visualize"
+  },
+  "state": "active",
+  "summary": "More than five reasoning or tool steps in one turn get a fold control",
+  "tags": [
+    "focus-chat",
+    "reasoning",
+    "tool-steps",
+    "transcript"
+  ],
+  "type": "decision"
+}

@@ -1,22 +1,35 @@
 {
   "acceptance": [
     {
-      "acceptance_id": "scoped-resume-failure-feedback",
-      "criterion": "When the first direct send for an unloaded existing Chat fails during thread/resume, the active Composer shows an accessible actionable failure tied to that Chat, and global diagnostic history records only the appropriate safe context without leaving a permanent blocking banner."
-    },
-    {
       "acceptance_id": "draft-and-attachment-preservation",
-      "criterion": "The exact unsent text, attachments, dictation edits, and Composer focus remain intact after resume failure and through the same-session retry; the text Draft also remains durable across a close/reopen or app restart before retry."
-    },
-    {
-      "acceptance_id": "idempotent-successful-retry",
-      "criterion": "After the resume fault clears, one deliberate retry performs at most one successful resume and one turn/start, clears the Draft only after accepted send, and produces no duplicate Turn, optimistic user message, or diagnostic."
+      "criterion": "The exact unsent text, attachments, dictation edits, and Composer focus remain intact after resume failure and through the same-session retry; the text Draft also remains durable across a close/reopen or app restart before retry.",
+      "identity": "sha256:0fdac8395d636160b2f3fb167763ea57e51612e59c2b20729309c35e588f28ca",
+      "revision": 1,
+      "state": "active"
     },
     {
       "acceptance_id": "focused-and-journey-regression",
-      "criterion": "A focused Electron regression deterministically forces resume failure and recovery, and the previously failing full v0.1 journey passes through the direct-send scenario while retaining New Chat, Fork first-send, restart, streaming, and diagnostics behavior."
+      "criterion": "A focused Electron regression deterministically forces resume failure and recovery, and the previously failing full v0.1 journey passes through the direct-send scenario while retaining New Chat, Fork first-send, restart, streaming, and diagnostics behavior.",
+      "identity": "sha256:6a5d3f1213c338586501cbb592cc1fe743e2b4d896b1b8832cf770ead567684a",
+      "revision": 1,
+      "state": "active"
+    },
+    {
+      "acceptance_id": "idempotent-successful-retry",
+      "criterion": "After the resume fault clears, one deliberate retry performs at most one successful resume and one turn/start, clears the Draft only after accepted send, and produces no duplicate Turn, optimistic user message, or diagnostic.",
+      "identity": "sha256:21695a2df791cf2d80e5fa4bb96f490bfb2aa7e92454912496913fc14230a6b2",
+      "revision": 1,
+      "state": "active"
+    },
+    {
+      "acceptance_id": "scoped-resume-failure-feedback",
+      "criterion": "When the first direct send for an unloaded existing Chat fails during thread/resume, the active Composer shows an accessible actionable failure tied to that Chat, and global diagnostic history records only the appropriate safe context without leaving a permanent blocking banner.",
+      "identity": "sha256:2845245d16da23e66729c345d746bd988e1833c1da00a0f6cae410b82635732c",
+      "revision": 1,
+      "state": "active"
     }
   ],
+  "active_contract_revision": 1,
   "constraints": [
     "Do not silently create a replacement Thread when resume fails.",
     "Do not clear Composer state before Codex accepts turn/start.",
@@ -27,11 +40,11 @@
   "context_refs": [
     {
       "purpose": "Provides the accepted scoped diagnostic and failure-presentation contract.",
-      "ref": ".vibehub/outcomes/ticket-route-appserver-requests-and-errors.yaml"
+      "ref": ".vibehub/outcomes/ticket-route-appserver-requests-and-errors/contract-v1.yaml"
     },
     {
       "purpose": "Provides the accepted direct-send Draft preservation and recovery baseline.",
-      "ref": ".vibehub/outcomes/ticket-deliver-v01-spatial-loop.yaml"
+      "ref": ".vibehub/outcomes/ticket-deliver-v01-spatial-loop/contract-v1.yaml"
     },
     {
       "purpose": "Contains the deterministic failed-resume scenario and current failing assertion.",
@@ -54,6 +67,34 @@
       "ref": "packages/codex-app-server/src/client.ts"
     }
   ],
+  "contract_revisions": [
+    {
+      "acceptance_revisions": [
+        {
+          "acceptance_id": "draft-and-attachment-preservation",
+          "identity": "sha256:0fdac8395d636160b2f3fb167763ea57e51612e59c2b20729309c35e588f28ca",
+          "revision": 1
+        },
+        {
+          "acceptance_id": "focused-and-journey-regression",
+          "identity": "sha256:6a5d3f1213c338586501cbb592cc1fe743e2b4d896b1b8832cf770ead567684a",
+          "revision": 1
+        },
+        {
+          "acceptance_id": "idempotent-successful-retry",
+          "identity": "sha256:21695a2df791cf2d80e5fa4bb96f490bfb2aa7e92454912496913fc14230a6b2",
+          "revision": 1
+        },
+        {
+          "acceptance_id": "scoped-resume-failure-feedback",
+          "identity": "sha256:2845245d16da23e66729c345d746bd988e1833c1da00a0f6cae410b82635732c",
+          "revision": 1
+        }
+      ],
+      "identity": "sha256:328414d2b0f017b6484bb4faf93fdf19d4dc4d73689d3b54a87906b0a8442bcf",
+      "revision": 1
+    }
+  ],
   "deliveries": [],
   "kind": "ticket",
   "maturity": "firm",
@@ -62,6 +103,7 @@
     "conversation:2026-09-18-followup-failed-resume-regression"
   ],
   "relations": [],
-  "schema_version": 2,
+  "revision_state": "bound",
+  "schema_version": 3,
   "ticket_id": "ticket-repair-direct-send-resume-recovery"
 }

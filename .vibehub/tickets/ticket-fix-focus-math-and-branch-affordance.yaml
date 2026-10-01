@@ -1,18 +1,28 @@
 {
   "acceptance": [
     {
+      "acceptance_id": "math-regression-evidence",
+      "criterion": "Automated unit and production Electron evidence covers inline and display formulas, the reported Attention expression, malformed and incomplete streamed delimiters, safe-content rejection, accessibility semantics, copy/selection, overflow, and retention of the existing Focus Markdown and Activity journeys.",
+      "identity": "sha256:5922a4a3c579727e0c743b9265b88a4d8a63aaa8046ea372e4a2893ae13c6555",
+      "revision": 1,
+      "state": "active"
+    },
+    {
       "acceptance_id": "safe-math-typesetting",
-      "criterion": "Completed assistant, user, Reasoning, Subagent, and error prose renders common inline and display math delimiters used by Codex, including the reported Attention expression with \\mathrm, \\frac, superscripts, and \\sqrt, as semantic accessible math instead of visible LaTeX control syntax; raw HTML and unsafe URL/content execution remain disabled."
+      "criterion": "Completed assistant, user, Reasoning, Subagent, and error prose renders common inline and display math delimiters used by Codex, including the reported Attention expression with \\mathrm, \\frac, superscripts, and \\sqrt, as semantic accessible math instead of visible LaTeX control syntax; raw HTML and unsafe URL/content execution remain disabled.",
+      "identity": "sha256:38b815fa0da4b6e51dd7f0684af0fe6d5b1d2e56d505f3e62601225b608f3e9f",
+      "revision": 1,
+      "state": "active"
     },
     {
       "acceptance_id": "streaming-and-copy-fidelity",
-      "criterion": "Incomplete streamed math remains readable source text without breaking surrounding Markdown or causing page-width overflow; completed math preserves selectable/copyable source meaning while headings, tables, blockquotes, links, fenced code, and existing streaming projection behavior remain intact."
-    },
-    {
-      "acceptance_id": "math-regression-evidence",
-      "criterion": "Automated unit and production Electron evidence covers inline and display formulas, the reported Attention expression, malformed and incomplete streamed delimiters, safe-content rejection, accessibility semantics, copy/selection, overflow, and retention of the existing Focus Markdown and Activity journeys."
+      "criterion": "Incomplete streamed math remains readable source text without breaking surrounding Markdown or causing page-width overflow; completed math preserves selectable/copyable source meaning while headings, tables, blockquotes, links, fenced code, and existing streaming projection behavior remain intact.",
+      "identity": "sha256:7051012d120d9e59ba9ea96653674d423db1b519f3cea51c5774ae7f28a481e7",
+      "revision": 1,
+      "state": "active"
     }
   ],
+  "active_contract_revision": 1,
   "constraints": [
     "Use a maintained math AST/typesetting path compatible with the existing safe ReactMarkdown renderer; do not enable raw HTML, arbitrary script execution, remote interactive embeds, or inline style injection.",
     "Do not reinterpret Command output, patches, diffs, unknown machine facts, or code fences as prose math.",
@@ -30,11 +40,34 @@
     },
     {
       "purpose": "Provides the completed safe Markdown and streaming baseline.",
-      "ref": ".vibehub/outcomes/ticket-rebuild-chat-reading-surface.yaml"
+      "ref": ".vibehub/outcomes/ticket-rebuild-chat-reading-surface/contract-v1.yaml"
     },
     {
       "purpose": "Provides the independently accepted rendering audit and split recommendation.",
-      "ref": ".vibehub/outcomes/ticket-audit-codex-rendering-surface.yaml"
+      "ref": ".vibehub/outcomes/ticket-audit-codex-rendering-surface/contract-v1.yaml"
+    }
+  ],
+  "contract_revisions": [
+    {
+      "acceptance_revisions": [
+        {
+          "acceptance_id": "math-regression-evidence",
+          "identity": "sha256:5922a4a3c579727e0c743b9265b88a4d8a63aaa8046ea372e4a2893ae13c6555",
+          "revision": 1
+        },
+        {
+          "acceptance_id": "safe-math-typesetting",
+          "identity": "sha256:38b815fa0da4b6e51dd7f0684af0fe6d5b1d2e56d505f3e62601225b608f3e9f",
+          "revision": 1
+        },
+        {
+          "acceptance_id": "streaming-and-copy-fidelity",
+          "identity": "sha256:7051012d120d9e59ba9ea96653674d423db1b519f3cea51c5774ae7f28a481e7",
+          "revision": 1
+        }
+      ],
+      "identity": "sha256:0cb82608424499f3f2370b166affe87991c0e7d6e8a67523276579f5bcad3f40",
+      "revision": 1
     }
   ],
   "deliveries": [],
@@ -48,6 +81,7 @@
     "apps/desktop/test/markdown.test.tsx"
   ],
   "relations": [],
-  "schema_version": 2,
+  "revision_state": "bound",
+  "schema_version": 3,
   "ticket_id": "ticket-fix-focus-math-and-branch-affordance"
 }

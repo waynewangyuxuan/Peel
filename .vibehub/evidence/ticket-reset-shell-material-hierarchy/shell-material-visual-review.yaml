@@ -4,6 +4,25 @@
     "coherent-material-and-geometry",
     "calm-activity-and-progressive-actions"
   ],
+  "acceptance_revisions": [
+    {
+      "acceptance_id": "content-first-shell-hierarchy",
+      "identity": "sha256:9a372d896f3ea0b4bb69103a7e1326c3d0d968b31b7ce07601cd08f4bb35b2c3",
+      "revision": 1
+    },
+    {
+      "acceptance_id": "coherent-material-and-geometry",
+      "identity": "sha256:b8ca184ebf79a49a303e83985455d52a01143b8f190a328c8193062d1c3ab708",
+      "revision": 1
+    },
+    {
+      "acceptance_id": "calm-activity-and-progressive-actions",
+      "identity": "sha256:a123f53d4d5bbd1b4b095de7bf2768207f49f8f21b2272b2965a9010c04b1ea5",
+      "revision": 1
+    }
+  ],
+  "binding_origin": "reconstructed",
+  "binding_state": "bound",
   "evidence_id": "shell-material-visual-review",
   "kind": "ticket_evidence",
   "origin": "agent",
@@ -17,7 +36,7 @@
     "apps/desktop/test-results/ui-focus-markdown-narrow.png",
     "apps/desktop/e2e/v01-journey.spec.ts:contained-navigation-and-activity-assertions"
   ],
-  "schema_version": 1,
+  "schema_version": 2,
   "summary": "Direct visual review of the fresh 1440x960 Focus Activity screenshot and 1000x720 narrow Focus screenshot confirms the conversation remains dominant, Spaces and Lineage are legible but recessive, current identity remains available through clipped labels plus full title/accessible name, secondary top-bar actions rest unboxed, and Reasoning, Command, File Change, Subagent, failure, and additional activity use integrated progressive disclosure rather than nested cards. The renderer now derives navigation, selection, elevated surface, border, shadow, radius, typography, rail-width, and motion decisions from one shared token block.",
   "ticket_id": "ticket-reset-shell-material-hierarchy"
 }

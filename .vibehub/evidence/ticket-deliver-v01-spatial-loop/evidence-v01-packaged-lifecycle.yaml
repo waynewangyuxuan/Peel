@@ -2,6 +2,15 @@
   "acceptance_ids": [
     "packaged-desktop-lifecycle"
   ],
+  "acceptance_revisions": [
+    {
+      "acceptance_id": "packaged-desktop-lifecycle",
+      "identity": "sha256:3b2611eb3e57c538f935d291eee42e0e7963a29bbafad83ceb9f6ee96efa94d4",
+      "revision": 1
+    }
+  ],
+  "binding_origin": "reconstructed",
+  "binding_state": "bound",
   "evidence_id": "evidence-v01-packaged-lifecycle",
   "kind": "ticket_evidence",
   "origin": "agent",
@@ -16,7 +25,7 @@
     "command:npm run verify:live-codex --workspace @peel/desktop",
     "verification:detached clean checkout npm ci --legacy-peer-deps; npm run build; npm test; npm run package:desktop"
   ],
-  "schema_version": 1,
+  "schema_version": 2,
   "summary": "Baseline commit 39194ada8bed962fa65f99efd1bb2cc7bd4ecf2b passed detached clean-checkout install/build/test/package. The repaired package launches outside Vite twice and restores an edit made immediately before close: Main requests a renderer flush, waits for acknowledgement, then shuts down App Server. Serialized atomic state transactions and stale-renderer merges preserve Space, Draft, Scroll, Node, title, and Camera updates under overlap. The ASAR package includes the unpacked native Voice helper/privacy metadata, and the read-only live check connected to local Codex and listed 50 Threads.",
   "ticket_id": "ticket-deliver-v01-spatial-loop"
 }

@@ -1,0 +1,25 @@
+{
+  "accepted_acceptance_ids": [
+    "safe-math-typesetting",
+    "streaming-and-copy-fidelity",
+    "math-regression-evidence"
+  ],
+  "binding_origin": "reconstructed",
+  "binding_state": "bound",
+  "closed_at": "2026-09-17T18:43:49Z",
+  "contract_revision": {
+    "identity": "sha256:0cb82608424499f3f2370b166affe87991c0e7d6e8a67523276579f5bcad3f40",
+    "revision": 1
+  },
+  "evidence_ids": [
+    "evidence-safe-focus-math-typesetting",
+    "evidence-focus-math-regression"
+  ],
+  "kind": "ticket_outcome",
+  "outcome_id": "contract-v1",
+  "schema_version": 2,
+  "status": "successful",
+  "summary": "Independent closeout accepted all three criteria. The maintained remark-math and rehype-katex path produces accessible HTML plus MathML for inline and display formulas, including the reported Attention expression, with trust disabled, raw HTML skipped, unsafe URLs filtered, and code and technical-output routes isolated. User, assistant, Reasoning, Subagent, and error prose all retain the shared safe Markdown route. Delimiter normalization is render-only, excludes fenced and inline code, leaves incomplete streams readable, and malformed completed math degrades without throwing. Display formulas contain their width with local horizontal scrolling and preserve source semantics through TeX annotation and selectable visible output. A fresh production build and all 57 desktop tests passed. The rebuilt Electron journey passed the in-scope MathML, source, selection, overflow, page-containment, Focus Markdown, Activity, streaming, scroll, Branch, and Approval assertions before failing only much later at the unrelated existing resume-alert assertion.",
+  "ticket_id": "ticket-fix-focus-math-and-branch-affordance",
+  "unresolved_acceptance_ids": []
+}

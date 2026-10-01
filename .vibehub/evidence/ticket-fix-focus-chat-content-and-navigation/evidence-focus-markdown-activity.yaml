@@ -3,6 +3,20 @@
     "markdown-gfm-fidelity",
     "activity-hierarchy"
   ],
+  "acceptance_revisions": [
+    {
+      "acceptance_id": "markdown-gfm-fidelity",
+      "identity": "sha256:9a5b48239afb97aeead01f2bfd730a420dd49833bba82bc27e7d02dba7dadfa7",
+      "revision": 1
+    },
+    {
+      "acceptance_id": "activity-hierarchy",
+      "identity": "sha256:fc2682ba2c13c0ad9e20972f2d8952f970042a417a1e1d7e8512cf5a7da6e3b0",
+      "revision": 1
+    }
+  ],
+  "binding_origin": "reconstructed",
+  "binding_state": "bound",
   "evidence_id": "evidence-focus-markdown-activity",
   "kind": "ticket_evidence",
   "origin": "agent",
@@ -19,7 +33,7 @@
     "https://github.com/remarkjs/react-markdown/blob/main/readme.md",
     "https://github.com/remarkjs/remark-gfm/blob/main/readme.md"
   ],
-  "schema_version": 1,
+  "schema_version": 2,
   "summary": "Assistant messages and Reasoning now share react-markdown with remark-gfm and remark-breaks, raw HTML disabled, the renderer's safe URL transform retained, and external links isolated. Unit proof renders headings, emphasis, blockquotes, ordered lists, task lists, tables, strikethrough, inline/fenced code, links, soft breaks, and a partial streaming caret while proving script markup and javascript URLs do not survive. Activity presentation now uses compact disclosure rows with human summaries (Reasoning, Ran command, Changed file, Subagent activity, Codex hit an issue), immediate Working/Needs attention states, completed detail collapsed by default, keyboard-native details, Markdown inside prose detail, and on-demand technical output. Visual inspection confirmed semantic table layout and Chat-like activity hierarchy instead of raw pipe text, literal emphasis syntax, or heavy generic cards.",
   "ticket_id": "ticket-fix-focus-chat-content-and-navigation"
 }

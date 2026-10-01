@@ -2,6 +2,15 @@
   "acceptance_ids": [
     "focus-fidelity"
   ],
+  "acceptance_revisions": [
+    {
+      "acceptance_id": "focus-fidelity",
+      "identity": "sha256:7cbb2fd73e4f6f8a1e16d7ee6cf6034bb15db482750a8e4f84286434662a674b",
+      "revision": 1
+    }
+  ],
+  "binding_origin": "reconstructed",
+  "binding_state": "bound",
   "evidence_id": "evidence-v01-focus-fidelity",
   "kind": "ticket_evidence",
   "origin": "agent",
@@ -13,7 +22,7 @@
     "apps/desktop/e2e/v01-journey.spec.ts",
     "apps/desktop/VERIFICATION.md"
   ],
-  "schema_version": 1,
+  "schema_version": 2,
   "summary": "Focus is a screen-space transcript/composer surface that renders user and agent messages, selectable safe Markdown, horizontally scrolling unwrapped fenced code, reasoning, commands, file changes, errors, approvals, folded Subagent Activity, image/audio attachments, and an explicit Copy-ID/open-Codex fallback. Rapid deltas use a leading/trailing throttle; near-bottom content follows, deliberate upward scroll and active selection do not jump. Keyed per-Thread surfaces prevent Voice/attachment crossover, and cancellation/current-Thread guards prove exact Draft/Scroll restoration under switching, out-of-order reads, immediate close, and restart.",
   "ticket_id": "ticket-deliver-v01-spatial-loop"
 }

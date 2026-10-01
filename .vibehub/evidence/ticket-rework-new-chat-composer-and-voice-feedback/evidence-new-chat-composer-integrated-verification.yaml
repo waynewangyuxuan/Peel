@@ -2,6 +2,15 @@
   "acceptance_ids": [
     "integrated-ui-verification"
   ],
+  "acceptance_revisions": [
+    {
+      "acceptance_id": "integrated-ui-verification",
+      "identity": "sha256:6701269de76c498c0237d8b24c64d3ff64ce48828d7f9ae46183259d31ebe0bc",
+      "revision": 1
+    }
+  ],
+  "binding_origin": "reconstructed",
+  "binding_state": "bound",
   "evidence_id": "evidence-new-chat-composer-integrated-verification",
   "kind": "ticket_evidence",
   "origin": "agent",
@@ -19,7 +28,7 @@
     "screenshot:apps/desktop/test-results/ui-voice-recording.png",
     "screenshot:apps/desktop/test-results/ui-voice-transcribing.png"
   ],
-  "schema_version": 1,
+  "schema_version": 2,
   "summary": "At the committed state, all repository tests, production builds, the full Electron journey, the packaged lifecycle check, and real Apple Speech verification pass. Welcome, empty New Chat, recording, and transcribing screenshots were visually reviewed against the preserved Demo, and the freshly packaged app was relaunched as the only active Peel instance.",
   "ticket_id": "ticket-rework-new-chat-composer-and-voice-feedback"
 }

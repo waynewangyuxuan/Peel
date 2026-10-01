@@ -5,6 +5,30 @@
     "rename-drag-and-selection-fidelity",
     "overview-entry-regression"
   ],
+  "acceptance_revisions": [
+    {
+      "acceptance_id": "consistent-current-thread-entry",
+      "identity": "sha256:04b4edea413d9d882416ed32f022bad02d1c53d5a04f11a7c916e99cf55c6579",
+      "revision": 1
+    },
+    {
+      "acceptance_id": "explicit-parent-return",
+      "identity": "sha256:3f2d36bf3b42bb23b1beb4da37125cf631a1ff621a2f4cfb2c4728447a21c7d1",
+      "revision": 1
+    },
+    {
+      "acceptance_id": "rename-drag-and-selection-fidelity",
+      "identity": "sha256:5b9a3c6fc5d648c1cac961251a7cc97e306b241a3ae7c70ba2c38589f336d9c2",
+      "revision": 1
+    },
+    {
+      "acceptance_id": "overview-entry-regression",
+      "identity": "sha256:f1b9cc157d80a5365739b1ba59bf2900d9d4a6c0de436d936003209ebac64d58",
+      "revision": 1
+    }
+  ],
+  "binding_origin": "reconstructed",
+  "binding_state": "bound",
   "evidence_id": "evidence-overview-thread-entry-electron-regression",
   "kind": "ticket_evidence",
   "origin": "agent",
@@ -21,7 +45,7 @@
     "command:npm run test --workspace @peel/desktop",
     "command:git diff --check"
   ],
-  "schema_version": 1,
+  "schema_version": 2,
   "summary": "Production Overview now gives passive card regions deterministic current-node ownership on pointer-up, makes title single-click open the represented Thread while preserving delayed double-click rename, keeps Latest user/result entry within that Thread, and moves parent navigation into a bounded labeled Parent button that preserves the exact fork Turn. A focused production-Electron three-node Root/Child/Sibling regression passed 1/1 after exercising title, passive provenance copy, latest result, explicit parent return and highlight, delayed-read rapid sibling switching, drag-without-open, keyboard entry, and restart restoration. The existing semantic-geometry Electron regression also passed, preserving zoom geometry, real edges, explicit Fit, saved positions, and drag semantics. The complete v0.1 journey rerun traversed its Overview, rename, exact-turn, scale, keyboard, and restart stages before reaching the separately known late failed-resume alert assertion; that unrelated terminal failure is not counted as passing evidence.",
   "ticket_id": "ticket-make-overview-thread-entry-unambiguous"
 }

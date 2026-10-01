@@ -2,21 +2,34 @@
   "acceptance": [
     {
       "acceptance_id": "canonical-native-icon-assets",
-      "criterion": "Checked-in native icon assets reuse the exact accepted Phase mark geometry, include a crisp 1024px source/render plus a valid multi-size macOS icns, require no runtime network or font, and can be regenerated reproducibly from a repository script without changing the renderer mark."
+      "criterion": "Checked-in native icon assets reuse the exact accepted Phase mark geometry, include a crisp 1024px source/render plus a valid multi-size macOS icns, require no runtime network or font, and can be regenerated reproducibly from a repository script without changing the renderer mark.",
+      "identity": "sha256:fc907f603dbe70d7a76963289c755a395c1ccf308db2ba03fcf641f12a377965",
+      "revision": 1,
+      "state": "active"
     },
     {
       "acceptance_id": "development-launch-identity",
-      "criterion": "On macOS, an unpackaged Electron launch sets the Peel application name and Dock icon from the checked-in native asset before the first BrowserWindow is shown; unsupported platforms remain safe and startup behavior is otherwise unchanged."
-    },
-    {
-      "acceptance_id": "packaged-app-identity",
-      "criterion": "The production package command embeds the Peel icns in Peel.app, Info.plist points to the embedded icon, and the packaged executable presents Peel rather than Electron in Finder, Dock, and the app switcher."
+      "criterion": "On macOS, an unpackaged Electron launch sets the Peel application name and Dock icon from the checked-in native asset before the first BrowserWindow is shown; unsupported platforms remain safe and startup behavior is otherwise unchanged.",
+      "identity": "sha256:c5e43387941e6c60c42424a6f0fcdcbff0d07437158af4c430ad26939c6acd6c",
+      "revision": 1,
+      "state": "active"
     },
     {
       "acceptance_id": "native-icon-verification",
-      "criterion": "Automated verification checks source dimensions/non-emptiness, the required icns representations, packaged Info.plist/resource linkage, and the development icon path; Desktop typecheck/build/tests and the packaged smoke journey pass without startup or state-restoration regression."
+      "criterion": "Automated verification checks source dimensions/non-emptiness, the required icns representations, packaged Info.plist/resource linkage, and the development icon path; Desktop typecheck/build/tests and the packaged smoke journey pass without startup or state-restoration regression.",
+      "identity": "sha256:23f1d6a6bfb8a36006c28e0ac0db85a9d47a3af59ecd26181fa494e7c44ccc36",
+      "revision": 1,
+      "state": "active"
+    },
+    {
+      "acceptance_id": "packaged-app-identity",
+      "criterion": "The production package command embeds the Peel icns in Peel.app, Info.plist points to the embedded icon, and the packaged executable presents Peel rather than Electron in Finder, Dock, and the app switcher.",
+      "identity": "sha256:c58c632da23e7be608b5d39414ec48fe9e60baf15fc14297a2caf27497998b10",
+      "revision": 1,
+      "state": "active"
     }
   ],
+  "active_contract_revision": 1,
   "constraints": [
     "Reuse the selected Phase mark exactly; do not redesign the logo or introduce a competing brand symbol.",
     "Keep icon loading local and synchronous enough to establish native identity before showing the first window; do not add a splash delay, remote asset request, or font dependency.",
@@ -27,7 +40,7 @@
   "context_refs": [
     {
       "purpose": "Records successful acceptance of the exact Phase brand mark already used by Peel.",
-      "ref": ".vibehub/outcomes/ticket-polish-space-sidebar.yaml"
+      "ref": ".vibehub/outcomes/ticket-polish-space-sidebar/contract-v1.yaml"
     },
     {
       "purpose": "Defines the canonical accepted Phase path and split geometry to reuse.",
@@ -46,6 +59,34 @@
       "ref": "apps/desktop/scripts/verify-package.mjs"
     }
   ],
+  "contract_revisions": [
+    {
+      "acceptance_revisions": [
+        {
+          "acceptance_id": "canonical-native-icon-assets",
+          "identity": "sha256:fc907f603dbe70d7a76963289c755a395c1ccf308db2ba03fcf641f12a377965",
+          "revision": 1
+        },
+        {
+          "acceptance_id": "development-launch-identity",
+          "identity": "sha256:c5e43387941e6c60c42424a6f0fcdcbff0d07437158af4c430ad26939c6acd6c",
+          "revision": 1
+        },
+        {
+          "acceptance_id": "native-icon-verification",
+          "identity": "sha256:23f1d6a6bfb8a36006c28e0ac0db85a9d47a3af59ecd26181fa494e7c44ccc36",
+          "revision": 1
+        },
+        {
+          "acceptance_id": "packaged-app-identity",
+          "identity": "sha256:c58c632da23e7be608b5d39414ec48fe9e60baf15fc14297a2caf27497998b10",
+          "revision": 1
+        }
+      ],
+      "identity": "sha256:d8ba949eb5018ca67dede6be7e9c0330fca1d258bd3ca88dd209d286c8d2576b",
+      "revision": 1
+    }
+  ],
   "deliveries": [],
   "kind": "ticket",
   "maturity": "firm",
@@ -54,6 +95,7 @@
     "conversation:2026-09-17-add-peel-native-launch-logo"
   ],
   "relations": [],
-  "schema_version": 2,
+  "revision_state": "bound",
+  "schema_version": 3,
   "ticket_id": "ticket-add-peel-desktop-app-icon"
 }

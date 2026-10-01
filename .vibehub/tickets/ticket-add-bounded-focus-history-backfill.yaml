@@ -1,34 +1,56 @@
 {
   "acceptance": [
     {
-      "acceptance_id": "bounded-production-focus-entry",
-      "criterion": "A production-build Electron A/B harness exercises the ordinary App to Focus to Transcript to MarkdownContent route with deterministic 10/100/500-Turn fixtures, at least two warmups, and at least seven measured baseline/backfill samples. For 500 Turns, median first-content and through-paint time with backfill are each at most 50% of the same-run full-mount baseline and no task of 50 ms or longer occurs before first content. For 10 and 100 Turns, median first-content and through-paint regress by no more than the greater of 10% or 5 ms. The harness records App Server read, snapshot construction, IPC, React commit, paint, long tasks, DOM descendants, and mounted Turn count."
-    },
-    {
       "acceptance_id": "anchor-aware-initial-range",
-      "criterion": "Initial mounting includes the correct bounded range for each entry scenario: the newest live tail for ordinary bottom entry, the saved Scroll anchor when returning to a Thread, the exact highlighted Parent Turn reached by Branched from, and the requested completed Turn for any direct Branch/highlight navigation. The target is present before restoration or highlight is declared complete, with no temporary jump to an unrelated range."
-    },
-    {
-      "acceptance_id": "stable-incremental-history-prepend",
-      "criterion": "Approaching the mounted history boundary incrementally prepends older authoritative Turns in scheduled bounded chunks. On deterministic text, code, math, attachment, Activity, command, file-change, notice, error, approval, and unknown-item fixtures, the visible anchor moves by no more than 1 CSS pixel after each settled prepend; no individual backfill task reaches 50 ms, ordering and exact Turn IDs remain unchanged, and repeatedly loading earlier history eventually exposes every Turn with exact selectable text and Branch anchors."
+      "criterion": "Initial mounting includes the correct bounded range for each entry scenario: the newest live tail for ordinary bottom entry, the saved Scroll anchor when returning to a Thread, the exact highlighted Parent Turn reached by Branched from, and the requested completed Turn for any direct Branch/highlight navigation. The target is present before restoration or highlight is declared complete, with no temporary jump to an unrelated range.",
+      "identity": "sha256:75ed1cc131b828381e8308b7357aaec2a7741b133ce73881ef8378d353c3a591",
+      "revision": 1,
+      "state": "active"
     },
     {
       "acceptance_id": "backfill-live-tail-responsiveness",
-      "criterion": "While historical backfill is pending or running, Composer input, code copy, Branch from here, Open in Codex, request/approval actions, and user scrolling remain operable. A replay with 100 completed Turns, a live tail, and 36 representative deltas keeps the live item visible, preserves user-controlled follow-bottom, processes all deltas, produces zero settled historical Turn or Markdown rerenders, and introduces no streaming task of 50 ms or longer."
-    },
-    {
-      "acceptance_id": "history-restoration-and-restart-fidelity",
-      "criterion": "Automated Focus coverage proves per-Thread Draft and Scroll restoration across switching and full app restart, returning from Parent to Child, highlighted Parent navigation, local horizontal overflow, math/CJK layout, remote-image placeholders, attachments, and exact completed-Turn Branch anchors both before and after the full history has backfilled."
-    },
-    {
-      "acceptance_id": "selection-and-image-anchor-stability",
-      "criterion": "An active text selection spanning multiple mounted Turns remains exact while older history is prepended, and after full backfill an automated selection across distant Turns returns the exact source text. Bounded local data: and blob: images retain their accepted sizing behavior; settling those images or prepending history around them moves the deterministic visible anchor by no more than 1 CSS pixel. Remote media remains click-only and cannot load automatically."
+      "criterion": "While historical backfill is pending or running, Composer input, code copy, Branch from here, Open in Codex, request/approval actions, and user scrolling remain operable. A replay with 100 completed Turns, a live tail, and 36 representative deltas keeps the live item visible, preserves user-controlled follow-bottom, processes all deltas, produces zero settled historical Turn or Markdown rerenders, and introduces no streaming task of 50 ms or longer.",
+      "identity": "sha256:d03c19ac10f5a5857d6e13aabeb488847242cd2360bc226ca7758a834b7ca791",
+      "revision": 1,
+      "state": "active"
     },
     {
       "acceptance_id": "bounded-backfill-architecture-boundary",
-      "criterion": "The implementation keeps Codex ReducedThread data authoritative and derives only a mounted Turn range plus restoration anchor; it does not copy conversation content into a parallel store, replace the Markdown runtime, add full transcript virtualization or content-visibility, omit history permanently, or weaken raw-HTML, URL, remote-media, parser-failure, or exact-copy safety boundaries."
+      "criterion": "The implementation keeps Codex ReducedThread data authoritative and derives only a mounted Turn range plus restoration anchor; it does not copy conversation content into a parallel store, replace the Markdown runtime, add full transcript virtualization or content-visibility, omit history permanently, or weaken raw-HTML, URL, remote-media, parser-failure, or exact-copy safety boundaries.",
+      "identity": "sha256:92cc12eee6cd055e7dc6294ed234c6ad0270d9e8693c33f0a85cf40fce51d86a",
+      "revision": 1,
+      "state": "active"
+    },
+    {
+      "acceptance_id": "bounded-production-focus-entry",
+      "criterion": "A production-build Electron A/B harness exercises the ordinary App to Focus to Transcript to MarkdownContent route with deterministic 10/100/500-Turn fixtures, at least two warmups, and at least seven measured baseline/backfill samples. For 500 Turns, median first-content and through-paint time with backfill are each at most 50% of the same-run full-mount baseline and no task of 50 ms or longer occurs before first content. For 10 and 100 Turns, median first-content and through-paint regress by no more than the greater of 10% or 5 ms. The harness records App Server read, snapshot construction, IPC, React commit, paint, long tasks, DOM descendants, and mounted Turn count.",
+      "identity": "sha256:21469abc50ed7d711a1309c2dd1958ca7e0cb5da3680f741aeee14d46d6382a8",
+      "revision": 1,
+      "state": "active"
+    },
+    {
+      "acceptance_id": "history-restoration-and-restart-fidelity",
+      "criterion": "Automated Focus coverage proves per-Thread Draft and Scroll restoration across switching and full app restart, returning from Parent to Child, highlighted Parent navigation, local horizontal overflow, math/CJK layout, remote-image placeholders, attachments, and exact completed-Turn Branch anchors both before and after the full history has backfilled.",
+      "identity": "sha256:e440a6ab9f145c0080faa8a48695c16d612bae14b879e21cfd89525ee45013a4",
+      "revision": 1,
+      "state": "active"
+    },
+    {
+      "acceptance_id": "selection-and-image-anchor-stability",
+      "criterion": "An active text selection spanning multiple mounted Turns remains exact while older history is prepended, and after full backfill an automated selection across distant Turns returns the exact source text. Bounded local data: and blob: images retain their accepted sizing behavior; settling those images or prepending history around them moves the deterministic visible anchor by no more than 1 CSS pixel. Remote media remains click-only and cannot load automatically.",
+      "identity": "sha256:7a3067be83d23160320020b0b316f2339bae8768ebe26137e9d28a1964080eae",
+      "revision": 1,
+      "state": "active"
+    },
+    {
+      "acceptance_id": "stable-incremental-history-prepend",
+      "criterion": "Approaching the mounted history boundary incrementally prepends older authoritative Turns in scheduled bounded chunks. On deterministic text, code, math, attachment, Activity, command, file-change, notice, error, approval, and unknown-item fixtures, the visible anchor moves by no more than 1 CSS pixel after each settled prepend; no individual backfill task reaches 50 ms, ordering and exact Turn IDs remain unchanged, and repeatedly loading earlier history eventually exposes every Turn with exact selectable text and Branch anchors.",
+      "identity": "sha256:ebdb10f0e0a69e6ceed139bb2c60a649d9ab7dc47d4ffe821f608d1e4f2c2417",
+      "revision": 1,
+      "state": "active"
     }
   ],
+  "active_contract_revision": 1,
   "constraints": [
     "Keep the complete Codex ReducedThread snapshot authoritative; bounded mounting is presentation state, not a second chat-history model.",
     "Preserve exact Turn IDs, item ordering, completion, request, notice, error, lineage, and Branch anchor semantics across not-yet-mounted and mounted history.",
@@ -75,6 +97,49 @@
       "ref": ".vibehub/evidence/ticket-optimize-native-transcript-rendering/evidence-native-transcript-identity-and-fidelity.yaml"
     }
   ],
+  "contract_revisions": [
+    {
+      "acceptance_revisions": [
+        {
+          "acceptance_id": "anchor-aware-initial-range",
+          "identity": "sha256:75ed1cc131b828381e8308b7357aaec2a7741b133ce73881ef8378d353c3a591",
+          "revision": 1
+        },
+        {
+          "acceptance_id": "backfill-live-tail-responsiveness",
+          "identity": "sha256:d03c19ac10f5a5857d6e13aabeb488847242cd2360bc226ca7758a834b7ca791",
+          "revision": 1
+        },
+        {
+          "acceptance_id": "bounded-backfill-architecture-boundary",
+          "identity": "sha256:92cc12eee6cd055e7dc6294ed234c6ad0270d9e8693c33f0a85cf40fce51d86a",
+          "revision": 1
+        },
+        {
+          "acceptance_id": "bounded-production-focus-entry",
+          "identity": "sha256:21469abc50ed7d711a1309c2dd1958ca7e0cb5da3680f741aeee14d46d6382a8",
+          "revision": 1
+        },
+        {
+          "acceptance_id": "history-restoration-and-restart-fidelity",
+          "identity": "sha256:e440a6ab9f145c0080faa8a48695c16d612bae14b879e21cfd89525ee45013a4",
+          "revision": 1
+        },
+        {
+          "acceptance_id": "selection-and-image-anchor-stability",
+          "identity": "sha256:7a3067be83d23160320020b0b316f2339bae8768ebe26137e9d28a1964080eae",
+          "revision": 1
+        },
+        {
+          "acceptance_id": "stable-incremental-history-prepend",
+          "identity": "sha256:ebdb10f0e0a69e6ceed139bb2c60a649d9ab7dc47d4ffe821f608d1e4f2c2417",
+          "revision": 1
+        }
+      ],
+      "identity": "sha256:1328eb1e1a060b19c66315cfced2e7a088bccfe29f29764b91ffa5d0691fdc98",
+      "revision": 1
+    }
+  ],
   "deliveries": [],
   "kind": "ticket",
   "maturity": "firm",
@@ -90,6 +155,7 @@
       "type": "depends_on"
     }
   ],
-  "schema_version": 2,
+  "revision_state": "bound",
+  "schema_version": 3,
   "ticket_id": "ticket-add-bounded-focus-history-backfill"
 }

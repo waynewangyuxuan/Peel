@@ -2,17 +2,27 @@
   "acceptance": [
     {
       "acceptance_id": "friendly-no-speech-retry",
-      "criterion": "Native/helper variants including `No speech detected`, an empty recognized transcript, and a too-short or unusable recording resolve in Focus as one concise non-technical no-speech notice that asks the user to try again and speak a little longer. The notice contains no `Error invoking remote method`, IPC channel, stack/error prefix, or recognizer implementation language, and it clears when the next recording starts."
+      "criterion": "Native/helper variants including `No speech detected`, an empty recognized transcript, and a too-short or unusable recording resolve in Focus as one concise non-technical no-speech notice that asks the user to try again and speak a little longer. The notice contains no `Error invoking remote method`, IPC channel, stack/error prefix, or recognizer implementation language, and it clears when the next recording starts.",
+      "identity": "sha256:af21e59ac1253ea6502e99187a69dd747c4be3ace05e2ee429616384605ee185",
+      "revision": 1,
+      "state": "active"
     },
     {
       "acceptance_id": "sanitized-voice-failure-safety",
-      "criterion": "Every Voice capture or transcription rejection removes repeated Electron IPC and `Error:` wrappers before presentation, leaves the exact existing per-Thread Draft unchanged, returns Dictation to an immediately retryable idle control, and reserves error styling for actual failures rather than the ordinary no-speech retry state."
+      "criterion": "Every Voice capture or transcription rejection removes repeated Electron IPC and `Error:` wrappers before presentation, leaves the exact existing per-Thread Draft unchanged, returns Dictation to an immediately retryable idle control, and reserves error styling for actual failures rather than the ordinary no-speech retry state.",
+      "identity": "sha256:be9844ee042da73e4ed4cc870eb1a67ec85b153b7f6150c9bf64b277191c4ad3",
+      "revision": 1,
+      "state": "active"
     },
     {
       "acceptance_id": "voice-error-regression-proof",
-      "criterion": "Automated unit and production Electron journey tests exercise the exact wrapped `peel:voice:transcribe` no-speech rejection, friendly notice and retry clearing, sanitized real failure, Draft preservation, and zero auto-send; repository tests and the desktop production build pass."
+      "criterion": "Automated unit and production Electron journey tests exercise the exact wrapped `peel:voice:transcribe` no-speech rejection, friendly notice and retry clearing, sanitized real failure, Draft preservation, and zero auto-send; repository tests and the desktop production build pass.",
+      "identity": "sha256:976a3ce5b898e21a4ecb8c6da616a719c22a397e7cfcd5422db6595c2b8f847d",
+      "revision": 1,
+      "state": "active"
     }
   ],
+  "active_contract_revision": 1,
   "constraints": [
     "Voice Dictation must remain Record → Transcribe → editable Draft → explicit Send and must never auto-send.",
     "Do not hide permission, capture, recognizer, or packaging failures; translate them into concise actionable copy while preserving their real distinction.",
@@ -34,10 +44,33 @@
       "ref": "docs/product/source/peel-demo-v0-original.html"
     }
   ],
+  "contract_revisions": [
+    {
+      "acceptance_revisions": [
+        {
+          "acceptance_id": "friendly-no-speech-retry",
+          "identity": "sha256:af21e59ac1253ea6502e99187a69dd747c4be3ace05e2ee429616384605ee185",
+          "revision": 1
+        },
+        {
+          "acceptance_id": "sanitized-voice-failure-safety",
+          "identity": "sha256:be9844ee042da73e4ed4cc870eb1a67ec85b153b7f6150c9bf64b277191c4ad3",
+          "revision": 1
+        },
+        {
+          "acceptance_id": "voice-error-regression-proof",
+          "identity": "sha256:976a3ce5b898e21a4ecb8c6da616a719c22a397e7cfcd5422db6595c2b8f847d",
+          "revision": 1
+        }
+      ],
+      "identity": "sha256:6b3317a8b086dafe148b43680921b70299a3ba038777c3f68107ff0e0de67ce6",
+      "revision": 1
+    }
+  ],
+  "deliveries": [],
   "kind": "ticket",
   "maturity": "firm",
   "outcome": "Voice Dictation treats an empty recognition result as a normal retryable listening miss and never exposes Electron IPC wrappers or raw speech-helper errors in the Composer.",
-  "deliveries": [],
   "provenance_refs": [
     "conversation:2026-08-27-voice-no-speech-raw-ipc-error"
   ],
@@ -48,6 +81,7 @@
       "type": "depends_on"
     }
   ],
-  "schema_version": 2,
+  "revision_state": "bound",
+  "schema_version": 3,
   "ticket_id": "ticket-fix-voice-no-speech-recovery"
 }

@@ -2,6 +2,15 @@
   "acceptance_ids": [
     "realistic-visual-regression-proof"
   ],
+  "acceptance_revisions": [
+    {
+      "acceptance_id": "realistic-visual-regression-proof",
+      "identity": "sha256:2cfe2d5464a95ec80fe64126377289f81cca7f9ccfba9922f012c54e4496da05",
+      "revision": 1
+    }
+  ],
+  "binding_origin": "reconstructed",
+  "binding_state": "bound",
   "evidence_id": "evidence-chat-reading-surface-regression",
   "kind": "ticket_evidence",
   "origin": "agent",
@@ -20,7 +29,7 @@
     "command:npm run verify:package --workspace @peel/desktop returns ok",
     "command:npm run verify:live-codex --workspace @peel/desktop lists 30 first-page and 60 paginated real Chats"
   ],
-  "schema_version": 1,
-  "summary": "The realistic bilingual fixture covers semantic quotes, nested and task lists, GFM tables, long highlighted TypeScript, command success and failure, exact output, a highlighted file diff, Reasoning, Subagent prose, error prose, unsafe content, unknown future items, and incomplete streaming. The full Electron journey asserts semantic DOM, sanitization, selection, local code overflow, clipboard feedback, expanded Reasoning and technical detail, long-title discovery, and wide/compact screenshots while retaining Picker pagination/races, Focus navigation, Fork and recovery, Worktree, Voice, Approval, Overview at scale, Diff, Draft, scroll, persistence, and restart behavior. All repository tests/build, production packaging, installed Codex Chat pagination, and direct screenshot inspection pass at the recorded HEAD."
-  ,"ticket_id": "ticket-rebuild-chat-reading-surface"
+  "schema_version": 2,
+  "summary": "The realistic bilingual fixture covers semantic quotes, nested and task lists, GFM tables, long highlighted TypeScript, command success and failure, exact output, a highlighted file diff, Reasoning, Subagent prose, error prose, unsafe content, unknown future items, and incomplete streaming. The full Electron journey asserts semantic DOM, sanitization, selection, local code overflow, clipboard feedback, expanded Reasoning and technical detail, long-title discovery, and wide/compact screenshots while retaining Picker pagination/races, Focus navigation, Fork and recovery, Worktree, Voice, Approval, Overview at scale, Diff, Draft, scroll, persistence, and restart behavior. All repository tests/build, production packaging, installed Codex Chat pagination, and direct screenshot inspection pass at the recorded HEAD.",
+  "ticket_id": "ticket-rebuild-chat-reading-surface"
 }

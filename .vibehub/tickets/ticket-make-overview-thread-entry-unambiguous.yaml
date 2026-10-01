@@ -2,21 +2,34 @@
   "acceptance": [
     {
       "acceptance_id": "consistent-current-thread-entry",
-      "criterion": "Pointer activation on the ordinary card body, title, provenance copy, Latest user, and Latest result regions opens the represented Thread, and keyboard activation of the card does the same; no visually passive card region silently redirects to the parent."
+      "criterion": "Pointer activation on the ordinary card body, title, provenance copy, Latest user, and Latest result regions opens the represented Thread, and keyboard activation of the card does the same; no visually passive card region silently redirects to the parent.",
+      "identity": "sha256:04b4edea413d9d882416ed32f022bad02d1c53d5a04f11a7c916e99cf55c6579",
+      "revision": 1,
+      "state": "active"
     },
     {
       "acceptance_id": "explicit-parent-return",
-      "criterion": "A non-Root card retains one clearly labeled and spatially bounded parent-return control; only that control returns to the parent Thread and highlights the exact forkedAtTurnId, while Root cards expose no parent action."
-    },
-    {
-      "acceptance_id": "rename-drag-and-selection-fidelity",
-      "criterion": "Double-click rename, card drag, active-path styling, rapid Root/Child/Sibling switching, and repeated Overview/Focus transitions remain reliable; a delayed stale Thread read cannot replace the visibly selected Thread, and dragging never opens a conversation."
+      "criterion": "A non-Root card retains one clearly labeled and spatially bounded parent-return control; only that control returns to the parent Thread and highlights the exact forkedAtTurnId, while Root cards expose no parent action.",
+      "identity": "sha256:3f2d36bf3b42bb23b1beb4da37125cf631a1ff621a2f4cfb2c4728447a21c7d1",
+      "revision": 1,
+      "state": "active"
     },
     {
       "acceptance_id": "overview-entry-regression",
-      "criterion": "Automated production-Electron coverage exercises a deterministic three-node Root/Child/Sibling fixture through the distinct card hit regions, the explicit parent action and exact-turn highlight, rapid switching, and restart persistence, with the header and transcript always matching the intended Thread."
+      "criterion": "Automated production-Electron coverage exercises a deterministic three-node Root/Child/Sibling fixture through the distinct card hit regions, the explicit parent action and exact-turn highlight, rapid switching, and restart persistence, with the header and transcript always matching the intended Thread.",
+      "identity": "sha256:f1b9cc157d80a5365739b1ba59bf2900d9d4a6c0de436d936003209ebac64d58",
+      "revision": 1,
+      "state": "active"
+    },
+    {
+      "acceptance_id": "rename-drag-and-selection-fidelity",
+      "criterion": "Double-click rename, card drag, active-path styling, rapid Root/Child/Sibling switching, and repeated Overview/Focus transitions remain reliable; a delayed stale Thread read cannot replace the visibly selected Thread, and dragging never opens a conversation.",
+      "identity": "sha256:5b9a3c6fc5d648c1cac961251a7cc97e306b241a3ae7c70ba2c38589f336d9c2",
+      "revision": 1,
+      "state": "active"
     }
   ],
+  "active_contract_revision": 1,
   "constraints": [
     "Preserve the existing Fork topology, stable node positions, camera behavior, card data hierarchy, and active-path semantics.",
     "Preserve exact parent-turn return as an explicit capability; do not remove it or make the whole card a parent shortcut.",
@@ -27,7 +40,7 @@
   "context_refs": [
     {
       "purpose": "Preserves the accepted Overview card anatomy, explicit provenance, interactions, stable spatial layout, and production-Electron evidence baseline.",
-      "ref": ".vibehub/outcomes/ticket-rebuild-overview-demo-fidelity.yaml"
+      "ref": ".vibehub/outcomes/ticket-rebuild-overview-demo-fidelity/contract-v1.yaml"
     },
     {
       "purpose": "Defines selected-Thread fidelity, per-Thread restoration, and stale-read protection when entering Focus.",
@@ -42,6 +55,34 @@
       "ref": "apps/desktop/src/renderer/App.tsx"
     }
   ],
+  "contract_revisions": [
+    {
+      "acceptance_revisions": [
+        {
+          "acceptance_id": "consistent-current-thread-entry",
+          "identity": "sha256:04b4edea413d9d882416ed32f022bad02d1c53d5a04f11a7c916e99cf55c6579",
+          "revision": 1
+        },
+        {
+          "acceptance_id": "explicit-parent-return",
+          "identity": "sha256:3f2d36bf3b42bb23b1beb4da37125cf631a1ff621a2f4cfb2c4728447a21c7d1",
+          "revision": 1
+        },
+        {
+          "acceptance_id": "overview-entry-regression",
+          "identity": "sha256:f1b9cc157d80a5365739b1ba59bf2900d9d4a6c0de436d936003209ebac64d58",
+          "revision": 1
+        },
+        {
+          "acceptance_id": "rename-drag-and-selection-fidelity",
+          "identity": "sha256:5b9a3c6fc5d648c1cac961251a7cc97e306b241a3ae7c70ba2c38589f336d9c2",
+          "revision": 1
+        }
+      ],
+      "identity": "sha256:afe8f604749d9b79ecaaa9fdba4aa0ffa97c33a1ac318c2226d93cf5d81d9085",
+      "revision": 1
+    }
+  ],
   "deliveries": [],
   "kind": "ticket",
   "maturity": "firm",
@@ -51,6 +92,7 @@
     "dogfood:packaged-peel-three-node-space-hit-target-reproduction"
   ],
   "relations": [],
-  "schema_version": 2,
+  "revision_state": "bound",
+  "schema_version": 3,
   "ticket_id": "ticket-make-overview-thread-entry-unambiguous"
 }

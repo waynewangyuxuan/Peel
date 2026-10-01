@@ -4,6 +4,25 @@
     "renderer-route-matrix",
     "prose-format-and-media-matrix"
   ],
+  "acceptance_revisions": [
+    {
+      "acceptance_id": "authoritative-content-inventory",
+      "identity": "sha256:aa0ed048b2c4c0aeb9b96fea313058557ef773cb7b38433b6ab1b6e2cdfe811d",
+      "revision": 1
+    },
+    {
+      "acceptance_id": "renderer-route-matrix",
+      "identity": "sha256:211ff8af5519a8cdf734744fddebf32640b8f6c7708c80c51a978d8d19c95afd",
+      "revision": 1
+    },
+    {
+      "acceptance_id": "prose-format-and-media-matrix",
+      "identity": "sha256:8cf8bf2b82960ea5d8fab8724c7a308864675f5d336a5aefe0f9abec6b7f4a2d",
+      "revision": 1
+    }
+  ],
+  "binding_origin": "reconstructed",
+  "binding_state": "bound",
   "evidence_id": "evidence-rendering-contract-and-route-audit",
   "kind": "ticket_evidence",
   "origin": "agent",
@@ -18,7 +37,7 @@
     "command:/opt/homebrew/bin/codex app-server generate-ts --out <temporary>#2026-09-16",
     "command:/opt/homebrew/bin/codex app-server generate-ts --experimental --out <temporary>#2026-09-16"
   ],
-  "schema_version": 1,
+  "schema_version": 2,
   "summary": "The checked-in audit compares the official App Server item and delta contract with stable and experimental types generated from codex-cli 0.154.0, records content-free completed-item counts from 200 recent local sessions, maps every installed item and request family through Peel's reducer and renderer, and evaluates completed and streaming Markdown, HTML, math, code, tables, lists, links, citations, image, audio, long-text, bidi, and malformed-syntax behavior. Stable and experimental ThreadItem unions were identical at the recorded SHA-256; no standalone HTML item exists in either authority.",
   "ticket_id": "ticket-audit-codex-rendering-surface"
 }

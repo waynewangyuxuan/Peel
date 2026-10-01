@@ -1,0 +1,31 @@
+{
+  "context_id": "constraint-turn-completion-keeps-user-message",
+  "detail": "A turn/started or turn/completed snapshot replaces the turn, but it must not drop an item Peel already has when that item's id is absent from the incoming item list. The incoming copy wins when the same id appears again. This is what kept the first question on screen after Codex completed a turn without repeating the user item.",
+  "evidence": [
+    {
+      "note": "Completion merges items whose ids are missing from the incoming turn, and keeps the incoming version on an id collision.",
+      "ref": "packages/codex-app-server/src/reducer.ts"
+    }
+  ],
+  "kind": "context",
+  "relations": [
+    {
+      "target_context_id": "contract-focus-chat-fidelity",
+      "type": "relates_to"
+    }
+  ],
+  "schema_version": 1,
+  "source": {
+    "captured_at": "2026-09-30T07:50:00Z",
+    "quote": "我们的发出的第一个问题也没了",
+    "ref": "conversation:2026-09-29-focus-html-and-visualize"
+  },
+  "state": "active",
+  "summary": "Turn completion must keep a user message the payload omits",
+  "tags": [
+    "transcript",
+    "reducer",
+    "user-message"
+  ],
+  "type": "constraint"
+}

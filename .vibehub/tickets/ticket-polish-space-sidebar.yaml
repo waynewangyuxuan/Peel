@@ -2,17 +2,27 @@
   "acceptance": [
     {
       "acceptance_id": "phase-brand",
-      "criterion": "The sidebar visibly renders the existing original Phase vector mark beside readable Peel text; the loading brand uses the same mark. Reusable SVG instances have unique clip IDs and decorative/named accessibility semantics. No circular text P placeholder or runtime asset/font request is introduced."
+      "criterion": "The sidebar visibly renders the existing original Phase vector mark beside readable Peel text; the loading brand uses the same mark. Reusable SVG instances have unique clip IDs and decorative/named accessibility semantics. No circular text P placeholder or runtime asset/font request is introduced.",
+      "identity": "sha256:c3555aa80de6a71f3d2f2855d26a8cd626002a50007b2c566c83f776f1aaa822",
+      "revision": 1,
+      "state": "active"
     },
     {
       "acceptance_id": "sidebar-craft",
-      "criterion": "Brand, Spaces heading, entry actions and navigation rows have deliberate alignment, restrained neutral surface depth and a distinguishable selected state. At1440x960 and1000x720, existing sidebar widths/drag strip are retained, long names truncate with full names available, Search/New Chat remain unobstructed, and a long list scrolls without clipping the header or page overflow. Keyboard focus is visible and selected navigation is exposed semantically."
+      "criterion": "Brand, Spaces heading, entry actions and navigation rows have deliberate alignment, restrained neutral surface depth and a distinguishable selected state. At1440x960 and1000x720, existing sidebar widths/drag strip are retained, long names truncate with full names available, Search/New Chat remain unobstructed, and a long list scrolls without clipping the header or page overflow. Keyboard focus is visible and selected navigation is exposed semantically.",
+      "identity": "sha256:d4a44aec4f2576da4654d99f4973a282738e8d1eccc44915f6828ab805cdca3f",
+      "revision": 1,
+      "state": "active"
     },
     {
       "acceptance_id": "verified-preview",
-      "criterion": "Desktop typecheck/build and existing tests pass; real Electron visual inspection at normal/narrow sizes verifies logo legibility, list/brand geometry, scrolling and navigation entry controls. Record reproducible synthetic screenshots and update the running PR preview for inspection."
+      "criterion": "Desktop typecheck/build and existing tests pass; real Electron visual inspection at normal/narrow sizes verifies logo legibility, list/brand geometry, scrolling and navigation entry controls. Record reproducible synthetic screenshots and update the running PR preview for inspection.",
+      "identity": "sha256:5a42f1c0b8a46cca785c86d5f76e092bf0ea11737c713def95a14f482cbe1dfb",
+      "revision": 1,
+      "state": "active"
     }
   ],
+  "active_contract_revision": 1,
   "constraints": [
     "Keep the current restrained monochrome desktop visual language; do not add unrelated navigation, status dashboards, decorative motion, or a new brand direction.",
     "Reuse the selected Phase geometry exactly; preserve main worktree uncommitted logo/package changes.",
@@ -42,23 +52,47 @@
       "ref": "apps/desktop/src/renderer/styles.css"
     }
   ],
+  "contract_revisions": [
+    {
+      "acceptance_revisions": [
+        {
+          "acceptance_id": "phase-brand",
+          "identity": "sha256:c3555aa80de6a71f3d2f2855d26a8cd626002a50007b2c566c83f776f1aaa822",
+          "revision": 1
+        },
+        {
+          "acceptance_id": "sidebar-craft",
+          "identity": "sha256:d4a44aec4f2576da4654d99f4973a282738e8d1eccc44915f6828ab805cdca3f",
+          "revision": 1
+        },
+        {
+          "acceptance_id": "verified-preview",
+          "identity": "sha256:5a42f1c0b8a46cca785c86d5f76e092bf0ea11737c713def95a14f482cbe1dfb",
+          "revision": 1
+        }
+      ],
+      "identity": "sha256:114d4b72fcf4e57b80d5a28a331178c8998333c557b442b7fd0e9aed1678fd2d",
+      "revision": 1
+    }
+  ],
+  "deliveries": [
+    {
+      "delivered_at": "2026-09-07T21:02:01Z",
+      "delivered_commit": "16edd76dffe422024ea63a56e4a6f5cc84611046",
+      "kind": "pull_request",
+      "ref": "https://github.com/waynewangyuxuan/Peel/pull/1",
+      "state": "delivered"
+    }
+  ],
   "kind": "ticket",
   "maturity": "firm",
   "outcome": "The left Space sidebar presents the existing Peel Phase identity and a refined, restrained material hierarchy while keeping navigation and entry actions familiar and usable.",
-  "deliveries": [
-    {
-      "kind": "pull_request",
-      "ref": "https://github.com/waynewangyuxuan/Peel/pull/1",
-      "state": "delivered",
-      "delivered_at": "2026-09-07T21:02:01Z",
-      "delivered_commit": "16edd76dffe422024ea63a56e4a6f5cc84611046"
-    }
-  ],
   "provenance_refs": [
     "conversation:2026-09-07-left-sidebar-brand-and-material-polish",
     "conversation:2026-08-28-select-c-expressive-phase-logo-and-request-app-update"
   ],
   "relations": [],
-  "schema_version": 2,
+  "revision_state": "bound",
+  "schema_version": 3,
   "ticket_id": "ticket-polish-space-sidebar"
 }

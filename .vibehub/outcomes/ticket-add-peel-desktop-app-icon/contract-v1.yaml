@@ -1,0 +1,26 @@
+{
+  "accepted_acceptance_ids": [
+    "canonical-native-icon-assets",
+    "development-launch-identity",
+    "packaged-app-identity",
+    "native-icon-verification"
+  ],
+  "binding_origin": "reconstructed",
+  "binding_state": "bound",
+  "closed_at": "2026-09-18T04:03:57Z",
+  "contract_revision": {
+    "identity": "sha256:d8ba949eb5018ca67dede6be7e9c0330fca1d258bd3ca88dd209d286c8d2576b",
+    "revision": 1
+  },
+  "evidence_ids": [
+    "evidence-peel-native-icon-assets-and-runtime",
+    "evidence-peel-packaged-icon-verification"
+  ],
+  "kind": "ticket_outcome",
+  "outcome_id": "contract-v1",
+  "schema_version": 2,
+  "status": "successful",
+  "summary": "Independently verified that Peel's checked-in SVG repeats the canonical renderer Phase path with the same lower and translated upper clips, regenerates deterministic 1024px PNG and valid multi-representation ICNS assets without runtime dependencies, and resolves a local icon for both development and packaged execution. Verified main-process naming and Dock setup occur before first-window creation/show, a production Electron development launch reports Peel with matching renderer identity, the full production package command succeeds, the bundle plist names Peel and links the embedded custom ICNS, packaged PNG/ICNS hashes match the checked-in assets, and the freshly packaged smoke launch reports Peel while preserving restart Draft state. Desktop typecheck and all 90 unit tests pass; no acceptance criterion remains unresolved.",
+  "ticket_id": "ticket-add-peel-desktop-app-icon",
+  "unresolved_acceptance_ids": []
+}

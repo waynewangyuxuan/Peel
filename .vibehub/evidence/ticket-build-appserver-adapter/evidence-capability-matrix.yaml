@@ -2,6 +2,15 @@
   "acceptance_ids": [
     "capability-matrix"
   ],
+  "acceptance_revisions": [
+    {
+      "acceptance_id": "capability-matrix",
+      "identity": "sha256:f9fa3dab8ba67d16d611f6b18d5ead41465c239d68488833ccee0262842fca8d",
+      "revision": 1
+    }
+  ],
+  "binding_origin": "reconstructed",
+  "binding_state": "bound",
   "evidence_id": "evidence-capability-matrix",
   "kind": "ticket_evidence",
   "origin": "agent",
@@ -13,7 +22,7 @@
     "packages/codex-app-server/scripts/check-installed-schema.mjs",
     "command:cd packages/codex-app-server && npm run check:schema"
   ],
-  "schema_version": 1,
+  "schema_version": 2,
   "summary": "AppServerClient binds CapabilityMatrix to the exact transport initialize.experimentalApi value and at connect time inspects the same resolved Codex executable's stable and experimental schemas. It classifies methods as stable, experimental-enabled, or unavailable, records an explicit fallback on detector failure, and downgrades JSON-RPC method-not-found at runtime. Installed-schema generation confirmed 10 required methods and 8 notifications while unimplemented Project, Realtime, pagination, filters, and WebSocket product features remain unavailable.",
   "ticket_id": "ticket-build-appserver-adapter"
 }

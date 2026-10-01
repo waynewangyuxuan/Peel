@@ -4,6 +4,25 @@
     "session-recovery-regression",
     "send-failure-draft-safety"
   ],
+  "acceptance_revisions": [
+    {
+      "acceptance_id": "resume-before-turn",
+      "identity": "sha256:21ff77a08b2a05270d15fae50f7bdefc37d260863e678e6cb6f9d50329e91f0d",
+      "revision": 1
+    },
+    {
+      "acceptance_id": "session-recovery-regression",
+      "identity": "sha256:2ffd30723aadda52a1635155fe6de7f3d684b5688513b4fa8ca271000e985d08",
+      "revision": 1
+    },
+    {
+      "acceptance_id": "send-failure-draft-safety",
+      "identity": "sha256:1854bbcf2a4bcf08a822d2dda3b6c279bedcaca956c9baddc0094ee898620283",
+      "revision": 1
+    }
+  ],
+  "binding_origin": "reconstructed",
+  "binding_state": "bound",
   "evidence_id": "evidence-session-resume-and-draft-safety",
   "kind": "ticket_evidence",
   "origin": "agent",
@@ -17,7 +36,7 @@
     "command:npm test passed 59 tests including 19 App Server lifecycle tests",
     "command:npm run test:e2e --workspace @peel/desktop passed the complete production Electron journey with forced resume failure and retry"
   ],
-  "schema_version": 1,
+  "schema_version": 2,
   "summary": "The App Server client now keeps read-only snapshots separate from loaded sessions, coalesces concurrent resume work, loads stored Threads before their first turn/start, preserves the already-loaded state of new and forked Threads, and invalidates it on disconnect, failure, or thread/closed. Unit tests exercise each transition. The production fixture now rejects turn/start for an unloaded Thread, and the Electron journey proves a forced resume failure presents an actionable Composer error, retains exact text plus attachment, then retries through one successful resume and one remote Turn without duplicate sends.",
   "ticket_id": "ticket-fix-session-resume-and-voice-launch"
 }

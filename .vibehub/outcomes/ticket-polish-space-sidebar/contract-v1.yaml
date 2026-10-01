@@ -1,0 +1,25 @@
+{
+  "accepted_acceptance_ids": [
+    "phase-brand",
+    "sidebar-craft",
+    "verified-preview"
+  ],
+  "binding_origin": "reconstructed",
+  "binding_state": "bound",
+  "closed_at": "2026-09-07T10:28:28.956742+00:00",
+  "contract_revision": {
+    "identity": "sha256:114d4b72fcf4e57b80d5a28a331178c8998333c557b442b7fd0e9aed1678fd2d",
+    "revision": 1
+  },
+  "evidence_ids": [
+    "sidebar-polish-verification",
+    "sidebar-polish-independent-closeout"
+  ],
+  "kind": "ticket_outcome",
+  "outcome_id": "contract-v1",
+  "schema_version": 2,
+  "status": "successful",
+  "summary": "All three criteria accepted after independent code, test, original-brand equality and normal/narrow screenshot review. Sidebar and loading surfaces reuse the selected Phase identity; restrained hierarchy, selection semantics, visible focus, full-name access and bounded scrolling preserve navigation and dimensions. Recorded checks passed, including the unchanged isolated full-journey retry, and the live PR renderer preview is updated. The macOS-constrained normal screenshot height is documented and supported by stricter narrow-height coverage. No protected human criteria or unresolved implementation gaps.",
+  "ticket_id": "ticket-polish-space-sidebar",
+  "unresolved_acceptance_ids": []
+}

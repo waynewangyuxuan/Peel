@@ -1,26 +1,42 @@
 {
   "acceptance": [
     {
-      "acceptance_id": "measured-packaged-launch-baseline",
-      "criterion": "A deterministic packaged production Electron harness records at least seven cold-launch samples before and after the change on the same host, separating process launch to first visible branded paint, first usable local shell, Codex transport ready, and first connected action; raw samples, medians, environment, and baseline commit are checked in as evidence."
+      "acceptance_id": "immediate-honest-first-frame",
+      "criterion": "The first visible window contains the Peel mark and a stable launch or shell surface rather than an empty, transparent, or unstyled frame; it appears before full conversation rendering code and never implies Codex is connected before connection state is known.",
+      "identity": "sha256:1c5b945431060ab584c3d1d0e6b059ca50da820eaa8e6e021c74cc4d429072fd",
+      "revision": 1,
+      "state": "active"
     },
     {
-      "acceptance_id": "immediate-honest-first-frame",
-      "criterion": "The first visible window contains the Peel mark and a stable launch or shell surface rather than an empty, transparent, or unstyled frame; it appears before full conversation rendering code and never implies Codex is connected before connection state is known."
+      "acceptance_id": "measured-packaged-launch-baseline",
+      "criterion": "A deterministic packaged production Electron harness records at least seven cold-launch samples before and after the change on the same host, separating process launch to first visible branded paint, first usable local shell, Codex transport ready, and first connected action; raw samples, medians, environment, and baseline commit are checked in as evidence.",
+      "identity": "sha256:bc35d3b2c7995eeab53b2e1d618f633baac27d1baadc2d224fdcab1d2921e794",
+      "revision": 1,
+      "state": "active"
     },
     {
       "acceptance_id": "parallel-nonblocking-initialization",
-      "criterion": "Window creation, local-state bootstrap, and Codex App Server connection begin without the current avoidable serial dependency; a slow, unavailable, or failing Codex process leaves the local shell responsive with accurate connecting/offline recovery UI and does not prevent opening the window."
+      "criterion": "Window creation, local-state bootstrap, and Codex App Server connection begin without the current avoidable serial dependency; a slow, unavailable, or failing Codex process leaves the local shell responsive with accurate connecting/offline recovery UI and does not prevent opening the window.",
+      "identity": "sha256:f79d22870fcf1e409fd83ef0de79e16079ce4e090a0e8feafb1fbe19a15be638",
+      "revision": 1,
+      "state": "active"
     },
     {
       "acceptance_id": "startup-improvement-gate",
-      "criterion": "On the recorded same-host packaged benchmark, optimized median process-launch-to-first-visible-branded-paint and first usable local shell are each no greater than baseline plus the larger of 10% of baseline or 50 ms, and optimized median connected-action timing is no greater than baseline plus the larger of 10% of baseline or 100 ms. The production renderer JavaScript synchronously required before the branded first frame is at most 35% of the recorded 703 KB baseline entry bundle, and a delayed-hydration regression proves the Codex initialize request begins before the full App module hydrates."
+      "criterion": "On the recorded same-host packaged benchmark, optimized median process-launch-to-first-visible-branded-paint and first usable local shell are each no greater than baseline plus the larger of 10% of baseline or 50 ms, and optimized median connected-action timing is no greater than baseline plus the larger of 10% of baseline or 100 ms. The production renderer JavaScript synchronously required before the branded first frame is at most 35% of the recorded 703 KB baseline entry bundle, and a delayed-hydration regression proves the Codex initialize request begins before the full App module hydrates.",
+      "identity": "sha256:712e9359325bcc373a663ee0cdcf109ebda0a55cefcd4db06ce02f258457bffa",
+      "revision": 1,
+      "state": "active"
     },
     {
       "acceptance_id": "startup-regression-coverage",
-      "criterion": "Automated tests cover normal connection, intentionally delayed Codex initialization, connection failure, restart with saved state, and production asset loading; existing package verification, Draft restoration, native Voice packaging, Focus/Overview navigation, and diagnostics behavior remain passing."
+      "criterion": "Automated tests cover normal connection, intentionally delayed Codex initialization, connection failure, restart with saved state, and production asset loading; existing package verification, Draft restoration, native Voice packaging, Focus/Overview navigation, and diagnostics behavior remain passing.",
+      "identity": "sha256:fe10d3f12f82fe7c4f07188a524bd080ab7e9ac848346037facecd6cf6e07cea",
+      "revision": 1,
+      "state": "active"
     }
   ],
+  "active_contract_revision": 1,
   "constraints": [
     "Optimize perceived and measured startup without replacing Electron, Streamdown, or the accepted renderer stack.",
     "Do not cache or fabricate Codex connection, Thread, status, or transcript facts to make launch appear faster.",
@@ -31,11 +47,11 @@
   "context_refs": [
     {
       "purpose": "Provides the accepted Electron architecture and process ownership boundary.",
-      "ref": ".vibehub/outcomes/ticket-establish-desktop-shell.yaml"
+      "ref": ".vibehub/outcomes/ticket-establish-desktop-shell/contract-v1.yaml"
     },
     {
       "purpose": "Provides the current production measurement discipline and optimized Focus rendering baseline.",
-      "ref": ".vibehub/outcomes/ticket-optimize-native-transcript-rendering.yaml"
+      "ref": ".vibehub/outcomes/ticket-optimize-native-transcript-rendering/contract-v1.yaml"
     },
     {
       "purpose": "Owns BrowserWindow visibility, renderer loading, and current post-load Codex connection ordering.",
@@ -58,6 +74,39 @@
       "ref": "apps/desktop/scripts/verify-live-codex.mjs"
     }
   ],
+  "contract_revisions": [
+    {
+      "acceptance_revisions": [
+        {
+          "acceptance_id": "immediate-honest-first-frame",
+          "identity": "sha256:1c5b945431060ab584c3d1d0e6b059ca50da820eaa8e6e021c74cc4d429072fd",
+          "revision": 1
+        },
+        {
+          "acceptance_id": "measured-packaged-launch-baseline",
+          "identity": "sha256:bc35d3b2c7995eeab53b2e1d618f633baac27d1baadc2d224fdcab1d2921e794",
+          "revision": 1
+        },
+        {
+          "acceptance_id": "parallel-nonblocking-initialization",
+          "identity": "sha256:f79d22870fcf1e409fd83ef0de79e16079ce4e090a0e8feafb1fbe19a15be638",
+          "revision": 1
+        },
+        {
+          "acceptance_id": "startup-improvement-gate",
+          "identity": "sha256:712e9359325bcc373a663ee0cdcf109ebda0a55cefcd4db06ce02f258457bffa",
+          "revision": 1
+        },
+        {
+          "acceptance_id": "startup-regression-coverage",
+          "identity": "sha256:fe10d3f12f82fe7c4f07188a524bd080ab7e9ac848346037facecd6cf6e07cea",
+          "revision": 1
+        }
+      ],
+      "identity": "sha256:8f10a4e9e9702ca1873e95a02119a4592dd57bc08b9955b281227faeb79871a8",
+      "revision": 1
+    }
+  ],
   "deliveries": [],
   "kind": "ticket",
   "maturity": "firm",
@@ -67,6 +116,7 @@
     "execution:2026-09-18-packaged-startup-baseline-and-first-optimization"
   ],
   "relations": [],
-  "schema_version": 2,
+  "revision_state": "bound",
+  "schema_version": 3,
   "ticket_id": "ticket-optimize-desktop-cold-start"
 }

@@ -1,30 +1,49 @@
 {
   "acceptance": [
     {
-      "acceptance_id": "stable-settled-transcript-identity",
-      "criterion": "Across renderer reconciliation of successive snapshots for one active Thread, every unchanged completed Turn and ThreadItem retains referential identity while the affected live Turn and Item receive new identity. Reducer/reconciler tests cover item start, all supported text/reasoning/command/file deltas, item completion, Turn start/completion, and thread status/name updates. Separate App/Transcript tests prove notices and server requests continue to render their latest payload and invalidate only their owning Turn or thread-level surface."
-    },
-    {
-      "acceptance_id": "tail-only-focus-invalidation",
-      "criterion": "In a production Electron Focus transcript with 100 completed Turns plus one streaming tail, at least 36 representative deltas increase render counters only for the live Turn and affected item/Markdown subtree: settled Turn and completed Markdown counters remain unchanged, while Branch, highlight, notices, approvals/server requests, errors, and status changes still update their owning Turn."
-    },
-    {
-      "acceptance_id": "oversized-message-readable-fallback",
-      "criterion": "A Markdown-bearing item at or above 200,000 characters uses a bounded-cost, readable, selectable, exact-text fallback instead of the full Markdown/math pipeline; it neither blanks nor crashes Focus, keeps local overflow and copy fidelity, does not interpret or execute HTML markup or initiate automatic remote-media loads, and content below the threshold retains the accepted Markdown, math, code-copy, link, and image behavior."
-    },
-    {
-      "acceptance_id": "production-focus-performance-evidence",
-      "criterion": "A production-build Electron harness exercises the ordinary App to Focus Transcript to MarkdownContent route against the same deterministic 10/100/500-Turn App Server fixture, not RenderingBenchmarkApp. A test-only baseline mode preserves the current full-snapshot/no-reconciliation behavior for comparison. After at least two warmups, at least seven paired baseline/optimized samples record separate durations for App Server read, snapshot construction, IPC delivery, renderer reconciliation, React render-to-layout-commit, and commit-to-two-animation-frame paint, plus long tasks, DOM count, and heap or retained-object evidence. For a 100-completed-Turn plus live-tail replay of 36 deltas, the optimized median aggregate reconciliation-plus-React-render/commit duration is at most 50% of baseline. Across 10/100/500-Turn cold Focus entry and 10-to-500 warm switching, optimized median first-content and through-paint times regress by no more than the greater of 10% or 5 ms."
+      "acceptance_id": "evidence-based-followup-boundary",
+      "criterion": "Checked-in evidence compares the measured native result with the completed renderer evaluation and states whether bounded initial backfill deserves a separate Ticket; this implementation does not add Streamdown, assistant-ui runtime, full transcript virtualization, content-visibility, or bounded history backfill.",
+      "identity": "sha256:ead20b3c72a8087985dc315f8dcd9fe113378f11ef137d1299f18e8d8013248f",
+      "revision": 1,
+      "state": "active"
     },
     {
       "acceptance_id": "focus-fidelity-regression-coverage",
-      "criterion": "Automated Focus coverage preserves exact completed-Turn Branch anchors, text selection, code copy, local horizontal overflow, math and CJK layout, streaming projection and caret, user-controlled follow-bottom, highlight navigation, per-Thread Draft and Scroll restoration, attachments, Activity, command/file change output, approvals/server requests, notices/errors, unknown-item fallback, and Open in Codex."
+      "criterion": "Automated Focus coverage preserves exact completed-Turn Branch anchors, text selection, code copy, local horizontal overflow, math and CJK layout, streaming projection and caret, user-controlled follow-bottom, highlight navigation, per-Thread Draft and Scroll restoration, attachments, Activity, command/file change output, approvals/server requests, notices/errors, unknown-item fallback, and Open in Codex.",
+      "identity": "sha256:22df7ee737e3f24e349332be789df689e67ec8c377668275dab3224005872e2b",
+      "revision": 1,
+      "state": "active"
     },
     {
-      "acceptance_id": "evidence-based-followup-boundary",
-      "criterion": "Checked-in evidence compares the measured native result with the completed renderer evaluation and states whether bounded initial backfill deserves a separate Ticket; this implementation does not add Streamdown, assistant-ui runtime, full transcript virtualization, content-visibility, or bounded history backfill."
+      "acceptance_id": "oversized-message-readable-fallback",
+      "criterion": "A Markdown-bearing item at or above 200,000 characters uses a bounded-cost, readable, selectable, exact-text fallback instead of the full Markdown/math pipeline; it neither blanks nor crashes Focus, keeps local overflow and copy fidelity, does not interpret or execute HTML markup or initiate automatic remote-media loads, and content below the threshold retains the accepted Markdown, math, code-copy, link, and image behavior.",
+      "identity": "sha256:2bdce9ab0b2562032a23ce18c5e432d1006f4d55bc6bdbe284f22c81e50ef7ec",
+      "revision": 1,
+      "state": "active"
+    },
+    {
+      "acceptance_id": "production-focus-performance-evidence",
+      "criterion": "A production-build Electron harness exercises the ordinary App to Focus Transcript to MarkdownContent route against the same deterministic 10/100/500-Turn App Server fixture, not RenderingBenchmarkApp. A test-only baseline mode preserves the current full-snapshot/no-reconciliation behavior for comparison. After at least two warmups, at least seven paired baseline/optimized samples record separate durations for App Server read, snapshot construction, IPC delivery, renderer reconciliation, React render-to-layout-commit, and commit-to-two-animation-frame paint, plus long tasks, DOM count, and heap or retained-object evidence. For a 100-completed-Turn plus live-tail replay of 36 deltas, the optimized median aggregate reconciliation-plus-React-render/commit duration is at most 50% of baseline. Across 10/100/500-Turn cold Focus entry and 10-to-500 warm switching, optimized median first-content and through-paint times regress by no more than the greater of 10% or 5 ms.",
+      "identity": "sha256:fe208d1f72d40289d1e5872fcdb574ea5d3debce2a23bd3641e2db88c261b978",
+      "revision": 1,
+      "state": "active"
+    },
+    {
+      "acceptance_id": "stable-settled-transcript-identity",
+      "criterion": "Across renderer reconciliation of successive snapshots for one active Thread, every unchanged completed Turn and ThreadItem retains referential identity while the affected live Turn and Item receive new identity. Reducer/reconciler tests cover item start, all supported text/reasoning/command/file deltas, item completion, Turn start/completion, and thread status/name updates. Separate App/Transcript tests prove notices and server requests continue to render their latest payload and invalidate only their owning Turn or thread-level surface.",
+      "identity": "sha256:be1b0bed1cad1d0826a556a604fd68352450147a0a02dc6d549602619ba100a3",
+      "revision": 1,
+      "state": "active"
+    },
+    {
+      "acceptance_id": "tail-only-focus-invalidation",
+      "criterion": "In a production Electron Focus transcript with 100 completed Turns plus one streaming tail, at least 36 representative deltas increase render counters only for the live Turn and affected item/Markdown subtree: settled Turn and completed Markdown counters remain unchanged, while Branch, highlight, notices, approvals/server requests, errors, and status changes still update their owning Turn.",
+      "identity": "sha256:94581342887e4c4fe7eb89d592a8edfc2e219d1aa0f484ad793380dad957e622",
+      "revision": 1,
+      "state": "active"
     }
   ],
+  "active_contract_revision": 1,
   "constraints": [
     "Keep Codex App Server Thread, Turn, ThreadItem, completion, request, and lineage semantics authoritative; do not create a parallel chat-history store.",
     "Preserve current raw-HTML denial, safe URL transformation, click-only remote media, exact code-copy text, and parser-failure readability boundaries.",
@@ -36,7 +55,7 @@
   "context_refs": [
     {
       "purpose": "Provides the successful A/B evaluation, benchmark evidence, and decision to defer Streamdown and assistant-ui runtime.",
-      "ref": ".vibehub/outcomes/ticket-evaluate-streamdown-rendering-runtime.yaml"
+      "ref": ".vibehub/outcomes/ticket-evaluate-streamdown-rendering-runtime/contract-v1.yaml"
     },
     {
       "purpose": "Records the adopted native techniques and the measurement gate for any later bounded-backfill work.",
@@ -68,7 +87,45 @@
     },
     {
       "purpose": "Defines the accepted exact desktop deep-link and recoverable failure behavior that transcript memoization must preserve.",
-      "ref": ".vibehub/outcomes/ticket-fix-open-in-codex-deep-link.yaml"
+      "ref": ".vibehub/outcomes/ticket-fix-open-in-codex-deep-link/contract-v1.yaml"
+    }
+  ],
+  "contract_revisions": [
+    {
+      "acceptance_revisions": [
+        {
+          "acceptance_id": "evidence-based-followup-boundary",
+          "identity": "sha256:ead20b3c72a8087985dc315f8dcd9fe113378f11ef137d1299f18e8d8013248f",
+          "revision": 1
+        },
+        {
+          "acceptance_id": "focus-fidelity-regression-coverage",
+          "identity": "sha256:22df7ee737e3f24e349332be789df689e67ec8c377668275dab3224005872e2b",
+          "revision": 1
+        },
+        {
+          "acceptance_id": "oversized-message-readable-fallback",
+          "identity": "sha256:2bdce9ab0b2562032a23ce18c5e432d1006f4d55bc6bdbe284f22c81e50ef7ec",
+          "revision": 1
+        },
+        {
+          "acceptance_id": "production-focus-performance-evidence",
+          "identity": "sha256:fe208d1f72d40289d1e5872fcdb574ea5d3debce2a23bd3641e2db88c261b978",
+          "revision": 1
+        },
+        {
+          "acceptance_id": "stable-settled-transcript-identity",
+          "identity": "sha256:be1b0bed1cad1d0826a556a604fd68352450147a0a02dc6d549602619ba100a3",
+          "revision": 1
+        },
+        {
+          "acceptance_id": "tail-only-focus-invalidation",
+          "identity": "sha256:94581342887e4c4fe7eb89d592a8edfc2e219d1aa0f484ad793380dad957e622",
+          "revision": 1
+        }
+      ],
+      "identity": "sha256:afef90bf7af77dac4d3075b63fa12a85ca8d9b68dead04e98b1582fc2e2e7dd0",
+      "revision": 1
     }
   ],
   "deliveries": [],
@@ -79,6 +136,7 @@
     "conversation:2026-09-17-native-transcript-experience-over-renderer-migration"
   ],
   "relations": [],
-  "schema_version": 2,
+  "revision_state": "bound",
+  "schema_version": 3,
   "ticket_id": "ticket-optimize-native-transcript-rendering"
 }

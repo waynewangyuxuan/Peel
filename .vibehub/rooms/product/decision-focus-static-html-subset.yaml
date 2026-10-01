@@ -1,0 +1,40 @@
+{
+  "context_id": "decision-focus-static-html-subset",
+  "detail": "The user decided Focus chat should show author HTML. The allowed surface is a static subset in the existing Markdown pipeline: common text, lists, tables, links, and images, with scripts, frames, forms, and event handlers removed. Remote images stay click-only links. This narrows the earlier note that raw HTML stays disabled. That note's protocol-first order still stands. A visualize widget is a separate isolated frame, not this subset.",
+  "evidence": [
+    {
+      "note": "Allowlist and drop set for the static subset, including the checkbox carve-out that stays disabled.",
+      "ref": "apps/desktop/src/renderer/safe-html.ts"
+    },
+    {
+      "note": "rehype-raw runs, then the allowlist, then KaTeX, so generated math HTML is not stripped.",
+      "ref": "apps/desktop/src/renderer/Markdown.tsx"
+    }
+  ],
+  "kind": "context",
+  "relations": [
+    {
+      "target_context_id": "note-rendering-protocol-before-html",
+      "type": "relates_to"
+    },
+    {
+      "target_context_id": "contract-focus-chat-fidelity",
+      "type": "relates_to"
+    }
+  ],
+  "schema_version": 1,
+  "source": {
+    "captured_at": "2026-09-30T07:50:00Z",
+    "quote": "我觉得我们可以考虑支持一下html。",
+    "ref": "conversation:2026-09-29-focus-html-and-visualize"
+  },
+  "state": "active",
+  "summary": "Focus chat renders a sanitized static HTML subset, not executable page HTML",
+  "tags": [
+    "html",
+    "rendering",
+    "focus-chat",
+    "security"
+  ],
+  "type": "decision"
+}

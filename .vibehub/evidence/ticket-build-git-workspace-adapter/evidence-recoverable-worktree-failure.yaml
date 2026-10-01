@@ -2,6 +2,15 @@
   "acceptance_ids": [
     "recover-partial-failure"
   ],
+  "acceptance_revisions": [
+    {
+      "acceptance_id": "recover-partial-failure",
+      "identity": "sha256:b27d0aede294fa75f6423f55418b7d8f7b49a1e1a3d0f191477b17d0dc7b1642",
+      "revision": 1
+    }
+  ],
+  "binding_origin": "reconstructed",
+  "binding_state": "bound",
   "evidence_id": "evidence-recoverable-worktree-failure",
   "kind": "ticket_evidence",
   "origin": "agent",
@@ -12,7 +21,7 @@
     "packages/git-workspace/test/adapter.test.ts",
     "packages/git-workspace/VERIFICATION.md"
   ],
-  "schema_version": 1,
+  "schema_version": 2,
   "summary": "All create stages normalize into GitWorkspaceError with stage, code, retryability, unchanged pendingForkId, Current Workspace cwd, attempted identity, and only positively detected artifacts. Injected failures prove exact branch-only reporting and distinguish an unregistered leftover directory from a registered worktree; retry allocates a new collision-free identity while preserving the same pending Fork ID.",
   "ticket_id": "ticket-build-git-workspace-adapter"
 }

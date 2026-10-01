@@ -2,6 +2,15 @@
   "acceptance_ids": [
     "reconstructable-reducer"
   ],
+  "acceptance_revisions": [
+    {
+      "acceptance_id": "reconstructable-reducer",
+      "identity": "sha256:efa1e6ed6c5dea75a17b1af4e3ef8eec026f0fce41919790086433fbbdeac864",
+      "revision": 1
+    }
+  ],
+  "binding_origin": "reconstructed",
+  "binding_state": "bound",
   "evidence_id": "evidence-reconstructable-reducer",
   "kind": "ticket_evidence",
   "origin": "agent",
@@ -11,7 +20,7 @@
     "packages/codex-app-server/test/reducer.test.ts",
     "packages/codex-app-server/README.md"
   ],
-  "schema_version": 1,
+  "schema_version": 2,
   "summary": "AppServerReducer rebuilds in-memory UI projections from authoritative thread/read snapshots and applies entity-ordered notifications with duplicate suppression. Tests prove completed Item/Turn authority, stale delta rejection, aggregate diff reconstruction, deterministic status/name state, and lossless collab/subagent facts without persisting a shadow Transcript.",
   "ticket_id": "ticket-build-appserver-adapter"
 }

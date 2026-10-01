@@ -3,6 +3,20 @@
     "safe-math-typesetting",
     "streaming-and-copy-fidelity"
   ],
+  "acceptance_revisions": [
+    {
+      "acceptance_id": "safe-math-typesetting",
+      "identity": "sha256:38b815fa0da4b6e51dd7f0684af0fe6d5b1d2e56d505f3e62601225b608f3e9f",
+      "revision": 1
+    },
+    {
+      "acceptance_id": "streaming-and-copy-fidelity",
+      "identity": "sha256:7051012d120d9e59ba9ea96653674d423db1b519f3cea51c5774ae7f28a481e7",
+      "revision": 1
+    }
+  ],
+  "binding_origin": "reconstructed",
+  "binding_state": "bound",
   "evidence_id": "evidence-safe-focus-math-typesetting",
   "kind": "ticket_evidence",
   "origin": "agent",
@@ -13,7 +27,7 @@
     "apps/desktop/package.json",
     "package-lock.json"
   ],
-  "schema_version": 1,
+  "schema_version": 2,
   "summary": "Focus prose now uses remark-math and rehype-katex with trust disabled, raw HTML still skipped, and accessible HTML+MathML output. A render-only delimiter normalizer supports Codex-style paired \\(...\\) and \\[...\\] outside fenced/inline code while leaving incomplete delimiters unchanged. Display math is locally horizontally scrollable and technical-output routes remain untouched.",
   "ticket_id": "ticket-fix-focus-math-and-branch-affordance"
 }

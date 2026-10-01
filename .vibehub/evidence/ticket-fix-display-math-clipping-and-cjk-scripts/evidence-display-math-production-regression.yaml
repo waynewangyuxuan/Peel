@@ -4,6 +4,25 @@
     "cjk-script-layout",
     "math-layout-regression-evidence"
   ],
+  "acceptance_revisions": [
+    {
+      "acceptance_id": "unclipped-display-glyphs",
+      "identity": "sha256:af032dbedf8f878a2dbef539cc846047ed31378fb69de77f6037163dfd4adcf7",
+      "revision": 1
+    },
+    {
+      "acceptance_id": "cjk-script-layout",
+      "identity": "sha256:385ef9824a4989d8f106f326a9913390d3d0aabfcad13079bfd757cb1e539a60",
+      "revision": 1
+    },
+    {
+      "acceptance_id": "math-layout-regression-evidence",
+      "identity": "sha256:bcc41ddf4b34220445e7004d3f1f979da470e8c89b2340d837ad09939852f578",
+      "revision": 1
+    }
+  ],
+  "binding_origin": "reconstructed",
+  "binding_state": "bound",
   "evidence_id": "evidence-display-math-production-regression",
   "kind": "ticket_evidence",
   "origin": "agent",
@@ -17,7 +36,7 @@
     "command:npm run build",
     "command:npx playwright test e2e/open-codex.spec.ts e2e/math-layout.spec.ts"
   ],
-  "schema_version": 1,
+  "schema_version": 2,
   "summary": "The dedicated Electron regression renders the exact reported formulas through Peel's compiled Markdown and CSS path at two viewports and asserts the resulting window.innerWidth/innerHeight are exactly 1440x960 and 1000x720. For the Latin expression it measures the whole visible KaTeX formula plus every non-empty visible text-node Range, including X/W, h subscripts, superscripts, punctuation, and italic overhang, and proves every bound remains vertically contained while overflow stays local. For both exact CJK expressions it measures q/k base, superscript, and CJK subscript centers and proves sup center < base center < sub center, verifies the targeted font/offset and container bounds, and emits separate screenshots. Repository verification passes 24 App Server, 12 Git workspace, and 64 desktop tests; typecheck and the full production build pass; the focused Open-in-Codex and math Electron suite passes 2/2. Existing Markdown coverage continues to prove raw HTML is disabled, KaTeX trust is false, MathML is emitted, incomplete streams stay readable, code is isolated, and copy remains source-faithful.",
   "ticket_id": "ticket-fix-display-math-clipping-and-cjk-scripts"
 }

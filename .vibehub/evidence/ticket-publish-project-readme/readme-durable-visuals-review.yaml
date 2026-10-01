@@ -2,6 +2,15 @@
   "acceptance_ids": [
     "durable-current-visuals"
   ],
+  "acceptance_revisions": [
+    {
+      "acceptance_id": "durable-current-visuals",
+      "identity": "sha256:1ec5d940b9317a7647af6113f645093418cb75dd06dc7f08864896be1bd147bc",
+      "revision": 1
+    }
+  ],
+  "binding_origin": "reconstructed",
+  "binding_state": "bound",
   "evidence_id": "readme-durable-visuals-review",
   "kind": "ticket_evidence",
   "origin": "agent",
@@ -14,7 +23,7 @@
     "source:apps/desktop/test-results/ui-overview-6.png",
     "verification:direct-original-detail-image-review-2026-08-28"
   ],
-  "schema_version": 1,
+  "schema_version": 2,
   "summary": "The README renders repository-relative Focus and six-node Overview screenshots copied from the latest independently verified Electron journey. Both files are tracked under docs/assets rather than ignored test output, were resized to a GitHub-appropriate 1600x1054, remain directly legible under original-detail inspection, and total under 500 KiB.",
   "ticket_id": "ticket-publish-project-readme"
 }

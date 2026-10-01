@@ -1,26 +1,42 @@
 {
   "acceptance": [
     {
-      "acceptance_id": "omit-empty-search-term",
-      "criterion": "Every first-page or paginated recent-Chat request whose normalized query is empty calls thread/list without a searchTerm field; a non-empty normalized query continues to send that exact term, and cursor, limit, sort key, and sort direction remain unchanged."
-    },
-    {
-      "acceptance_id": "shared-warm-recent-request",
-      "criterion": "Connection warmup and a Picker opened before warmup settles share one ordinary recent-list in-flight request and cache key; opening after warmup settles renders the cached first page within 100ms without issuing another request."
-    },
-    {
-      "acceptance_id": "responsive-loading-and-refresh",
-      "criterion": "If the ordinary live request is still pending, the Picker remains interactive, preserves any provisional results, and communicates non-blocking loading or refresh state without hiding the search field, blanking a usable page, or delaying the desktop shell."
-    },
-    {
       "acceptance_id": "empty-search-regression-coverage",
-      "criterion": "Automated adapter/service and Electron coverage distinguishes an omitted searchTerm from an explicit empty value, proves in-flight and warm-cache reuse for the empty Picker query, and retains non-empty search, pagination, de-duplication, late-response rejection, close/reopen, and selection behavior from the completed discovery Ticket."
+      "criterion": "Automated adapter/service and Electron coverage distinguishes an omitted searchTerm from an explicit empty value, proves in-flight and warm-cache reuse for the empty Picker query, and retains non-empty search, pagination, de-duplication, late-response rejection, close/reopen, and selection behavior from the completed discovery Ticket.",
+      "identity": "sha256:8d1eaf45128c7c74e737703de2b95b3c9577af16057709e44ec067d5b63a389b",
+      "revision": 1,
+      "state": "active"
     },
     {
       "acceptance_id": "live-codex-latency-evidence",
-      "criterion": "A read-only installed-Codex verification records transport-ready-to-request timing and ordinary recent-list completion, confirms no explicit-empty searchTerm is emitted, and reports warm Picker first-content latency separately from server latency so renderer and App Server time are not conflated."
+      "criterion": "A read-only installed-Codex verification records transport-ready-to-request timing and ordinary recent-list completion, confirms no explicit-empty searchTerm is emitted, and reports warm Picker first-content latency separately from server latency so renderer and App Server time are not conflated.",
+      "identity": "sha256:881481ec2c2ece88fd90f0e441774e46d99e7fc62806739ff311de3b8dd1b81a",
+      "revision": 1,
+      "state": "active"
+    },
+    {
+      "acceptance_id": "omit-empty-search-term",
+      "criterion": "Every first-page or paginated recent-Chat request whose normalized query is empty calls thread/list without a searchTerm field; a non-empty normalized query continues to send that exact term, and cursor, limit, sort key, and sort direction remain unchanged.",
+      "identity": "sha256:1e7472a755387b61b8c71c97b8862c81ed45ab2d13b54e419fec64b01441ea7f",
+      "revision": 1,
+      "state": "active"
+    },
+    {
+      "acceptance_id": "responsive-loading-and-refresh",
+      "criterion": "If the ordinary live request is still pending, the Picker remains interactive, preserves any provisional results, and communicates non-blocking loading or refresh state without hiding the search field, blanking a usable page, or delaying the desktop shell.",
+      "identity": "sha256:a46acbd1e4bd0c676021447e4980930cec73e3a08512a9cd1be03df6b62a1dd5",
+      "revision": 1,
+      "state": "active"
+    },
+    {
+      "acceptance_id": "shared-warm-recent-request",
+      "criterion": "Connection warmup and a Picker opened before warmup settles share one ordinary recent-list in-flight request and cache key; opening after warmup settles renders the cached first page within 100ms without issuing another request.",
+      "identity": "sha256:e65c8150cbea78c0675b2cd59ee323ce63fc8fcc253079d0239bf79d16e8285c",
+      "revision": 1,
+      "state": "active"
     }
   ],
+  "active_contract_revision": 1,
   "constraints": [
     "Do not persist or index Codex-owned transcript content to hide server latency.",
     "Do not remove cursor pagination, the 15,000ms response-cache boundary, provisional matching, or stale-response guards from the accepted Thread Picker contract.",
@@ -31,7 +47,7 @@
   "context_refs": [
     {
       "purpose": "Provides the accepted warm cache, pagination, provisional-result, and race-safety baseline that this regression must preserve.",
-      "ref": ".vibehub/outcomes/ticket-optimize-thread-picker-discovery.yaml"
+      "ref": ".vibehub/outcomes/ticket-optimize-thread-picker-discovery/contract-v1.yaml"
     },
     {
       "purpose": "Defines the human dogfood expectation that cached and provisional Picker results feel immediate.",
@@ -46,6 +62,39 @@
       "ref": "packages/codex-app-server/src/client.ts"
     }
   ],
+  "contract_revisions": [
+    {
+      "acceptance_revisions": [
+        {
+          "acceptance_id": "empty-search-regression-coverage",
+          "identity": "sha256:8d1eaf45128c7c74e737703de2b95b3c9577af16057709e44ec067d5b63a389b",
+          "revision": 1
+        },
+        {
+          "acceptance_id": "live-codex-latency-evidence",
+          "identity": "sha256:881481ec2c2ece88fd90f0e441774e46d99e7fc62806739ff311de3b8dd1b81a",
+          "revision": 1
+        },
+        {
+          "acceptance_id": "omit-empty-search-term",
+          "identity": "sha256:1e7472a755387b61b8c71c97b8862c81ed45ab2d13b54e419fec64b01441ea7f",
+          "revision": 1
+        },
+        {
+          "acceptance_id": "responsive-loading-and-refresh",
+          "identity": "sha256:a46acbd1e4bd0c676021447e4980930cec73e3a08512a9cd1be03df6b62a1dd5",
+          "revision": 1
+        },
+        {
+          "acceptance_id": "shared-warm-recent-request",
+          "identity": "sha256:e65c8150cbea78c0675b2cd59ee323ce63fc8fcc253079d0239bf79d16e8285c",
+          "revision": 1
+        }
+      ],
+      "identity": "sha256:d9c0f19b1a6169c65baee99f6ac2601981e0faa6f69ca8b83607f6dc21021e6e",
+      "revision": 1
+    }
+  ],
   "deliveries": [],
   "kind": "ticket",
   "maturity": "firm",
@@ -55,6 +104,7 @@
     "live-codex:0.154.0-thread-list-ordinary-1759ms-explicit-empty-15832ms"
   ],
   "relations": [],
-  "schema_version": 2,
+  "revision_state": "bound",
+  "schema_version": 3,
   "ticket_id": "ticket-fix-thread-picker-empty-search-latency"
 }

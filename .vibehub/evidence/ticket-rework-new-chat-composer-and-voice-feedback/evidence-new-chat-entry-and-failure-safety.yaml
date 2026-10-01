@@ -4,6 +4,25 @@
     "distinct-entry-semantics",
     "new-chat-failure-safety"
   ],
+  "acceptance_revisions": [
+    {
+      "acceptance_id": "immediate-real-new-chat",
+      "identity": "sha256:6ff6e700ed3bc3b2e0ccdcfb5c8a5316a0294d0b48a204620d4717ce5ec3b321",
+      "revision": 1
+    },
+    {
+      "acceptance_id": "distinct-entry-semantics",
+      "identity": "sha256:4694dc93ea67bc478a9c3b0cf7e2b5b97df3e92f0ec5295674aee3041362de20",
+      "revision": 1
+    },
+    {
+      "acceptance_id": "new-chat-failure-safety",
+      "identity": "sha256:ecb8073526fcbefcd5513c11900f84b98aba39378ee6bbc6ada1c41e961eb11d",
+      "revision": 1
+    }
+  ],
+  "binding_origin": "reconstructed",
+  "binding_state": "bound",
   "evidence_id": "evidence-new-chat-entry-and-failure-safety",
   "kind": "ticket_evidence",
   "origin": "agent",
@@ -16,7 +35,7 @@
     "command:npm test passed all 62 repository tests",
     "command:npm run test:e2e --workspace @peel/desktop passed the production Electron journey"
   ],
-  "schema_version": 1,
+  "schema_version": 2,
   "summary": "The committed desktop implementation starts a real Codex Thread directly, persists it as a one-root Space, reuses the active cwd when present, and cleans up the remote Thread if persistence fails. The UI now has one New Chat plus and one Search Chats icon, with separate empty-state and keyboard semantics. Service and production Electron tests prove immediate usability without thread/list, retryable human-readable failure, and no phantom Space.",
   "ticket_id": "ticket-rework-new-chat-composer-and-voice-feedback"
 }

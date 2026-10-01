@@ -2,17 +2,27 @@
   "acceptance": [
     {
       "acceptance_id": "bounded-surfaces",
-      "criterion": "At scales 0.08 through 1.45 and both hysteresis directions, compact/map surfaces fit inside their original 294x205 world-space footprint, so previously disjoint card rectangles stay disjoint. Long titles truncate inside their label with full title available on hover/focus entry, and compact content stays contained."
+      "criterion": "At scales 0.08 through 1.45 and both hysteresis directions, compact/map surfaces fit inside their original 294x205 world-space footprint, so previously disjoint card rectangles stay disjoint. Long titles truncate inside their label with full title available on hover/focus entry, and compact content stays contained.",
+      "identity": "sha256:529a0f9b645987769b386938636ede27ba7a70c65a0e55a56124cc2502d31fb0",
+      "revision": 1,
+      "state": "active"
     },
     {
       "acceptance_id": "consistent-geometry",
-      "criterion": "Fork edge endpoints use current visible card bounds during zoom and drag, Fit contains and centers visible surfaces, and zoom/Fit never emit node position updates."
+      "criterion": "Fork edge endpoints use current visible card bounds during zoom and drag, Fit contains and centers visible surfaces, and zoom/Fit never emit node position updates.",
+      "identity": "sha256:395f53d83f1a7c78af5feb6460f2ff81bf1a8280f551ea4246d05d6720d2795d",
+      "revision": 1,
+      "state": "active"
     },
     {
       "acceptance_id": "regression-proof",
-      "criterion": "Regression tests cover bounding and edge/Fit geometry at detail, compact, map and minimum zoom; desktop tests/typecheck/build pass and the live Electron preview visibly shows separated labels for the reported existing layout."
+      "criterion": "Regression tests cover bounding and edge/Fit geometry at detail, compact, map and minimum zoom; desktop tests/typecheck/build pass and the live Electron preview visibly shows separated labels for the reported existing layout.",
+      "identity": "sha256:3c39fb88b4fe560896ef99f187bbba5e040b55ccae2d92a3ddac38035e3f9ab1",
+      "revision": 1,
+      "state": "active"
     }
   ],
+  "active_contract_revision": 1,
   "constraints": [
     "Preserve persisted node positions and world-coordinate drag behavior; no automatic tidy or layout displacement.",
     "Limit changes to Overview semantic geometry/styles and regression coverage on ui/peel-shell-semantic-zoom.",
@@ -37,23 +47,47 @@
       "ref": "apps/desktop/src/renderer/polish.css"
     }
   ],
+  "contract_revisions": [
+    {
+      "acceptance_revisions": [
+        {
+          "acceptance_id": "bounded-surfaces",
+          "identity": "sha256:529a0f9b645987769b386938636ede27ba7a70c65a0e55a56124cc2502d31fb0",
+          "revision": 1
+        },
+        {
+          "acceptance_id": "consistent-geometry",
+          "identity": "sha256:395f53d83f1a7c78af5feb6460f2ff81bf1a8280f551ea4246d05d6720d2795d",
+          "revision": 1
+        },
+        {
+          "acceptance_id": "regression-proof",
+          "identity": "sha256:3c39fb88b4fe560896ef99f187bbba5e040b55ccae2d92a3ddac38035e3f9ab1",
+          "revision": 1
+        }
+      ],
+      "identity": "sha256:befd167c3275511c87c8bbac3b765c88db3a218d8d7018e0aa6f6054b16e82d0",
+      "revision": 1
+    }
+  ],
+  "deliveries": [
+    {
+      "delivered_at": "2026-09-07T21:02:01Z",
+      "delivered_commit": "16edd76dffe422024ea63a56e4a6f5cc84611046",
+      "kind": "pull_request",
+      "ref": "https://github.com/waynewangyuxuan/Peel/pull/1",
+      "state": "delivered"
+    }
+  ],
   "kind": "ticket",
   "maturity": "firm",
   "outcome": "Overview semantic zoom stays within each original card footprint, keeps fork edges attached to the visible surfaces, and preserves saved node positions.",
-  "deliveries": [
-    {
-      "kind": "pull_request",
-      "ref": "https://github.com/waynewangyuxuan/Peel/pull/1",
-      "state": "delivered",
-      "delivered_at": "2026-09-07T21:02:01Z",
-      "delivered_commit": "16edd76dffe422024ea63a56e4a6f5cc84611046"
-    }
-  ],
   "provenance_refs": [
     "conversation:2026-09-07-overlapping-semantic-map-labels",
     "https://github.com/waynewangyuxuan/Peel/pull/1"
   ],
   "relations": [],
-  "schema_version": 2,
+  "revision_state": "bound",
+  "schema_version": 3,
   "ticket_id": "ticket-fix-semantic-zoom-geometry"
 }

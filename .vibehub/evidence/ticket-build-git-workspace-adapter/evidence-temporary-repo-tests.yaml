@@ -2,6 +2,15 @@
   "acceptance_ids": [
     "temporary-repo-tests"
   ],
+  "acceptance_revisions": [
+    {
+      "acceptance_id": "temporary-repo-tests",
+      "identity": "sha256:e850aa17b2f0da7d9cd6c973cec2f86c8111e03d847123cf67cc4bfdf2ee84d6",
+      "revision": 1
+    }
+  ],
+  "binding_origin": "reconstructed",
+  "binding_state": "bound",
   "evidence_id": "evidence-temporary-repo-tests",
   "kind": "ticket_evidence",
   "origin": "agent",
@@ -13,7 +22,7 @@
     "command:cd packages/git-workspace && npm test",
     "command:cd packages/git-workspace && npm pack --dry-run --cache /private/tmp/peel-npm-cache"
   ],
-  "schema_version": 1,
+  "schema_version": 2,
   "summary": "Ten automated tests passed in mkdtemp-owned repositories, covering main checkout, linked worktree, dirty and untracked state, naming collision, invalid and unavailable Git contexts, broad/unresolved targets, injected branch-only and leftover-directory failures, exact artifact reporting, retry/current fallback facts, NUL-safe tab-containing paths, symlink escape rejection, and diff/open behavior. Test cleanup removes only each fixture's unique temporary root.",
   "ticket_id": "ticket-build-git-workspace-adapter"
 }

@@ -1,26 +1,42 @@
 {
   "acceptance": [
     {
-      "acceptance_id": "keyboard-navigation",
-      "criterion": "Keyboard-first Overview navigation can move through Parent, Child, Sibling, attention results, and search results, focus a selected Thread, and return without trapping focus or breaking standard text interaction."
-    },
-    {
-      "acceptance_id": "reversible-reduction",
-      "criterion": "Collapse/Park Subtree, Show Recent Only, Space Search, and Pin Thread are reversible, preserve underlying topology and positions, and clearly distinguish hidden from removed content."
-    },
-    {
       "acceptance_id": "explicit-tidy",
-      "criterion": "Tidy Layout is the only operation allowed to reposition existing nodes globally, requires an explicit user action, produces a reviewable result, and preserves manual positions until invoked again."
-    },
-    {
-      "acceptance_id": "large-space-task-test",
-      "criterion": "Automated and evaluator-driven tests on 30–50 Node real-shape fixtures demonstrate that, after opening Overview, a known titled Thread is focusable within 4 deliberate actions, an approval-needed Thread and a recent result within 3 actions each, and a parked deep descendant within 5 actions; typing a search query counts as one action and opening Transcripts to hunt does not satisfy the test."
+      "criterion": "Tidy Layout is the only operation allowed to reposition existing nodes globally, requires an explicit user action, produces a reviewable result, and preserves manual positions until invoked again.",
+      "identity": "sha256:574a3af9df0a7a07d4ecc63c864ee2440589ebe0057e6e7deb84f8babe6e4baa",
+      "revision": 1,
+      "state": "active"
     },
     {
       "acceptance_id": "focus-tree-folding",
-      "criterion": "Focus Tree progressively prioritizes Current Path, Siblings, direct Children, and attention states while allowing any hidden subtree to be deliberately expanded."
+      "criterion": "Focus Tree progressively prioritizes Current Path, Siblings, direct Children, and attention states while allowing any hidden subtree to be deliberately expanded.",
+      "identity": "sha256:003f0790a5fa3fe501922b95c40b022dd977142e1b8dc05e009d01c2428eb0fe",
+      "revision": 1,
+      "state": "active"
+    },
+    {
+      "acceptance_id": "keyboard-navigation",
+      "criterion": "Keyboard-first Overview navigation can move through Parent, Child, Sibling, attention results, and search results, focus a selected Thread, and return without trapping focus or breaking standard text interaction.",
+      "identity": "sha256:18d1209bda7b22e86f48a1cd39e1ab7d44b9bab18fcc329447f1fdb16665eb18",
+      "revision": 1,
+      "state": "active"
+    },
+    {
+      "acceptance_id": "large-space-task-test",
+      "criterion": "Automated and evaluator-driven tests on 30–50 Node real-shape fixtures demonstrate that, after opening Overview, a known titled Thread is focusable within 4 deliberate actions, an approval-needed Thread and a recent result within 3 actions each, and a parked deep descendant within 5 actions; typing a search query counts as one action and opening Transcripts to hunt does not satisfy the test.",
+      "identity": "sha256:d180b2e4977c745c9de50c990670f64ea5422e2d4c13f17d2db576508e633a07",
+      "revision": 1,
+      "state": "active"
+    },
+    {
+      "acceptance_id": "reversible-reduction",
+      "criterion": "Collapse/Park Subtree, Show Recent Only, Space Search, and Pin Thread are reversible, preserve underlying topology and positions, and clearly distinguish hidden from removed content.",
+      "identity": "sha256:19abb9087219f2fb59c7bcb7347894c1b471df557f90b5a51d2fdf70db320ded",
+      "revision": 1,
+      "state": "active"
     }
   ],
+  "active_contract_revision": 1,
   "constraints": [
     "Do not change Fork topology or saved positions during filter, collapse, park, search, or pin operations.",
     "Do not add arbitrary Edge, AI-generated branch taxonomy, or Project grouping.",
@@ -45,10 +61,43 @@
       "ref": ".vibehub/rooms/product/contract-attention-and-subagent-activity.yaml"
     }
   ],
+  "contract_revisions": [
+    {
+      "acceptance_revisions": [
+        {
+          "acceptance_id": "explicit-tidy",
+          "identity": "sha256:574a3af9df0a7a07d4ecc63c864ee2440589ebe0057e6e7deb84f8babe6e4baa",
+          "revision": 1
+        },
+        {
+          "acceptance_id": "focus-tree-folding",
+          "identity": "sha256:003f0790a5fa3fe501922b95c40b022dd977142e1b8dc05e009d01c2428eb0fe",
+          "revision": 1
+        },
+        {
+          "acceptance_id": "keyboard-navigation",
+          "identity": "sha256:18d1209bda7b22e86f48a1cd39e1ab7d44b9bab18fcc329447f1fdb16665eb18",
+          "revision": 1
+        },
+        {
+          "acceptance_id": "large-space-task-test",
+          "identity": "sha256:d180b2e4977c745c9de50c990670f64ea5422e2d4c13f17d2db576508e633a07",
+          "revision": 1
+        },
+        {
+          "acceptance_id": "reversible-reduction",
+          "identity": "sha256:19abb9087219f2fb59c7bcb7347894c1b471df557f90b5a51d2fdf70db320ded",
+          "revision": 1
+        }
+      ],
+      "identity": "sha256:134a6691649f61c317dec281f3dbc3d06459cef2798e7a3446f1dc5ade18c712",
+      "revision": 1
+    }
+  ],
+  "deliveries": [],
   "kind": "ticket",
   "maturity": "firm",
   "outcome": "Large Peel Spaces support fast, reversible navigation and attention management across 30–50 real Thread nodes without sacrificing stable spatial memory.",
-  "deliveries": [],
   "provenance_refs": [
     "conversation:2026-08-25-plan-peel-v01-v02"
   ],
@@ -59,6 +108,7 @@
       "type": "depends_on"
     }
   ],
-  "schema_version": 2,
+  "revision_state": "bound",
+  "schema_version": 3,
   "ticket_id": "ticket-deliver-v02-scale-navigation"
 }

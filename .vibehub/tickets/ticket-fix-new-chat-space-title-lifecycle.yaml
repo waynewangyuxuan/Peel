@@ -1,26 +1,42 @@
 {
   "acceptance": [
     {
-      "acceptance_id": "new-chat-default-title-transition",
-      "criterion": "A directly created empty Chat may initially display New Chat, but after the first text prompt establishes the Root temporary/automatic title, its default-owned Space label transitions to the same useful title in the sidebar without requiring restart or manual rename."
+      "acceptance_id": "legacy-new-chat-repair",
+      "criterion": "Existing persisted Spaces whose label is exactly the legacy default New Chat and whose Root has a non-default useful title are repaired deterministically; no other existing Space name is rewritten.",
+      "identity": "sha256:a6ae06f686a9327be20823ef2014cf349c89c3d9327d10a346fffb6c54875998",
+      "revision": 1,
+      "state": "active"
     },
     {
       "acceptance_id": "manual-space-name-precedence",
-      "criterion": "Once a user explicitly renames a Space, later Root Thread temporary, automatic, manual, or thread/name/updated changes never overwrite that Space name; renaming the Space still does not write back to Codex Thread name."
-    },
-    {
-      "acceptance_id": "title-origin-persistence",
-      "criterion": "Peel persists enough Space-name provenance to distinguish default-following from manual Space names across switching and full application restart, with normalization for older saved state that lacks the new provenance field."
-    },
-    {
-      "acceptance_id": "legacy-new-chat-repair",
-      "criterion": "Existing persisted Spaces whose label is exactly the legacy default New Chat and whose Root has a non-default useful title are repaired deterministically; no other existing Space name is rewritten."
+      "criterion": "Once a user explicitly renames a Space, later Root Thread temporary, automatic, manual, or thread/name/updated changes never overwrite that Space name; renaming the Space still does not write back to Codex Thread name.",
+      "identity": "sha256:82d62ffd9f90299e8353f3cee6cc6234e978e7f9d2f43e63fee33819be6ffbd3",
+      "revision": 1,
+      "state": "active"
     },
     {
       "acceptance_id": "naming-regression-evidence",
-      "criterion": "Service/state unit tests and the production Electron journey cover direct creation, first prompt, delayed automatic title, manual Space rename before and after completion, manual Thread rename, thread/name/updated, legacy-state normalization, sidebar rendering, and restart restoration without regressing Fork titles or Codex title synchronization."
+      "criterion": "Service/state unit tests and the production Electron journey cover direct creation, first prompt, delayed automatic title, manual Space rename before and after completion, manual Thread rename, thread/name/updated, legacy-state normalization, sidebar rendering, and restart restoration without regressing Fork titles or Codex title synchronization.",
+      "identity": "sha256:79eb380fe50f86dea292b85332cd0f40660fae6389abbe19d2e1d9ee3e4547d9",
+      "revision": 1,
+      "state": "active"
+    },
+    {
+      "acceptance_id": "new-chat-default-title-transition",
+      "criterion": "A directly created empty Chat may initially display New Chat, but after the first text prompt establishes the Root temporary/automatic title, its default-owned Space label transitions to the same useful title in the sidebar without requiring restart or manual rename.",
+      "identity": "sha256:05f9d573293df900fc2ef54405b4e4867a18ca238b7038a177365a580a5b16fa",
+      "revision": 1,
+      "state": "active"
+    },
+    {
+      "acceptance_id": "title-origin-persistence",
+      "criterion": "Peel persists enough Space-name provenance to distinguish default-following from manual Space names across switching and full application restart, with normalization for older saved state that lacks the new provenance field.",
+      "identity": "sha256:43e553d67358cb3e876dedc348b6098dc218e32eb43dd075569037ce3770b6bd",
+      "revision": 1,
+      "state": "active"
     }
   ],
+  "active_contract_revision": 1,
   "constraints": [
     "Space Name and Thread Name remain distinct product concepts; only default-owned Space names follow the Root lifecycle.",
     "Never overwrite an explicit Space name or write a Space rename to Codex.",
@@ -39,7 +55,40 @@
     },
     {
       "purpose": "Provides the completed direct New Chat creation baseline this correction extends.",
-      "ref": ".vibehub/outcomes/ticket-rework-new-chat-composer-and-voice-feedback.yaml"
+      "ref": ".vibehub/outcomes/ticket-rework-new-chat-composer-and-voice-feedback/contract-v1.yaml"
+    }
+  ],
+  "contract_revisions": [
+    {
+      "acceptance_revisions": [
+        {
+          "acceptance_id": "legacy-new-chat-repair",
+          "identity": "sha256:a6ae06f686a9327be20823ef2014cf349c89c3d9327d10a346fffb6c54875998",
+          "revision": 1
+        },
+        {
+          "acceptance_id": "manual-space-name-precedence",
+          "identity": "sha256:82d62ffd9f90299e8353f3cee6cc6234e978e7f9d2f43e63fee33819be6ffbd3",
+          "revision": 1
+        },
+        {
+          "acceptance_id": "naming-regression-evidence",
+          "identity": "sha256:79eb380fe50f86dea292b85332cd0f40660fae6389abbe19d2e1d9ee3e4547d9",
+          "revision": 1
+        },
+        {
+          "acceptance_id": "new-chat-default-title-transition",
+          "identity": "sha256:05f9d573293df900fc2ef54405b4e4867a18ca238b7038a177365a580a5b16fa",
+          "revision": 1
+        },
+        {
+          "acceptance_id": "title-origin-persistence",
+          "identity": "sha256:43e553d67358cb3e876dedc348b6098dc218e32eb43dd075569037ce3770b6bd",
+          "revision": 1
+        }
+      ],
+      "identity": "sha256:cfae11ddf218ced9302ea33525c18044c23ba7fe2251a41fe731caeec7320601",
+      "revision": 1
     }
   ],
   "deliveries": [],
@@ -52,6 +101,7 @@
     "apps/desktop/src/shared/state.ts"
   ],
   "relations": [],
-  "schema_version": 2,
+  "revision_state": "bound",
+  "schema_version": 3,
   "ticket_id": "ticket-fix-new-chat-space-title-lifecycle"
 }

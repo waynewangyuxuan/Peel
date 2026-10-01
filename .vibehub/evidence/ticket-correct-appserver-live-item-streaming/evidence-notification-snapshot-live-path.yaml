@@ -5,6 +5,30 @@
     "live-rendering-behavior",
     "streaming-contract-evidence"
   ],
+  "acceptance_revisions": [
+    {
+      "acceptance_id": "reasoning-channel-fidelity",
+      "identity": "sha256:533f77eaacbbf0ec66cc861c65b7a9ec41b83853014fa5dd0014bffaf4ca8747",
+      "revision": 1
+    },
+    {
+      "acceptance_id": "authoritative-completion",
+      "identity": "sha256:6c17e16f88d1464a04abf67325509d1a95974ecbbef3455761e5a9d1c489059c",
+      "revision": 1
+    },
+    {
+      "acceptance_id": "live-rendering-behavior",
+      "identity": "sha256:ab82d2b4b833d50b664a8fdd2d6ab9fa260239ffa4ac99dff3eb78f947688116",
+      "revision": 1
+    },
+    {
+      "acceptance_id": "streaming-contract-evidence",
+      "identity": "sha256:6d861970ddc5c7f340edf13772750be026ddd507e898ff12bcc1200b4af8ee8e",
+      "revision": 1
+    }
+  ],
+  "binding_origin": "reconstructed",
+  "binding_state": "bound",
   "evidence_id": "evidence-notification-snapshot-live-path",
   "kind": "ticket_evidence",
   "origin": "agent",
@@ -21,7 +45,7 @@
     "command:npm run typecheck --workspace @peel/desktop",
     "command:npm test --workspace @peel/desktop -- --run test/markdown.test.tsx"
   ],
-  "schema_version": 1,
+  "schema_version": 2,
   "summary": "Independent review found and implementation removed the notification-time full thread/read loop: PeelService now publishes the reducer-derived ThreadSnapshot with each notification and App installs it directly, while full reads remain on initial load/recovery paths. Electron coverage asserts streaming a child produces at most its one initial read. Completed Reasoning now explicitly prefers public summary parts over simultaneous raw content, with a both-fields regression proving raw content is not duplicated into the public summary view. Desktop typecheck and all 54 desktop tests pass after these corrections.",
   "ticket_id": "ticket-correct-appserver-live-item-streaming"
 }

@@ -2,6 +2,15 @@
   "acceptance_ids": [
     "surface-and-safety-regression"
   ],
+  "acceptance_revisions": [
+    {
+      "acceptance_id": "surface-and-safety-regression",
+      "identity": "sha256:92abf09a06d039e76a6cc123506a7ade7e3136ea19ee5bb68c65fe01020f3d01",
+      "revision": 1
+    }
+  ],
+  "binding_origin": "reconstructed",
+  "binding_state": "bound",
   "evidence_id": "evidence-main-diff-surface-regression",
   "kind": "ticket_evidence",
   "origin": "agent",
@@ -15,7 +24,7 @@
     "command:npm run test:e2e --workspace @peel/desktop passes 1/1 in 36.7 seconds",
     "command:npm run build passes"
   ],
-  "schema_version": 1,
+  "schema_version": 2,
   "summary": "The production Diff drawer now visibly shows Compared with main beside its changed-file and line totals. The complete Electron product journey initializes its disposable repository explicitly on main, asserts that comparison label, exercises Current/New Worktree Forks and recoverable failures, then renders the real Diff patch. It passed 1/1 in 36.7 seconds; the generated ui-diff.png was directly inspected and retains the Demo-aligned drawer hierarchy without clipping or regression. Full repository build and all 44 tests pass.",
   "ticket_id": "ticket-fix-main-git-baseline"
 }

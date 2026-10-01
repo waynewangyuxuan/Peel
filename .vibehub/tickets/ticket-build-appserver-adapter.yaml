@@ -1,26 +1,42 @@
 {
   "acceptance": [
     {
-      "acceptance_id": "transport-handshake",
-      "criterion": "AppServerTransport owns process lifecycle, initialize/initialized handshake, request correlation, cancellation, stderr/error propagation, graceful shutdown, and reconnect behavior for local stdio."
-    },
-    {
-      "acceptance_id": "thread-client-mainline",
-      "criterion": "ThreadClient provides typed list/search, read with turns, fork with exact completed lastTurnId, start turn, name set, status subscription, streamed Turn/Item events, approval responses, and aggregated turn diff access using the installed App Server schema."
-    },
-    {
-      "acceptance_id": "reconstructable-reducer",
-      "criterion": "EventReducer produces deterministic Thread/Turn/Item state from snapshots plus events, treats completed items as authoritative, survives duplicate/out-of-order reconnect replay where the protocol permits, and can rebuild from Codex after interruption without shadow Transcript state."
+      "acceptance_id": "adapter-verification",
+      "criterion": "Automated fixture tests cover protocol success and error paths, and an opt-in live smoke test against the locally installed Codex proves list/read/fork(lastTurnId)/turn/name/status/diff behavior without mutating unrelated user Threads.",
+      "identity": "sha256:61fb64eb7df2af2e786b00fb9503483ede1e471f7fd3262a44c797e19096d54a",
+      "revision": 1,
+      "state": "active"
     },
     {
       "acceptance_id": "capability-matrix",
-      "criterion": "Startup capability detection classifies each used method as stable, experimental-enabled, or unavailable; Project, paginated-item, Realtime, and other optional features degrade explicitly without breaking the Thread-first loop."
+      "criterion": "Startup capability detection classifies each used method as stable, experimental-enabled, or unavailable; Project, paginated-item, Realtime, and other optional features degrade explicitly without breaking the Thread-first loop.",
+      "identity": "sha256:f9fa3dab8ba67d16d611f6b18d5ead41465c239d68488833ccee0262842fca8d",
+      "revision": 1,
+      "state": "active"
     },
     {
-      "acceptance_id": "adapter-verification",
-      "criterion": "Automated fixture tests cover protocol success and error paths, and an opt-in live smoke test against the locally installed Codex proves list/read/fork(lastTurnId)/turn/name/status/diff behavior without mutating unrelated user Threads."
+      "acceptance_id": "reconstructable-reducer",
+      "criterion": "EventReducer produces deterministic Thread/Turn/Item state from snapshots plus events, treats completed items as authoritative, survives duplicate/out-of-order reconnect replay where the protocol permits, and can rebuild from Codex after interruption without shadow Transcript state.",
+      "identity": "sha256:efa1e6ed6c5dea75a17b1af4e3ef8eec026f0fce41919790086433fbbdeac864",
+      "revision": 1,
+      "state": "active"
+    },
+    {
+      "acceptance_id": "thread-client-mainline",
+      "criterion": "ThreadClient provides typed list/search, read with turns, fork with exact completed lastTurnId, start turn, name set, status subscription, streamed Turn/Item events, approval responses, and aggregated turn diff access using the installed App Server schema.",
+      "identity": "sha256:bb4f15630786bf80e533822a75c42424d7120f24871fece7c0be83504959556b",
+      "revision": 1,
+      "state": "active"
+    },
+    {
+      "acceptance_id": "transport-handshake",
+      "criterion": "AppServerTransport owns process lifecycle, initialize/initialized handshake, request correlation, cancellation, stderr/error propagation, graceful shutdown, and reconnect behavior for local stdio.",
+      "identity": "sha256:2e128b5d3c591dfaf2ba42f4263193b7a5f5eee93bbda73ba3302d1059aef8d4",
+      "revision": 1,
+      "state": "active"
     }
   ],
+  "active_contract_revision": 1,
   "constraints": [
     "Codex remains Source of Truth for Transcript, Turn/Item, status, approval, cwd/worktree, Git state, and Subagent Threads.",
     "Do not require Codex Project APIs for any mainline operation.",
@@ -50,10 +66,43 @@
       "ref": ".vibehub/rooms/product/contract-attention-and-subagent-activity.yaml"
     }
   ],
+  "contract_revisions": [
+    {
+      "acceptance_revisions": [
+        {
+          "acceptance_id": "adapter-verification",
+          "identity": "sha256:61fb64eb7df2af2e786b00fb9503483ede1e471f7fd3262a44c797e19096d54a",
+          "revision": 1
+        },
+        {
+          "acceptance_id": "capability-matrix",
+          "identity": "sha256:f9fa3dab8ba67d16d611f6b18d5ead41465c239d68488833ccee0262842fca8d",
+          "revision": 1
+        },
+        {
+          "acceptance_id": "reconstructable-reducer",
+          "identity": "sha256:efa1e6ed6c5dea75a17b1af4e3ef8eec026f0fce41919790086433fbbdeac864",
+          "revision": 1
+        },
+        {
+          "acceptance_id": "thread-client-mainline",
+          "identity": "sha256:bb4f15630786bf80e533822a75c42424d7120f24871fece7c0be83504959556b",
+          "revision": 1
+        },
+        {
+          "acceptance_id": "transport-handshake",
+          "identity": "sha256:2e128b5d3c591dfaf2ba42f4263193b7a5f5eee93bbda73ba3302d1059aef8d4",
+          "revision": 1
+        }
+      ],
+      "identity": "sha256:cc322289fc63759ea7e412cd0c0ea88ccac5fed5d66249a1e5c45aab35ac9c68",
+      "revision": 1
+    }
+  ],
+  "deliveries": [],
   "kind": "ticket",
   "maturity": "firm",
   "outcome": "Peel has a tested rich-client Codex App Server adapter that exposes stable Thread operations and reconstructable event state without Project dependence.",
-  "deliveries": [],
   "provenance_refs": [
     "conversation:2026-08-25-codex-app-server-capability-audit",
     "https://learn.chatgpt.com/docs/app-server",
@@ -67,6 +116,7 @@
       "type": "depends_on"
     }
   ],
-  "schema_version": 2,
+  "revision_state": "bound",
+  "schema_version": 3,
   "ticket_id": "ticket-build-appserver-adapter"
 }

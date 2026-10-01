@@ -1,22 +1,35 @@
 {
   "acceptance": [
     {
-      "acceptance_id": "transient-dismissible-diagnostics",
-      "criterion": "Every surfaced global diagnostic has a visible, keyboard-accessible close action; warnings and notices automatically fade after a short readable interval, errors remain until explicitly dismissed, and reduced-motion users receive the same lifecycle without decorative motion."
-    },
-    {
-      "acceptance_id": "session-history-with-context",
-      "criterion": "A discoverable Diagnostics entry opens the latest 50 session diagnostics newest-first with timestamp, severity, sanitized message, and producing conversation title or Thread identifier when scoped, otherwise Global; manually dismissed and automatically faded items remain reviewable for the session."
-    },
-    {
       "acceptance_id": "dedupe-and-recurrence-semantics",
-      "criterion": "One diagnostic identity does not continuously re-toast, a later occurrence refreshes its recorded time or equivalent recurrence metadata without unbounded growth, new errors still surface, and dismissing UI never claims that the underlying Codex condition was repaired."
+      "criterion": "One diagnostic identity does not continuously re-toast, a later occurrence refreshes its recorded time or equivalent recurrence metadata without unbounded growth, new errors still surface, and dismissing UI never claims that the underlying Codex condition was repaired.",
+      "identity": "sha256:d038897986528047a84a08bcf0558a5b64d3156de83cd5bdd0d4fa3d6e1b1a62",
+      "revision": 1,
+      "state": "active"
     },
     {
       "acceptance_id": "diagnostics-lifecycle-regression",
-      "criterion": "Unit and production-Electron tests cover the current pagination deprecation notice, Thread-scoped warning/error context, explicit close, warning timeout, sticky error, history access, newest-first ordering, 50-item bound, sanitization, and an unobstructed top bar after dismissal or fade."
+      "criterion": "Unit and production-Electron tests cover the current pagination deprecation notice, Thread-scoped warning/error context, explicit close, warning timeout, sticky error, history access, newest-first ordering, 50-item bound, sanitization, and an unobstructed top bar after dismissal or fade.",
+      "identity": "sha256:da01291fb552c6e88913bb60948766e828aaf51e7383803144c16cf93a8c3ccf",
+      "revision": 1,
+      "state": "active"
+    },
+    {
+      "acceptance_id": "session-history-with-context",
+      "criterion": "A discoverable Diagnostics entry opens the latest 50 session diagnostics newest-first with timestamp, severity, sanitized message, and producing conversation title or Thread identifier when scoped, otherwise Global; manually dismissed and automatically faded items remain reviewable for the session.",
+      "identity": "sha256:7763729c09911a18b778385e2cbd787550b477bd6d82212daac6e8b8dbe2e042",
+      "revision": 1,
+      "state": "active"
+    },
+    {
+      "acceptance_id": "transient-dismissible-diagnostics",
+      "criterion": "Every surfaced global diagnostic has a visible, keyboard-accessible close action; warnings and notices automatically fade after a short readable interval, errors remain until explicitly dismissed, and reduced-motion users receive the same lifecycle without decorative motion.",
+      "identity": "sha256:f3a31e8d539e271f218d0dbb5ce22a40de4b47fee16958a1461998688fc77585",
+      "revision": 1,
+      "state": "active"
     }
   ],
+  "active_contract_revision": 1,
   "constraints": [
     "Preserve the accepted separation between Turn errors, Thread warnings, and global host diagnostics; diagnostics must not masquerade as conversation content.",
     "Retain the in-memory 50-item cap and do not add durable saved-state or telemetry storage for this session history.",
@@ -27,7 +40,7 @@
   "context_refs": [
     {
       "purpose": "Preserves the accepted diagnostic scoping, sanitization, unsupported-method response, and application-server routing behavior.",
-      "ref": ".vibehub/outcomes/ticket-route-appserver-requests-and-errors.yaml"
+      "ref": ".vibehub/outcomes/ticket-route-appserver-requests-and-errors/contract-v1.yaml"
     },
     {
       "purpose": "Owns the existing deduplicated 50-item in-memory diagnostic collection and sanitized App Server notification mapping.",
@@ -42,6 +55,34 @@
       "ref": "apps/desktop/src/renderer/Transcript.tsx"
     }
   ],
+  "contract_revisions": [
+    {
+      "acceptance_revisions": [
+        {
+          "acceptance_id": "dedupe-and-recurrence-semantics",
+          "identity": "sha256:d038897986528047a84a08bcf0558a5b64d3156de83cd5bdd0d4fa3d6e1b1a62",
+          "revision": 1
+        },
+        {
+          "acceptance_id": "diagnostics-lifecycle-regression",
+          "identity": "sha256:da01291fb552c6e88913bb60948766e828aaf51e7383803144c16cf93a8c3ccf",
+          "revision": 1
+        },
+        {
+          "acceptance_id": "session-history-with-context",
+          "identity": "sha256:7763729c09911a18b778385e2cbd787550b477bd6d82212daac6e8b8dbe2e042",
+          "revision": 1
+        },
+        {
+          "acceptance_id": "transient-dismissible-diagnostics",
+          "identity": "sha256:f3a31e8d539e271f218d0dbb5ce22a40de4b47fee16958a1461998688fc77585",
+          "revision": 1
+        }
+      ],
+      "identity": "sha256:c69a06b6336db39e165bef7f9786dcbf824a6069f475beed4c7746eee94280b0",
+      "revision": 1
+    }
+  ],
   "deliveries": [],
   "kind": "ticket",
   "maturity": "firm",
@@ -51,6 +92,7 @@
     "dogfood:global-full-history-hydration-deprecation-notice"
   ],
   "relations": [],
-  "schema_version": 2,
+  "revision_state": "bound",
+  "schema_version": 3,
   "ticket_id": "ticket-make-codex-diagnostics-dismissible-and-reviewable"
 }

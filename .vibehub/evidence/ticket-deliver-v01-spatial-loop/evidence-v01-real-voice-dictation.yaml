@@ -2,6 +2,15 @@
   "acceptance_ids": [
     "real-voice-dictation"
   ],
+  "acceptance_revisions": [
+    {
+      "acceptance_id": "real-voice-dictation",
+      "identity": "sha256:865628896f2b8bbb099cbe0e05b501709de9e0c0fc9d9a7613e65af8c2295cb5",
+      "revision": 1
+    }
+  ],
+  "binding_origin": "reconstructed",
+  "binding_state": "bound",
   "evidence_id": "evidence-v01-real-voice-dictation",
   "kind": "ticket_evidence",
   "origin": "agent",
@@ -18,7 +27,7 @@
     "apps/desktop/scripts/verify-package.mjs",
     "command:otool -L apps/desktop/native/bin/peel-speech"
   ],
-  "schema_version": 1,
+  "schema_version": 2,
   "summary": "Production Voice is real microphone MediaStream to mono PCM/WAV to an unpacked Objective-C helper linked to Apple Speech.framework, with helper/app bundle identity and microphone/Speech privacy declarations. Returned words append against the latest editable Draft and never auto-send, so typing during pending recognition is preserved. Pending permission resolution after a Thread switch cancels the late session; capture interruption, permission denial, recognition failure, short/empty capture, and timeout preserve the exact Draft. The UI fixture proves interaction/recovery only; native linkage/source are the production proof and no synthetic waveform is claimed as human speech recognition.",
   "ticket_id": "ticket-deliver-v01-spatial-loop"
 }

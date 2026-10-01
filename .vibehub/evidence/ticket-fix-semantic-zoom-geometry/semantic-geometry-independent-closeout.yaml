@@ -4,6 +4,25 @@
     "consistent-geometry",
     "regression-proof"
   ],
+  "acceptance_revisions": [
+    {
+      "acceptance_id": "bounded-surfaces",
+      "identity": "sha256:529a0f9b645987769b386938636ede27ba7a70c65a0e55a56124cc2502d31fb0",
+      "revision": 1
+    },
+    {
+      "acceptance_id": "consistent-geometry",
+      "identity": "sha256:395f53d83f1a7c78af5feb6460f2ff81bf1a8280f551ea4246d05d6720d2795d",
+      "revision": 1
+    },
+    {
+      "acceptance_id": "regression-proof",
+      "identity": "sha256:3c39fb88b4fe560896ef99f187bbba5e040b55ccae2d92a3ddac38035e3f9ab1",
+      "revision": 1
+    }
+  ],
+  "binding_origin": "reconstructed",
+  "binding_state": "bound",
   "evidence_id": "semantic-geometry-independent-closeout",
   "kind": "ticket_evidence",
   "origin": "agent",
@@ -18,7 +37,7 @@
     "docs/review/semantic-zoom/geometry-fix/fit-separated.png",
     "conversation:2026-09-07-independent-geometry-closeout-verification"
   ],
-  "schema_version": 1,
+  "schema_version": 2,
   "summary": "Independent closeout inspected the exact Ticket, implementation diff, semantic geometry unit and Electron tests, and existing journey adjustments. Identified transient outgoing compact-layer expansion; re-reviewed its correction to independent bounded per-layer CSS scale/width and animation-frame audit. Independently reran all 51 desktop tests in 11 files, typecheck, and complete native/renderer/main/preload build successfully after final changes. Retained Electron last-run status is passed with no failed tests. Inspected tracked map and Fit screenshots: synthetic labels are disjoint and fork endpoints attached. Independently compared the existing preview source state and final inspection copy: all saved node coordinates match, active layout has four nodes at camera scale 0.32, and every actual-layout map rectangle is disjoint (294 by 109.25 world units). Original-layout screenshot was inspected by executor and is referenced in its Evidence; closeout independently corroborated that observation through source-state geometry and retained rendered regression artifacts. No unresolved acceptance gaps found.",
   "ticket_id": "ticket-fix-semantic-zoom-geometry"
 }

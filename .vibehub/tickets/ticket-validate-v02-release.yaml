@@ -1,23 +1,36 @@
 {
   "acceptance": [
     {
+      "acceptance_id": "human-large-space-utility",
+      "authority": "human",
+      "criterion": "Wayne dogfoods a large Space and explicitly confirms he can locate and prioritize non-current Branches without opening every Transcript; any release-blocking mismatch is recorded as human-origin evidence.",
+      "identity": "sha256:9f4ed1a6fa02c83018094f01bd4e38c1cd2a454d00678133c8f97fef73e61159",
+      "revision": 1,
+      "state": "active"
+    },
+    {
       "acceptance_id": "refine-after-continuity-contract",
-      "criterion": "After External Continuity becomes Firm, this same Ticket is rewritten as Firm so every supported continuity behavior has an independent release check and no unsupported behavior is implied."
+      "criterion": "After External Continuity becomes Firm, this same Ticket is rewritten as Firm so every supported continuity behavior has an independent release check and no unsupported behavior is implied.",
+      "identity": "sha256:4a9ae1aec860868d39c252c1f78abe5e0bfca90e5e5cd1bbe8f33d6a33898c85",
+      "revision": 1,
+      "state": "active"
     },
     {
       "acceptance_id": "retain-scale-release-proof",
-      "criterion": "The refined gate independently verifies the concrete large-space action bounds plus keyboard, search, pin, collapse/park, recent filtering, Focus Tree folding, and explicit Tidy across representative 30–50 Node Spaces without topology or unintended position changes."
+      "criterion": "The refined gate independently verifies the concrete large-space action bounds plus keyboard, search, pin, collapse/park, recent filtering, Focus Tree folding, and explicit Tidy across representative 30–50 Node Spaces without topology or unintended position changes.",
+      "identity": "sha256:565b24e40b9bc644f91d6837978b5a61e57faedf4af9d1abeab52f8296a06d13",
+      "revision": 1,
+      "state": "active"
     },
     {
       "acceptance_id": "retain-thread-first-release-boundary",
-      "criterion": "The refined gate proves every released v0.2 function works with Project APIs disabled or unavailable, includes the spatial-utility human judgment and final shape review, and keeps the separate Project inheritance evaluation non-gating."
-    },
-    {
-      "acceptance_id": "human-large-space-utility",
-      "authority": "human",
-      "criterion": "Wayne dogfoods a large Space and explicitly confirms he can locate and prioritize non-current Branches without opening every Transcript; any release-blocking mismatch is recorded as human-origin evidence."
+      "criterion": "The refined gate proves every released v0.2 function works with Project APIs disabled or unavailable, includes the spatial-utility human judgment and final shape review, and keeps the separate Project inheritance evaluation non-gating.",
+      "identity": "sha256:7b8830000e520a7f9f0509ad8adb2c0a01d98ed066675867be26443e5c1f2768",
+      "revision": 1,
+      "state": "active"
     }
   ],
+  "active_contract_revision": 1,
   "constraints": [
     "Project inheritance evaluation is not a release dependency.",
     "Human authority applies only to the large-Space utility judgment.",
@@ -42,10 +55,38 @@
       "ref": ".vibehub/rooms/product/decision-project-optional-context-overlay.yaml"
     }
   ],
+  "contract_revisions": [
+    {
+      "acceptance_revisions": [
+        {
+          "acceptance_id": "human-large-space-utility",
+          "identity": "sha256:9f4ed1a6fa02c83018094f01bd4e38c1cd2a454d00678133c8f97fef73e61159",
+          "revision": 1
+        },
+        {
+          "acceptance_id": "refine-after-continuity-contract",
+          "identity": "sha256:4a9ae1aec860868d39c252c1f78abe5e0bfca90e5e5cd1bbe8f33d6a33898c85",
+          "revision": 1
+        },
+        {
+          "acceptance_id": "retain-scale-release-proof",
+          "identity": "sha256:565b24e40b9bc644f91d6837978b5a61e57faedf4af9d1abeab52f8296a06d13",
+          "revision": 1
+        },
+        {
+          "acceptance_id": "retain-thread-first-release-boundary",
+          "identity": "sha256:7b8830000e520a7f9f0509ad8adb2c0a01d98ed066675867be26443e5c1f2768",
+          "revision": 1
+        }
+      ],
+      "identity": "sha256:16e198e7ecc2c50a5d45148db0c31a11ee661f5a9643a6b45093b7b1d572e2d2",
+      "revision": 1
+    }
+  ],
+  "deliveries": [],
   "kind": "ticket",
   "maturity": "draft",
   "outcome": "Peel v0.2 has a refined independent release gate that proves repeated work in large Spaces and only the native-Codex continuity behavior supported by post-v0.1 evidence, with Project APIs remaining optional.",
-  "deliveries": [],
   "provenance_refs": [
     "conversation:2026-08-25-plan-peel-v01-v02"
   ],
@@ -61,6 +102,7 @@
       "type": "depends_on"
     }
   ],
-  "schema_version": 2,
+  "revision_state": "bound",
+  "schema_version": 3,
   "ticket_id": "ticket-validate-v02-release"
 }

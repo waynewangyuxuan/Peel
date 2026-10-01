@@ -1,26 +1,42 @@
 {
   "acceptance": [
     {
-      "acceptance_id": "space-list-containment",
-      "criterion": "At the production 226px rail and compact 196px rail, long ASCII and CJK Space or Thread names never widen the navigation, create horizontal scrolling, cover controls, or break selected and hover states; the complete name remains available from keyboard focus and pointer hover."
+      "acceptance_id": "activity-hierarchy",
+      "criterion": "Reasoning, command, file-change, subagent, and failure items use compact Chat-like human labels and disclosure hierarchy; completed details are collapsed by default, active and failed states remain immediately legible, raw Markdown is parsed where appropriate, and technical details remain keyboard-accessible on demand.",
+      "identity": "sha256:fc2682ba2c13c0ad9e20972f2d8952f970042a417a1e1d7e8512cf5a7da6e3b0",
+      "revision": 1,
+      "state": "active"
     },
     {
       "acceptance_id": "current-thread-identity",
-      "criterion": "Long current Space and Thread names receive flexible but bounded top-bar space, preserve the complete title in the Focus transcript introduction, and expose the complete title through an accessible hover and focus affordance, so the current conversation can be identified without renaming it."
+      "criterion": "Long current Space and Thread names receive flexible but bounded top-bar space, preserve the complete title in the Focus transcript introduction, and expose the complete title through an accessible hover and focus affordance, so the current conversation can be identified without renaming it.",
+      "identity": "sha256:d89b9d7e5ffe746b2e1566d15fb804734a329fa293e8983e0ceeeae8cef49321",
+      "revision": 1,
+      "state": "active"
     },
     {
       "acceptance_id": "markdown-gfm-fidelity",
-      "criterion": "Assistant messages and Reasoning render safe CommonMark/GFM including tables, blockquotes, headings, ordered and unordered lists, task lists, emphasis, strikethrough, links, fenced and inline code, and soft line breaks; raw HTML is not executed and partial streaming content remains legible and selectable."
+      "criterion": "Assistant messages and Reasoning render safe CommonMark/GFM including tables, blockquotes, headings, ordered and unordered lists, task lists, emphasis, strikethrough, links, fenced and inline code, and soft line breaks; raw HTML is not executed and partial streaming content remains legible and selectable.",
+      "identity": "sha256:9a5b48239afb97aeead01f2bfd730a420dd49833bba82bc27e7d02dba7dadfa7",
+      "revision": 1,
+      "state": "active"
     },
     {
-      "acceptance_id": "activity-hierarchy",
-      "criterion": "Reasoning, command, file-change, subagent, and failure items use compact Chat-like human labels and disclosure hierarchy; completed details are collapsed by default, active and failed states remain immediately legible, raw Markdown is parsed where appropriate, and technical details remain keyboard-accessible on demand."
+      "acceptance_id": "space-list-containment",
+      "criterion": "At the production 226px rail and compact 196px rail, long ASCII and CJK Space or Thread names never widen the navigation, create horizontal scrolling, cover controls, or break selected and hover states; the complete name remains available from keyboard focus and pointer hover.",
+      "identity": "sha256:bbf4c2ec1b5635145c358c855a488e424621a58aac44e5a00917b31a6494e0dc",
+      "revision": 1,
+      "state": "active"
     },
     {
       "acceptance_id": "visual-behavior-regression",
-      "criterion": "Production-backed unit and desktop E2E evidence proves title containment without horizontal overflow, complete-title discovery, parsed table and Reasoning content, compact activity presentation, and retention of the delivered Focus, Overview, Fork, Voice, Diff, streaming, scroll-restoration, and approval behavior."
+      "criterion": "Production-backed unit and desktop E2E evidence proves title containment without horizontal overflow, complete-title discovery, parsed table and Reasoning content, compact activity presentation, and retention of the delivered Focus, Overview, Fork, Voice, Diff, streaming, scroll-restoration, and approval behavior.",
+      "identity": "sha256:990c99255b8a6ec2fdb6c7deb5d47b8a21f626def7b94719ef0ecf209826e89d",
+      "revision": 1,
+      "state": "active"
     }
   ],
+  "active_contract_revision": 1,
   "constraints": [
     "Use the preserved Demo as the authority for material, spacing, restraint, and overall visual direction; this repair must not introduce a competing redesign.",
     "Use ChatGPT and Codex interaction conventions only as a behavioral reference for content hierarchy and disclosure, without copying branding or assets.",
@@ -47,10 +63,43 @@
       "ref": "docs/product/source/peel-demo-v0-original.html"
     }
   ],
+  "contract_revisions": [
+    {
+      "acceptance_revisions": [
+        {
+          "acceptance_id": "activity-hierarchy",
+          "identity": "sha256:fc2682ba2c13c0ad9e20972f2d8952f970042a417a1e1d7e8512cf5a7da6e3b0",
+          "revision": 1
+        },
+        {
+          "acceptance_id": "current-thread-identity",
+          "identity": "sha256:d89b9d7e5ffe746b2e1566d15fb804734a329fa293e8983e0ceeeae8cef49321",
+          "revision": 1
+        },
+        {
+          "acceptance_id": "markdown-gfm-fidelity",
+          "identity": "sha256:9a5b48239afb97aeead01f2bfd730a420dd49833bba82bc27e7d02dba7dadfa7",
+          "revision": 1
+        },
+        {
+          "acceptance_id": "space-list-containment",
+          "identity": "sha256:bbf4c2ec1b5635145c358c855a488e424621a58aac44e5a00917b31a6494e0dc",
+          "revision": 1
+        },
+        {
+          "acceptance_id": "visual-behavior-regression",
+          "identity": "sha256:990c99255b8a6ec2fdb6c7deb5d47b8a21f626def7b94719ef0ecf209826e89d",
+          "revision": 1
+        }
+      ],
+      "identity": "sha256:929de990906d2e72bdc32ff549aa5bbb2d9c87adb456d9527797a72abfa20058",
+      "revision": 1
+    }
+  ],
+  "deliveries": [],
   "kind": "ticket",
   "maturity": "firm",
   "outcome": "Peel Focus Chat becomes a first-class readable conversation surface with contained navigation, discoverable long titles, safe full Markdown rendering, and compact human activity hierarchy aligned with the approved Demo.",
-  "deliveries": [],
   "provenance_refs": [
     "conversation:2026-08-26-focus-chat-ui-dogfood"
   ],
@@ -61,6 +110,7 @@
       "type": "depends_on"
     }
   ],
-  "schema_version": 2,
+  "revision_state": "bound",
+  "schema_version": 3,
   "ticket_id": "ticket-fix-focus-chat-content-and-navigation"
 }

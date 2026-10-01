@@ -3,6 +3,20 @@
     "supported-server-draft-lifecycle",
     "switch-cancel-and-fallback-safety"
   ],
+  "acceptance_revisions": [
+    {
+      "acceptance_id": "supported-server-draft-lifecycle",
+      "identity": "sha256:4fea3e2d5e5fe256d443caae3fa4283f80fa004558e43f6a02f9fabf7899cecc",
+      "revision": 1
+    },
+    {
+      "acceptance_id": "switch-cancel-and-fallback-safety",
+      "identity": "sha256:357cceb2d71a47b7faad80b87b85383d61bfdd651582f84707768c15d5f5af8f",
+      "revision": 1
+    }
+  ],
+  "binding_origin": "reconstructed",
+  "binding_state": "bound",
   "evidence_id": "evidence-realtime-draft-and-cancellation-safety",
   "kind": "ticket_evidence",
   "origin": "agent",
@@ -17,7 +31,7 @@
     "apps/desktop/test/audio.test.ts",
     "apps/desktop/e2e/v01-journey.spec.ts"
   ],
-  "schema_version": 1,
-  "summary": "The supported Server lifecycle sends measured PCM16 chunks with sample metadata, accepts only user-role transcript deltas/completions, and merges the finished transcript into the latest editable Draft without auto-send or thread/turn/start. Ordered audio append and concurrent Draft typing are preserved. Thread switch, unmount, recorder interruption, append failure, permission denial, active Server error, and explicit cancel close the matching session and cannot write into another Thread. Append failures reset the recorder UI as soon as the failed audio request returns; Thread changes reset voice state, levels, and feedback so the newly selected Composer is immediately retryable while the original Draft restores on return. Tests cover fragmented transcript assembly, role filtering, exact thread isolation, start/append/server-error cleanup, active recording Thread switch, cancellation, Draft merge, fallback, and native regression."
-  ,"ticket_id": "ticket-integrate-codex-realtime-dictation"
+  "schema_version": 2,
+  "summary": "The supported Server lifecycle sends measured PCM16 chunks with sample metadata, accepts only user-role transcript deltas/completions, and merges the finished transcript into the latest editable Draft without auto-send or thread/turn/start. Ordered audio append and concurrent Draft typing are preserved. Thread switch, unmount, recorder interruption, append failure, permission denial, active Server error, and explicit cancel close the matching session and cannot write into another Thread. Append failures reset the recorder UI as soon as the failed audio request returns; Thread changes reset voice state, levels, and feedback so the newly selected Composer is immediately retryable while the original Draft restores on return. Tests cover fragmented transcript assembly, role filtering, exact thread isolation, start/append/server-error cleanup, active recording Thread switch, cancellation, Draft merge, fallback, and native regression.",
+  "ticket_id": "ticket-integrate-codex-realtime-dictation"
 }
