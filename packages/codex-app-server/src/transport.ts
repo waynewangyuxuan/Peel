@@ -2,7 +2,7 @@ import { spawn } from "node:child_process";
 import { EventEmitter } from "node:events";
 import { access } from "node:fs/promises";
 import { constants as fsConstants } from "node:fs";
-import { delimiter, isAbsolute } from "node:path";
+import { delimiter, dirname, isAbsolute } from "node:path";
 import type { Readable, Writable } from "node:stream";
 
 import type {
@@ -121,6 +121,17 @@ export function allowlistedEnvironment(source: NodeJS.ProcessEnv = process.env):
   return result;
 }
 
+const WELL_KNOWN_BIN_DIRS = ["/opt/homebrew/bin", "/usr/local/bin"];
+
+// Apps launched from Finder inherit a minimal PATH, so a `#!/usr/bin/env node`
+// Codex shim cannot find node unless its own directory is on PATH.
+export function codexEnvironment(binary: string, source: NodeJS.ProcessEnv = process.env): NodeJS.ProcessEnv {
+  const env = allowlistedEnvironment(source);
+  const entries = [dirname(binary), ...(env.PATH ?? "").split(delimiter), ...WELL_KNOWN_BIN_DIRS].filter(Boolean);
+  env.PATH = [...new Set(entries)].join(delimiter);
+  return env;
+}
+
 async function executable(path: string): Promise<boolean> {
   try {
     await access(path, fsConstants.X_OK);
@@ -141,8 +152,7 @@ export async function resolveCodexBinary(
   }
 
   const candidates = [
-    "/opt/homebrew/bin/codex",
-    "/usr/local/bin/codex",
+    ...WELL_KNOWN_BIN_DIRS.map((entry) => `${entry}/codex`),
     ...(env.PATH ?? "")
       .split(delimiter)
       .filter(Boolean)
@@ -325,15 +335,16 @@ export class AppServerTransport extends EventEmitter {
 
   async #spawnAndInitialize(): Promise<InitializeResponse> {
     const factory = this.#options.processFactory ?? defaultProcessFactory;
+    const binary = this.#binary ?? (() => { throw new Error("Codex binary was not resolved"); })();
     const child = factory(
-      this.#binary ?? (() => { throw new Error("Codex binary was not resolved"); })(),
+      binary,
       [
         "app-server",
         "--stdio",
         ...(this.#options.enabledFeatures ?? ["realtime_conversation"])
           .flatMap((feature) => ["--enable", feature]),
       ],
-      allowlistedEnvironment(this.#options.env),
+      codexEnvironment(binary, this.#options.env),
     );
     this.#process = child;
     this.#buffer = "";

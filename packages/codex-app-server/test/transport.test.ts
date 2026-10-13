@@ -8,6 +8,7 @@ import {
   AppServerRpcError,
   AppServerTransport,
   allowlistedEnvironment,
+  codexEnvironment,
 } from "../src/transport.js";
 import { FakeProcess } from "./fixtures.js";
 
@@ -112,4 +113,13 @@ test("environment inheritance is allowlisted", () => {
   assert.equal(result.PATH, "/bin");
   assert.equal(result.OPENAI_API_KEY, undefined);
   assert.equal(result.RANDOM_SECRET, undefined);
+});
+
+test("Codex PATH reaches the binary's own directory under a Finder launch", () => {
+  const result = codexEnvironment("/opt/homebrew/bin/codex", {
+    PATH: "/usr/bin:/bin:/usr/sbin:/sbin",
+    OPENAI_API_KEY: "must-not-leak",
+  });
+  assert.equal(result.PATH, "/opt/homebrew/bin:/usr/bin:/bin:/usr/sbin:/sbin:/usr/local/bin");
+  assert.equal(result.OPENAI_API_KEY, undefined);
 });
